@@ -37,3 +37,6 @@ Thumbs.db
 .coverage
 htmlcov/
 
+
+db.sqlite3
+*.sqlite3
