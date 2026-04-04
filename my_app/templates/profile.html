@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profil | BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: var(--bg-surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.profile-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+    color: var(--accent);
+}
+
+.profile-info {
+    text-align: left;
+    background: var(--glass-bg);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: 1px solid var(--glass-border);
+}
+
+.profile-info p {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: var(--text-light);
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 10px;
+}
+
+.profile-info p strong {
+    color: var(--text-dim);
+    font-weight: 600;
+}
+
+.status span {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.vip {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.normal {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    border: 1px solid var(--glass-border);
+}
+
+.site-info {
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    color: var(--accent);
+    font-weight: 800;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <div class="profile-container">
+        <h1 class="profile-title">Foydalanuvchi Profili</h1>
+        
+        <div class="user-av" style="width: 100px; height: 100px; border-radius: 50%; background: var(--accent); margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 900;">
+            {{ user.username|make_list|first|upper }}
+        </div>
+
+        <div class="profile-info">
+            <p><strong>ID:</strong> <span>{{ user.id }}</span></p>
+            <p><strong>Username:</strong> <span>@{{ user.username }}</span></p>
+            <p><strong>Email:</strong> <span>{{ user.email }}</span></p>
+            <p><strong>Ism:</strong> <span>{{ user.first_name|default:"Kiritilmagan" }}</span></p>
+            <p><strong>Familiya:</strong> <span>{{ user.last_name|default:"Kiritilmagan" }}</span></p>
+            <p><strong>Ro‘yxatdan o‘tgan sana:</strong> <span>{{ date_joined_uz }}</span></p>
+            
+            <p class="status" style="border-bottom: none; padding-bottom: 0;">
+                <strong>Status:</strong>
+                {% if user.vip_data.vip_active %}
+                    <span class="vip">
+                        <i class='bx bx-crown'></i> VIP
+                    </span>
+                {% else %}
+                    <span class="normal">
+                        <i class='bx bx-user'></i> Oddiy
+                    </span>
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="site-info">
+            <p>Saytdagi jami foydalanuvchilar: {{ total_users }}</p>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,562 @@
+/* ==========================
+   Global reset va font
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* ==========================
+   Body va fon
+========================= */
+body {
+    background: #0b0f19;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================
+   Navbar dizayni
+========================= */
+.navbar {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: nowrap;
+}
+
+.navbar h2 {
+    font-size: 24px;
+    flex-shrink: 0;
+    color: #fff;
+}
+
+/* ==========================
+   Letter Wave animatsiyasi
+========================= */
+/* ==========================
+   BestMedia Letter Wave + Glow
+========================== */
+
+
+/* ==========================
+   Navbar linklar
+========================= */
+.navbar .nav-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: nowrap;
+}
+
+.navbar .nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.navbar .nav-links a:hover {
+    background: #00ffea;
+    color: #000;
+}
+
+.navbar .nav-links a.btn-profile {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ==========================
+   Navbar logo wave + glow
+========================= */
+
+.animated-logo span {
+    display: inline-block;
+    color: #fff;
+    text-shadow: 0 0 5px #00ffea, 0 0 10px #00ffea;
+    animation: wave 1.2s infinite, glow 1.5s ease-in-out infinite alternate;
+    animation-delay: calc(0.1s * var(--i)); /* harf ketma-ket tepishi uchun */
+}
+
+/* Harf tepish animatsiyasi (Wave) */
+@keyframes wave {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+}
+
+/* Harf yaltirash animatsiyasi (Glow) */
+@keyframes glow {
+    0% { text-shadow: 0 0 5px #00ffea, 0 0 10px #00ffea; }
+    50% { text-shadow: 0 0 15px #00ffea, 0 0 30px #00ffea; }
+    100% { text-shadow: 0 0 5px #00ffea, 0 0 10px #00ffea; }
+}
+/* ==========================
+   Container va grid layout
+========================= */
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(3, 1fr); /* Desktop: 3 card */
+}
+
+/* ==========================
+   Card dizayni 9:16
+========================= */
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 255, 234, 0.3);
+}
+
+.card img {
+    width: 100%;
+    aspect-ratio: 9 / 16; /* Telefon va kompyuter uchun 9:16 */
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+}
+
+/* Desktop maksimal balandlik */
+@media (min-width: 1024px) {
+    .card img {
+        max-height: 300px;
+    }
+}
+
+/* Tablet / Mobil: ixcham card */
+@media (max-width: 1023px) {
+    .card img {
+        max-height: 220px;
+    }
+}
+
+.card-content {
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-content h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.card-content p {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.btn-watch {
+    text-align: center;
+    display: inline-block;
+    padding: 10px 15px;
+    background: #00ffea;
+    color: #000;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-watch:hover {
+    background: #00e6cc;
+}
+
+/* ==========================
+   Load More / Barchasi tugmalari
+========================= */
+.load-more-wrapper {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.load-more-wrapper button {
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #28a745;
+    color: #fff;
+}
+
+.load-more-wrapper button:hover {
+    transform: scale(1.05);
+    background-color: #218838;
+}
+
+.load-more-wrapper button:active {
+    transform: scale(0.98);
+    background-color: #1e7e34;
+}
+
+/* Barcha yopish tugmasi rang */
+.load-more-wrapper .close-btn {
+    background-color: #ff4d4d;
+}
+
+.load-more-wrapper .close-btn:hover {
+    background-color: #cc0000;
+    color: #fff;
+}
+
+/* ==========================
+   Sidebar zamonaviy + hover/zoom + Dark/Light (navbar/footer doim qora)
+========================== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background: rgba(0,0,0,0.9); /* doim qora */
+    backdrop-filter: blur(10px);
+    padding: 20px 0;
+    transition: 0.3s ease;
+    z-index: 200;
+    overflow-y: auto;
+}
+
+/* Navbar ichidagi menu icon */
+#menu-btn {
+    font-size: 36px; /* kattalik px da, xohlasang 40px yoki 50px qilsa bo‘ladi */
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+/* Hover effekti */
+#menu-btn:hover {
+    transform: scale(1.2); /* bosilganda yoki hoverda biroz kattalashadi */
+    color: #00ffea; /* neon rang yoki xohlagan rang */
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar-links {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-links li {
+    margin: 0;
+}
+
+.sidebar-links li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 25px;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.sidebar-links li a:hover {
+    transform: scale(1.05);
+    background: rgba(0,255,234,0.2);
+    color: #00ffea;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 5px 0;
+}
+
+.overlay {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.5);
+    opacity:0;
+    visibility:hidden;
+    transition:0.3s ease;
+    z-index:100;
+}
+
+.overlay.active {
+    opacity:1;
+    visibility:visible;
+}
+/* Sidebar pastida versiya */
+/* Sidebar pastida versiya */
+.sidebar-version {
+    text-align: center;
+    color: rgba(255,255,255,0.7); /* biroz ko‘proq ko‘rinadigan rang */
+    font-size: 16px; /* kattaroq shrift */
+    margin-top: 25px; /* pastga biroz bo‘sh joy */
+    pointer-events: none; /* bosilmaydi */
+    font-weight: 600; /* qalinroq shrift */
+}
+
+/* Sidebar oxirgi ko‘rilganlar */
+.sidebar-recent {
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 20px;
+}
+
+.sidebar-recent h4 {
+    color: #00ffea;
+    font-size: 16px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#recent-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.recent-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.05);
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.recent-card:hover {
+    background: rgba(0,255,234,0.2);
+}
+
+.recent-card img {
+    width: 40px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.recent-card span {
+    color: #fff;
+    font-size: 14px;
+}
+
+/* Sidebar versiya */
+.sidebar-version {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+}
+
+/* Dark / Light mode: faqat body fonini o'zgartiradi, navbar/footer/sidebar qora qoladi */
+body.light {
+    background: #f5f5f5;
+    color: #111;
+}
+
+body.light .card {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(0,0,0,0.1);
+    color: #111;
+}
+
+body.light .btn-watch {
+    background-color: #00c0ff;
+    color: #000;
+}
+
+body.light .btn-watch:hover {
+    background-color: #00a0cc;
+}
+
+/* Footer va navbar qora rangda qoladi */
+.navbar, .sidebar, footer {
+    background: rgba(0,0,0,0.9) !important;
+    color: #fff !important;
+}
+
+body.light .navbar a, body.light footer a {
+    color: #fff; /* linklar qora bo'lmasin */
+}
+
+/* Theme toggle icon */
+#theme-toggle {
+    cursor: pointer;
+    font-size: 22px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.3);
+    color: #00ffea;
+    transition: all 0.3s ease;
+}
+
+#theme-toggle:hover {
+    background: rgba(0,0,0,0.5);
+    transform: scale(1.1);
+}
+
+/* ==========================
+   Footer dizayni
+========================= */
+footer {
+    background: rgba(0,0,0,0.8);
+    padding: 30px 20px;
+    text-align: center;
+    color: #fff;
+    margin-top: auto; /* Footer sahifa oxirida turadi */
+}
+
+footer h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+footer p {
+    font-size: 16px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.footer-btn {
+    padding: 10px 20px;
+    background: #444;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+/* Footer tugma hover: zoom + rang o'zgarishi */
+.footer-btn:hover {
+    transform: scale(1.1);
+    background-color: #28a745;
+    color: #fff;
+}
+
+.nav-links a:hover {
+    animation: bounce 0.5s;
+}
+
+@keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+    50% { transform: translateY(0); }
+}
+
+/* ==========================
+   Categories tugmalari
+========================= */
+.categories {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    padding: 15px 20px;
+    overflow-x: auto;
+    background: #0b0f19;
+}
+
+.category-btn {
+    padding: 8px 18px;
+    background: #1a1f2e;
+    color: white;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.category-btn:hover {
+    background: #ff3d3d;
+    color: #fff;
+}
+
+.category-btn.active {
+    background: #00ffea;
+    color: #000;
+    font-weight: 600;
+}
+
+/* ==========================
+   Responsive dizayn
+========================= */
+@media (min-width: 1024px) {
+    .container {
+        grid-template-columns: repeat(3, 1fr); /* Desktop: 3 card */
+    }
+}
+
+@media (max-width: 1023px) {
+    .container {
+        grid-template-columns: repeat(2, 1fr); /* Tablet / telefon: 2 card */
+    }
+}
+
+@media (max-width: 600px) {
+    .navbar {
+        padding: 15px 15px;
+    }
+
+    .navbar h2 {
+        font-size: 20px;
+    }
+
+    .nav-links a {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .load-more-wrapper button {
+        width: 95%;
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+}
+

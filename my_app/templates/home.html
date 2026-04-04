@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}BESTMEDIA - Bosh Sahifa{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ----- HERO SLIDER ----- */
+    .slider-container {
+        position: relative;
+        width: 100%;
+        height: 75vh;
+        overflow: hidden;
+    }
+
+    .slides-wrapper {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .slide {
+        min-width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        padding: 5% 5% 8% 5%;
+        overflow: hidden;
+    }
+
+    .slide-bg {
+        position: absolute;
+        top: -10%;
+        left: -10%;
+        width: 120%;
+        height: 120%;
+        background-size: cover;
+        background-position: center;
+        z-index: 1;
+        transition: transform 0.1s linear;
+    }
+
+    .slide-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(to right, rgba(15,15,19,0.95) 0%, rgba(15,15,19,0.4) 50%, transparent 100%),
+                    linear-gradient(to top, rgba(15,15,19,1) 0%, transparent 40%);
+    }
+
+    .slide-content {
+        position: relative;
+        z-index: 10;
+        max-width: 700px;
+    }
+
+    .tags {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .tag {
+        background: rgba(0, 243, 255, 0.15);
+        color: var(--accent);
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        border: 1px solid rgba(0, 243, 255, 0.3);
+    }
+
+    .tag.rating {
+        background: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+        border-color: rgba(255, 193, 7, 0.3);
+    }
+
+    .slide-title {
+        font-size: 4rem;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 15px;
+        text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+
+    .slide-desc {
+        font-size: 1.1rem;
+        color: var(--text-dim);
+        line-height: 1.6;
+        margin-bottom: 25px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .btn-main {
+        padding: 14px 30px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 800;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+        box-shadow: 0 8px 25px rgba(0, 243, 255, 0.3);
+        text-decoration: none;
+    }
+
+    .btn-main:hover {
+        background: var(--accent-hover);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 243, 255, 0.5);
+    }
+
+    .slider-controls {
+        position: absolute;
+        bottom: 30px;
+        right: 5%;
+        display: flex;
+        gap: 10px;
+        z-index: 20;
+    }
+
+    .dot {
+        width: 30px;
+        height: 4px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 2px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .dot.active {
+        background: var(--accent);
+        width: 50px;
+    }
+
+    /* ----- MAIN CONTENT ----- */
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 5%;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin: 40px 0 30px 0;
+    }
+
+    .section-title h3 {
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+
+    .section-title span {
+        color: var(--accent);
+    }
+
+    .view-all {
+        color: var(--text-dim);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+    }
+
+    .view-all:hover {
+        color: var(--text-light);
+    }
+
+    /* ----- YANGILANGAN KARTOCHKALAR (HOVER EFFEKTLI) ----- */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+        padding-bottom: 50px;
+    }
+
+    .card-wrapper {
+         text-decoration: none;
+         color: inherit;
+         display: flex;
+         flex-direction: column;
+         gap: 8px;
+    }
+
+    .anime-card {
+        width: 100%;
+        height: 270px;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        background: var(--bg-surface);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-wrapper:hover .anime-card {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .anime-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .card-wrapper:hover .anime-card img {
+        transform: scale(1.05);
+    }
+
+    .anime-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(13,13,18,0.9) 0%, transparent 40%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .card-wrapper:hover .anime-card::after {
+        opacity: 1;
+    }
+
+    .top-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: #eab308;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #000;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .badge-quality {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--accent);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: white;
+        z-index: 10;
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    }
+
+    .card-info-bottom {
+         display: flex;
+         flex-direction: column;
+         gap: 2px;
+    }
+
+    .card-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--text-light);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color 0.3s ease;
+    }
+
+    .card-wrapper:hover .card-title {
+         color: var(--accent);
+    }
+
+    .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-dim);
+    }
+
+    .tag-jp { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 3px; color: var(--text-light); font-size: 0.65rem; font-weight: 800;}
+
+    @media (max-width: 1024px) {
+        .slide-title { font-size: 3rem; }
+    }
+    @media (max-width: 768px) {
+        .slider-container { height: 60vh; }
+        .slide { padding: 4% 4% 12% 4%; }
+        .slide-title { font-size: 2.2rem; }
+        .slide-desc { font-size: 0.9rem; -webkit-line-clamp: 2; }
+        .btn-main { padding: 12px 22px; font-size: 0.9rem; }
+        
+        .section-title h3 { font-size: 1.3rem; }
+        .section-header { margin: 25px 0 15px 0; }
+        .cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+        .anime-card { height: 220px; }
+    }
+    @media (max-width: 480px) {
+        .slider-container { height: 55vh; }
+        .slide-title { font-size: 1.7rem; }
+        .slider-controls { bottom: 15px; }
+        .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .anime-card { height: 190px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="slider-container">
+    <div class="slides-wrapper" id="slidesWrapper">
+        {% for anime in movies|slice:":3" %}
+        <div class="slide">
+             <div class="slide-bg" style="background-image: url('{% if anime.image %}{{ anime.image.url }}{% else %}/static/images/default.jpg{% endif %}');"></div>
+             <div class="slide-overlay"></div>
+
+            <div class="slide-content">
+                <div class="tags">
+                    <span class="tag">YANGI</span>
+                    <span class="tag rating">★ {{ anime.rating|default:"0" }}</span>
+                    <span class="tag">{{ anime.release_year }}</span>
+                    {% if anime.episodes.count > 0 %}
+                    <span class="tag">{{ anime.episodes.count }} qism</span>
+                    {% endif %}
+                </div>
+                <h1 class="slide-title">{{ anime.title }}</h1>
+                <p class="slide-desc">{{ anime.description|truncatechars:180 }}</p>
+                <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
+                    ▶ Hozir ko'rish
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="slider-controls" id="sliderDots">
+        {% for anime in movies|slice:":3" %}
+        <div class="dot {% if forloop.first %}active{% endif %}" onclick="goToSlide({{ forloop.counter0 }})"></div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container" id="new-releases">
+    <div class="section-header">
+        <div class="section-title">
+            <h3>Yangi <span>Qo'shilganlar</span></h3>
+        </div>
+        <a href="{% url 'search' %}" class="view-all">Barchasini ko'rish →</a>
+    </div>
+
+    <div class="cards-grid">
+        {% for anime in movies %}
+        <a href="{% url 'movie_detail' anime.id %}" class="card-wrapper">
+            <div class="anime-card">
+                <div class="top-badge">★ {{ anime.rating|default:"8.7" }}</div>
+                {% if anime.episodes.count > 0 %}
+                <div class="badge-quality">HD</div>
+                {% else %}
+                <div class="badge-quality">HD</div>
+                {% endif %}
+                <img src="{% if anime.image %}{{ anime.image.url }}{% else %}/static/images/default.jpg{% endif %}" alt="{{ anime.title }}">
+            </div>
+
+            <div class="card-info-bottom">
+                 <h4 class="card-title">{{ anime.title }}</h4>
+                  <div class="card-meta">
+                       <span class="tag-jp">JP</span>
+                       <span>{{ anime.release_year|default:"2024" }}</span>
+                  </div>
+            </div>
+        </a>
+        {% empty %}
+        <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">Hozircha animelar kiritilmadi.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    const wrapper = document.getElementById('slidesWrapper');
+    const dots = document.querySelectorAll('.dot');
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    function goToSlide(index) {
+        if (totalSlides === 0) return;
+        currentSlide = index;
+        wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+        dots.forEach(dot => dot.classList.remove('active'));
+        if (dots[currentSlide]) {
+            dots[currentSlide].classList.add('active');
+        }
+    }
+
+    if(totalSlides > 1) {
+        setInterval(() => {
+            let nextSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(nextSlide);
+        }, 5000);
+    }
+
+    // Parallax Effect
+    window.addEventListener('scroll', () => {
+        let scrollY = window.scrollY;
+        if (scrollY < 800) {
+            const bgs = document.querySelectorAll('.slide-bg');
+            bgs.forEach(bg => {
+                 bg.style.transform = `translateY(${scrollY * 0.4}px) scale(${1 + scrollY * 0.0005})`;
+            });
+        }
+    });
+</script>
+{% endblock %}

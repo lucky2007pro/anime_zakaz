@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BESTMEDIA Admin Dashboard{% endblock %}</title>
+    <!-- Include fonts and icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --bg-card: #09090b;
+            --accent: #00f3ff;
+            --accent-secondary: #b000ff;
+            --accent-glow: rgba(0, 243, 255, 0.5);
+            --text-main: #ffffff;
+            --text-dim: #8892b0;
+            --border-line: #1e1e24;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px; background: #050505;
+            border-right: 1px solid var(--border-line); display: flex; flex-direction: column; padding: 30px 20px;
+        }
+        .brand { font-size: 1.8rem; font-weight: 900; margin-bottom: 5px; color: white; text-decoration: none; display:block; letter-spacing: 2px;}
+        .brand span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
+        .brand-sub { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 40px; display:block;}
+        
+        .menu-title { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 15px; letter-spacing: 2px; }
+        .menu-list { list-style: none; margin-bottom: 30px; }
+        .menu-list li { margin-bottom: 10px; }
+        .menu-list a {
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+            color: var(--text-dim); text-decoration: none; border-radius: 12px;
+            font-weight: 600; transition: all 0.3s ease;
+        }
+        .menu-list a:hover {
+            color: var(--accent); background: #0a0a0f; transform: translateX(5px); border-left: 2px solid var(--accent);
+        }
+        .menu-list a.active {
+            color: #000; background: var(--accent);
+            border-left: none; box-shadow: 0 0 15px var(--accent-glow); font-weight: 800;
+        }
+        .menu-list a i { font-size: 1.4rem; }
+        
+        .sidebar-bottom { margin-top: auto; }
+        .logout-btn { display: flex; align-items: center; gap: 10px; color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: 0.3s;}
+        .logout-btn:hover { color: #ff3b30; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; overflow-y: auto;
+            background: linear-gradient(135deg, #050510 0%, #000000 100%);
+        }
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; border-bottom: 1px solid var(--border-line);
+            background: rgba(0, 0, 0, 0.9); position: sticky; top: 0; z-index: 10;
+        }
+        .page-title { font-size: 1.2rem; font-weight: 600; color: white; text-transform: uppercase; letter-spacing: 1px;}
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-role { font-size: 0.75rem; font-weight: 800; background: var(--border-line); color: var(--accent); padding: 5px 12px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,243,255,0.2);}
+
+        .content-area { padding: 40px; }
+
+        /* GLOBALS */
+        .glass-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-line); border-radius: 8px;
+            padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <a href="{% url 'home' %}" class="brand">BEST<span>MEDIA</span></a>
+        <span class="brand-sub">Admin panel</span>
+
+        <h4 class="menu-title">UMUMIY</h4>
+        <ul class="menu-list">
+            <li><a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"><i class='bx bxs-dashboard'></i> Dashboard</a></li>
+        </ul>
+
+        <h4 class="menu-title">KONTENT</h4>
+        <ul class="menu-list">
+            <li><a href="{% url 'admin_genres' %}" class="{% if request.resolver_match.url_name == 'admin_genres' %}active{% endif %}"><i class='bx bxs-category'></i> Janrlar</a></li>
+            <li><a href="{% url 'admin_movies' %}" class="{% if request.resolver_match.url_name == 'admin_movies' or request.resolver_match.url_name == 'admin_movie_form' %}active{% endif %}"><i class='bx bx-movie-play'></i> Animelar</a></li>
+            <li><a href="{% url 'admin_episodes' %}" class="{% if request.resolver_match.url_name == 'admin_episodes' or request.resolver_match.url_name == 'admin_episode_form' %}active{% endif %}"><i class='bx bx-list-ol'></i> Qismlar</a></li>
+            <li><a href="{% url 'admin_chat' %}" class="{% if request.resolver_match.url_name == 'admin_chat' %}active{% endif %}"><i class='bx bx-message-dots'></i> Chat</a></li>
+        </ul>
+
+        <div class="sidebar-bottom">
+            <a href="{% url 'home' %}" class="logout-btn"><i class='bx bx-arrow-back'></i> Saytga qaytish</a>
+            <div style="margin-top:15px; font-size:0.8rem; color: #555;">{{ request.user.username }} (#{{ request.user.id }})</div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="page-title">Admin / {% block page_title %}Dashboard{% endblock %}</div>
+            <div class="user-info">
+                <div class="user-role">{% if request.user.is_superuser %}Superadmin{% else %}Staff{% endif %}</div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+</body>
+</html>

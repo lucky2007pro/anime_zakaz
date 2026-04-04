@@ -1,0 +1,212 @@
+/* ==========================
+   Global Reset
+========================== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Poppins", sans-serif;
+}
+
+/* ==========================
+   Body
+========================== */
+body{
+    background:#0b0f19;
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+/* ==========================
+   Navbar
+========================== */
+.navbar{
+    width:100%;
+    background:#111827;
+    padding:14px 20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.5);
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+.nav-container{
+    max-width:1200px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.nav-logo{
+    color:#2563eb;
+    font-size:22px;
+    font-weight:600;
+    text-decoration:none;
+}
+
+.nav-link{
+    color:#fff;
+    text-decoration:none;
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:0.3s;
+}
+
+.nav-link:hover{
+    color:#2563eb;
+}
+
+/* ==========================
+   Main Wrapper
+========================== */
+.main-wrapper{
+    flex:1;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:30px 15px;
+}
+
+/* ==========================
+   Container
+========================== */
+.profile-container{
+    width:100%;
+    max-width:650px;
+}
+
+/* ==========================
+   Title
+========================== */
+.profile-title{
+    text-align:center;
+    margin-bottom:25px;
+    font-size:32px;
+}
+
+/* ==========================
+   Profile Card
+========================== */
+.profile-card{
+    background:#111827;
+    padding:35px;
+    border-radius:16px;
+    box-shadow:0 12px 35px rgba(0,0,0,0.6);
+}
+
+/* ==========================
+   Profile Info
+========================== */
+.profile-info p{
+    margin-bottom:14px;
+    font-size:17px;
+    line-height:1.5;
+    word-break:break-word;
+}
+
+/* ==========================
+   Status
+========================== */
+.status{
+    margin-top:10px;
+    font-size:18px;
+}
+
+.vip{
+    color:gold;
+    font-weight:600;
+}
+
+.normal{
+    color:#cbd5e1;
+}
+
+/* ==========================
+   Site Info
+========================== */
+.site-info{
+    margin-top:25px;
+    padding-top:20px;
+    border-top:1px solid #2a2f3a;
+    font-size:16px;
+}
+
+/* ==========================
+   Tablet
+========================== */
+@media (max-width:768px){
+
+    .profile-title{
+        font-size:28px;
+    }
+
+    .profile-card{
+        padding:28px;
+    }
+
+    .profile-info p{
+        font-size:16px;
+    }
+
+}
+
+/* ==========================
+   Mobile
+========================== */
+@media (max-width:480px){
+
+    .main-wrapper{
+        padding:20px 10px;
+    }
+
+    .profile-title{
+        font-size:24px;
+    }
+
+    .profile-card{
+        padding:22px;
+        border-radius:14px;
+    }
+
+    .profile-info p{
+        font-size:15px;
+    }
+
+    .status{
+        font-size:16px;
+    }
+
+    .site-info{
+        font-size:14px;
+    }
+
+    .nav-logo{
+        font-size:18px;
+    }
+
+    .nav-link{
+        font-size:14px;
+    }
+
+}
+
+/* ==========================
+   Large Screens
+========================== */
+@media (min-width:1400px){
+
+    .profile-container{
+        max-width:720px;
+    }
+
+    .profile-card{
+        padding:40px;
+    }
+
+}

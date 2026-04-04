@@ -1,0 +1,64 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}{% if episode %}Qismni Tahrirlash{% else %}Yangi Qism Qo'shish{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container { max-width: 600px; margin: 0 auto; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--text-dim); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    
+    .form-control {
+        width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-line);
+        color: white; border-radius: 4px; font-family: 'Outfit'; font-size: 1rem; transition: 0.3s;
+    }
+    .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+    
+    .select-control { appearance: none; }
+    
+    .btn-submit {
+        background: var(--accent); color: black; border: none; padding: 14px 20px; border-radius: 4px;
+        width: 100%; font-weight: 900; font-size: 1rem; cursor: pointer; transition: 0.3s;
+        text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .btn-submit:hover { background: white; box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel form-container">
+    <h2 style="margin-bottom: 25px; font-size: 1.8rem; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--border-line); padding-bottom: 10px;">
+        {% if episode %}Qismni Tahrirlash ({{ episode.episode_number }}){% else %}Yangi Qism Qo'shish{% endif %}
+    </h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Qaysi Animaga tegishli?</label>
+            <select name="movie" class="form-control select-control" required>
+                <option value="">Anima tanlang...</option>
+                {% for m in movies %}
+                <option value="{{ m.id }}" {% if episode and episode.movie_id == m.id %}selected{% endif %}>{{ m.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group" style="display:flex; gap: 20px;">
+            <div style="flex:1;">
+                <label>Qism raqami</label>
+                <input type="number" name="episode_number" class="form-control" required value="{{ episode.episode_number|default:'1' }}" min="1">
+            </div>
+            <div style="flex:2;">
+                <label>Nomlanishi (ixtiyoriy)</label>
+                <input type="text" name="title" class="form-control" value="{{ episode.title|default:'' }}" placeholder="Masalan: Qahramonning uyg'onishi">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Video URL (Bunny.net/CDN linki)</label>
+            <input type="url" name="video_url" class="form-control" required value="{{ episode.video_url|default:'' }}" placeholder="https://...">
+        </div>
+        
+        <button type="submit" class="btn-submit">SAQLASH <i class='bx bx-save'></i></button>
+    </form>
+</div>
+{% endblock %}

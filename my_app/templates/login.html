@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Kirish - BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+.bg-video, .bg-image {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0.3; /* blend with dark background */
+}
+
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    padding: 20px;
+}
+
+.messages {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.messages li {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.messages li.success { background: rgba(40, 167, 69, 0.2); border: 1px solid #28a745; color: #28a745; }
+.messages li.error { background: rgba(220, 53, 69, 0.2); border: 1px solid #dc3545; color: #dc3545; }
+
+.input-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-box i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 1.2rem;
+}
+
+.input-box .toggle-password {
+    right: 40px;
+    cursor: pointer;
+}
+
+.input-box .toggle-password:hover {
+    color: var(--accent);
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 25px;
+    color: var(--text-dim);
+}
+
+.remember-forgot label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.remember-forgot a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.remember-forgot a:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% if site_settings %}
+    {% if site_settings.background_video %}
+        <video autoplay muted loop class="bg-video">
+            <source src="{{ site_settings.background_video.url }}" type="video/mp4">
+        </video>
+    {% elif site_settings.background_image %}
+        <div class="bg-video bg-image" style="background-image: url('{{ site_settings.background_image.url }}');"></div>
+    {% endif %}
+{% endif %}
+
+<main class="main-content" style="margin-top: 0; display:flex; align-items:center;">
+    <div class="auth-wrapper" style="width: 100%;">
+        <div class="auth-container">
+            <h2>Kirish</h2>
+
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                <div class="input-box form-group">
+                    <input type="text" name="username" class="form-control" placeholder="Username" required>
+                    <i class='bx bx-user-circle'></i>
+                </div>
+
+                <div class="input-box form-group">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Parol" required>
+                    <i class='bx bx-lock'></i>
+                    <i class='bx bxs-low-vision toggle-password' id="togglePassword"></i>
+                </div>
+
+                <div class="remember-forgot">
+                    <label><input type="checkbox" name="remember"> Eslab qolish</label>
+                    <a href="{% url 'register' %}">Ro'yxatdan o'tish</a>
+                </div>
+
+                <button type="submit" class="btn-submit">Kirish</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+
+    if(togglePassword && password) {
+        togglePassword.addEventListener('click', function () {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('active');
+        });
+    }
+</script>
+{% endblock %}

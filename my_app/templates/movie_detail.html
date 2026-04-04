@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ movie.title }} | BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ======================= MOVIE DETAIL STYLES ======================= */
+.movie-wrapper {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 5%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.top-bar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.movie-title {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.btn-back {
+    text-decoration: none;
+    color: white;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 800;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-back:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: translateX(-5px);
+}
+
+.video-section {
+    width: 100%;
+}
+
+.video-container {
+    width: 100%;
+    background: var(--bg-surface);
+    border-radius: 15px;
+    padding: 10px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.video-container video {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    outline: none;
+    cursor: pointer;
+}
+
+.bunny-player-wrapper {
+    position: relative;
+    padding-top: 56.25%;
+    height: 0;
+}
+
+.bunny-player-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 12px;
+}
+
+.custom-progress-wrapper {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    position: relative;
+}
+
+.custom-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+.time-display {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.episodes-box {
+    width: 100%;
+    background: var(--bg-surface);
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.episodes-box h4 {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.episode-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.episode-btn {
+    flex: 1 1 15%;
+    min-width: 60px;
+    padding: 12px 0;
+    background: var(--glass-bg);
+    color: white;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 800;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.episode-btn:hover, .active-episode-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
+}
+
+.telegram-download-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 25px 0;
+}
+
+.telegram-download-btn {
+    background: linear-gradient(45deg, #0088cc, #00aced);
+    color: #fff;
+    padding: 14px 35px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0,136,204,0.4);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.telegram-download-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,136,204,0.6);
+}
+
+.movie-info {
+    width: 100%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 25px;
+    border-radius: 15px;
+    line-height: 1.7;
+}
+
+.movie-info h4 {
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.movie-info p {
+    font-size: 1rem;
+    color: var(--text-dim);
+}
+
+.bunny-fullscreen-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: 0.3s;
+}
+
+.bunny-fullscreen-btn:hover {
+    background: var(--accent);
+}
+
+@media(max-width:992px){.episode-btn{flex:1 1 25%;}}
+@media(max-width:768px){
+    .movie-title{font-size:1.5rem;}
+    .episode-btn{flex:1 1 35%;font-size:0.9rem;}
+    .video-container video{border-radius:10px;}
+    .movie-wrapper { padding: 0 3%; }
+}
+@media(max-width:480px){
+    .top-bar{flex-direction:column;align-items:flex-start;gap:15px;}
+    .btn-back{padding:8px 16px;font-size:0.9rem;}
+    .episode-btn{flex:1 1 45%;font-size:0.85rem;}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <div class="movie-wrapper">
+        <header class="top-bar">
+            <a href="{% url 'home' %}" class="btn-back">⬅ Orqaga</a>
+            <h2 class="movie-title">{{ movie.title }}</h2>
+        </header>
+
+        <div class="video-section">
+            {% if movie.episodes.all %}
+                {% with first_episode=movie.episodes.first %}
+                <div class="video-container" id="video-container">
+                    {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
+                    <div class="bunny-player-wrapper">
+                        <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                        <button class="bunny-fullscreen-btn">⛶</button>
+                    </div>
+                    {% else %}
+                    <video id="video-player" controls>
+                        <source src="{{ first_episode.video_url }}" type="video/mp4">
+                        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+                    </video>
+                    <div class="custom-progress-wrapper mt-2"><div id="custom-progress" class="custom-progress-bar"></div></div>
+                    <div class="time-display mt-1">
+                        <span id="current-time">00:00</span>
+                        <span id="duration-time">00:00</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endwith %}
+            {% else %}
+                <p style="text-align: center; color: var(--text-dim); padding: 40px; background: var(--bg-surface); border-radius: 12px;">Hozircha video mavjud emas.</p>
+            {% endif %}
+
+            {% if movie.telegram_link %}
+            <div class="telegram-download-wrapper">
+                <a href="{{ movie.telegram_link }}" target="_blank" class="telegram-download-btn">📥 Telegramdan yuklab olish</a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if movie.episodes.all %}
+        <div class="episodes-box">
+            <h4>Qismlar</h4>
+            <div class="episode-buttons">
+                {% for episode in movie.episodes.all %}
+                <button class="episode-btn" data-video="{{ episode.video_url }}">{{ forloop.counter }}-qism</button>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="movie-info">
+            <h4>Kino haqida</h4>
+            <p>{{ movie.description|default:"Ushbu kinoni BESTMEDIA platformasida onlayn tomosha qilishingiz mumkin. Sifatli video va qulay interfeys bilan rohatlaning 🎬" }}</p>
+        </div>
+    </div>
+</main>
+
+<script>
+const episodeBtns = document.querySelectorAll('.episode-btn');
+const videoContainer = document.getElementById('video-container');
+let videoPlayer = document.getElementById('video-player');
+let iframePlayer = document.getElementById('iframe-player');
+
+function enableFullscreen(el){
+    if(el.requestFullscreen){el.requestFullscreen();}
+    else if(el.webkitRequestFullscreen){el.webkitRequestFullscreen();}
+    else if(el.msRequestFullscreen){el.msRequestFullscreen();}
+    if(window.screen.orientation && window.screen.orientation.lock){window.screen.orientation.lock('landscape').catch(()=>{});}
+}
+
+function addFullscreenButton(){
+    const fsBtn = document.querySelector('.bunny-fullscreen-btn');
+    if(fsBtn && iframePlayer){fsBtn.addEventListener('click',()=>{enableFullscreen(iframePlayer);});}
+}
+addFullscreenButton();
+
+const videoClickActions=()=>{
+    const mp4Player = document.getElementById('video-player');
+    if(!mp4Player || !iframePlayer) return;
+    let clickTimeout=null;
+    mp4Player.addEventListener('click',()=>{
+        if(clickTimeout!==null){clearTimeout(clickTimeout);clickTimeout=null;enableFullscreen(mp4Player);}
+        else{clickTimeout=setTimeout(()=>{clickTimeout=null;if(iframePlayer) iframePlayer.contentWindow.postMessage(JSON.stringify({method:'pause'}),'*');},300);}
+    });
+};
+videoClickActions();
+
+if(episodeBtns.length > 0) {
+    episodeBtns[0].classList.add('active-episode-btn');
+}
+
+episodeBtns.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        const videoSrc = btn.dataset.video;
+        if(videoSrc.includes('iframe') || videoSrc.includes('mediadelivery.net')){
+            if(iframePlayer){iframePlayer.src=videoSrc+'?autoplay=false&loop=false&muted=false&responsive=true';}
+            else{
+                videoContainer.innerHTML=`<div class="bunny-player-wrapper"><iframe id="iframe-player" src="${videoSrc}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe><button class="bunny-fullscreen-btn">⛶</button></div>`;
+                iframePlayer=document.getElementById('iframe-player');videoPlayer=null;addFullscreenButton();videoClickActions();
+            }
+        }else{
+            if(videoPlayer){videoPlayer.src=videoSrc;videoPlayer.currentTime=0;videoPlayer.play();}
+            else{
+                videoContainer.innerHTML=`<video id="video-player" controls><source src="${videoSrc}" type="video/mp4">Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.</video><div class="custom-progress-wrapper mt-2"><div id="custom-progress" class="custom-progress-bar"></div></div><div class="time-display d-flex justify-content-between mt-1"><span id="current-time">00:00</span><span id="duration-time">00:00</span></div>`;
+                videoPlayer=document.getElementById('video-player');iframePlayer=null;videoClickActions();
+            }
+        }
+        episodeBtns.forEach(b=>b.classList.remove('active-episode-btn'));
+        btn.classList.add('active-episode-btn');
+    });
+});
+</script>
+{% endblock %}

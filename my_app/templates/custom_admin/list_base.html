@@ -1,0 +1,98 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-panel { padding: 30px; }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .panel-header h2 { font-size: 1.5rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 1px; }
+    .header-actions .btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 800; cursor: pointer; text-decoration: none; text-transform: uppercase; box-shadow: 0 0 10px var(--accent-glow); transition: 0.3s;}
+    .header-actions .btn:hover { background: white; box-shadow: 0 0 15px rgba(255,255,255,0.5); }
+    
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 15px; font-size: 0.75rem; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border-line); letter-spacing: 1px;}
+    td { padding: 15px; font-size: 0.95rem; border-bottom: 1px solid #111; }
+    tr:hover td { background: #111; }
+
+    .action-btn { background: #1e1e24; color: white; border: 1px solid #333; padding: 5px 10px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 0.8rem; transition: 0.3s;}
+    .action-btn:hover { background: var(--accent); color: black; border-color: var(--accent); }
+    .action-btn.delete { background: #fee2e2; color: #ef4444; border-color: #fca5a5;}
+    .action-btn.delete:hover { background: #ef4444; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <div class="panel-header">
+        <h2>{{ page_title }} ro'yxati</h2>
+        <div class="header-actions">
+            {% if type == 'movie' %}
+            <a href="{% url 'admin_movie_form' %}" class="btn">+ Qo'shish</a>
+            {% elif type == 'episode' %}
+            <a href="{% url 'admin_episode_form' %}" class="btn">+ Qo'shish</a>
+            {% elif type == 'genre' %}
+            <a href="{% url 'admin_genre_form' %}" class="btn">+ Qo'shish</a>
+            {% else %}
+            <button class="btn" style="opacity:0.5; pointer-events:none;" title="Keyingi updatelarda qo'shiladi">+ Qo'shish</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                {% if type == 'movie' %}
+                <th>Nom</th><th>Rasmi</th><th>Sana</th><th>Harakatlar</th>
+                {% elif type == 'genre' %}
+                <th>Nomi</th><th>Sana</th><th>Harakatlar</th>
+                {% elif type == 'episode' %}
+                <th>Anime</th><th>Qism No</th><th>Nomi</th><th>Harakatlar</th>
+                {% elif type == 'chat' %}
+                <th>Foydalanuvchi</th><th>Xabar</th><th>Sana</th><th>Harakatlar</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                {% if type == 'movie' %}
+                <td style="font-weight:600;">{{ item.title }}</td>
+                <td>{% if item.image %}<img src="{{ item.image.url }}" style="height:30px; border-radius:4px;">{% else %}-{% endif %}</td>
+                <td>{{ item.created_at|date:"d.m.Y" }}</td>
+                {% elif type == 'genre' %}
+                <td style="font-weight:600;">{{ item.name }}</td>
+                <td>{{ item.created_at|date:"d.m.Y" }}</td>
+                {% elif type == 'episode' %}
+                <td style="font-weight:600;">{{ item.movie.title }}</td>
+                <td>{{ item.episode_number }}</td>
+                <td>{{ item.title|default:"-" }}</td>
+                {% elif type == 'chat' %}
+                <td style="font-weight:600;">{{ item.user.username }}</td>
+                <td>{{ item.message|truncatechars:50 }}</td>
+                <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+                {% endif %}
+                
+                <td>
+                    {% if type == 'movie' %}
+                    <a href="{% url 'admin_movie_form' item.id %}" class="action-btn">Tahrirlash</a>
+                    <a href="{% url 'admin_movie_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                    {% elif type == 'genre' %}
+                    <a href="{% url 'admin_genre_form' item.id %}" class="action-btn">Tahrirlash</a>
+                    <a href="{% url 'admin_genre_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                    {% elif type == 'episode' %}
+                    <a href="{% url 'admin_episode_form' item.id %}" class="action-btn">Tahrirlash</a>
+                    <a href="{% url 'admin_episode_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                    {% else %}
+                    <button class="action-btn" style="opacity:0.5; pointer-events:none;">Tahrirlash</button>
+                    <button class="action-btn delete" style="opacity:0.5; pointer-events:none;">O'chirish</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="text-align:center; padding:30px; color:gray;">Hech narsa topilmadi!</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

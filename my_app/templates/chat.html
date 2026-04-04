@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat | BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+.chat-container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: var(--bg-surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
+}
+
+.chat-header {
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-align: center;
+    border-radius: 16px 16px 0 0;
+}
+
+.chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.chat-box::-webkit-scrollbar {
+    width: 6px;
+}
+.chat-box::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 6px;
+}
+
+.message-wrapper {
+    display: flex;
+    width: 100%;
+}
+
+.message-wrapper.own {
+    justify-content: flex-end;
+}
+
+.message {
+    max-width: 75%;
+    background: var(--glass-bg);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    position: relative;
+}
+
+.message-wrapper.own .message {
+    background: rgba(0, 243, 255, 0.1);
+    border-color: rgba(0, 243, 255, 0.2);
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.username {
+    font-weight: 800;
+    color: var(--text-light);
+}
+
+.message-wrapper.own .username {
+    color: var(--accent);
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.message:hover .actions {
+    opacity: 1;
+}
+
+.actions i, .actions a {
+    color: var(--text-dim);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.actions i:hover {
+    color: var(--accent);
+}
+
+.message-body {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.reply-info {
+    background: rgba(0,0,0,0.3);
+    padding: 8px 12px;
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    color: var(--text-dim);
+}
+
+.chat-form {
+    display: flex;
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    border-top: 1px solid var(--glass-border);
+    gap: 10px;
+    border-radius: 0 0 16px 16px;
+}
+
+.chat-form input {
+    flex: 1;
+    background: var(--bg-base);
+    border: 1px solid var(--glass-border);
+    padding: 15px;
+    border-radius: 8px;
+    color: white;
+    outline: none;
+    font-family: inherit;
+}
+
+.chat-form input:focus {
+    border-color: var(--accent);
+}
+
+.chat-form button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    width: 50px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    transition: 0.3s;
+}
+
+.chat-form button:hover {
+    background: var(--accent-hover);
+}
+
+.edit-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.edit-form input {
+    flex: 1;
+    padding: 8px;
+    background: var(--bg-base);
+    border: 1px solid var(--glass-border);
+    color: white;
+    border-radius: 4px;
+}
+
+.edit-form button {
+    padding: 8px 12px;
+    background: var(--glass-bg);
+    color: white;
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.reply-preview {
+    background: rgba(0, 243, 255, 0.1);
+    padding: 10px 20px;
+    border-left: 3px solid var(--accent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.reply-preview button {
+    background: transparent;
+    color: var(--accent);
+    border: none;
+    cursor: pointer;
+    font-weight: 800;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <div class="chat-container">
+        <div class="chat-header">
+            Umumiy Chat
+        </div>
+
+        <div id="replyPreview" style="display:none;" class="reply-preview">
+            <span>Javob: <strong id="replyUsername"></strong> - "<span id="replyMessage"></span>"</span>
+            <button type="button" onclick="cancelReply()">✕ Bekor</button>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+            {% for msg in messages %}
+            <div class="message-wrapper {% if msg.user == request.user %}own{% else %}other{% endif %}">
+                <div class="message">
+                    <div class="message-header">
+                        <span class="username">
+                            {{ msg.user.username }}
+                            {% if msg.user.is_admin_user %}
+                                <i class='bx bx-crown' title="Admin" style="color: #ffc107;"></i>
+                            {% endif %}
+                        </span>
+                        
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <span class="time">
+                                {% if msg.edited %}<span style="opacity: 0.5; font-size: 0.75rem;">(edited)</span>{% endif %}
+                                {{ msg.local_created_at|date:"H:i" }}
+                            </span>
+                            <div class="actions">
+                                {% if msg.user == request.user or request.user.is_admin_user %}
+                                    <i class='bx bx-edit-alt' onclick="openEdit({{ msg.id }})"></i>
+                                    <a href="{% url 'delete_message' msg.id %}"><i class='bx bx-trash'></i></a>
+                                {% endif %}
+
+                                {% if request.user.is_admin_user and not msg.user.is_admin_user %}
+                                    <a href="{% url 'ban_user' msg.user.id %}" title="Ban foydalanuvchi"><i class='bx bx-block'></i></a>
+                                {% endif %}
+
+                                <i class='bx bx-reply' onclick="replyMessage('{{ msg.user.username }}','{{ msg.message }}')"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message-body" id="text-{{ msg.id }}">
+                        {{ msg.message }}
+                        {% if msg.reply_to %}
+                            <div class="reply-info">
+                                <i class='bx bx-message-square-dots'></i> <strong>{{ msg.reply_to.user.username }}</strong> ga javoban: "{{ msg.reply_to.message }}"
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <form method="POST" action="{% url 'edit_message' msg.id %}" class="edit-form" id="edit-form-{{ msg.id }}" style="display:none;">
+                        {% csrf_token %}
+                        <input type="text" name="message" value="{{ msg.message }}" {% if request.user.is_banned %}disabled{% endif %} required>
+                        <button type="submit" {% if request.user.is_banned %}disabled{% endif %} style="background: var(--accent); border-color: var(--accent);">Saqlash</button>
+                        <button type="button" onclick="closeEdit({{ msg.id }})">Bekor</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: var(--text-dim); margin-top: 20px;">Hali xabar yo‘q. Birinchi bo'lib yozing!</p>
+            {% endfor %}
+        </div>
+
+        <form method="POST" class="chat-form">
+            {% csrf_token %}
+            <input type="hidden" name="reply_to" id="replyToInput" value="">
+            <input type="text" name="message" placeholder="Xabaringizni yozing..." id="messageInput" {% if request.user.is_banned %}disabled{% endif %} required autocomplete="off">
+            <button type="submit" {% if request.user.is_banned %}disabled{% endif %}><i class='bx bx-send'></i></button>
+        </form>
+    </div>
+</main>
+
+<script>
+    function openEdit(id) {
+        document.getElementById("text-" + id).style.display = "none";
+        document.getElementById("edit-form-" + id).style.display = "flex";
+    }
+
+    function closeEdit(id) {
+        document.getElementById("text-" + id).style.display = "block";
+        document.getElementById("edit-form-" + id).style.display = "none";
+    }
+
+    function replyMessage(username, message) {
+        document.getElementById("replyPreview").style.display = "flex";
+        document.getElementById("replyUsername").innerText = username;
+        document.getElementById("replyMessage").innerText = message;
+        document.getElementById("messageInput").focus();
+        document.getElementById("replyToInput").value = username;
+    }
+
+    function cancelReply() {
+        document.getElementById("replyPreview").style.display = "none";
+        document.getElementById("replyToInput").value = '';
+    }
+
+    const chatBox = document.getElementById('chatBox');
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+{% endblock %}

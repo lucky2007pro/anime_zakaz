@@ -1,0 +1,252 @@
+/* ==========================
+   Global
+========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background: #0b0f19;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    touch-action: manipulation;
+}
+
+/* ==========================
+   Navbar (TEGILMADI)
+========================== */
+.nav-links a {
+    font-size: 24px;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.navbar {
+    padding: 50px 50px;
+}
+
+.navbar h2 {
+    font-size: 50px;
+}
+
+.navbar .nav-links i {
+    font-size: 50px;
+}
+
+/* ==========================
+   Search Section (TEGILMADI)
+========================== */
+.search-wrapper {
+    text-align: center;
+    margin: 40px 0 20px 0;
+}
+
+.search-wrapper form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,0,0,0.6);
+    padding: 20px 25px;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 20px rgba(0,255,234,0.2);
+}
+
+#search-input {
+    width: 300px;
+    height: 50px;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: 4px solid #00ffea;
+    background: transparent;
+    color: #fff;
+    font-size: 18px;
+    outline: none;
+    text-align: center;
+    transition: 0.3s;
+}
+
+#search-input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+#search-input:focus {
+    border-color: #00d4b8;
+    box-shadow: 0 0 10px rgba(0,255,234,0.5);
+}
+
+.search-wrapper button {
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: none;
+    background: #00ffea;
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.search-wrapper button:hover {
+    background: #00d4b8;
+    transform: scale(1.05);
+}
+
+/* ==========================
+   Movie Cards Container
+   (YAXSHILANDI)
+========================== */
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    padding: 100px 60px 60px 60px;
+    justify-items: center;
+    position: relative;
+    background: url("https://i.pinimg.com/736x/20/54/4a/20544a9424215b3a61cb9c2fbeab20f3.jpg") center/contain no-repeat;
+    background-size: 150px 200px;
+}
+
+
+.container.no-bg {
+    background: none;
+    opacity: 1;
+}
+
+/* ==========================
+   Cards (KATTALASHTIRILDI)
+========================== */
+.card {
+    width: 100%;
+    max-width: 320px;   /* REAL kattalashadi */
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 255, 234, 0.4);
+}
+
+.card img {
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+    max-height: 320px;
+}
+
+.card-content {
+    padding: 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-content h3 {
+    font-size: 22px;
+    margin-bottom: 12px;
+}
+
+.card-content p {
+    font-size: 17px;
+    margin-bottom: 10px;
+    color: #ccc;
+}
+
+.btn-watch {
+    display: inline-block;
+    padding: 10px 15px;
+    background: #00ffea;
+    color: #000;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.btn-watch:hover {
+    background: #00d4b8;
+    transform: scale(1.05);
+}
+
+/* ==========================
+   No Results
+========================== */
+.container p {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 18px;
+    margin-top: 30px;
+    color: #aaa;
+}
+
+/* ==========================
+   Footer (TEGILMADI)
+========================== */
+footer {
+    padding: 30px 20px;
+}
+
+/* ==========================
+   Responsive
+========================== */
+@media(max-width:1024px){
+    .container {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        padding: 80px 40px 50px 40px;
+    }
+
+    .card {
+        width: 260px;
+    }
+
+    .card img {
+        max-height: 300px;
+    }
+}
+
+@media(max-width:768px){
+    .container {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        padding: 60px 20px 40px 20px;
+        gap: 25px;
+    }
+
+    .card {
+        width: 90%;
+        max-width: 280px;
+    }
+
+    .card img {
+        max-height: 340px;
+    }
+}
+
+/* ==========================
+   Zoom disable
+========================== */
+meta[name=viewport] {
+    user-scalable: no;
+}

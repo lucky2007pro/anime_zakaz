@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Qidiruv | BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+.search-wrapper {
+    max-width: 800px;
+    margin: 20px auto 40px auto;
+    text-align: center;
+}
+
+.search-wrapper form {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    background: var(--glass-bg);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.search-wrapper input {
+    flex: 1;
+    padding: 15px 25px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: white;
+    font-size: 1.1rem;
+    font-family: inherit;
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-wrapper input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+}
+
+.btn-search {
+    padding: 15px 35px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: inherit;
+}
+
+.btn-search:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 243, 255, 0.4);
+}
+
+/* Cards reuse existing BESTMEDIA grid */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+    padding-bottom: 50px;
+}
+
+.card-wrapper {
+     text-decoration: none;
+     color: inherit;
+     display: flex;
+     flex-direction: column;
+     gap: 10px;
+}
+
+.anime-card {
+    width: 100%;
+    height: 300px;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-wrapper:hover .anime-card {
+    transform: scale(1.05);
+    border-color: var(--accent);
+    box-shadow: 0 10px 20px rgba(0, 243, 255, 0.2);
+}
+
+.anime-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.card-wrapper:hover .anime-card img {
+    transform: scale(1.1);
+}
+
+.anime-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15,15,19,0.9) 0%, rgba(15,15,19,0.2) 50%, transparent 100%);
+    transition: background 0.3s;
+}
+
+.card-wrapper:hover .anime-card::after {
+    background: linear-gradient(to top, rgba(0, 243, 255, 0.6) 0%, rgba(15,15,19,0.4) 60%, transparent 100%);
+}
+
+.top-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #FFC107;
+    z-index: 10;
+}
+
+.badge-quality {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--accent);
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: white;
+    z-index: 10;
+}
+
+.card-info-bottom {
+     display: flex;
+     flex-direction: column;
+     gap: 4px;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-wrapper:hover .card-title {
+     color: var(--accent);
+}
+
+.card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-dim);
+}
+
+.tag-jp { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: white; font-size: 0.7rem; }
+
+.hide-cards { display: none !important; }
+
+@media (max-width: 768px) {
+    .search-wrapper form { flex-direction: column; }
+    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .anime-card { height: 220px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    
+    <div class="search-wrapper">
+        <h2 style="margin-bottom: 20px; font-weight: 800;">Katalog Qidiruv</h2>
+        <form method="GET" action="{% url 'search' %}" onsubmit="return false;">
+            <input type="text" id="search-input" placeholder="Anime nomini yozing..." autocomplete="off">
+            <button type="submit" class="btn-search">Qidirish</button>
+        </form>
+    </div>
+
+    <div class="cards-grid hide-cards" id="movie-container">
+        {% for anime in movies %}
+        <a href="{% url 'movie_detail' anime.id %}" class="card-wrapper search-card" data-title="{{ anime.title|lower }}">
+            <div class="anime-card">
+                <div class="top-badge">★ {{ anime.rating|default:"0" }}</div>
+                {% if anime.episodes.count > 0 %}
+                <div class="badge-quality">{{ anime.episodes.count }} qism</div>
+                {% endif %}
+                <img src="{% if anime.image_url %}{{ anime.image_url }}{% elif anime.image %}{{ anime.image.url }}{% else %}/static/images/default.jpg{% endif %}" alt="{{ anime.title }}">
+            </div>
+
+            <div class="card-info-bottom">
+                 <h4 class="card-title">{{ anime.title }}</h4>
+                 <div class="card-meta">
+                      <span class="tag-jp">JP</span>
+                      <span>{{ anime.release_year }}</span>
+                 </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</main>
+
+<script>
+const searchInput = document.getElementById('search-input');
+const cards = document.querySelectorAll('.search-card');
+const container = document.getElementById('movie-container');
+
+searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase().trim();
+
+    if(query.length > 0){
+        container.classList.remove('hide-cards');
+    } else {
+        container.classList.add('hide-cards');
+    }
+
+    let anyVisible = false;
+    cards.forEach(card => {
+        const title = card.getAttribute('data-title');
+        if(query.length > 0 && title.includes(query)){
+            card.style.display = 'flex';
+            anyVisible = true;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    let existingMsg = document.getElementById('no-results-msg');
+    if(!anyVisible && query.length > 0){
+        if(!existingMsg){
+            const msg = document.createElement('p');
+            msg.id = 'no-results-msg';
+            msg.textContent = `"${query}" bo‘yicha hech narsa topilmadi ❌`;
+            msg.style.gridColumn = '1 / -1';
+            msg.style.textAlign = 'center';
+            msg.style.fontSize = '1.2rem';
+            msg.style.color = 'var(--text-dim)';
+            msg.style.marginTop = '40px';
+            container.appendChild(msg);
+        }
+    } else if(existingMsg){
+        existingMsg.remove();
+    }
+});
+</script>
+{% endblock %}

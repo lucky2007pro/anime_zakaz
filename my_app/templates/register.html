@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ro'yxatdan o'tish - BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bg-video,
+    .bg-image {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        opacity: 0.3;
+    }
+
+    .auth-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 80px);
+        padding: 20px;
+    }
+
+    .input-box {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .input-box i {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-dim);
+        font-size: 1.2rem;
+    }
+
+    .input-box .toggle-password {
+        right: 40px;
+        cursor: pointer;
+    }
+
+    .input-box .toggle-password:hover {
+        color: var(--accent);
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: var(--text-dim);
+    }
+
+    .login-link a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if site_settings %}
+{% if site_settings.background_video %}
+<video autoplay muted loop class="bg-video">
+    <source src="{{ site_settings.background_video.url }}" type="video/mp4">
+</video>
+{% elif site_settings.background_image %}
+<div class="bg-video" style="background-image: url('{{ site_settings.background_image.url }}');"></div>
+{% endif %}
+{% endif %}
+
+<main class="main-content" style="margin-top: 0; display:flex; align-items:center;">
+    <div class="auth-wrapper" style="width: 100%;">
+        <div class="auth-container">
+            <h2>Ro'yxatdan o'tish</h2>
+
+            <form id="registerForm" action="" method="post">
+                {% csrf_token %}
+
+                <div class="input-box form-group">
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Username"
+                        required>
+                    <i class='bx bx-user-circle'></i>
+                    <small id="usernameError" style="color:var(--accent); display:block; margin-top:5px;"></small>
+                </div>
+
+                <div class="input-box form-group">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Parol"
+                        required>
+                    <i class='bx bx-lock'></i>
+                    <i class='bx bxs-low-vision toggle-password' id="togglePassword1"></i>
+                </div>
+
+                <div class="input-box form-group">
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                        placeholder="Parolni takrorlang" required>
+                    <i class='bx bx-lock'></i>
+                    <i class='bx bxs-low-vision toggle-password' id="togglePassword2"></i>
+                </div>
+
+                <div class="input-box form-group" style="margin-bottom: 25px;">
+                    <label id="mathLabel"
+                        style="color:var(--text-light); margin-bottom:10px; display:block; font-weight: 600;"></label>
+                    <input type="number" id="math_answer" class="form-control" placeholder="Javobni kiriting" required>
+                    <i class='bx bx-calculator'></i>
+                </div>
+
+                <button type="submit" class="btn-submit">Ro'yxatdan o'tish</button>
+
+                <div class="login-link">
+                    <p>Allaqachon akkaunt yaratdingizmi? <a href="{% url 'login' %}">Kirish</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script>
+    const usernameInput = document.getElementById("username");
+    const usernameError = document.getElementById("usernameError");
+
+    if (usernameInput) {
+        usernameInput.addEventListener("keyup", function () {
+            const username = this.value;
+            if (username.length > 2) {
+                fetch(`/check-username/?username=${username}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            usernameError.innerText = "Bu username band! Boshqa tanlang.";
+                        } else {
+                            usernameError.innerText = "";
+                        }
+                    });
+            } else {
+                usernameError.innerText = "";
+            }
+        });
+    }
+
+    const togglePassword1 = document.getElementById("togglePassword1");
+    const togglePassword2 = document.getElementById("togglePassword2");
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirm_password");
+
+    if (togglePassword1) {
+        togglePassword1.addEventListener("click", function () {
+            const type = password.type === "password" ? "text" : "password";
+            password.type = type;
+            this.classList.toggle('active');
+        });
+    }
+
+    if (togglePassword2) {
+        togglePassword2.addEventListener("click", function () {
+            const type = confirmPassword.type === "password" ? "text" : "password";
+            confirmPassword.type = type;
+            this.classList.toggle('active');
+        });
+    }
+
+    const mathLabel = document.getElementById('mathLabel');
+    const mathAnswer = document.getElementById('math_answer');
+
+    let num1 = Math.floor(Math.random() * 10);
+    let num2 = Math.floor(Math.random() * 10 - num1 >= 0 ? 10 - num1 : 0);
+    let correctAnswer = num1 + num2;
+
+    if (mathLabel) {
+        mathLabel.innerText = `Quyidagi amalni yeching: ${num1} + ${num2} = ?`;
+    }
+
+    const form = document.getElementById('registerForm');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            const passwordValue = password.value;
+            const confirmValue = confirmPassword.value;
+            const mathValue = parseInt(mathAnswer.value);
+
+            if (passwordValue.length < 8) {
+                alert("Parol kamida 8 ta belgi bo'lishi kerak!");
+                e.preventDefault();
+                password.value = '';
+                confirmPassword.value = '';
+                return;
+            }
+
+            if (passwordValue !== confirmValue) {
+                alert("Parollar mos emas!");
+                e.preventDefault();
+                password.value = '';
+                confirmPassword.value = '';
+                return;
+            }
+
+            if (mathValue !== correctAnswer) {
+                alert("Matematik amal xato! Iltimos qayta urinib ko'ring.");
+                e.preventDefault();
+                mathAnswer.value = '';
+                return;
+            }
+
+            if (usernameError.innerText !== "") {
+                alert("Iltimos boshqa username tanlang!");
+                e.preventDefault();
+                return;
+            }
+        });
+    }
+</script>
+{% endblock %}
