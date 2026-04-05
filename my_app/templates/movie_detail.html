@@ -70,6 +70,45 @@
     cursor: pointer;
 }
 
+.seek-bar {
+    width: 100%;
+    margin-top: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    outline: none;
+    cursor: pointer;
+}
+
+.seek-bar::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0, 243, 255, 0.18);
+    cursor: pointer;
+}
+
+.seek-bar::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0, 243, 255, 0.18);
+    cursor: pointer;
+}
+
+.seek-bar::-moz-range-track {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+}
+
 .bunny-player-wrapper {
     position: relative;
     padding-top: 56.25%;
@@ -255,7 +294,7 @@
                         <source src="{{ first_episode.video_file.url }}">
                         Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                     </video>
-                    <div class="custom-progress-wrapper mt-2"><div id="custom-progress" class="custom-progress-bar"></div></div>
+                    <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
                     <div class="time-display mt-1">
                         <span id="current-time">00:00</span>
                         <span id="duration-time">00:00</span>
@@ -267,11 +306,11 @@
                         <button class="bunny-fullscreen-btn">⛶</button>
                     </div>
                         {% else %}
-                    <video id="video-player" controls>
+                            <video id="video-player" controls playsinline preload="metadata">
                         <source src="{{ first_episode.video_url }}" type="video/mp4">
                         Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                     </video>
-                    <div class="custom-progress-wrapper mt-2"><div id="custom-progress" class="custom-progress-bar"></div></div>
+                            <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
                     <div class="time-display mt-1">
                         <span id="current-time">00:00</span>
                         <span id="duration-time">00:00</span>
@@ -320,9 +359,131 @@ const episodeBtns = document.querySelectorAll('.episode-btn');
 const videoContainer = document.getElementById('video-container');
 let videoPlayer = document.getElementById('video-player');
 let iframePlayer = document.getElementById('iframe-player');
+let seekBar = document.getElementById('seek-bar');
+let currentTimeEl = document.getElementById('current-time');
+let durationTimeEl = document.getElementById('duration-time');
+let pendingSeekRatio = null;
+let isSeeking = false;
 
 function getEpisodeSource(btn){
     return btn.dataset.videoSrc || '';
+}
+
+function formatTime(seconds){
+    if(!Number.isFinite(seconds) || seconds < 0){
+        return '00:00';
+    }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function syncSeekBar(){
+    if(!videoPlayer || !seekBar || !Number.isFinite(videoPlayer.duration) || videoPlayer.duration <= 0){
+        return;
+    }
+    seekBar.value = Math.round((videoPlayer.currentTime / videoPlayer.duration) * Number(seekBar.max || 1000));
+}
+
+function bindNativePlayerControls(){
+    videoPlayer = document.getElementById('video-player');
+    seekBar = document.getElementById('seek-bar');
+    currentTimeEl = document.getElementById('current-time');
+    durationTimeEl = document.getElementById('duration-time');
+
+    if(!videoPlayer || !seekBar){
+        return;
+    }
+
+    const applyPendingSeek = () => {
+        if(pendingSeekRatio === null || !Number.isFinite(videoPlayer.duration) || videoPlayer.duration <= 0){
+            return;
+        }
+        const targetTime = Math.max(0, Math.min(1, pendingSeekRatio)) * videoPlayer.duration;
+        videoPlayer.currentTime = targetTime;
+        pendingSeekRatio = null;
+    };
+
+    const updateTimes = () => {
+        if(currentTimeEl){
+            currentTimeEl.textContent = formatTime(videoPlayer.currentTime);
+        }
+        if(durationTimeEl && Number.isFinite(videoPlayer.duration)){
+            durationTimeEl.textContent = formatTime(videoPlayer.duration);
+        }
+        if(!isSeeking){
+            syncSeekBar();
+        }
+    };
+
+    seekBar.addEventListener('input', () => {
+        isSeeking = true;
+        const max = Number(seekBar.max || 1000);
+        const ratio = max > 0 ? Number(seekBar.value) / max : 0;
+
+        if(Number.isFinite(videoPlayer.duration) && videoPlayer.duration > 0){
+            videoPlayer.currentTime = ratio * videoPlayer.duration;
+            pendingSeekRatio = null;
+            updateTimes();
+        } else {
+            pendingSeekRatio = ratio;
+        }
+    });
+
+    seekBar.addEventListener('change', () => {
+        isSeeking = false;
+        applyPendingSeek();
+        updateTimes();
+    });
+
+    videoPlayer.addEventListener('loadedmetadata', () => {
+        if(durationTimeEl){
+            durationTimeEl.textContent = formatTime(videoPlayer.duration);
+        }
+        applyPendingSeek();
+        updateTimes();
+    });
+
+    videoPlayer.addEventListener('durationchange', updateTimes);
+    videoPlayer.addEventListener('timeupdate', updateTimes);
+    videoPlayer.addEventListener('progress', syncSeekBar);
+
+    if(Number.isFinite(videoPlayer.duration) && videoPlayer.duration > 0){
+        durationTimeEl.textContent = formatTime(videoPlayer.duration);
+    }
+    syncSeekBar();
+}
+
+function loadNativeVideoSource(videoSrc){
+    if(!videoSrc){
+        return;
+    }
+
+    if(!videoPlayer){
+        videoContainer.innerHTML=`<video id="video-player" controls playsinline preload="metadata"><source src="${videoSrc}" type="video/mp4">Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.</video><input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar"><div class="time-display d-flex justify-content-between mt-1"><span id="current-time">00:00</span><span id="duration-time">00:00</span></div>`;
+        videoPlayer=document.getElementById('video-player');
+        seekBar=document.getElementById('seek-bar');
+        currentTimeEl=document.getElementById('current-time');
+        durationTimeEl=document.getElementById('duration-time');
+        iframePlayer=null;
+        bindNativePlayerControls();
+    }
+
+    pendingSeekRatio = null;
+    isSeeking = false;
+    if(seekBar){
+        seekBar.value = 0;
+    }
+    if(currentTimeEl){
+        currentTimeEl.textContent = '00:00';
+    }
+    if(durationTimeEl){
+        durationTimeEl.textContent = '00:00';
+    }
+
+    videoPlayer.src = videoSrc;
+    videoPlayer.load();
+    videoPlayer.play();
 }
 
 function enableFullscreen(el){
@@ -337,6 +498,7 @@ function addFullscreenButton(){
     if(fsBtn && iframePlayer){fsBtn.addEventListener('click',()=>{enableFullscreen(iframePlayer);});}
 }
 addFullscreenButton();
+bindNativePlayerControls();
 
 const videoClickActions=()=>{
     const mp4Player = document.getElementById('video-player');
@@ -364,11 +526,7 @@ episodeBtns.forEach(btn=>{
                 iframePlayer=document.getElementById('iframe-player');videoPlayer=null;addFullscreenButton();videoClickActions();
             }
         }else{
-            if(videoPlayer){videoPlayer.src=videoSrc;videoPlayer.currentTime=0;videoPlayer.play();}
-            else{
-                videoContainer.innerHTML=`<video id="video-player" controls><source src="${videoSrc}" type="video/mp4">Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.</video><div class="custom-progress-wrapper mt-2"><div id="custom-progress" class="custom-progress-bar"></div></div><div class="time-display d-flex justify-content-between mt-1"><span id="current-time">00:00</span><span id="duration-time">00:00</span></div>`;
-                videoPlayer=document.getElementById('video-player');iframePlayer=null;videoClickActions();
-            }
+            loadNativeVideoSource(videoSrc);
         }
         episodeBtns.forEach(b=>b.classList.remove('active-episode-btn'));
         btn.classList.add('active-episode-btn');
