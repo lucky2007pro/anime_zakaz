@@ -145,7 +145,8 @@ cloudinary_credentials_set = all([
 ])
 
 # In production prefer remote media storage to avoid Railway's ephemeral filesystem loss.
-use_cloudinary = _env_bool('USE_CLOUDINARY', default=(not DEBUG)) and cloudinary_credentials_set
+use_volume_storage = bool(railway_volume_root)
+use_cloudinary = (not use_volume_storage) and _env_bool('USE_CLOUDINARY', default=(not DEBUG)) and cloudinary_credentials_set
 
 if ENVIRONMENT == 'production' and not DEBUG:
     media_persistent_via_volume = bool(railway_volume_root)
@@ -164,7 +165,7 @@ CLOUDINARY_STORAGE = {
 
 STORAGES = {
     'default': {
-        'BACKEND': 'cloudinary_storage.storage.RawMediaCloudinaryStorage' if use_cloudinary else 'django.core.files.storage.FileSystemStorage',
+        'BACKEND': 'django.core.files.storage.FileSystemStorage' if use_volume_storage or not use_cloudinary else 'cloudinary_storage.storage.RawMediaCloudinaryStorage',
     },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
@@ -176,6 +177,10 @@ if not use_cloudinary:
         'location': MEDIA_ROOT,
         'base_url': MEDIA_URL,
     }
+
+# Large uploads like 200MB need a higher request-body allowance than Django's small default.
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('DATA_UPLOAD_MAX_MEMORY_SIZE', str(256 * 1024 * 1024)))
+FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('FILE_UPLOAD_MAX_MEMORY_SIZE', str(5 * 1024 * 1024)))
 
 if ENVIRONMENT == 'production' and not DEBUG and USE_HTTPS:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
