@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-3stjy_8w_4-1$67wt@hvzi$3nu@elz^n$33frr(zbf=p31el3&')
@@ -90,11 +91,16 @@ DATABASES = {
     }
 }
 
-if 'DATABASE_URL' in os.environ:
+database_url = os.environ.get('DATABASE_URL', '').strip()
+
+if database_url:
     DATABASES['default'] = dict(dj_database_url.config(
+        default=database_url,
         conn_max_age=600,
         conn_health_checks=True,
     ))
+elif ENVIRONMENT == 'production' and not DEBUG:
+    raise ImproperlyConfigured('DATABASE_URL production muhitida majburiy. Railway Postgres ulang.')
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -126,7 +132,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+railway_volume_root = os.environ.get('RAILWAY_VOLUME_MOUNT_PATH', '').strip()
+MEDIA_ROOT = os.path.join(railway_volume_root, 'media') if railway_volume_root else os.path.join(BASE_DIR, 'media')
 
 cloudinary_cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME', '').strip()
 cloudinary_api_key = os.environ.get('CLOUDINARY_API_KEY', '').strip()
@@ -139,6 +146,13 @@ cloudinary_credentials_set = all([
 
 # In production prefer remote media storage to avoid Railway's ephemeral filesystem loss.
 use_cloudinary = _env_bool('USE_CLOUDINARY', default=(not DEBUG)) and cloudinary_credentials_set
+
+if ENVIRONMENT == 'production' and not DEBUG:
+    media_persistent_via_volume = bool(railway_volume_root)
+    if not use_cloudinary and not media_persistent_via_volume:
+        raise ImproperlyConfigured(
+            'Production media uchun CLOUDINARY_* ni sozlang yoki Railway Volume ulang (RAILWAY_VOLUME_MOUNT_PATH).'
+        )
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': cloudinary_cloud_name,
