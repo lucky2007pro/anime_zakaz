@@ -1,8 +1,0 @@
-{
-  "$schema": "https://railway.app/railway.schema.json",
-  "deploy": {
-    "startCommand": "gunicorn src.wsgi:application --bind 0.0.0.0:$PORT",
-    "healthcheckPath": "/",
-    "restartPolicyType": "on_failure"
-  }
-}
