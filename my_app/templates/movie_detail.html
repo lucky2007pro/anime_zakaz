@@ -286,44 +286,67 @@
         </header>
 
         <div class="video-section">
-            {% if movie.episodes.all %}
-                {% with first_episode=movie.episodes.first %}
+            {% with first_episode=movie.episodes.first %}
                 <div class="video-container" id="video-container">
-                    {% if first_episode.video_file %}
-                    <video id="video-player" controls playsinline preload="metadata">
-                        <source src="{{ first_episode.video_file.url }}">
-                        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
-                    </video>
-                    <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
-                    <div class="time-display mt-1">
-                        <span id="current-time">00:00</span>
-                        <span id="duration-time">00:00</span>
-                    </div>
-                    {% elif first_episode.video_url %}
-                        {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
-                    <div class="bunny-player-wrapper">
-                        <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-                        <button class="bunny-fullscreen-btn">⛶</button>
-                    </div>
+                    {% if movie.video_file %}
+                        <video id="video-player" controls playsinline preload="metadata">
+                            <source src="{{ movie.video_file.url }}">
+                            Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+                        </video>
+                        <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
+                        <div class="time-display mt-1">
+                            <span id="current-time">00:00</span>
+                            <span id="duration-time">00:00</span>
+                        </div>
+                    {% elif movie.video_url %}
+                        {% if "iframe" in movie.video_url or "mediadelivery.net" in movie.video_url %}
+                            <div class="bunny-player-wrapper">
+                                <iframe id="iframe-player" src="{{ movie.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                                <button class="bunny-fullscreen-btn">⛶</button>
+                            </div>
                         {% else %}
                             <video id="video-player" controls playsinline preload="metadata">
-                        <source src="{{ first_episode.video_url }}" type="video/mp4">
-                        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
-                    </video>
+                                <source src="{{ movie.video_url }}" type="video/mp4">
+                                Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+                            </video>
                             <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
-                    <div class="time-display mt-1">
-                        <span id="current-time">00:00</span>
-                        <span id="duration-time">00:00</span>
-                    </div>
+                            <div class="time-display mt-1">
+                                <span id="current-time">00:00</span>
+                                <span id="duration-time">00:00</span>
+                            </div>
+                        {% endif %}
+                    {% elif first_episode and first_episode.video_file %}
+                        <video id="video-player" controls playsinline preload="metadata">
+                            <source src="{{ first_episode.video_file.url }}">
+                            Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+                        </video>
+                        <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
+                        <div class="time-display mt-1">
+                            <span id="current-time">00:00</span>
+                            <span id="duration-time">00:00</span>
+                        </div>
+                    {% elif first_episode and first_episode.video_url %}
+                        {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
+                            <div class="bunny-player-wrapper">
+                                <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                                <button class="bunny-fullscreen-btn">⛶</button>
+                            </div>
+                        {% else %}
+                            <video id="video-player" controls playsinline preload="metadata">
+                                <source src="{{ first_episode.video_url }}" type="video/mp4">
+                                Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+                            </video>
+                            <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
+                            <div class="time-display mt-1">
+                                <span id="current-time">00:00</span>
+                                <span id="duration-time">00:00</span>
+                            </div>
                         {% endif %}
                     {% else %}
-                    <p style="text-align: center; color: var(--text-dim); padding: 30px 20px;">Bu qism uchun video manbasi yuklanmagan.</p>
+                        <p style="text-align: center; color: var(--text-dim); padding: 30px 20px;">Bu qism uchun video manbasi yuklanmagan.</p>
                     {% endif %}
                 </div>
-                {% endwith %}
-            {% else %}
-                <p style="text-align: center; color: var(--text-dim); padding: 40px; background: var(--bg-surface); border-radius: 12px;">Hozircha video mavjud emas.</p>
-            {% endif %}
+            {% endwith %}
 
             {% if movie.telegram_link %}
             <div class="telegram-download-wrapper">
@@ -339,8 +362,10 @@
                 {% for episode in movie.episodes.all %}
                 {% if episode.video_file %}
                 <button class="episode-btn" data-video-src="{{ episode.video_file.url }}">{{ forloop.counter }}-qism</button>
+                {% elif episode.video_url %}
+                <button class="episode-btn" data-video-src="{{ episode.video_url }}">{{ forloop.counter }}-qism</button>
                 {% else %}
-                <button class="episode-btn" data-video-src="{{ episode.video_url|default:'' }}">{{ forloop.counter }}-qism</button>
+                <button class="episode-btn" data-video-src="">{{ forloop.counter }}-qism</button>
                 {% endif %}
                 {% endfor %}
             </div>

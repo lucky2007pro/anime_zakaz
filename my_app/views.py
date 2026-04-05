@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import localtime
 from datetime import timedelta
-import pytz
+from zoneinfo import ZoneInfo
 from django.db.models import Max
 from django.utils import timezone
 
@@ -140,7 +140,7 @@ def check_username(request):
 @login_required
 def profile(request):
     user = request.user
-    uz_time = pytz.timezone('Asia/Tashkent')
+    uz_time = ZoneInfo('Asia/Tashkent')
     date_joined_uz = localtime(user.date_joined, uz_time).strftime("%d-%m-%Y %H:%M:%S")
 
     try:
@@ -199,7 +199,7 @@ def search(request):
 # =======================
 @login_required
 def chat(request):
-    tz = pytz.timezone('Asia/Tashkent')
+    tz = ZoneInfo('Asia/Tashkent')
     messages_list = ChatMessage.objects.select_related('user', 'reply_to').order_by('created_at')
 
     for msg in messages_list:

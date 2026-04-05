@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+from zoneinfo import ZoneInfo
 
 # =======================
 # CATEGORY
@@ -154,8 +155,7 @@ class ChatMessage(models.Model):
     def local_created_at(self):
         """Vaqtni Tashkent timezone ga o‘giradi"""
         from django.utils.timezone import localtime
-        import pytz
-        uz_time = pytz.timezone('Asia/Tashkent')
+        uz_time = ZoneInfo('Asia/Tashkent')
         return localtime(self.created_at, uz_time)
 
     def can_delete(self, current_user):

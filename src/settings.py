@@ -1,4 +1,5 @@
 import os
+import importlib.util
 from pathlib import Path
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
@@ -40,6 +41,11 @@ DEFAULT_CSRF_TRUSTED_ORIGINS = [
 ALLOWED_HOSTS = list(dict.fromkeys(_split_csv_env('ALLOWED_HOSTS') + DEFAULT_ALLOWED_HOSTS))
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(_split_csv_env('CSRF_TRUSTED_ORIGINS') + DEFAULT_CSRF_TRUSTED_ORIGINS))
 
+_cloudinary_available = all([
+    importlib.util.find_spec('cloudinary') is not None,
+    importlib.util.find_spec('cloudinary_storage') is not None,
+])
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,11 +54,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'cloudinary_storage',
-    'cloudinary',
-
     'my_app.apps.MyAppConfig',
 ]
+
+if _cloudinary_available:
+    INSTALLED_APPS += [
+        'cloudinary_storage',
+        'cloudinary',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -146,14 +155,8 @@ cloudinary_credentials_set = all([
 
 # In production prefer remote media storage to avoid Railway's ephemeral filesystem loss.
 use_volume_storage = bool(railway_volume_root)
-use_cloudinary = (not use_volume_storage) and _env_bool('USE_CLOUDINARY', default=(not DEBUG)) and cloudinary_credentials_set
+use_cloudinary = _cloudinary_available and (not use_volume_storage) and _env_bool('USE_CLOUDINARY', default=(not DEBUG)) and cloudinary_credentials_set
 
-if ENVIRONMENT == 'production' and not DEBUG:
-    media_persistent_via_volume = bool(railway_volume_root)
-    if not use_cloudinary and not media_persistent_via_volume:
-        raise ImproperlyConfigured(
-            'Production media uchun CLOUDINARY_* ni sozlang yoki Railway Volume ulang (RAILWAY_VOLUME_MOUNT_PATH).'
-        )
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': cloudinary_cloud_name,
