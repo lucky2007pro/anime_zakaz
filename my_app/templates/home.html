@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% static 'images/default.svg' as default_movie_poster %}
+
 {% block title %}BESTMEDIA - Bosh Sahifa{% endblock %}
 
 {% block extra_css %}
@@ -326,7 +328,7 @@
     <div class="slides-wrapper" id="slidesWrapper">
         {% for anime in movies|slice:":3" %}
         <div class="slide">
-             <div class="slide-bg" style="background-image: url('{% if anime.image %}{{ anime.image.url }}{% else %}/static/images/default.jpg{% endif %}');"></div>
+             <div class="slide-bg" style="background-image: url('{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');"></div>
              <div class="slide-overlay"></div>
 
             <div class="slide-content">
@@ -373,7 +375,7 @@
                 {% else %}
                 <div class="badge-quality">HD</div>
                 {% endif %}
-                <img src="{% if anime.image %}{{ anime.image.url }}{% else %}/static/images/default.jpg{% endif %}" alt="{{ anime.title }}">
+                <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
             </div>
 
             <div class="card-info-bottom">

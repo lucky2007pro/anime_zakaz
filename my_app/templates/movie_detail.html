@@ -250,12 +250,23 @@
             {% if movie.episodes.all %}
                 {% with first_episode=movie.episodes.first %}
                 <div class="video-container" id="video-container">
-                    {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
+                    {% if first_episode.video_file %}
+                    <video id="video-player" controls playsinline preload="metadata">
+                        <source src="{{ first_episode.video_file.url }}">
+                        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
+                    </video>
+                    <div class="custom-progress-wrapper mt-2"><div id="custom-progress" class="custom-progress-bar"></div></div>
+                    <div class="time-display mt-1">
+                        <span id="current-time">00:00</span>
+                        <span id="duration-time">00:00</span>
+                    </div>
+                    {% elif first_episode.video_url %}
+                        {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
                     <div class="bunny-player-wrapper">
                         <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
                         <button class="bunny-fullscreen-btn">⛶</button>
                     </div>
-                    {% else %}
+                        {% else %}
                     <video id="video-player" controls>
                         <source src="{{ first_episode.video_url }}" type="video/mp4">
                         Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
@@ -265,6 +276,9 @@
                         <span id="current-time">00:00</span>
                         <span id="duration-time">00:00</span>
                     </div>
+                        {% endif %}
+                    {% else %}
+                    <p style="text-align: center; color: var(--text-dim); padding: 30px 20px;">Bu qism uchun video manbasi yuklanmagan.</p>
                     {% endif %}
                 </div>
                 {% endwith %}
@@ -284,7 +298,11 @@
             <h4>Qismlar</h4>
             <div class="episode-buttons">
                 {% for episode in movie.episodes.all %}
-                <button class="episode-btn" data-video="{{ episode.video_url }}">{{ forloop.counter }}-qism</button>
+                {% if episode.video_file %}
+                <button class="episode-btn" data-video-src="{{ episode.video_file.url }}">{{ forloop.counter }}-qism</button>
+                {% else %}
+                <button class="episode-btn" data-video-src="{{ episode.video_url|default:'' }}">{{ forloop.counter }}-qism</button>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -302,6 +320,10 @@ const episodeBtns = document.querySelectorAll('.episode-btn');
 const videoContainer = document.getElementById('video-container');
 let videoPlayer = document.getElementById('video-player');
 let iframePlayer = document.getElementById('iframe-player');
+
+function getEpisodeSource(btn){
+    return btn.dataset.videoSrc || '';
+}
 
 function enableFullscreen(el){
     if(el.requestFullscreen){el.requestFullscreen();}
@@ -333,7 +355,8 @@ if(episodeBtns.length > 0) {
 
 episodeBtns.forEach(btn=>{
     btn.addEventListener('click',()=>{
-        const videoSrc = btn.dataset.video;
+        const videoSrc = getEpisodeSource(btn);
+        if(!videoSrc) return;
         if(videoSrc.includes('iframe') || videoSrc.includes('mediadelivery.net')){
             if(iframePlayer){iframePlayer.src=videoSrc+'?autoplay=false&loop=false&muted=false&responsive=true';}
             else{

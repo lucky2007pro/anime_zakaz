@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% static 'images/default.svg' as default_movie_poster %}
+
 {% block title %}Qidiruv | BESTMEDIA{% endblock %}
 
 {% block extra_css %}
@@ -201,7 +203,7 @@
                 {% if anime.episodes.count > 0 %}
                 <div class="badge-quality">{{ anime.episodes.count }} qism</div>
                 {% endif %}
-                <img src="{% if anime.image_url %}{{ anime.image_url }}{% elif anime.image %}{{ anime.image.url }}{% else %}/static/images/default.jpg{% endif %}" alt="{{ anime.title }}">
+                <img src="{% if anime.image_url %}{{ anime.image_url }}{% elif anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
             </div>
 
             <div class="card-info-bottom">

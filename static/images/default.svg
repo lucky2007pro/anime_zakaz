@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Default poster</title>
+  <desc id="desc">Placeholder image for missing movie posters</desc>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#111118"/>
+      <stop offset="100%" stop-color="#1d1d2b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00f3ff"/>
+      <stop offset="100%" stop-color="#00d2dd"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="900" fill="url(#g)" rx="36"/>
+  <rect x="48" y="48" width="504" height="804" rx="28" fill="none" stroke="url(#accent)" stroke-width="6" stroke-dasharray="18 16" opacity="0.75"/>
+  <circle cx="300" cy="345" r="120" fill="rgba(0,243,255,0.08)"/>
+  <path d="M250 255l180 90-180 90z" fill="url(#accent)"/>
+  <text x="300" y="580" font-family="Arial, Helvetica, sans-serif" font-size="36" fill="#ffffff" text-anchor="middle" font-weight="700">IMAGE NOT FOUND</text>
+  <text x="300" y="630" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#8a8a9d" text-anchor="middle">BESTMEDIA</text>
+</svg>
+
