@@ -41,17 +41,15 @@ def _split_csv_env(var_name, default_value=''):
 
 
 DEFAULT_ALLOWED_HOSTS = [
-    'anistream-694e.onrender.com',
-    'anistream.dev',
-    'www.anistream.dev',
+    'healthcheck.railway.app',          # Railway-ning sog'liqni tekshirish xizmati uchun
+    '.up.railway.app',                  # Barcha Railway subdomenlari uchun (Wildcard)
     '127.0.0.1',
     'localhost',
 ]
 
 DEFAULT_CSRF_TRUSTED_ORIGINS = [
-    'https://anistream.dev',
-    'https://www.anistream.dev',
-    'https://anistream-694e.onrender.com',
+    'https://healthcheck.railway.app',  # Railway healthcheck uchun HTTPS ruxsati
+    'https://*.up.railway.app',         # Railway-dagi barcha subdomenlar uchun
 ]
 
 # Env qiymatlari noto'g'ri berilgan taqdirda ham asosiy domenlar doim ruxsatda bo'ladi.
