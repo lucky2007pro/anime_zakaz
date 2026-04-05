@@ -73,7 +73,11 @@ def admin_movie_form(request, pk=None):
         if video_file:
             movie.video_file = video_file
             
-        movie.save()
+        try:
+            movie.save()
+        except Exception:
+            messages.error(request, "Fayl yuklanmadi. Rasm yoki video formatini tekshirib, qayta urinib ko'ring.")
+            return render(request, 'custom_admin/movie_form.html', {'movie': movie, 'genres': genres})
         messages.success(request, "Anime muvaffaqiyatli saqlandi!")
         return redirect('admin_movies')
         
@@ -115,7 +119,11 @@ def admin_episode_form(request, pk=None):
         episode.video_url = vid_url
         if video_file:
             episode.video_file = video_file
-        episode.save()
+        try:
+            episode.save()
+        except Exception:
+            messages.error(request, "Video yuklanmadi. Video URL kiriting yoki to'g'ri video formatini yuklang.")
+            return render(request, 'custom_admin/episode_form.html', {'episode': episode, 'movies': movies})
         
         messages.success(request, "Qism muvaffaqiyatli saqlandi!")
         return redirect('admin_episodes')

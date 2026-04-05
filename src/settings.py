@@ -145,6 +145,7 @@ CLOUDINARY_STORAGE = {
     'API_KEY': cloudinary_api_key,
     'API_SECRET': cloudinary_api_secret,
     'SECURE': True,
+    'RESOURCE_TYPE': 'auto',
 }
 
 STORAGES = {
