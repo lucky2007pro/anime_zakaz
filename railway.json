@@ -1,0 +1,8 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "deploy": {
+    "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput",
+    "startCommand": "gunicorn src.wsgi:application --bind 0.0.0.0:$PORT"
+  }
+}
+
