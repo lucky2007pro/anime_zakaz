@@ -30,7 +30,7 @@
     <h2 style="margin-bottom: 25px; font-size: 1.8rem; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--border-line); padding-bottom: 10px;">
         {% if episode %}Qismni Tahrirlash ({{ episode.episode_number }}){% else %}Yangi Qism Qo'shish{% endif %}
     </h2>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group">
             <label>Qaysi Animaga tegishli?</label>
@@ -54,8 +54,18 @@
         </div>
         
         <div class="form-group">
-            <label>Video URL (Bunny.net/CDN linki)</label>
-            <input type="url" name="video_url" class="form-control" required value="{{ episode.video_url|default:'' }}" placeholder="https://...">
+            <label>Video URL (Bunny.net/CDN linki) - Ixtiyoriy</label>
+            <input type="url" name="video_url" class="form-control" value="{{ episode.video_url|default:'' }}" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+            <label>Yoki Video Faylni Yuklang (MP4, MKV va b.) - Ixtiyoriy</label>
+            <input type="file" name="video_file" class="form-control" accept="video/*">
+            {% if episode and episode.video_file %}
+            <div style="margin-top: 10px; color: var(--text-dim); font-size: 0.9rem;">
+                ✓ Yuklangan: {{ episode.video_file.name }}
+            </div>
+            {% endif %}
         </div>
         
         <button type="submit" class="btn-submit">SAQLASH <i class='bx bx-save'></i></button>

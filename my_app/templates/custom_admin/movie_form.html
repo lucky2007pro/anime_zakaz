@@ -48,6 +48,16 @@
         </div>
 
         <div class="form-group">
+            <label>Yoki Video Faylni Yuklang (MP4, MKV va b.) - Ixtiyoriy</label>
+            <input type="file" name="video_file" class="form-control" accept="video/*">
+            {% if movie and movie.video_file %}
+            <div style="margin-top: 10px; color: var(--text-dim); font-size: 0.9rem;">
+                ✓ Yuklangan: {{ movie.video_file.name }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
             <label>Telegram Link (Ixtiyoriy - tugma chiqarish uchn)</label>
             <input type="url" name="telegram_link" class="form-control" value="{{ movie.telegram_link|default:'' }}">
         </div>

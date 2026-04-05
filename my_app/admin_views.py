@@ -57,6 +57,7 @@ def admin_movie_form(request, pk=None):
         vid_url = request.POST.get('video_url')
         tg_link = request.POST.get('telegram_link')
         image = request.FILES.get('image')
+        video_file = request.FILES.get('video_file')
 
         if not movie:
             movie = Movie()
@@ -69,6 +70,8 @@ def admin_movie_form(request, pk=None):
             movie.category = Category.objects.get(id=cat_id)
         if image:
             movie.image = image
+        if video_file:
+            movie.video_file = video_file
             
         movie.save()
         messages.success(request, "Anime muvaffaqiyatli saqlandi!")
@@ -101,6 +104,7 @@ def admin_episode_form(request, pk=None):
         ep_num = request.POST.get('episode_number')
         title = request.POST.get('title')
         vid_url = request.POST.get('video_url')
+        video_file = request.FILES.get('video_file')
 
         if not episode:
             episode = MovieEpisode()
@@ -109,6 +113,8 @@ def admin_episode_form(request, pk=None):
         episode.episode_number = ep_num
         episode.title = title
         episode.video_url = vid_url
+        if video_file:
+            episode.video_file = video_file
         episode.save()
         
         messages.success(request, "Qism muvaffaqiyatli saqlandi!")

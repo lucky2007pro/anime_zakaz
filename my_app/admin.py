@@ -30,7 +30,7 @@ class CustomUserAdmin(UserAdmin):
 class MovieEpisodeInline(admin.TabularInline):
     model = MovieEpisode
     extra = 1
-    fields = ('episode_number', 'title', 'video_url', 'description')
+    fields = ('episode_number', 'title', 'video_url', 'video_file', 'description')
     show_change_link = True
 
 

@@ -63,6 +63,13 @@ class Movie(models.Model):
         help_text="Asosiy video URL (mp4 yoki CDN linki)"
     )
 
+    video_file = models.FileField(
+        upload_to='movies/videos/',
+        blank=True,
+        null=True,
+        help_text="Yoki video faylni yuklang (mp4, mkv va b.)"
+    )
+
     telegram_link = models.URLField(
         blank=True,
         null=True,
@@ -82,7 +89,8 @@ class MovieEpisode(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='episodes')
     episode_number = models.PositiveIntegerField(default=1)
     title = models.CharField(max_length=200)
-    video_url = models.URLField(help_text="Bunny.net iframe yoki mp4 linkini yozing")
+    video_url = models.URLField(blank=True, null=True, help_text="Bunny.net iframe yoki mp4 linkini yozing")
+    video_file = models.FileField(upload_to='videos/', blank=True, null=True, help_text="Yoki video faylni yuklang (mp4, mkv va b.)")
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
