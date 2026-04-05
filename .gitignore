@@ -5,16 +5,21 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+*.egg-info/
+dist/
+build/
 
 # Virtual environments
 venv/
 .venv/
 env/
+ENV/
 
 # Django
 *.log
 local_settings.py
 db.sqlite3
+*.sqlite3
 media/
 staticfiles/
 
@@ -26,6 +31,9 @@ staticfiles/
 # IDE
 .idea/
 .vscode/
+*.swp
+*.swo
+*~
 
 # OS
 .DS_Store
@@ -37,6 +45,11 @@ Thumbs.db
 .coverage
 htmlcov/
 
+# Railway
+*.tar.gz
+.railway/
 
-db.sqlite3
-*.sqlite3
+# Node (agar frontend build tools bo'lsa)
+node_modules/
+npm-debug.log
+yarn-error.log

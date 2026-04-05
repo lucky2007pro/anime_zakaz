@@ -1,51 +1,21 @@
 import os
-import importlib.util
+import sys
 from pathlib import Path
-import dj_database_url
-from django.core.exceptions import ImproperlyConfigured
+from decouple import config, Csv
+
+# Loyihaning asosiy yo'li
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-3stjy_8w_4-1$67wt@hvzi$3nu@elz^n$33frr(zbf=p31el3&')
+# .env faylidan sozlamalarni o'qish (environment variable uchun)
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-bestmedia-vps-key-2026-change-in-production')
 
-ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development').lower()
-USE_HTTPS = os.environ.get('USE_HTTPS', 'false').lower() in ('1', 'true', 'yes')
+# Production: False, Development: True (environment variable dan o'qish)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-if 'DEBUG' in os.environ:
-    DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-else:
-    DEBUG = ENVIRONMENT != 'production'
+# Allowed hosts (environment variable dan o'qish yoki default qo'yish)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
 
-
-def _env_bool(var_name, default=False):
-    return os.environ.get(var_name, str(default)).strip().lower() in ('1', 'true', 'yes', 'on')
-
-
-def _split_csv_env(var_name, default_value=''):
-    """Comma-separated env qiymatini tozalab list ko'rinishiga o'tkazadi."""
-    raw_value = os.environ.get(var_name, default_value)
-    return [item.strip() for item in raw_value.split(',') if item.strip()]
-
-
-DEFAULT_ALLOWED_HOSTS = [
-    'healthcheck.railway.app',
-    '.up.railway.app',
-    '127.0.0.1',
-    'localhost',
-]
-
-DEFAULT_CSRF_TRUSTED_ORIGINS = [
-    'https://healthcheck.railway.app',
-    'https://*.up.railway.app',
-]
-
-ALLOWED_HOSTS = list(dict.fromkeys(_split_csv_env('ALLOWED_HOSTS') + DEFAULT_ALLOWED_HOSTS))
-CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(_split_csv_env('CSRF_TRUSTED_ORIGINS') + DEFAULT_CSRF_TRUSTED_ORIGINS))
-
-_cloudinary_available = all([
-    importlib.util.find_spec('cloudinary') is not None,
-    importlib.util.find_spec('cloudinary_storage') is not None,
-])
-
+# Ilovalar ro'yxati
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,18 +24,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Sizning ilovangiz
     'my_app.apps.MyAppConfig',
-]
 
-if _cloudinary_available:
-    INSTALLED_APPS += [
-        'cloudinary_storage',
-        'cloudinary',
-    ]
+    # Media va Static uchun
+    'cloudinary_storage',
+    'cloudinary',
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Static fayllarni yetkazish uchun
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -83,6 +52,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -93,134 +63,93 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'src.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# --- MA'LUMOTLAR BAZASI (Production: PostgreSQL, Development: SQLite) ---
+import dj_database_url
+
+ENVIRONMENT = config('ENVIRONMENT', default='development')
+
+# DATABASE_URL mavjud bo'lsa (Railway/Production) uni ishlatish
+if config('DATABASE_URL', default=None):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=config('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
-
-database_url = os.environ.get('DATABASE_URL', '').strip()
-
-if database_url:
-    DATABASES['default'] = dict(dj_database_url.config(
-        default=database_url,
-        conn_max_age=600,
-        conn_health_checks=True,
-    ))
-elif ENVIRONMENT == 'production' and not DEBUG:
-    raise ImproperlyConfigured('DATABASE_URL production muhitida majburiy. Railway Postgres ulang.')
+elif ENVIRONMENT == 'production':
+    # Railway PostgreSQL (manual konfiguratsiya)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME', default='bestmedia_db'),
+            'USER': config('DB_USER', default='postgres'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+            'CONN_MAX_AGE': 600,
+            'OPTIONS': {
+                'connect_timeout': 10,
+            }
+        }
+    }
+else:
+    # Development - SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Custom User Model
 AUTH_USER_MODEL = 'my_app.CustomUser'
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
-
 USE_TZ = True
 
+# --- STATIC VA MEDIA FAYLLAR ---
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
-railway_volume_root = os.environ.get('RAILWAY_VOLUME_MOUNT_PATH', '').strip()
-MEDIA_ROOT = os.path.join(railway_volume_root, 'media') if railway_volume_root else os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-cloudinary_cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME', '').strip()
-cloudinary_api_key = os.environ.get('CLOUDINARY_API_KEY', '').strip()
-cloudinary_api_secret = os.environ.get('CLOUDINARY_API_SECRET', '').strip()
-cloudinary_credentials_set = all([
-    cloudinary_cloud_name,
-    cloudinary_api_key,
-    cloudinary_api_secret,
-])
-
-# In production prefer remote media storage to avoid Railway's ephemeral filesystem loss.
-use_volume_storage = bool(railway_volume_root)
-use_cloudinary = _cloudinary_available and (not use_volume_storage) and _env_bool('USE_CLOUDINARY', default=(not DEBUG)) and cloudinary_credentials_set
-
-
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': cloudinary_cloud_name,
-    'API_KEY': cloudinary_api_key,
-    'API_SECRET': cloudinary_api_secret,
-    'SECURE': True,
-    'RESOURCE_TYPE': 'auto',
-}
-
-STORAGES = {
-    'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage' if use_volume_storage or not use_cloudinary else 'cloudinary_storage.storage.RawMediaCloudinaryStorage',
-    },
-    'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-    },
-}
-
-if not use_cloudinary:
-    STORAGES['default']['OPTIONS'] = {
-        'location': MEDIA_ROOT,
-        'base_url': MEDIA_URL,
-    }
-
-# Large uploads like 200MB need a higher request-body allowance than Django's small default.
-DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('DATA_UPLOAD_MAX_MEMORY_SIZE', str(256 * 1024 * 1024)))
-FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('FILE_UPLOAD_MAX_MEMORY_SIZE', str(5 * 1024 * 1024)))
-
-if ENVIRONMENT == 'production' and not DEBUG and USE_HTTPS:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+# Whitenoise static fayllarni siqish uchun
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'propagate': False,
-        },
-    },
-}
+# --- CSRF VA SECURITY SOZLAMALARI ---
+# Environment'dan ALLOWED_HOSTS va CSRF_TRUSTED_ORIGINS ni o'qish
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='http://127.0.0.1,http://localhost',
+    cast=Csv()
+)
+
+# Session va Cookie sozlamalari (Production)
+if ENVIRONMENT == 'production':
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = config('USE_HTTPS', default=True, cast=bool)
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
+else:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT = False
 
