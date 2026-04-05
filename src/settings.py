@@ -14,6 +14,10 @@ else:
     DEBUG = ENVIRONMENT != 'production'
 
 
+def _env_bool(var_name, default=False):
+    return os.environ.get(var_name, str(default)).strip().lower() in ('1', 'true', 'yes', 'on')
+
+
 def _split_csv_env(var_name, default_value=''):
     """Comma-separated env qiymatini tozalab list ko'rinishiga o'tkazadi."""
     raw_value = os.environ.get(var_name, default_value)
@@ -121,20 +125,42 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+cloudinary_cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME', '').strip()
+cloudinary_api_key = os.environ.get('CLOUDINARY_API_KEY', '').strip()
+cloudinary_api_secret = os.environ.get('CLOUDINARY_API_SECRET', '').strip()
+cloudinary_credentials_set = all([
+    cloudinary_cloud_name,
+    cloudinary_api_key,
+    cloudinary_api_secret,
+])
+
+# In production prefer remote media storage to avoid Railway's ephemeral filesystem loss.
+use_cloudinary = _env_bool('USE_CLOUDINARY', default=(not DEBUG)) and cloudinary_credentials_set
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
+    'CLOUD_NAME': cloudinary_cloud_name,
+    'API_KEY': cloudinary_api_key,
+    'API_SECRET': cloudinary_api_secret,
+    'SECURE': True,
 }
 
-if not DEBUG or os.environ.get('USE_CLOUDINARY', 'False') == 'True':
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_URL = '/media/'
-else:
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STORAGES = {
+    'default': {
+        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage' if use_cloudinary else 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
+if not use_cloudinary:
+    STORAGES['default']['OPTIONS'] = {
+        'location': MEDIA_ROOT,
+        'base_url': MEDIA_URL,
+    }
 
 if ENVIRONMENT == 'production' and not DEBUG and USE_HTTPS:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
