@@ -340,7 +340,7 @@
 {% block content %}
 <div class="slider-container">
     <div class="slides-wrapper" id="slidesWrapper">
-        {% for anime in movies|slice:":3" %}
+        {% for anime in hero_movies %}
         <div class="slide">
              <div class="slide-bg" style="background-image: url('{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');"></div>
              <div class="slide-overlay"></div>
@@ -367,7 +367,7 @@
     </div>
 
     <div class="slider-controls" id="sliderDots">
-        {% for anime in movies|slice:":3" %}
+        {% for anime in hero_movies %}
         <div class="dot" role="button" tabindex="0" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" onclick="goToSlide({{ forloop.counter0 }})"></div>
         {% endfor %}
     </div>

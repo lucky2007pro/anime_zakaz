@@ -35,9 +35,10 @@ class MovieEpisodeInline(admin.TabularInline):
 
 
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created_at')
+    list_display = ('title', 'is_home_featured', 'home_featured_order', 'created_at')
     search_fields = ('title',)
-    list_filter = ('created_at',)
+    list_filter = ('created_at', 'is_home_featured')
+    list_editable = ('is_home_featured', 'home_featured_order')
     inlines = [MovieEpisodeInline]
 
 

@@ -88,6 +88,17 @@ def home(request):
         last_episode=Max('episodes__created_at')
     ).order_by('-last_episode')
 
+    hero_movies = list(
+        Movie.objects.select_related('category').prefetch_related('episodes')
+        .filter(is_home_featured=True)
+        .order_by('home_featured_order', '-created_at')[:7]
+    )
+
+    if not hero_movies:
+        hero_movies = list(
+            movies.select_related('category').prefetch_related('episodes')[:7]
+        )
+
     categories = Category.objects.all()
 
     mp3_to_play = None
@@ -103,6 +114,7 @@ def home(request):
 
     context = {
         'movies': movies,
+        'hero_movies': hero_movies,
         'categories': categories,
         'mp3_file': mp3_to_play,
         'total_users': User.objects.count(),

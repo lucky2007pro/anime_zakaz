@@ -49,6 +49,14 @@ class Movie(models.Model):
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='movies/')
     description = models.TextField(blank=True, null=True)
+    is_home_featured = models.BooleanField(
+        default=False,
+        help_text="Bosh sahifa hero fonida ko'rsatish uchun belgilang"
+    )
+    home_featured_order = models.PositiveSmallIntegerField(
+        default=0,
+        help_text="Kichik raqam avval ko'rsatiladi"
+    )
 
     category = models.ForeignKey(
         Category,

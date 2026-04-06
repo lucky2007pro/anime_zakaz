@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
-from django.utils import timezone
 from django.http import JsonResponse
 from django.urls import reverse
 from .models import CustomUser, Movie, MovieEpisode, Category, ChatMessage
@@ -62,6 +61,11 @@ def admin_movie_form(request, pk=None):
         cat_id = request.POST.get('category')
         vid_url = request.POST.get('video_url')
         tg_link = request.POST.get('telegram_link')
+        is_home_featured = request.POST.get('is_home_featured') == 'on'
+        try:
+            home_featured_order = int(request.POST.get('home_featured_order', 0) or 0)
+        except (TypeError, ValueError):
+            home_featured_order = 0
         image = request.FILES.get('image')
         video_file = request.FILES.get('video_file')
 
@@ -72,6 +76,8 @@ def admin_movie_form(request, pk=None):
         movie.description = desc
         movie.video_url = vid_url
         movie.telegram_link = tg_link
+        movie.is_home_featured = is_home_featured
+        movie.home_featured_order = home_featured_order
         if cat_id:
             movie.category = Category.objects.get(id=cat_id)
         if image:
