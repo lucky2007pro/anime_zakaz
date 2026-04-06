@@ -26,6 +26,22 @@
     background: rgba(17,17,24,0.88);
 }
 
+.movie-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.03);
+}
+
+.movie-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(10,10,15,0.94) 0%, rgba(10,10,15,0.80) 45%, rgba(10,10,15,0.40) 100%),
+        linear-gradient(0deg, rgba(10,10,15,0.86) 0%, transparent 58%);
+}
+
 .movie-hero-content {
     position: relative;
     z-index: 2;
@@ -394,6 +410,8 @@
 <main class="main-content">
     <div class="movie-page">
         <section class="movie-hero">
+            <div class="movie-hero-bg" style="background-image:url('{% if movie.image %}{{ movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');"></div>
+            <div class="movie-hero-overlay"></div>
             <div class="movie-hero-content">
                 <div class="hero-top">
                     <a href="{% url 'home' %}" class="btn-back">⬅ Orqaga</a>

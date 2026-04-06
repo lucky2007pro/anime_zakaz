@@ -94,10 +94,6 @@ def home(request):
         .order_by('home_featured_order', '-created_at')[:7]
     )
 
-    if not hero_movies:
-        hero_movies = list(
-            movies.select_related('category').prefetch_related('episodes')[:7]
-        )
 
     categories = Category.objects.all()
 

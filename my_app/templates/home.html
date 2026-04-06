@@ -338,6 +338,7 @@
 {% endblock %}
 
 {% block content %}
+{% if hero_movies %}
 <div class="slider-container">
     <div class="slides-wrapper" id="slidesWrapper">
         {% for anime in hero_movies %}
@@ -372,6 +373,7 @@
         {% endfor %}
     </div>
 </div>
+{% endif %}
 
 <div class="container" id="new-releases">
     <div class="section-header">
