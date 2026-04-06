@@ -2,10 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.utils import timezone
+from django.http import JsonResponse
+from django.urls import reverse
 from .models import CustomUser, Movie, MovieEpisode, Category, ChatMessage
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
+
+
+def _is_ajax(request):
+    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
 @user_passes_test(is_admin, login_url='/')
 def admin_dashboard(request):
@@ -76,8 +82,15 @@ def admin_movie_form(request, pk=None):
         try:
             movie.save()
         except Exception:
-            messages.error(request, "Fayl yuklanmadi. Rasm yoki video formatini tekshirib, qayta urinib ko'ring.")
+            err_msg = "Fayl yuklanmadi. Rasm yoki video formatini tekshirib, qayta urinib ko'ring."
+            if _is_ajax(request):
+                return JsonResponse({'ok': False, 'error': err_msg}, status=400)
+            messages.error(request, err_msg)
             return render(request, 'custom_admin/movie_form.html', {'movie': movie, 'genres': genres})
+
+        if _is_ajax(request):
+            return JsonResponse({'ok': True, 'redirect_url': reverse('admin_movies')})
+
         messages.success(request, "Anime muvaffaqiyatli saqlandi!")
         return redirect('admin_movies')
         
@@ -122,8 +135,14 @@ def admin_episode_form(request, pk=None):
         try:
             episode.save()
         except Exception:
-            messages.error(request, "Video yuklanmadi. Video URL kiriting yoki to'g'ri video formatini yuklang.")
+            err_msg = "Video yuklanmadi. Video URL kiriting yoki to'g'ri video formatini yuklang."
+            if _is_ajax(request):
+                return JsonResponse({'ok': False, 'error': err_msg}, status=400)
+            messages.error(request, err_msg)
             return render(request, 'custom_admin/episode_form.html', {'episode': episode, 'movies': movies})
+
+        if _is_ajax(request):
+            return JsonResponse({'ok': True, 'redirect_url': reverse('admin_episodes')})
         
         messages.success(request, "Qism muvaffaqiyatli saqlandi!")
         return redirect('admin_episodes')

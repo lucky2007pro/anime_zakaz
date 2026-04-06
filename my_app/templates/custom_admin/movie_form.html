@@ -1,4 +1,5 @@
 {% extends 'custom_admin/base.html' %}
+{% load static %}
 
 {% block page_title %}{% if movie %}Anime Tahrirlash{% else %}Yangi Anime Qo'shish{% endif %}{% endblock %}
 
@@ -22,6 +23,43 @@
         text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 15px var(--accent-glow);
     }
     .btn-submit:hover { background: white; box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+    .upload-progress-wrap {
+        display: none;
+        margin: 14px 0 6px;
+        padding: 12px;
+        background: rgba(0, 243, 255, 0.08);
+        border: 1px solid var(--border-line);
+        border-radius: 8px;
+    }
+
+    .upload-progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .upload-progress-track {
+        height: 10px;
+        background: rgba(255,255,255,0.12);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .upload-progress-fill {
+        width: 0;
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #34d399);
+        transition: width 0.2s ease;
+    }
+
+    .upload-progress-text {
+        margin-top: 8px;
+        color: var(--text-dim);
+        font-size: 0.85rem;
+    }
 </style>
 {% endblock %}
 
@@ -30,13 +68,24 @@
     <h2 style="margin-bottom: 25px; font-size: 1.8rem; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--border-line); padding-bottom: 10px;">
         {% if movie %}Anime Tahrirlash: {{ movie.title }}{% else %}Yangi Anime Qo'shish{% endif %}
     </h2>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id="video-upload-form">
         {% csrf_token %}
         <div class="form-group">
             <label>Anime Nomi</label>
             <input type="text" name="title" class="form-control" required value="{{ movie.title|default:'' }}">
         </div>
-        
+
+        <div class="upload-progress-wrap" id="upload-progress-wrap">
+            <div class="upload-progress-header">
+                <strong>Video yuklanmoqda...</strong>
+                <span id="upload-progress-percent">0%</span>
+            </div>
+            <div class="upload-progress-track">
+                <div class="upload-progress-fill" id="upload-progress-fill"></div>
+            </div>
+            <div class="upload-progress-text" id="upload-progress-text">Yuklash boshlanishi kutilmoqda...</div>
+        </div>
+
         <div class="form-group">
             <label>Tavsifi (Ixtiyoriy)</label>
             <textarea name="description" class="form-control" rows="4">{{ movie.description|default:'' }}</textarea>
@@ -85,4 +134,9 @@
         <button type="submit" class="btn-submit">SAQLASH <i class='bx bx-save'></i></button>
     </form>
 </div>
+
+<script src="{% static 'js/admin_upload_progress.js' %}"></script>
+<script>
+    window.BestMediaUploadProgress.initUploadProgress('#video-upload-form');
+</script>
 {% endblock %}
