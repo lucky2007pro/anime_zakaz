@@ -76,10 +76,10 @@
         border: 1px solid rgba(0, 243, 255, 0.3);
     }
 
-    .tag.rating {
-        background: rgba(255, 193, 7, 0.15);
-        color: #ffc107;
-        border-color: rgba(255, 193, 7, 0.3);
+    .tag-muted {
+        background: rgba(255,255,255,0.08);
+        color: var(--text-light);
+        border-color: rgba(255,255,255,0.15);
     }
 
     .slide-title {
@@ -152,6 +152,11 @@
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 5%;
+    }
+
+    .slider-container,
+    .container {
+        width: 100%;
     }
 
     .section-header {
@@ -302,23 +307,41 @@
         .slide-title { font-size: 3rem; }
     }
     @media (max-width: 768px) {
-        .slider-container { height: 60vh; }
-        .slide { padding: 4% 4% 12% 4%; }
+        .slider-container {
+            height: 62vh;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+        }
+        .slide {
+            padding: 18px 16px 54px;
+            align-items: flex-end;
+        }
+        .slide-content { max-width: 100%; }
         .slide-title { font-size: 2.2rem; }
         .slide-desc { font-size: 0.9rem; -webkit-line-clamp: 2; }
         .btn-main { padding: 12px 22px; font-size: 0.9rem; }
-        
+        .container { padding: 0 4%; }
+
         .section-title h3 { font-size: 1.3rem; }
-        .section-header { margin: 25px 0 15px 0; }
-        .cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+        .section-header { margin: 24px 0 14px; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         .anime-card { height: 220px; }
     }
     @media (max-width: 480px) {
-        .slider-container { height: 55vh; }
-        .slide-title { font-size: 1.7rem; }
+        .slider-container {
+            height: 54vh;
+            margin-top: 60px;
+        }
+        .slide-title { font-size: 1.55rem; }
+        .slide-desc { font-size: 0.85rem; margin-bottom: 16px; }
+        .btn-main { padding: 10px 16px; font-size: 0.85rem; }
         .slider-controls { bottom: 15px; }
-        .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .anime-card { height: 190px; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .anime-card { height: 180px; }
+        .card-title { font-size: 0.92rem; }
+        .card-meta { font-size: 0.7rem; }
+        .top-badge, .badge-quality { font-size: 0.62rem; }
     }
 </style>
 {% endblock %}
@@ -334,10 +357,12 @@
             <div class="slide-content">
                 <div class="tags">
                     <span class="tag">YANGI</span>
-                    <span class="tag rating">★ {{ anime.rating|default:"0" }}</span>
-                    <span class="tag">{{ anime.release_year }}</span>
+                    <span class="tag tag-muted">{{ anime.created_at|date:"Y" }}</span>
                     {% if anime.episodes.count > 0 %}
                     <span class="tag">{{ anime.episodes.count }} qism</span>
+                    {% endif %}
+                    {% if anime.category %}
+                    <span class="tag tag-muted">{{ anime.category.name }}</span>
                     {% endif %}
                 </div>
                 <h1 class="slide-title">{{ anime.title }}</h1>
@@ -369,11 +394,10 @@
         {% for anime in movies %}
         <a href="{% url 'movie_detail' anime.id %}" class="card-wrapper">
             <div class="anime-card">
-                <div class="top-badge">★ {{ anime.rating|default:"8.7" }}</div>
                 {% if anime.episodes.count > 0 %}
-                <div class="badge-quality">HD</div>
+                <div class="top-badge">{{ anime.episodes.count }} qism</div>
                 {% else %}
-                <div class="badge-quality">HD</div>
+                <div class="top-badge">Film</div>
                 {% endif %}
                 <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
             </div>
@@ -381,8 +405,8 @@
             <div class="card-info-bottom">
                  <h4 class="card-title">{{ anime.title }}</h4>
                   <div class="card-meta">
-                       <span class="tag-jp">JP</span>
-                       <span>{{ anime.release_year|default:"2024" }}</span>
+                       {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                       <span>{{ anime.created_at|date:"Y" }}</span>
                   </div>
             </div>
         </a>

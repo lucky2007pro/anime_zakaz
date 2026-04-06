@@ -199,9 +199,10 @@
         {% for anime in movies %}
         <a href="{% url 'movie_detail' anime.id %}" class="card-wrapper search-card" data-title="{{ anime.title|lower }}">
             <div class="anime-card">
-                <div class="top-badge">★ {{ anime.rating|default:"0" }}</div>
                 {% if anime.episodes.count > 0 %}
-                <div class="badge-quality">{{ anime.episodes.count }} qism</div>
+                <div class="top-badge">{{ anime.episodes.count }} qism</div>
+                {% else %}
+                <div class="top-badge">Film</div>
                 {% endif %}
                 <img src="{% if anime.image_url %}{{ anime.image_url }}{% elif anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
             </div>
@@ -209,8 +210,8 @@
             <div class="card-info-bottom">
                  <h4 class="card-title">{{ anime.title }}</h4>
                  <div class="card-meta">
-                      <span class="tag-jp">JP</span>
-                      <span>{{ anime.release_year }}</span>
+                      {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                      <span>{{ anime.created_at|date:"Y" }}</span>
                  </div>
             </div>
         </a>

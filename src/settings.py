@@ -29,7 +29,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-bestmedia-vps-key-202
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Allowed hosts (environment variable dan o'qish yoki default qo'yish)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='bestmedia-official.uz,www.bestmedia-official.uz,5.189.136.95', cast=Csv())
 
 # Ilovalar ro'yxati
 INSTALLED_APPS = [
@@ -150,7 +150,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Environment'dan ALLOWED_HOSTS va CSRF_TRUSTED_ORIGINS ni o'qish
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
-    default='http://127.0.0.1,http://localhost',
+    default='https://bestmedia-official.uz,https://www.bestmedia-official.uz,http://127.0.0.1,http://localhost',
     cast=Csv()
 )
 
@@ -169,3 +169,5 @@ else:
     CSRF_COOKIE_SECURE = False
     SECURE_SSL_REDIRECT = False
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000
+FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000

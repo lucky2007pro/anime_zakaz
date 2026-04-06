@@ -43,13 +43,23 @@
             font-family: 'Outfit', sans-serif;
         }
 
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             background-color: var(--bg-base);
             color: var(--text-light);
-            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+        }
+
+        img, video, iframe {
+            max-width: 100%;
+            height: auto;
         }
 
         /* ----- NAVBAR ----- */
@@ -343,14 +353,22 @@
             .hamburger { display: flex; }
             .nav-brand { font-size: 1.4rem; }
             .nav-actions .action-icon:not(.profile-btn) { display: none; }
+            .nav-actions { gap: 8px; }
+            .action-icon, .profile-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem;
+            }
             .profile-sidebar { width: 100%; right: -100%; border-left: none; }
             .profile-sidebar.active { right: 0; }
             main.main-content { margin-top: 72px; padding: 22px 4%; }
         }
         @media (max-width: 480px) {
-            .nav-brand { font-size: 1.2rem; }
+            .navbar { padding: 10px 3.5%; }
+            .nav-brand { font-size: 1.12rem; }
             .profile-sidebar { padding: 16px; }
             .mobile-nav-overlay a, .mobile-profile-btn { font-size: 1.15rem; }
+            .hamburger span { width: 22px; }
         }
 
         {% block extra_css %}{% endblock %}
