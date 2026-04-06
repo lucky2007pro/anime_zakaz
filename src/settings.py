@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-bestmedia-vps-key-2026-change-in-production')
 
 # Production: False, Development: True (environment variable dan o'qish)
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Allowed hosts (environment variable dan o'qish yoki default qo'yish)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='bestmedia-official.uz,www.bestmedia-official.uz,5.189.136.95', cast=Csv())
@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'src.wsgi.application'
 # --- MA'LUMOTLAR BAZASI (Production: PostgreSQL, Development: SQLite) ---
 import dj_database_url
 
-ENVIRONMENT = config('ENVIRONMENT', default='development')
+ENVIRONMENT = config('ENVIRONMENT', default='production')
 
 # DATABASE_URL mavjud bo'lsa (Railway/Production) uni ishlatish
 if config('DATABASE_URL', default=None):
@@ -127,6 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Custom User Model
 AUTH_USER_MODEL = 'my_app.CustomUser'
+LOGIN_URL = '/login/'
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Tashkent'
@@ -150,7 +151,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Environment'dan ALLOWED_HOSTS va CSRF_TRUSTED_ORIGINS ni o'qish
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
-    default='https://bestmedia-official.uz,https://www.bestmedia-official.uz,http://127.0.0.1,http://localhost',
+    default='http://bestmedia-official.uz,https://www.bestmedia-official.uz',
     cast=Csv()
 )
 

@@ -380,7 +380,7 @@
     <a href="{% url 'home' %}" class="nav-brand">BEST<span>MEDIA</span></a>
 
     <div class="nav-menu">
-        <a href="{% url 'search' %}" class="pill-nav-item"><i class='bx bx-play-circle'></i> KATALOG</a>
+        <a href="{% url 'anime_catalog' %}" class="pill-nav-item"><i class='bx bx-play-circle'></i> KATALOG</a>
         <a href="{% url 'chat' %}" class="pill-nav-item"><i class='bx bx-message-dots'></i> CHAT</a>
         <a href="{% url 'home' %}" class="pill-nav-item"><i class='bx bx-home-alt'></i> BOSH SAHIFA</a>
     </div>
@@ -401,7 +401,7 @@
 
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="if(event.target===this) toggleMobileNav()">
     <a href="{% url 'home' %}">Bosh sahifa</a>
-    <a href="{% url 'search' %}">Katalog</a>
+    <a href="{% url 'anime_catalog' %}">Katalog</a>
     <a href="{% url 'chat' %}">Chat</a>
     <button type="button" class="mobile-profile-btn" onclick="toggleMobileNav(); toggleProfileMenu();">Profil</button>
 </div>
@@ -437,7 +437,7 @@
         <h4 class="menu-title">MENING PROFILIM</h4>
         <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span> Umumiy chat <span class="arrow">›</span></a>
         <a href="{% url 'profile' %}" class="menu-item"><span class="icon-left"><i class='bx bx-user'></i></span> Profilni tahrirlash <span class="arrow">›</span></a>
-        <a href="{% url 'search' %}" class="menu-item"><span class="icon-left"><i class='bx bx-search'></i></span> Katalog qidiruv <span class="arrow">›</span></a>
+        <a href="{% url 'anime_catalog' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span> Katalog <span class="arrow">›</span></a>
         <a href="{% url 'home' %}" class="menu-item"><span class="icon-left"><i class='bx bx-home-alt'></i></span> Bosh sahifa <span class="arrow">›</span></a>
     </div>
 

@@ -8,6 +8,7 @@ from django.utils.timezone import localtime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 from django.db.models import Max
+from django.core.paginator import Paginator
 from django.utils import timezone
 
 from .models import (
@@ -191,6 +192,20 @@ def search(request):
     return render(request, 'search.html', {
         'movies': movies,
         'query': query,
+    })
+
+
+# =======================
+# CATALOG
+# =======================
+def anime_catalog(request):
+    movies = Movie.objects.select_related('category').prefetch_related('episodes').order_by('-created_at')
+    paginator = Paginator(movies, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'anime_catalog.html', {
+        'page_obj': page_obj,
+        'movies': page_obj.object_list,
     })
 
 

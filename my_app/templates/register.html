@@ -64,6 +64,28 @@
     .login-link a:hover {
         text-decoration: underline;
     }
+
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        border: 0;
+    }
+
+    @media (max-width: 768px) {
+        .auth-wrapper { min-height: calc(100vh - 70px); padding: 12px; }
+        .auth-container { width: min(100%, 420px); padding: 22px 18px; }
+        .login-link { font-size: 0.85rem; }
+    }
+
+    @media (max-width: 480px) {
+        .auth-container { padding: 18px 14px; }
+        .auth-container h2 { font-size: 1.35rem; }
+    }
 </style>
 {% endblock %}
 
@@ -74,7 +96,7 @@
     <source src="{{ site_settings.background_video.url }}" type="video/mp4">
 </video>
 {% elif site_settings.background_image %}
-<div class="bg-video" style="background-image: url('{{ site_settings.background_image.url }}');"></div>
+<div class="bg-image" style="background-image: url('{{ site_settings.background_image.url }}');"></div>
 {% endif %}
 {% endif %}
 
@@ -83,33 +105,32 @@
         <div class="auth-container">
             <h2>Ro'yxatdan o'tish</h2>
 
-            <form id="registerForm" action="" method="post">
+            <form id="registerForm" action="{% url 'register' %}" method="post">
                 {% csrf_token %}
 
                 <div class="input-box form-group">
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Username"
-                        required>
+                    <label class="sr-only" for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Username" required>
                     <i class='bx bx-user-circle'></i>
                     <small id="usernameError" style="color:var(--accent); display:block; margin-top:5px;"></small>
                 </div>
 
                 <div class="input-box form-group">
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Parol"
-                        required>
+                    <label class="sr-only" for="password">Parol</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Parol" required>
                     <i class='bx bx-lock'></i>
                     <i class='bx bxs-low-vision toggle-password' id="togglePassword1"></i>
                 </div>
 
                 <div class="input-box form-group">
-                    <input type="password" id="confirm_password" name="confirm_password" class="form-control"
-                        placeholder="Parolni takrorlang" required>
+                    <label class="sr-only" for="confirm_password">Parolni takrorlang</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Parolni takrorlang" required>
                     <i class='bx bx-lock'></i>
                     <i class='bx bxs-low-vision toggle-password' id="togglePassword2"></i>
                 </div>
 
                 <div class="input-box form-group" style="margin-bottom: 25px;">
-                    <label id="mathLabel"
-                        style="color:var(--text-light); margin-bottom:10px; display:block; font-weight: 600;"></label>
+                    <label id="mathLabel" for="math_answer" style="color:var(--text-light); margin-bottom:10px; display:block; font-weight: 600;"></label>
                     <input type="number" id="math_answer" class="form-control" placeholder="Javobni kiriting" required>
                     <i class='bx bx-calculator'></i>
                 </div>
@@ -154,16 +175,14 @@
 
     if (togglePassword1) {
         togglePassword1.addEventListener("click", function () {
-            const type = password.type === "password" ? "text" : "password";
-            password.type = type;
+            password.type = password.type === "password" ? "text" : "password";
             this.classList.toggle('active');
         });
     }
 
     if (togglePassword2) {
         togglePassword2.addEventListener("click", function () {
-            const type = confirmPassword.type === "password" ? "text" : "password";
-            confirmPassword.type = type;
+            confirmPassword.type = confirmPassword.type === "password" ? "text" : "password";
             this.classList.toggle('active');
         });
     }
@@ -171,8 +190,8 @@
     const mathLabel = document.getElementById('mathLabel');
     const mathAnswer = document.getElementById('math_answer');
 
-    let num1 = Math.floor(Math.random() * 10);
-    let num2 = Math.floor(Math.random() * 10 - num1 >= 0 ? 10 - num1 : 0);
+        let num1 = Math.floor(Math.random() * 10);
+        let num2 = Math.floor(Math.random() * (10 - num1 + 1));
     let correctAnswer = num1 + num2;
 
     if (mathLabel) {
@@ -212,7 +231,6 @@
             if (usernameError.innerText !== "") {
                 alert("Iltimos boshqa username tanlang!");
                 e.preventDefault();
-                return;
             }
         });
     }

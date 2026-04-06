@@ -10,7 +10,7 @@
     
     .form-control {
         width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-line);
-        color: white; border-radius: 4px; font-family: 'Outfit'; font-size: 1rem; transition: 0.3s;
+        color: white; border-radius: 4px; font-family: 'Outfit', sans-serif; font-size: 1rem; transition: 0.3s;
     }
     .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
     
@@ -20,6 +20,10 @@
         text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 15px var(--accent-glow);
     }
     .btn-submit:hover { background: white; color: black; box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+    @media (max-width: 768px) {
+        .form-container { max-width: 100%; }
+    }
 </style>
 {% endblock %}
 
@@ -31,8 +35,8 @@
     <form method="post">
         {% csrf_token %}
         <div class="form-group">
-            <label>Nomi</label>
-            <input type="text" name="name" class="form-control" required value="{{ genre.name|default:'' }}" placeholder="Masalan: Jangari, Fantastika">
+            <label for="genre-name">Nomi</label>
+            <input id="genre-name" type="text" name="name" class="form-control" required value="{{ genre.name|default:'' }}" placeholder="Masalan: Jangari, Fantastika">
         </div>
         
         <button type="submit" class="btn-submit">SAQLASH <i class='bx bx-save'></i></button>

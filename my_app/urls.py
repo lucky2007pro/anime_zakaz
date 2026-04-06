@@ -8,9 +8,11 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', home, name='home'),
     path('login/', login, name='login'),
+    path('accounts/login/', login, name='login_legacy'),
     path('register/', register, name='register'),
     path('logout/', logout_view, name='logout'),
     path('movie/<int:id>/', movie_detail, name='movie_detail'),
+    path('catalog/', anime_catalog, name='anime_catalog'),
     path('search/', search, name='search'),
     path('profile/', profile, name='profile'),
     path('check-username/', check_username, name='check_username'),

@@ -11,7 +11,7 @@
     
     .form-control {
         width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-line);
-        color: white; border-radius: 4px; font-family: 'Outfit'; font-size: 1rem; transition: 0.3s;
+        color: white; border-radius: 4px; font-family: 'Outfit', sans-serif; font-size: 1rem; transition: 0.3s;
     }
     .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
     
@@ -60,6 +60,11 @@
         color: var(--text-dim);
         font-size: 0.85rem;
     }
+
+    @media (max-width: 768px) {
+        .form-container { max-width: 100%; }
+        .inline-row { display: block !important; }
+    }
 </style>
 {% endblock %}
 
@@ -71,8 +76,8 @@
     <form method="post" enctype="multipart/form-data" id="video-upload-form">
         {% csrf_token %}
         <div class="form-group">
-            <label>Qaysi Animaga tegishli?</label>
-            <select name="movie" class="form-control select-control" required>
+            <label for="episode-movie">Qaysi Animaga tegishli?</label>
+            <select id="episode-movie" name="movie" class="form-control select-control" required>
                 <option value="">Anima tanlang...</option>
                 {% for m in movies %}
                 <option value="{{ m.id }}" {% if episode and episode.movie_id == m.id %}selected{% endif %}>{{ m.title }}</option>
@@ -80,25 +85,25 @@
             </select>
         </div>
         
-        <div class="form-group" style="display:flex; gap: 20px;">
+        <div class="form-group inline-row" style="display:flex; gap: 20px;">
             <div style="flex:1;">
-                <label>Qism raqami</label>
-                <input type="number" name="episode_number" class="form-control" required value="{{ episode.episode_number|default:'1' }}" min="1">
+                <label for="episode-number">Qism raqami</label>
+                <input id="episode-number" type="number" name="episode_number" class="form-control" required value="{{ episode.episode_number|default:'1' }}" min="1">
             </div>
             <div style="flex:2;">
-                <label>Nomlanishi (ixtiyoriy)</label>
-                <input type="text" name="title" class="form-control" value="{{ episode.title|default:'' }}" placeholder="Masalan: Qahramonning uyg'onishi">
+                <label for="episode-title">Nomlanishi (ixtiyoriy)</label>
+                <input id="episode-title" type="text" name="title" class="form-control" value="{{ episode.title|default:'' }}" placeholder="Masalan: Qahramonning uyg'onishi">
             </div>
         </div>
         
         <div class="form-group">
-            <label>Video URL (Bunny.net/CDN linki) - Ixtiyoriy</label>
-            <input type="url" name="video_url" class="form-control" value="{{ episode.video_url|default:'' }}" placeholder="https://...">
+            <label for="episode-video-url">Video URL (Bunny.net/CDN linki) - Ixtiyoriy</label>
+            <input id="episode-video-url" type="url" name="video_url" class="form-control" value="{{ episode.video_url|default:'' }}" placeholder="https://...">
         </div>
 
         <div class="form-group">
-            <label>Yoki Video Faylni Yuklang (MP4, MKV va b.) - Ixtiyoriy</label>
-            <input type="file" name="video_file" class="form-control" accept="video/*">
+            <label for="episode-video-file">Yoki Video Faylni Yuklang (MP4, MKV va b.) - Ixtiyoriy</label>
+            <input id="episode-video-file" type="file" name="video_file" class="form-control" accept="video/*">
             {% if episode and episode.video_file %}
             <div style="margin-top: 10px; color: var(--text-dim); font-size: 0.9rem;">
                 ✓ Yuklangan: {{ episode.video_file.name }}

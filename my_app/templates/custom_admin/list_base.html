@@ -19,6 +19,15 @@
     .action-btn:hover { background: var(--accent); color: black; border-color: var(--accent); }
     .action-btn.delete { background: #fee2e2; color: #ef4444; border-color: #fca5a5;}
     .action-btn.delete:hover { background: #ef4444; color: white; }
+
+    .table-wrap { width: 100%; overflow-x: auto; }
+    .table-wrap table { min-width: 720px; }
+
+    @media (max-width: 768px) {
+        .glass-panel { padding: 18px; }
+        .panel-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .panel-header h2 { font-size: 1.2rem; }
+    }
 </style>
 {% endblock %}
 
@@ -30,15 +39,16 @@
             {% if type == 'movie' %}
             <a href="{% url 'admin_movie_form' %}" class="btn">+ Qo'shish</a>
             {% elif type == 'episode' %}
-            <a href="{% url 'admin_episode_form' %}" class="btn">+ Qo'shish</a>
+            <a href="/control-panel/episodes/add/" class="btn">+ Qo'shish</a>
             {% elif type == 'genre' %}
-            <a href="{% url 'admin_genre_form' %}" class="btn">+ Qo'shish</a>
+            <a href="/control-panel/genres/add/" class="btn">+ Qo'shish</a>
             {% else %}
             <button class="btn" style="opacity:0.5; pointer-events:none;" title="Keyingi updatelarda qo'shiladi">+ Qo'shish</button>
             {% endif %}
         </div>
     </div>
 
+    <div class="table-wrap">
     <table>
         <thead>
             <tr>
@@ -58,7 +68,7 @@
             <tr>
                 {% if type == 'movie' %}
                 <td style="font-weight:600;">{{ item.title }}</td>
-                <td>{% if item.image %}<img src="{{ item.image.url }}" style="height:30px; border-radius:4px;">{% else %}-{% endif %}</td>
+                <td>{% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.title }} poster" style="height:30px; border-radius:4px;">{% else %}-{% endif %}</td>
                 <td>{{ item.created_at|date:"d.m.Y" }}</td>
                 {% elif type == 'genre' %}
                 <td style="font-weight:600;">{{ item.name }}</td>
@@ -90,9 +100,10 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" style="text-align:center; padding:30px; color:gray;">Hech narsa topilmadi!</td></tr>
+            <tr><td colspan="{% if type == 'movie' %}4{% elif type == 'genre' %}3{% elif type == 'episode' %}4{% elif type == 'chat' %}4{% else %}4{% endif %}" style="text-align:center; padding:30px; color:gray;">Hech narsa topilmadi!</td></tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
 {% endblock %}

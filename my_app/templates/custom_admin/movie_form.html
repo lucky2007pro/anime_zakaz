@@ -11,7 +11,7 @@
     
     .form-control {
         width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-line);
-        color: white; border-radius: 4px; font-family: 'Outfit'; font-size: 1rem; transition: 0.3s;
+        color: white; border-radius: 4px; font-family: 'Outfit', sans-serif; font-size: 1rem; transition: 0.3s;
     }
     .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
     
@@ -23,6 +23,14 @@
         text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 15px var(--accent-glow);
     }
     .btn-submit:hover { background: white; box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+    .form-grid { display: grid; gap: 20px; }
+    .inline-file-preview img { max-width: 100%; height: auto; }
+
+    @media (max-width: 768px) {
+        .form-container { max-width: 100%; }
+        .inline-row { display: block !important; }
+    }
 
     .upload-progress-wrap {
         display: none;
@@ -71,8 +79,8 @@
     <form method="post" enctype="multipart/form-data" id="video-upload-form">
         {% csrf_token %}
         <div class="form-group">
-            <label>Anime Nomi</label>
-            <input type="text" name="title" class="form-control" required value="{{ movie.title|default:'' }}">
+            <label for="movie-title">Anime Nomi</label>
+            <input id="movie-title" type="text" name="title" class="form-control" required value="{{ movie.title|default:'' }}">
         </div>
 
         <div class="upload-progress-wrap" id="upload-progress-wrap">
@@ -87,18 +95,18 @@
         </div>
 
         <div class="form-group">
-            <label>Tavsifi (Ixtiyoriy)</label>
-            <textarea name="description" class="form-control" rows="4">{{ movie.description|default:'' }}</textarea>
+            <label for="movie-description">Tavsifi (Ixtiyoriy)</label>
+            <textarea id="movie-description" name="description" class="form-control" rows="4">{{ movie.description|default:'' }}</textarea>
         </div>
         
         <div class="form-group">
-            <label>Video URL (Ixtiyoriy)</label>
-            <input type="url" name="video_url" class="form-control" value="{{ movie.video_url|default:'' }}">
+            <label for="movie-video-url">Video URL (Ixtiyoriy)</label>
+            <input id="movie-video-url" type="url" name="video_url" class="form-control" value="{{ movie.video_url|default:'' }}">
         </div>
 
         <div class="form-group">
-            <label>Yoki Video Faylni Yuklang (MP4, MKV va b.) - Ixtiyoriy</label>
-            <input type="file" name="video_file" class="form-control" accept="video/*">
+            <label for="movie-video-file">Yoki Video Faylni Yuklang (MP4, MKV va b.) - Ixtiyoriy</label>
+            <input id="movie-video-file" type="file" name="video_file" class="form-control" accept="video/*">
             {% if movie and movie.video_file %}
             <div style="margin-top: 10px; color: var(--text-dim); font-size: 0.9rem;">
                 ✓ Yuklangan: {{ movie.video_file.name }}
@@ -107,13 +115,13 @@
         </div>
 
         <div class="form-group">
-            <label>Telegram Link (Ixtiyoriy - tugma chiqarish uchn)</label>
-            <input type="url" name="telegram_link" class="form-control" value="{{ movie.telegram_link|default:'' }}">
+            <label for="movie-telegram-link">Telegram Link (Ixtiyoriy - tugma chiqarish uchun)</label>
+            <input id="movie-telegram-link" type="url" name="telegram_link" class="form-control" value="{{ movie.telegram_link|default:'' }}">
         </div>
         
         <div class="form-group">
-            <label>Janr (Kategoriya)</label>
-            <select name="category" class="form-control select-control">
+            <label for="movie-category">Janr (Kategoriya)</label>
+            <select id="movie-category" name="category" class="form-control select-control">
                 <option value="">Tanlang...</option>
                 {% for genre in genres %}
                 <option value="{{ genre.id }}" {% if movie and movie.category_id == genre.id %}selected{% endif %}>{{ genre.name }}</option>
@@ -122,11 +130,11 @@
         </div>
         
         <div class="form-group">
-            <label>Ooster/Rasm {% if not movie %}(Majburiy){% else %}(Ixtiyoriy - almashtirish uchun){% endif %}</label>
-            <input type="file" name="image" class="form-control" {% if not movie %}required{% endif %} accept="image/*">
+            <label for="movie-image">Poster/Rasm {% if not movie %}(Majburiy){% else %}(Ixtiyoriy - almashtirish uchun){% endif %}</label>
+            <input id="movie-image" type="file" name="image" class="form-control" {% if not movie %}required{% endif %} accept="image/*">
             {% if movie and movie.image %}
             <div style="margin-top: 10px;">
-                <img src="{{ movie.image.url }}" style="height: 100px; border-radius: 4px; border: 1px solid var(--border-line);">
+                <img src="{{ movie.image.url }}" alt="{{ movie.title }} poster" style="height: 100px; border-radius: 4px; border: 1px solid var(--border-line);">
             </div>
             {% endif %}
         </div>

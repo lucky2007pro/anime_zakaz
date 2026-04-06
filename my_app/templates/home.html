@@ -142,7 +142,7 @@
         transition: all 0.3s;
     }
 
-    .dot.active {
+    .dot[aria-pressed="true"] {
         background: var(--accent);
         width: 50px;
     }
@@ -258,19 +258,6 @@
         gap: 2px;
     }
 
-    .badge-quality {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        background: var(--accent);
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        font-weight: 800;
-        color: white;
-        z-index: 10;
-        box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-    }
 
     .card-info-bottom {
          display: flex;
@@ -333,6 +320,10 @@
             height: 54vh;
             margin-top: 60px;
         }
+        .slide {
+            padding: 16px 14px 48px;
+        }
+        .tags { gap: 6px; }
         .slide-title { font-size: 1.55rem; }
         .slide-desc { font-size: 0.85rem; margin-bottom: 16px; }
         .btn-main { padding: 10px 16px; font-size: 0.85rem; }
@@ -341,7 +332,7 @@
         .anime-card { height: 180px; }
         .card-title { font-size: 0.92rem; }
         .card-meta { font-size: 0.7rem; }
-        .top-badge, .badge-quality { font-size: 0.62rem; }
+        .top-badge { font-size: 0.62rem; padding: 3px 6px; }
     }
 </style>
 {% endblock %}
@@ -377,7 +368,7 @@
 
     <div class="slider-controls" id="sliderDots">
         {% for anime in movies|slice:":3" %}
-        <div class="dot {% if forloop.first %}active{% endif %}" onclick="goToSlide({{ forloop.counter0 }})"></div>
+        <div class="dot" role="button" tabindex="0" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" onclick="goToSlide({{ forloop.counter0 }})"></div>
         {% endfor %}
     </div>
 </div>
@@ -387,7 +378,7 @@
         <div class="section-title">
             <h3>Yangi <span>Qo'shilganlar</span></h3>
         </div>
-        <a href="{% url 'search' %}" class="view-all">Barchasini ko'rish →</a>
+        <a href="{% url 'anime_catalog' %}" class="view-all">Barchasini ko'rish →</a>
     </div>
 
     <div class="cards-grid">
@@ -428,9 +419,9 @@
         currentSlide = index;
         wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
 
-        dots.forEach(dot => dot.classList.remove('active'));
+        dots.forEach(dot => dot.setAttribute('aria-pressed', 'false'));
         if (dots[currentSlide]) {
-            dots[currentSlide].classList.add('active');
+            dots[currentSlide].setAttribute('aria-pressed', 'true');
         }
     }
 

@@ -131,19 +131,6 @@
     z-index: 10;
 }
 
-.badge-quality {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: var(--accent);
-    padding: 4px 6px;
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-weight: 900;
-    color: white;
-    z-index: 10;
-}
-
 .card-info-bottom {
      display: flex;
      flex-direction: column;
@@ -176,10 +163,33 @@
 
 .hide-cards { display: none !important; }
 
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
 @media (max-width: 768px) {
-    .search-wrapper form { flex-direction: column; }
-    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .search-wrapper { margin: 10px auto 28px; }
+    .search-wrapper form { flex-direction: column; padding: 14px; }
+    .search-wrapper input, .btn-search { width: 100%; }
+    .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .anime-card { height: 220px; }
+}
+
+@media (max-width: 480px) {
+    .search-wrapper h2 { font-size: 1.15rem; }
+    .search-wrapper input { font-size: 0.95rem; padding: 12px 14px; }
+    .btn-search { font-size: 0.95rem; padding: 12px 16px; }
+    .cards-grid { gap: 12px; }
+    .anime-card { height: 180px; }
+    .card-title { font-size: 0.9rem; }
+    .card-meta { font-size: 0.72rem; }
 }
 </style>
 {% endblock %}
@@ -188,14 +198,15 @@
 <main class="main-content">
     
     <div class="search-wrapper">
-        <h2 style="margin-bottom: 20px; font-weight: 800;">Katalog Qidiruv</h2>
+        <h2 style="margin-bottom: 20px; font-weight: 800;">Barcha animelar</h2>
         <form method="GET" action="{% url 'search' %}" onsubmit="return false;">
-            <input type="text" id="search-input" placeholder="Anime nomini yozing..." autocomplete="off">
+            <label class="sr-only" for="search-input">Anime nomini yozing</label>
+            <input type="text" id="search-input" placeholder="Anime nomini yozing..." aria-label="Anime nomini yozing" autocomplete="off">
             <button type="submit" class="btn-search">Qidirish</button>
         </form>
     </div>
 
-    <div class="cards-grid hide-cards" id="movie-container">
+    <div class="cards-grid" id="movie-container">
         {% for anime in movies %}
         <a href="{% url 'movie_detail' anime.id %}" class="card-wrapper search-card" data-title="{{ anime.title|lower }}">
             <div class="anime-card">
@@ -227,16 +238,10 @@ const container = document.getElementById('movie-container');
 searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase().trim();
 
-    if(query.length > 0){
-        container.classList.remove('hide-cards');
-    } else {
-        container.classList.add('hide-cards');
-    }
-
     let anyVisible = false;
     cards.forEach(card => {
         const title = card.getAttribute('data-title');
-        if(query.length > 0 && title.includes(query)){
+        if(query.length === 0 || title.includes(query)){
             card.style.display = 'flex';
             anyVisible = true;
         } else {

@@ -10,7 +10,7 @@
     top: 0; left: 0; width: 100%; height: 100%;
     object-fit: cover;
     z-index: -1;
-    opacity: 0.3; /* blend with dark background */
+    opacity: 0.3;
 }
 
 .auth-wrapper {
@@ -84,6 +84,29 @@
 .remember-forgot a:hover {
     text-decoration: underline;
 }
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+@media (max-width: 768px) {
+    .auth-wrapper { min-height: calc(100vh - 70px); padding: 12px; }
+    .auth-container { width: min(100%, 420px); padding: 22px 18px; }
+    .remember-forgot { flex-direction: column; gap: 10px; align-items: flex-start; }
+}
+
+@media (max-width: 480px) {
+    .auth-container { padding: 18px 14px; }
+    .auth-container h2 { font-size: 1.35rem; }
+    .messages li { font-size: 0.9rem; }
+}
 </style>
 {% endblock %}
 
@@ -114,11 +137,13 @@
             <form action="{% url 'login' %}" method="post">
                 {% csrf_token %}
                 <div class="input-box form-group">
-                    <input type="text" name="username" class="form-control" placeholder="Username" required>
+                    <label class="sr-only" for="login-username">Username</label>
+                    <input id="login-username" type="text" name="username" class="form-control" placeholder="Username" required>
                     <i class='bx bx-user-circle'></i>
                 </div>
 
                 <div class="input-box form-group">
+                    <label class="sr-only" for="password">Parol</label>
                     <input type="password" id="password" name="password" class="form-control" placeholder="Parol" required>
                     <i class='bx bx-lock'></i>
                     <i class='bx bxs-low-vision toggle-password' id="togglePassword"></i>

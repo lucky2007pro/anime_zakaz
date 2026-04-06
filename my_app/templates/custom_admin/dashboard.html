@@ -20,7 +20,9 @@
     .panel-header p { font-size: 0.9rem; color: var(--text-dim); }
 
     .tables-container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; }
-    
+    .table-wrap { width: 100%; overflow-x: auto; }
+    .table-wrap table { min-width: 520px; }
+
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; padding: 15px; font-size: 0.75rem; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border-line); letter-spacing: 1px;}
     td { padding: 15px; font-size: 0.95rem; border-bottom: 1px solid #111; }
@@ -33,6 +35,17 @@
     .glass-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 10px var(--accent-glow);}
 
     @media (max-width: 1200px) { .tables-container { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+        .glass-panel { padding: 18px; }
+        .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .stat-value { font-size: 1.8rem; }
+        .tables-container { gap: 18px; margin-top: 22px; }
+        .panel-header h2 { font-size: 1.15rem; }
+    }
+    @media (max-width: 480px) {
+        .stats-grid { grid-template-columns: 1fr; }
+        .panel-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
 </style>
 {% endblock %}
 
@@ -76,6 +89,7 @@
             </div>
             <a href="{% url 'admin_movies' %}" class="glass-btn">Barchasi &rarr;</a>
         </div>
+        <div class="table-wrap">
         <table>
             <thead>
                 <tr>
@@ -96,6 +110,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     </div>
 
     <div class="glass-panel">
@@ -105,6 +120,7 @@
                 <p>So'nggi 5 ta a'zolar</p>
             </div>
         </div>
+        <div class="table-wrap">
         <table>
             <thead>
                 <tr>
@@ -125,6 +141,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 {% endblock %}

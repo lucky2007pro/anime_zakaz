@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% static 'images/default.svg' as default_movie_poster %}
+
+{% block title %}Katalog | BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+.catalog-header {
+    max-width: 1400px;
+    margin: 0 auto 18px;
+    padding: 0 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.catalog-title {
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.catalog-title span {
+    color: var(--accent);
+}
+
+.catalog-sub {
+    margin-top: 6px;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+}
+
+.catalog-search-link {
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: 700;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    padding: 10px 14px;
+    transition: 0.2s;
+}
+
+.catalog-search-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.catalog-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 5% 20px;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 18px;
+}
+
+.card-wrapper {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.anime-card {
+    width: 100%;
+    height: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid rgba(255,255,255,0.07);
+    transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.card-wrapper:hover .anime-card {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.48);
+}
+
+.anime-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.top-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.72);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 7px;
+}
+
+.card-title {
+    font-size: 1.02rem;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: var(--text-dim);
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.tag-meta {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.67rem;
+}
+
+.pagination-wrap {
+    margin-top: 26px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.page-btn {
+    min-width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: 800;
+    background: rgba(255,255,255,0.03);
+    transition: 0.2s;
+}
+
+.page-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.page-btn.active {
+    background: #ff3366;
+    border-color: #ff3366;
+    color: #fff;
+}
+
+.page-btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .catalog-header,
+    .catalog-container {
+        padding: 0 4%;
+    }
+
+    .catalog-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .anime-card {
+        height: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .catalog-title {
+        font-size: 1.4rem;
+    }
+
+    .anime-card {
+        height: 185px;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+    }
+
+    .card-meta {
+        font-size: 0.7rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <div class="catalog-header">
+        <div>
+            <h1 class="catalog-title">Barcha <span>Animelar</span></h1>
+            <p class="catalog-sub">Jami: {{ page_obj.paginator.count }} ta</p>
+        </div>
+        <a href="{% url 'search' %}" class="catalog-search-link">Qidiruvga o'tish</a>
+    </div>
+
+    <div class="catalog-container">
+        <div class="cards-grid">
+            {% for anime in movies %}
+            <a href="{% url 'movie_detail' anime.id %}" class="card-wrapper">
+                <div class="anime-card">
+                    {% if anime.episodes.count > 0 %}
+                    <div class="top-badge">{{ anime.episodes.count }} qism</div>
+                    {% else %}
+                    <div class="top-badge">Film</div>
+                    {% endif %}
+                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                </div>
+
+                <div>
+                    <div class="card-title">{{ anime.title }}</div>
+                    <div class="card-meta">
+                        {% if anime.category %}<span class="tag-meta">{{ anime.category.name }}</span>{% endif %}
+                        <span>{{ anime.created_at|date:"Y" }}</span>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div style="grid-column:1/-1; text-align:center; color:var(--text-dim); padding: 24px 0;">Hozircha animelar yo'q.</div>
+            {% endfor %}
+        </div>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="pagination-wrap">
+            {% if page_obj.has_previous %}
+                <a class="page-btn" href="?page={{ page_obj.previous_page_number }}" aria-label="Oldingi">&#10094;</a>
+            {% else %}
+                <span class="page-btn disabled">&#10094;</span>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="page-btn active">{{ num }}</span>
+                {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                    <a class="page-btn" href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a class="page-btn" href="?page={{ page_obj.next_page_number }}" aria-label="Keyingi">&#10095;</a>
+            {% else %}
+                <span class="page-btn disabled">&#10095;</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
