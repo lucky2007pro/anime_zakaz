@@ -25,6 +25,8 @@ urlpatterns = [
 
     # Admin Panel
     path('control-panel/', admin_dashboard, name='admin_dashboard'),
+    path('control-panel/users/', admin_users, name='admin_users'),
+    path('control-panel/users/<int:user_id>/role/', admin_user_role, name='admin_user_role'),
     path('control-panel/movies/', admin_movies, name='admin_movies'),
     path('control-panel/movies/add/', admin_movie_form, name='admin_movie_form'),
     path('control-panel/movies/<int:pk>/edit/', admin_movie_form, name='admin_movie_form'),

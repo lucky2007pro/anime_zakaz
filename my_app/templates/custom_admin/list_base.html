@@ -42,6 +42,8 @@
             <a href="/control-panel/episodes/add/" class="btn">+ Qo'shish</a>
             {% elif type == 'genre' %}
             <a href="/control-panel/genres/add/" class="btn">+ Qo'shish</a>
+            {% elif type == 'user' %}
+            <button class="btn" style="opacity:0.6; pointer-events:none;" title="Vakolatlar ro'yxatdan boshqariladi">+ Qo'shish</button>
             {% else %}
             <button class="btn" style="opacity:0.5; pointer-events:none;" title="Keyingi updatelarda qo'shiladi">+ Qo'shish</button>
             {% endif %}
@@ -60,6 +62,8 @@
                 <th>Anime</th><th>Qism No</th><th>Nomi</th><th>Harakatlar</th>
                 {% elif type == 'chat' %}
                 <th>Foydalanuvchi</th><th>Xabar</th><th>Sana</th><th>Harakatlar</th>
+                {% elif type == 'user' %}
+                <th>Username</th><th>Email</th><th>Vakolat</th><th>Holat</th><th>Harakatlar</th>
                 {% endif %}
             </tr>
         </thead>
@@ -81,6 +85,30 @@
                 <td style="font-weight:600;">{{ item.user.username }}</td>
                 <td>{{ item.message|truncatechars:50 }}</td>
                 <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+                {% elif type == 'user' %}
+                <td style="font-weight:600;">{{ item.username }}</td>
+                <td>{{ item.email|default:"-" }}</td>
+                <td>
+                    {% if item.is_superuser %}
+                        <span style="display:inline-block; padding:4px 8px; border-radius:999px; background: rgba(176,0,255,0.15); color:#d8b4fe; margin:2px 4px 2px 0;">Superadmin</span>
+                    {% endif %}
+                    {% if item.is_staff %}
+                        <span style="display:inline-block; padding:4px 8px; border-radius:999px; background: rgba(0,243,255,0.12); color: var(--accent); margin:2px 4px 2px 0;">Staff</span>
+                    {% endif %}
+                    {% if item.is_admin_user %}
+                        <span style="display:inline-block; padding:4px 8px; border-radius:999px; background: rgba(16,185,129,0.12); color:#34d399; margin:2px 4px 2px 0;">Kontent admin</span>
+                    {% endif %}
+                    {% if not item.is_superuser and not item.is_staff and not item.is_admin_user %}
+                        <span style="color: var(--text-dim);">Oddiy user</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.is_active %}
+                        <span style="color:#34d399; font-weight:700;">Faol</span>
+                    {% else %}
+                        <span style="color:#f87171; font-weight:700;">Nofaol</span>
+                    {% endif %}
+                </td>
                 {% endif %}
                 
                 <td>
@@ -93,6 +121,25 @@
                     {% elif type == 'episode' %}
                     <a href="{% url 'admin_episode_form' item.id %}" class="action-btn">Tahrirlash</a>
                     <a href="{% url 'admin_episode_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                    {% elif type == 'user' %}
+                    <form method="post" action="{% url 'admin_user_role' item.id %}" style="display:inline; margin-right:6px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="role" value="content_admin">
+                        <input type="hidden" name="value" value="{% if item.is_admin_user %}0{% else %}1{% endif %}">
+                        <button type="submit" class="action-btn">{% if item.is_admin_user %}Adminni olish{% else %}Admin berish{% endif %}</button>
+                    </form>
+                    <form method="post" action="{% url 'admin_user_role' item.id %}" style="display:inline; margin-right:6px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="role" value="staff">
+                        <input type="hidden" name="value" value="{% if item.is_staff %}0{% else %}1{% endif %}">
+                        <button type="submit" class="action-btn">{% if item.is_staff %}Staffni olish{% else %}Staff berish{% endif %}</button>
+                    </form>
+                    <form method="post" action="{% url 'admin_user_role' item.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="role" value="superuser">
+                        <input type="hidden" name="value" value="{% if item.is_superuser %}0{% else %}1{% endif %}">
+                        <button type="submit" class="action-btn delete" onclick="return confirm('Superadmin vakolatini o‘zgartirishga ishonchingiz komilmi?');">{% if item.is_superuser %}Superadminni olish{% else %}Superadmin qilish{% endif %}</button>
+                    </form>
                     {% else %}
                     <button class="action-btn" style="opacity:0.5; pointer-events:none;">Tahrirlash</button>
                     <button class="action-btn delete" style="opacity:0.5; pointer-events:none;">O'chirish</button>
@@ -100,7 +147,7 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="{% if type == 'movie' %}4{% elif type == 'genre' %}3{% elif type == 'episode' %}4{% elif type == 'chat' %}4{% else %}4{% endif %}" style="text-align:center; padding:30px; color:gray;">Hech narsa topilmadi!</td></tr>
+            <tr><td colspan="{% if type == 'movie' %}4{% elif type == 'genre' %}3{% elif type == 'episode' %}4{% elif type == 'chat' %}4{% elif type == 'user' %}5{% else %}4{% endif %}" style="text-align:center; padding:30px; color:gray;">Hech narsa topilmadi!</td></tr>
             {% endfor %}
         </tbody>
     </table>

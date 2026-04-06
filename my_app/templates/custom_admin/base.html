@@ -140,6 +140,9 @@
         <h4 class="menu-title">UMUMIY</h4>
         <ul class="menu-list">
             <li><a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"><i class='bx bxs-dashboard'></i> Dashboard</a></li>
+            {% if request.user.is_superuser %}
+            <li><a href="{% url 'admin_users' %}" class="{% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}"><i class='bx bxs-user-detail'></i> Foydalanuvchilar</a></li>
+            {% endif %}
         </ul>
 
         <h4 class="menu-title">KONTENT</h4>

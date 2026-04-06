@@ -186,6 +186,68 @@
     overflow: hidden;
     border: 1px solid rgba(255,255,255,0.08);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    position: relative;
+}
+
+.fullscreen-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(10,10,15,0.72);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: 0.25s ease;
+}
+
+.fullscreen-btn:hover {
+    background: rgba(0,243,255,0.16);
+    border-color: rgba(0,243,255,0.35);
+    transform: translateY(-1px);
+}
+
+.player-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.player-action-btn {
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    border-radius: 10px;
+    height: 38px;
+    padding: 0 12px;
+    font-weight: 700;
+    font-size: 0.86rem;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.player-action-btn:hover {
+    background: rgba(0,243,255,0.12);
+    border-color: rgba(0,243,255,0.30);
+}
+
+.player-action-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.player-action-btn.telegram {
+    border-color: rgba(0,136,204,0.55);
+    color: #7dd3fc;
 }
 
 .video-container video {
@@ -415,8 +477,9 @@
                     {% with first_episode=movie.episodes.first %}
                         <div class="video-container" id="video-container">
                             <div class="player-shell">
+                            <button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button>
                             {% if movie.video_file %}
-                                <video id="video-player" controls playsinline preload="metadata">
+                                <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
                                     <source src="{{ movie.video_file.url }}">
                                     Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                                 </video>
@@ -428,10 +491,10 @@
                             {% elif movie.video_url %}
                                 {% if "iframe" in movie.video_url or "mediadelivery.net" in movie.video_url %}
                                     <div class="bunny-player-wrapper">
-                                        <iframe id="iframe-player" src="{{ movie.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>
+                                        <iframe id="iframe-player" src="{{ movie.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
                                     </div>
                                 {% else %}
-                                    <video id="video-player" controls playsinline preload="metadata">
+                                    <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
                                         <source src="{{ movie.video_url }}" type="video/mp4">
                                         Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                                     </video>
@@ -442,7 +505,7 @@
                                     </div>
                                 {% endif %}
                             {% elif first_episode and first_episode.video_file %}
-                                <video id="video-player" controls playsinline preload="metadata">
+                                <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
                                     <source src="{{ first_episode.video_file.url }}">
                                     Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                                 </video>
@@ -454,10 +517,10 @@
                             {% elif first_episode and first_episode.video_url %}
                                 {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
                                     <div class="bunny-player-wrapper">
-                                        <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>
+                                        <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
                                     </div>
                                 {% else %}
-                                    <video id="video-player" controls playsinline preload="metadata">
+                                    <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
                                         <source src="{{ first_episode.video_url }}" type="video/mp4">
                                         Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                                     </video>
@@ -470,6 +533,12 @@
                             {% else %}
                                 <p style="text-align: center; color: var(--text-dim); padding: 30px 20px;">Bu qism uchun video manbasi yuklanmagan.</p>
                             {% endif %}
+                            </div>
+                            <div class="player-actions" id="player-actions">
+                                <button type="button" class="player-action-btn" id="play-toggle" aria-label="Play/Pause">Play/Pause</button>
+                                <button type="button" class="player-action-btn" id="mute-toggle" aria-label="Mute/Unmute">Ovoz</button>
+                                <button type="button" class="player-action-btn" id="fullscreen-inline" aria-label="To'liq ekran">To'liq ekran</button>
+                                <button type="button" class="player-action-btn" id="open-browser" aria-label="Brauzerda ochish">Brauzerda ochish</button>
                             </div>
                         </div>
                     {% endwith %}
@@ -517,12 +586,29 @@ let iframePlayer = document.getElementById('iframe-player');
 let seekBar = document.getElementById('seek-bar');
 let currentTimeEl = document.getElementById('current-time');
 let durationTimeEl = document.getElementById('duration-time');
+let playToggleBtn = document.getElementById('play-toggle');
+let muteToggleBtn = document.getElementById('mute-toggle');
+let fullscreenInlineBtn = document.getElementById('fullscreen-inline');
+let openBrowserBtn = document.getElementById('open-browser');
 let pendingSeekRatio = null;
 let isSeeking = false;
+let currentSource = '';
+const isTelegramInApp = /Telegram/i.test(navigator.userAgent) || typeof window.TelegramWebviewProxy !== 'undefined';
+
+function buildPlayerActionsMarkup(){
+    return `
+        <div class="player-actions" id="player-actions">
+            <button type="button" class="player-action-btn" id="play-toggle" aria-label="Play/Pause">Play/Pause</button>
+            <button type="button" class="player-action-btn" id="mute-toggle" aria-label="Mute/Unmute">Ovoz</button>
+            <button type="button" class="player-action-btn" id="fullscreen-inline" aria-label="To'liq ekran">To'liq ekran</button>
+            <button type="button" class="player-action-btn" id="open-browser" aria-label="Brauzerda ochish">Brauzerda ochish</button>
+        </div>`;
+}
 
 function buildNativePlayerMarkup(videoSrc){
     return `
-        <video id="video-player" controls playsinline preload="metadata">
+        <button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button>
+        <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
             <source src="${videoSrc}" type="video/mp4">
             Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
         </video>
@@ -531,6 +617,130 @@ function buildNativePlayerMarkup(videoSrc){
             <span id="current-time">00:00</span>
             <span id="duration-time">00:00</span>
         </div>`;
+}
+
+function appendPlayerQuery(videoSrc){
+    if(!videoSrc){
+        return '';
+    }
+    const joiner = videoSrc.includes('?') ? '&' : '?';
+    return `${videoSrc}${joiner}autoplay=false&loop=false&muted=false&responsive=true`;
+}
+
+function requestPlayerFullscreen(){
+    const shell = document.querySelector('.player-shell');
+    const iframe = document.getElementById('iframe-player');
+    const video = document.getElementById('video-player');
+
+    const target = video || iframe || shell;
+    if(!target){
+        return;
+    }
+
+    const fullscreenFn = target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen;
+    try {
+        if(fullscreenFn){
+            const result = fullscreenFn.call(target);
+            if(result && typeof result.catch === 'function'){
+                result.catch(() => {
+                    if(video && typeof video.webkitEnterFullscreen === 'function'){
+                        video.webkitEnterFullscreen();
+                    }
+                });
+            }
+        } else if(video && typeof video.webkitEnterFullscreen === 'function'){
+            video.webkitEnterFullscreen();
+        }
+    } catch (error) {
+        if(video && typeof video.webkitEnterFullscreen === 'function'){
+            video.webkitEnterFullscreen();
+        }
+    }
+}
+
+document.addEventListener('click', (event) => {
+    if(event.target.closest('#fullscreen-toggle')){
+        requestPlayerFullscreen();
+    }
+});
+
+function updateActionButtonsState(){
+    const hasNativeVideo = Boolean(videoPlayer);
+    if(playToggleBtn){
+        playToggleBtn.disabled = !hasNativeVideo;
+        playToggleBtn.textContent = hasNativeVideo && !videoPlayer.paused ? 'Pauza' : 'Play';
+    }
+    if(muteToggleBtn){
+        muteToggleBtn.disabled = !hasNativeVideo;
+        muteToggleBtn.textContent = hasNativeVideo && videoPlayer.muted ? 'Ovoz: Off' : 'Ovoz: On';
+    }
+    if(openBrowserBtn){
+        openBrowserBtn.classList.toggle('telegram', isTelegramInApp);
+        openBrowserBtn.textContent = isTelegramInApp ? 'Tashqi brauzerda ochish' : 'Brauzerda ochish';
+    }
+}
+
+function updateCurrentSource(){
+    if(videoPlayer){
+        currentSource = videoPlayer.currentSrc || videoPlayer.src || '';
+        return;
+    }
+    if(iframePlayer){
+        currentSource = iframePlayer.src || '';
+        return;
+    }
+    currentSource = '';
+}
+
+function bindActionButtons(){
+    playToggleBtn = document.getElementById('play-toggle');
+    muteToggleBtn = document.getElementById('mute-toggle');
+    fullscreenInlineBtn = document.getElementById('fullscreen-inline');
+    openBrowserBtn = document.getElementById('open-browser');
+
+    if(playToggleBtn){
+        playToggleBtn.onclick = async () => {
+            if(!videoPlayer){
+                return;
+            }
+            try {
+                if(videoPlayer.paused){
+                    await videoPlayer.play();
+                } else {
+                    videoPlayer.pause();
+                }
+            } catch (e) {
+                // Ignore autoplay restrictions and keep controls responsive.
+            }
+            updateActionButtonsState();
+        };
+    }
+
+    if(muteToggleBtn){
+        muteToggleBtn.onclick = () => {
+            if(!videoPlayer){
+                return;
+            }
+            videoPlayer.muted = !videoPlayer.muted;
+            updateActionButtonsState();
+        };
+    }
+
+    if(fullscreenInlineBtn){
+        fullscreenInlineBtn.onclick = () => requestPlayerFullscreen();
+    }
+
+    if(openBrowserBtn){
+        openBrowserBtn.onclick = () => {
+            updateCurrentSource();
+            if(!currentSource){
+                return;
+            }
+            window.open(currentSource, '_blank', 'noopener,noreferrer');
+        };
+    }
+
+    updateActionButtonsState();
 }
 
 function getEpisodeSource(btn){
@@ -560,6 +770,7 @@ function bindNativePlayerControls(){
     durationTimeEl = document.getElementById('duration-time');
 
     if(!videoPlayer || !seekBar){
+        updateActionButtonsState();
         return;
     }
 
@@ -614,11 +825,16 @@ function bindNativePlayerControls(){
     videoPlayer.addEventListener('durationchange', updateTimes);
     videoPlayer.addEventListener('timeupdate', updateTimes);
     videoPlayer.addEventListener('progress', syncSeekBar);
+    videoPlayer.addEventListener('play', updateActionButtonsState);
+    videoPlayer.addEventListener('pause', updateActionButtonsState);
+    videoPlayer.addEventListener('volumechange', updateActionButtonsState);
 
     if(Number.isFinite(videoPlayer.duration) && videoPlayer.duration > 0){
         durationTimeEl.textContent = formatTime(videoPlayer.duration);
     }
     syncSeekBar();
+    updateCurrentSource();
+    updateActionButtonsState();
 }
 
 function loadNativeVideoSource(videoSrc){
@@ -627,12 +843,13 @@ function loadNativeVideoSource(videoSrc){
     }
 
     if(!videoPlayer){
-        videoContainer.innerHTML = `<div class="player-shell">${buildNativePlayerMarkup(videoSrc)}</div>`;
+        videoContainer.innerHTML = `<div class="player-shell">${buildNativePlayerMarkup(videoSrc)}</div>${buildPlayerActionsMarkup()}`;
         videoPlayer=document.getElementById('video-player');
         seekBar=document.getElementById('seek-bar');
         currentTimeEl=document.getElementById('current-time');
         durationTimeEl=document.getElementById('duration-time');
         iframePlayer=null;
+        bindActionButtons();
         bindNativePlayerControls();
     }
 
@@ -651,9 +868,13 @@ function loadNativeVideoSource(videoSrc){
     videoPlayer.src = videoSrc;
     videoPlayer.load();
     videoPlayer.play();
+    currentSource = videoSrc;
+    updateActionButtonsState();
 }
 
 bindNativePlayerControls();
+bindActionButtons();
+updateCurrentSource();
 
 if(episodeBtns.length > 0) {
     episodeBtns[0].setAttribute('aria-pressed', 'true');
@@ -664,11 +885,18 @@ episodeBtns.forEach(btn=>{
         const videoSrc = getEpisodeSource(btn);
         if(!videoSrc) return;
         if(videoSrc.includes('iframe') || videoSrc.includes('mediadelivery.net')){
-            if(iframePlayer){iframePlayer.src=videoSrc+'?autoplay=false&loop=false&muted=false&responsive=true';}
+                    const embedSrc = appendPlayerQuery(videoSrc);
+                    if(iframePlayer){iframePlayer.src=embedSrc;}
             else{
-                videoContainer.innerHTML=`<div class="player-shell"><div class="bunny-player-wrapper"><iframe id="iframe-player" src="${videoSrc}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div></div>`;
+                        videoContainer.innerHTML=`<div class="player-shell"><button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button><div class="bunny-player-wrapper"><iframe id="iframe-player" src="${embedSrc}" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe></div></div>${buildPlayerActionsMarkup()}`;
                 iframePlayer=document.getElementById('iframe-player');videoPlayer=null;
+                seekBar=null;
+                currentTimeEl=null;
+                durationTimeEl=null;
             }
+            currentSource = embedSrc;
+            bindActionButtons();
+            updateActionButtonsState();
         }else{
             loadNativeVideoSource(videoSrc);
         }

@@ -9,6 +9,10 @@ def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
 
 
+def is_super_admin(user):
+    return user.is_authenticated and user.is_superuser
+
+
 def _is_ajax(request):
     return request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
@@ -23,6 +27,59 @@ def admin_dashboard(request):
         'latest_users': CustomUser.objects.all().order_by('-date_joined')[:5],
     }
     return render(request, 'custom_admin/dashboard.html', context)
+
+
+@user_passes_test(is_super_admin, login_url='/')
+def admin_users(request):
+    users = CustomUser.objects.all().order_by('-date_joined')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Foydalanuvchilar',
+        'items': users,
+        'type': 'user'
+    })
+
+
+@user_passes_test(is_super_admin, login_url='/')
+def admin_user_role(request, user_id):
+    if request.method != 'POST':
+        return redirect('admin_users')
+
+    user = get_object_or_404(CustomUser, id=user_id)
+    role = request.POST.get('role', '')
+    value = request.POST.get('value', '0') == '1'
+
+    if user == request.user and not value and role in {'superuser', 'staff'}:
+        messages.error(request, 'O‘zingizning asosiy admin vakolatingizni shu yerda olib tashlay olmaysiz.')
+        return redirect('admin_users')
+
+    if role == 'content_admin':
+        user.is_admin_user = value
+        if value:
+            user.is_active = True
+    elif role == 'staff':
+        user.is_staff = value
+        if value:
+            user.is_active = True
+    elif role == 'superuser':
+        if request.user.is_superuser:
+            user.is_superuser = value
+            if value:
+                user.is_staff = True
+                user.is_admin_user = True
+                user.is_active = True
+        else:
+            messages.error(request, 'Superadmin vakolati faqat superadmin tomonidan o‘zgartiriladi.')
+            return redirect('admin_users')
+    else:
+        messages.error(request, 'Noto‘g‘ri rol turi.')
+        return redirect('admin_users')
+
+    if role != 'superuser':
+        user.is_superuser = user.is_superuser and request.user.is_superuser
+
+    user.save(update_fields=['is_admin_user', 'is_staff', 'is_superuser', 'is_active'])
+    messages.success(request, f"{user.username} uchun vakolatlar yangilandi.")
+    return redirect('admin_users')
 
 @user_passes_test(is_admin, login_url='/')
 def admin_movies(request):
