@@ -201,6 +201,16 @@
     cursor: pointer;
     font-weight: 800;
 }
+
+@media (max-width: 768px) {
+    .chat-container { height: calc(100vh - 120px); margin: 10px auto; border-radius: 12px; }
+    .chat-header { padding: 14px; font-size: 1.1rem; }
+    .chat-box { padding: 12px; gap: 10px; }
+    .message { max-width: 92%; padding: 12px; }
+    .message-body { font-size: 0.92rem; }
+    .chat-form { padding: 12px; }
+    .chat-form input { padding: 12px; }
+}
 </style>
 {% endblock %}
 
@@ -243,7 +253,7 @@
                                     <a href="{% url 'ban_user' msg.user.id %}" title="Ban foydalanuvchi"><i class='bx bx-block'></i></a>
                                 {% endif %}
 
-                                <i class='bx bx-reply' onclick="replyMessage('{{ msg.user.username }}','{{ msg.message }}')"></i>
+                                <i class='bx bx-reply' onclick="replyMessage({{ msg.id }}, '{{ msg.user.username|escapejs }}', '{{ msg.message|escapejs }}')"></i>
                             </div>
                         </div>
                     </div>
@@ -290,12 +300,12 @@
         document.getElementById("edit-form-" + id).style.display = "none";
     }
 
-    function replyMessage(username, message) {
+    function replyMessage(messageId, username, message) {
         document.getElementById("replyPreview").style.display = "flex";
         document.getElementById("replyUsername").innerText = username;
         document.getElementById("replyMessage").innerText = message;
         document.getElementById("messageInput").focus();
-        document.getElementById("replyToInput").value = username;
+        document.getElementById("replyToInput").value = messageId;
     }
 
     function cancelReply() {

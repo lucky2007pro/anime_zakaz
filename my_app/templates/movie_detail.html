@@ -123,6 +123,7 @@
     height: 100%;
     border: none;
     border-radius: 12px;
+    background: #000;
 }
 
 .custom-progress-wrapper {
@@ -242,26 +243,6 @@
     color: var(--text-dim);
 }
 
-.bunny-fullscreen-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 10;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(5px);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 10px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: 0.3s;
-}
-
-.bunny-fullscreen-btn:hover {
-    background: var(--accent);
-}
-
 @media(max-width:992px){.episode-btn{flex:1 1 25%;}}
 @media(max-width:768px){
     .movie-title{font-size:1.5rem;}
@@ -301,8 +282,7 @@
                     {% elif movie.video_url %}
                         {% if "iframe" in movie.video_url or "mediadelivery.net" in movie.video_url %}
                             <div class="bunny-player-wrapper">
-                                <iframe id="iframe-player" src="{{ movie.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-                                <button class="bunny-fullscreen-btn">⛶</button>
+                                <iframe id="iframe-player" src="{{ movie.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>
                             </div>
                         {% else %}
                             <video id="video-player" controls playsinline preload="metadata">
@@ -328,8 +308,7 @@
                     {% elif first_episode and first_episode.video_url %}
                         {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
                             <div class="bunny-player-wrapper">
-                                <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-                                <button class="bunny-fullscreen-btn">⛶</button>
+                                <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>
                             </div>
                         {% else %}
                             <video id="video-player" controls playsinline preload="metadata">
@@ -511,30 +490,7 @@ function loadNativeVideoSource(videoSrc){
     videoPlayer.play();
 }
 
-function enableFullscreen(el){
-    if(el.requestFullscreen){el.requestFullscreen();}
-    else if(el.webkitRequestFullscreen){el.webkitRequestFullscreen();}
-    else if(el.msRequestFullscreen){el.msRequestFullscreen();}
-    if(window.screen.orientation && window.screen.orientation.lock){window.screen.orientation.lock('landscape').catch(()=>{});}
-}
-
-function addFullscreenButton(){
-    const fsBtn = document.querySelector('.bunny-fullscreen-btn');
-    if(fsBtn && iframePlayer){fsBtn.addEventListener('click',()=>{enableFullscreen(iframePlayer);});}
-}
-addFullscreenButton();
 bindNativePlayerControls();
-
-const videoClickActions=()=>{
-    const mp4Player = document.getElementById('video-player');
-    if(!mp4Player || !iframePlayer) return;
-    let clickTimeout=null;
-    mp4Player.addEventListener('click',()=>{
-        if(clickTimeout!==null){clearTimeout(clickTimeout);clickTimeout=null;enableFullscreen(mp4Player);}
-        else{clickTimeout=setTimeout(()=>{clickTimeout=null;if(iframePlayer) iframePlayer.contentWindow.postMessage(JSON.stringify({method:'pause'}),'*');},300);}
-    });
-};
-videoClickActions();
 
 if(episodeBtns.length > 0) {
     episodeBtns[0].classList.add('active-episode-btn');
@@ -547,8 +503,8 @@ episodeBtns.forEach(btn=>{
         if(videoSrc.includes('iframe') || videoSrc.includes('mediadelivery.net')){
             if(iframePlayer){iframePlayer.src=videoSrc+'?autoplay=false&loop=false&muted=false&responsive=true';}
             else{
-                videoContainer.innerHTML=`<div class="bunny-player-wrapper"><iframe id="iframe-player" src="${videoSrc}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe><button class="bunny-fullscreen-btn">⛶</button></div>`;
-                iframePlayer=document.getElementById('iframe-player');videoPlayer=null;addFullscreenButton();videoClickActions();
+                videoContainer.innerHTML=`<div class="bunny-player-wrapper"><iframe id="iframe-player" src="${videoSrc}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`;
+                iframePlayer=document.getElementById('iframe-player');videoPlayer=null;
             }
         }else{
             loadNativeVideoSource(videoSrc);

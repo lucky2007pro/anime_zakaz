@@ -77,6 +77,13 @@
     color: var(--accent);
     font-weight: 800;
 }
+
+@media (max-width: 768px) {
+    .profile-container { margin: 20px auto; padding: 20px 14px; }
+    .profile-title { font-size: 1.5rem; margin-bottom: 20px; }
+    .profile-info { padding: 14px; }
+    .profile-info p { font-size: 0.95rem; flex-direction: column; gap: 6px; align-items: flex-start; }
+}
 </style>
 {% endblock %}
 
@@ -99,7 +106,7 @@
             
             <p class="status" style="border-bottom: none; padding-bottom: 0;">
                 <strong>Status:</strong>
-                {% if user.vip_data.vip_active %}
+                {% if vip_active %}
                     <span class="vip">
                         <i class='bx bx-crown'></i> VIP
                     </span>

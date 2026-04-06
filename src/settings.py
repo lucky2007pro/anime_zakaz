@@ -1,7 +1,23 @@
 import os
 import sys
 from pathlib import Path
-from decouple import config, Csv
+
+try:
+    from decouple import config, Csv
+except ImportError:
+    class Csv:
+        def __call__(self, value):
+            return [item.strip() for item in str(value).split(',') if item.strip()]
+
+    def config(key, default=None, cast=None):
+        value = os.getenv(key, default)
+        if cast is None:
+            return value
+        if cast is bool:
+            return str(value).strip().lower() in {'1', 'true', 'yes', 'on'}
+        if callable(cast):
+            return cast(value)
+        return value
 
 # Loyihaning asosiy yo'li
 BASE_DIR = Path(__file__).resolve().parent.parent

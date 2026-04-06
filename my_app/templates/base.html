@@ -212,17 +212,30 @@
         .menu-title { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 10px; padding-left: 0; }
 
         .menu-item {
-            display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.03); text-decoration: none; color: #fff; transition: 0.3s; font-weight: 800; font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            padding: 12px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            text-decoration: none;
+            color: #fff;
+            transition: 0.25s;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 10px;
         }
-        .menu-item:hover { color: var(--accent); transform: translateX(5px); border-bottom-color: rgba(0, 243, 255, 0.2); }
-        .menu-item span.icon-left { font-size: 1.25rem; margin-right: 15px; color: var(--text-dim); transition: 0.3s; }
+        .menu-item:hover {
+            color: var(--accent);
+            transform: translateX(4px);
+            background: rgba(255,255,255,0.04);
+            border-bottom-color: rgba(0, 243, 255, 0.2);
+        }
+        .menu-item span.icon-left {
+            font-size: 1.15rem;
+            margin-right: 12px;
+            color: var(--text-dim);
+            transition: 0.25s;
+        }
         .menu-item:hover span.icon-left { color: var(--accent); }
-            display: flex; align-items: center; padding: 12px 10px;
-            color: #d1d1d6; text-decoration: none; font-weight: 600;
-            font-size: 1rem; border-radius: 10px; transition: 0.3s;
-        }
-        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 15px; }
-        .menu-item span:first-child { width: 30px; font-size: 1.2rem; opacity: 0.8; }
 
         .menu-item .arrow { margin-left: auto; color: var(--text-dim); font-size: 1.2rem; }
         .menu-item .value { margin-left: auto; color: var(--text-dim); font-size: 0.85rem; margin-right: 10px; }
@@ -289,9 +302,25 @@
         /* Generic Classes for Pages */
         main.main-content {
             flex: 1;
-            margin-top: 80px;
-            padding: 40px 5%;
+            width: min(1400px, 100%);
+            margin: 80px auto 0;
+            padding: 30px 5%;
         }
+
+        .mobile-profile-btn {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 18px 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+        .mobile-profile-btn:hover { color: var(--accent); background: rgba(0,243,255,0.05); }
 
         /* Basic Auth/Form Styles refactored to fit BESTMEDIA */
         .auth-container { max-width: 400px; margin: 50px auto; background: var(--bg-surface); padding: 30px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -303,6 +332,11 @@
         .btn-submit { width: 100%; padding: 14px; background: var(--accent); color: black; border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.3s; font-family: 'Outfit'; box-shadow: 0 8px 25px rgba(0, 243, 255, 0.3);}
         .btn-submit:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255, 255, 255, 0.5); }
 
+        @media (max-width: 1024px) {
+            .nav-menu { gap: 10px; }
+            .pill-nav-item { padding: 7px 14px; font-size: 0.78rem; }
+        }
+
         @media (max-width: 768px) {
             .navbar { padding: 12px 4%; }
             .nav-menu { display: none; }
@@ -311,9 +345,12 @@
             .nav-actions .action-icon:not(.profile-btn) { display: none; }
             .profile-sidebar { width: 100%; right: -100%; border-left: none; }
             .profile-sidebar.active { right: 0; }
+            main.main-content { margin-top: 72px; padding: 22px 4%; }
         }
         @media (max-width: 480px) {
             .nav-brand { font-size: 1.2rem; }
+            .profile-sidebar { padding: 16px; }
+            .mobile-nav-overlay a, .mobile-profile-btn { font-size: 1.15rem; }
         }
 
         {% block extra_css %}{% endblock %}
@@ -331,9 +368,8 @@
     </div>
 
     <div class="nav-actions">
-        <!-- <a href="#" class="action-icon"><i class='bx bx-sparkles'></i></a> -->
         <a href="{% url 'search' %}" class="action-icon"><i class='bx bx-search'></i></a>
-        <a href="#" class="action-icon"><i class='bx bx-bell'></i></a>
+        <a href="{% url 'chat' %}" class="action-icon" aria-label="Chat"><i class='bx bx-bell'></i></a>
         <div class="action-icon profile-btn" onclick="toggleProfileMenu()">
              <i class='bx bx-user'></i>
         </div>
@@ -345,21 +381,25 @@
     </div>
 </nav>
 
-<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="if(event.target==this) toggleMobileNav()">
+<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="if(event.target===this) toggleMobileNav()">
     <a href="{% url 'home' %}">Bosh sahifa</a>
     <a href="{% url 'search' %}">Katalog</a>
     <a href="{% url 'chat' %}">Chat</a>
-    <a href="#" onclick="toggleMobileNav(); toggleProfileMenu();">Profil</a>
+    <button type="button" class="mobile-profile-btn" onclick="toggleMobileNav(); toggleProfileMenu();">Profil</button>
 </div>
 
 {% block content %}
 {% endblock %}
 
-<div class="profile-overlay" id="profileOverlay" onclick="if(event.target==this) toggleProfileMenu()"></div>
+<div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this) toggleProfileMenu()"></div>
 
 <div class="profile-sidebar" id="profileSidebar">
     <div class="sidebar-header premium-btn-container">
-        <a href="#" class="premium-btn"><i class='bx bxs-bolt'></i> PREMIUMGA O'TING!</a>
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="premium-btn"><i class='bx bxs-bolt'></i> PROFILGA O'TING</a>
+        {% else %}
+        <a href="{% url 'register' %}" class="premium-btn"><i class='bx bxs-bolt'></i> RO'YXATDAN O'TING</a>
+        {% endif %}
         <button class="close-btn" onclick="toggleProfileMenu()"><i class='bx bx-x'></i></button>
     </div>
 
@@ -377,12 +417,10 @@
 
     <div class="menu-section">
         <h4 class="menu-title">MENING PROFILIM</h4>
-        <a href="#" class="menu-item"><span class="icon-left"><i class='bx bx-video'></i></span> Jonli Efirlar <span class="arrow">›</span></a>
+        <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span> Umumiy chat <span class="arrow">›</span></a>
         <a href="{% url 'profile' %}" class="menu-item"><span class="icon-left"><i class='bx bx-user'></i></span> Profilni tahrirlash <span class="arrow">›</span></a>
-        <a href="#" class="menu-item"><span class="icon-left"><i class='bx bx-wallet'></i></span> Mening Hisobim <span class="value">0 UZS</span><span class="arrow">›</span></a>
-        <a href="#" class="menu-item"><span class="icon-left"><i class='bx bx-crown'></i></span> Premium Obuna <span class="value">Yo'q</span><span class="arrow">›</span></a>
-        <a href="#" class="menu-item"><span class="icon-left"><i class='bx bx-bookmark'></i></span> Saqlanganlar <span class="arrow">›</span></a>
-        <a href="#" class="menu-item"><span class="icon-left"><i class='bx bx-history'></i></span> Ko'rishlar tarixi <span class="arrow">›</span></a>
+        <a href="{% url 'search' %}" class="menu-item"><span class="icon-left"><i class='bx bx-search'></i></span> Katalog qidiruv <span class="arrow">›</span></a>
+        <a href="{% url 'home' %}" class="menu-item"><span class="icon-left"><i class='bx bx-home-alt'></i></span> Bosh sahifa <span class="arrow">›</span></a>
     </div>
 
     {% if request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
