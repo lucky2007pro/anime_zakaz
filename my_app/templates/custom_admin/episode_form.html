@@ -102,6 +102,11 @@
         </div>
 
         <div class="form-group">
+            <label for="episode-description">Qism haqida izoh (ixtiyoriy)</label>
+            <textarea id="episode-description" name="description" class="form-control" rows="4" placeholder="Bu qism uchun qisqa izoh...">{{ episode.description|default:'' }}</textarea>
+        </div>
+
+        <div class="form-group">
             <label for="episode-video-file">Yoki Video Faylni Yuklang (MP4, MKV va b.) - Ixtiyoriy</label>
             <input id="episode-video-file" type="file" name="video_file" class="form-control" accept="video/*">
             {% if episode and episode.video_file %}

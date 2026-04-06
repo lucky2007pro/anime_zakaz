@@ -23,24 +23,7 @@
     overflow: hidden;
     border: 1px solid rgba(255,255,255,0.08);
     box-shadow: 0 22px 60px rgba(0,0,0,0.45);
-    background: linear-gradient(135deg, rgba(0,243,255,0.12), rgba(255,51,102,0.08));
-}
-
-.movie-hero-bg {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    transform: scale(1.05);
-    filter: saturate(1.05) contrast(1.02);
-}
-
-.movie-hero-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(90deg, rgba(10,10,15,0.96) 0%, rgba(10,10,15,0.88) 42%, rgba(10,10,15,0.50) 100%),
-        linear-gradient(0deg, rgba(10,10,15,0.9) 0%, transparent 55%);
+    background: rgba(17,17,24,0.88);
 }
 
 .movie-hero-content {
@@ -216,38 +199,7 @@
 }
 
 .player-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 12px;
-}
-
-.player-action-btn {
-    border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(255,255,255,0.04);
-    color: #fff;
-    border-radius: 10px;
-    height: 38px;
-    padding: 0 12px;
-    font-weight: 700;
-    font-size: 0.86rem;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.player-action-btn:hover {
-    background: rgba(0,243,255,0.12);
-    border-color: rgba(0,243,255,0.30);
-}
-
-.player-action-btn:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-.player-action-btn.telegram {
-    border-color: rgba(0,136,204,0.55);
-    color: #7dd3fc;
+    display: none;
 }
 
 .video-container video {
@@ -442,9 +394,6 @@
 <main class="main-content">
     <div class="movie-page">
         <section class="movie-hero">
-            <div class="movie-hero-bg" style="background-image:url('{% if movie.image %}{{ movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');"></div>
-            <div class="movie-hero-overlay"></div>
-
             <div class="movie-hero-content">
                 <div class="hero-top">
                     <a href="{% url 'home' %}" class="btn-back">⬅ Orqaga</a>
@@ -460,7 +409,7 @@
                 </div>
 
                 <h2 class="movie-title">{{ movie.title }}</h2>
-                <p class="movie-summary">{{ movie.description|default:"Ushbu Animeni BESTMEDIA platformasida onlayn tomosha qilishingiz mumkin. Sifatli video va qulay interfeys bilan rohatlaning 🎬" }}</p>
+                <p class="movie-summary">{{ movie.description|default:"Bu anime uchun izoh kiritilmagan." }}</p>
             </div>
         </section>
 
@@ -534,12 +483,6 @@
                                 <p style="text-align: center; color: var(--text-dim); padding: 30px 20px;">Bu qism uchun video manbasi yuklanmagan.</p>
                             {% endif %}
                             </div>
-                            <div class="player-actions" id="player-actions">
-                                <button type="button" class="player-action-btn" id="play-toggle" aria-label="Play/Pause">Play/Pause</button>
-                                <button type="button" class="player-action-btn" id="mute-toggle" aria-label="Mute/Unmute">Ovoz</button>
-                                <button type="button" class="player-action-btn" id="fullscreen-inline" aria-label="To'liq ekran">To'liq ekran</button>
-                                <button type="button" class="player-action-btn" id="open-browser" aria-label="Brauzerda ochish">Brauzerda ochish</button>
-                            </div>
                         </div>
                     {% endwith %}
 
@@ -558,11 +501,11 @@
                     <div class="episode-buttons">
                         {% for episode in movie.episodes.all %}
                         {% if episode.video_file %}
-                        <button class="episode-btn" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" data-video-src="{{ episode.video_file.url }}">{{ forloop.counter }}-qism</button>
+                        <button class="episode-btn" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" data-video-src="{{ episode.video_file.url }}" data-description="{{ episode.description|default:''|striptags|escape }}">{{ forloop.counter }}-qism</button>
                         {% elif episode.video_url %}
-                        <button class="episode-btn" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" data-video-src="{{ episode.video_url }}">{{ forloop.counter }}-qism</button>
+                        <button class="episode-btn" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" data-video-src="{{ episode.video_url }}" data-description="{{ episode.description|default:''|striptags|escape }}">{{ forloop.counter }}-qism</button>
                         {% else %}
-                        <button class="episode-btn" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" data-video-src="">{{ forloop.counter }}-qism</button>
+                        <button class="episode-btn" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" data-video-src="" data-description="{{ episode.description|default:''|striptags|escape }}">{{ forloop.counter }}-qism</button>
                         {% endif %}
                         {% endfor %}
                     </div>
@@ -571,7 +514,9 @@
 
                 <div class="movie-info">
                     <h4>Anime haqida</h4>
-                    <p>{{ movie.description|default:"Ushbu Animeni BESTMEDIA platformasida onlayn tomosha qilishingiz mumkin. Sifatli video va qulay interfeys bilan rohatlaning 🎬" }}</p>
+                    {% with first_episode=movie.episodes.first %}
+                    <p id="episode-description" data-movie-description="{{ movie.description|default:'Bu anime uchun izoh kiritilmagan.'|striptags|escape }}">{{ first_episode.description|default:movie.description|default:"Bu anime uchun izoh kiritilmagan." }}</p>
+                    {% endwith %}
                 </div>
             </aside>
         </div>
@@ -586,24 +531,10 @@ let iframePlayer = document.getElementById('iframe-player');
 let seekBar = document.getElementById('seek-bar');
 let currentTimeEl = document.getElementById('current-time');
 let durationTimeEl = document.getElementById('duration-time');
-let playToggleBtn = document.getElementById('play-toggle');
-let muteToggleBtn = document.getElementById('mute-toggle');
-let fullscreenInlineBtn = document.getElementById('fullscreen-inline');
-let openBrowserBtn = document.getElementById('open-browser');
+const episodeDescriptionEl = document.getElementById('episode-description');
 let pendingSeekRatio = null;
 let isSeeking = false;
 let currentSource = '';
-const isTelegramInApp = /Telegram/i.test(navigator.userAgent) || typeof window.TelegramWebviewProxy !== 'undefined';
-
-function buildPlayerActionsMarkup(){
-    return `
-        <div class="player-actions" id="player-actions">
-            <button type="button" class="player-action-btn" id="play-toggle" aria-label="Play/Pause">Play/Pause</button>
-            <button type="button" class="player-action-btn" id="mute-toggle" aria-label="Mute/Unmute">Ovoz</button>
-            <button type="button" class="player-action-btn" id="fullscreen-inline" aria-label="To'liq ekran">To'liq ekran</button>
-            <button type="button" class="player-action-btn" id="open-browser" aria-label="Brauzerda ochish">Brauzerda ochish</button>
-        </div>`;
-}
 
 function buildNativePlayerMarkup(videoSrc){
     return `
@@ -664,22 +595,6 @@ document.addEventListener('click', (event) => {
     }
 });
 
-function updateActionButtonsState(){
-    const hasNativeVideo = Boolean(videoPlayer);
-    if(playToggleBtn){
-        playToggleBtn.disabled = !hasNativeVideo;
-        playToggleBtn.textContent = hasNativeVideo && !videoPlayer.paused ? 'Pauza' : 'Play';
-    }
-    if(muteToggleBtn){
-        muteToggleBtn.disabled = !hasNativeVideo;
-        muteToggleBtn.textContent = hasNativeVideo && videoPlayer.muted ? 'Ovoz: Off' : 'Ovoz: On';
-    }
-    if(openBrowserBtn){
-        openBrowserBtn.classList.toggle('telegram', isTelegramInApp);
-        openBrowserBtn.textContent = isTelegramInApp ? 'Tashqi brauzerda ochish' : 'Brauzerda ochish';
-    }
-}
-
 function updateCurrentSource(){
     if(videoPlayer){
         currentSource = videoPlayer.currentSrc || videoPlayer.src || '';
@@ -692,59 +607,22 @@ function updateCurrentSource(){
     currentSource = '';
 }
 
-function bindActionButtons(){
-    playToggleBtn = document.getElementById('play-toggle');
-    muteToggleBtn = document.getElementById('mute-toggle');
-    fullscreenInlineBtn = document.getElementById('fullscreen-inline');
-    openBrowserBtn = document.getElementById('open-browser');
-
-    if(playToggleBtn){
-        playToggleBtn.onclick = async () => {
-            if(!videoPlayer){
-                return;
-            }
-            try {
-                if(videoPlayer.paused){
-                    await videoPlayer.play();
-                } else {
-                    videoPlayer.pause();
-                }
-            } catch (e) {
-                // Ignore autoplay restrictions and keep controls responsive.
-            }
-            updateActionButtonsState();
-        };
-    }
-
-    if(muteToggleBtn){
-        muteToggleBtn.onclick = () => {
-            if(!videoPlayer){
-                return;
-            }
-            videoPlayer.muted = !videoPlayer.muted;
-            updateActionButtonsState();
-        };
-    }
-
-    if(fullscreenInlineBtn){
-        fullscreenInlineBtn.onclick = () => requestPlayerFullscreen();
-    }
-
-    if(openBrowserBtn){
-        openBrowserBtn.onclick = () => {
-            updateCurrentSource();
-            if(!currentSource){
-                return;
-            }
-            window.open(currentSource, '_blank', 'noopener,noreferrer');
-        };
-    }
-
-    updateActionButtonsState();
-}
-
 function getEpisodeSource(btn){
     return btn.dataset.videoSrc || '';
+}
+
+function getEpisodeDescription(btn){
+    return (btn.dataset.description || '').trim();
+}
+
+function updateEpisodeDescription(btn){
+    if(!episodeDescriptionEl){
+        return;
+    }
+
+    const movieDescription = (episodeDescriptionEl.dataset.movieDescription || '').trim();
+    const episodeDescription = btn ? getEpisodeDescription(btn) : '';
+    episodeDescriptionEl.textContent = episodeDescription || movieDescription || 'Bu qism uchun izoh kiritilmagan.';
 }
 
 function formatTime(seconds){
@@ -770,7 +648,6 @@ function bindNativePlayerControls(){
     durationTimeEl = document.getElementById('duration-time');
 
     if(!videoPlayer || !seekBar){
-        updateActionButtonsState();
         return;
     }
 
@@ -825,16 +702,12 @@ function bindNativePlayerControls(){
     videoPlayer.addEventListener('durationchange', updateTimes);
     videoPlayer.addEventListener('timeupdate', updateTimes);
     videoPlayer.addEventListener('progress', syncSeekBar);
-    videoPlayer.addEventListener('play', updateActionButtonsState);
-    videoPlayer.addEventListener('pause', updateActionButtonsState);
-    videoPlayer.addEventListener('volumechange', updateActionButtonsState);
 
     if(Number.isFinite(videoPlayer.duration) && videoPlayer.duration > 0){
         durationTimeEl.textContent = formatTime(videoPlayer.duration);
     }
     syncSeekBar();
     updateCurrentSource();
-    updateActionButtonsState();
 }
 
 function loadNativeVideoSource(videoSrc){
@@ -843,13 +716,12 @@ function loadNativeVideoSource(videoSrc){
     }
 
     if(!videoPlayer){
-        videoContainer.innerHTML = `<div class="player-shell">${buildNativePlayerMarkup(videoSrc)}</div>${buildPlayerActionsMarkup()}`;
+        videoContainer.innerHTML = `<div class="player-shell">${buildNativePlayerMarkup(videoSrc)}</div>`;
         videoPlayer=document.getElementById('video-player');
         seekBar=document.getElementById('seek-bar');
         currentTimeEl=document.getElementById('current-time');
         durationTimeEl=document.getElementById('duration-time');
         iframePlayer=null;
-        bindActionButtons();
         bindNativePlayerControls();
     }
 
@@ -869,15 +741,16 @@ function loadNativeVideoSource(videoSrc){
     videoPlayer.load();
     videoPlayer.play();
     currentSource = videoSrc;
-    updateActionButtonsState();
 }
 
 bindNativePlayerControls();
-bindActionButtons();
 updateCurrentSource();
 
 if(episodeBtns.length > 0) {
     episodeBtns[0].setAttribute('aria-pressed', 'true');
+    updateEpisodeDescription(episodeBtns[0]);
+} else {
+    updateEpisodeDescription(null);
 }
 
 episodeBtns.forEach(btn=>{
@@ -888,20 +761,19 @@ episodeBtns.forEach(btn=>{
                     const embedSrc = appendPlayerQuery(videoSrc);
                     if(iframePlayer){iframePlayer.src=embedSrc;}
             else{
-                        videoContainer.innerHTML=`<div class="player-shell"><button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button><div class="bunny-player-wrapper"><iframe id="iframe-player" src="${embedSrc}" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe></div></div>${buildPlayerActionsMarkup()}`;
+                        videoContainer.innerHTML=`<div class="player-shell"><button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button><div class="bunny-player-wrapper"><iframe id="iframe-player" src="${embedSrc}" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe></div></div>`;
                 iframePlayer=document.getElementById('iframe-player');videoPlayer=null;
                 seekBar=null;
                 currentTimeEl=null;
                 durationTimeEl=null;
             }
             currentSource = embedSrc;
-            bindActionButtons();
-            updateActionButtonsState();
         }else{
             loadNativeVideoSource(videoSrc);
         }
         episodeBtns.forEach(b=>b.setAttribute('aria-pressed', 'false'));
         btn.setAttribute('aria-pressed', 'true');
+        updateEpisodeDescription(btn);
     });
 });
 </script>

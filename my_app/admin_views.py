@@ -184,6 +184,7 @@ def admin_episode_form(request, pk=None):
         ep_num = request.POST.get('episode_number')
         title = request.POST.get('title')
         vid_url = request.POST.get('video_url')
+        description = request.POST.get('description')
         video_file = request.FILES.get('video_file')
 
         if not episode:
@@ -193,6 +194,7 @@ def admin_episode_form(request, pk=None):
         episode.episode_number = ep_num
         episode.title = title
         episode.video_url = vid_url
+        episode.description = description
         if video_file:
             episode.video_file = video_file
         try:
