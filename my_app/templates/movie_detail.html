@@ -513,9 +513,9 @@
                 {% endif %}
 
                 <div class="movie-info">
-                    <h4>Anime haqida</h4>
+                    <h4>Qism haqida</h4>
                     {% with first_episode=movie.episodes.first %}
-                    <p id="episode-description" data-movie-description="{{ movie.description|default:'Bu anime uchun izoh kiritilmagan.'|striptags|escape }}">{{ first_episode.description|default:movie.description|default:"Bu anime uchun izoh kiritilmagan." }}</p>
+                    <p id="episode-description">{{ first_episode.description|default:"Bu qism uchun izoh kiritilmagan." }}</p>
                     {% endwith %}
                 </div>
             </aside>
@@ -619,10 +619,8 @@ function updateEpisodeDescription(btn){
     if(!episodeDescriptionEl){
         return;
     }
-
-    const movieDescription = (episodeDescriptionEl.dataset.movieDescription || '').trim();
     const episodeDescription = btn ? getEpisodeDescription(btn) : '';
-    episodeDescriptionEl.textContent = episodeDescription || movieDescription || 'Bu qism uchun izoh kiritilmagan.';
+    episodeDescriptionEl.textContent = episodeDescription || 'Bu qism uchun izoh kiritilmagan.';
 }
 
 function formatTime(seconds){
