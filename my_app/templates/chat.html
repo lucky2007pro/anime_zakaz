@@ -11,20 +11,15 @@
 main.main-content {
     display: flex;
     justify-content: center;
-    align-items: stretch;
-    margin: 80px auto 0;
-    width: 100%;
-    max-width: 100%;
-    padding: 16px;
-    height: calc(100dvh - 80px);
-    height: calc(100svh - 80px);
+    align-items: flex-start;
+    padding: 20px 16px;
+    height: 100dvh;
+    height: -webkit-fill-available;
     overflow: hidden;
     position: relative;
-    box-sizing: border-box;
 }
 
 .chat-container {
-    --composer-h: 56px;
     width: 100%;
     max-width: 860px;
     background: var(--bg-surface);
@@ -33,9 +28,8 @@ main.main-content {
     box-shadow: 0 16px 48px rgba(0,0,0,0.55);
     display: flex;
     flex-direction: column;
-    height: 100%;
-    max-height: 100%;
-    min-height: 0;
+    height: min(80vh, calc(100dvh - 60px));
+    min-height: 520px;
     overflow: hidden;
     position: relative;
 }
@@ -417,7 +411,7 @@ main.main-content {
    ===================================================== */
 .sticker-panel {
     position: absolute;
-    bottom: calc(var(--composer-h) + max(0px, env(safe-area-inset-bottom)));
+    bottom: 70px;      /* input paneli balandligi */
     left: 0;
     right: 0;
     max-height: 0;
@@ -476,7 +470,7 @@ main.main-content {
     border-top: 1px solid var(--glass-border);
     gap: 8px;
     border-radius: 0 0 20px 20px;
-    min-height: var(--composer-h);
+    min-height: 56px;
     position: relative;
     z-index: 10;
     padding-bottom: calc(10px + max(0px, env(safe-area-inset-bottom)));
@@ -702,15 +696,13 @@ main.main-content {
 
 @media (max-width: 768px) {
     main.main-content {
-        margin: 72px 0 0 0;
         padding: 0;
+        padding-top: max(8px, env(safe-area-inset-top));
         align-items: stretch;
-        height: calc(100dvh - 72px);
-        height: calc(100svh - 72px);
+        height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         overflow: hidden;
     }
     .chat-container {
-        --composer-h: 52px;
         width: 100%;
         max-width: 100%;
         margin: 0;
@@ -718,6 +710,7 @@ main.main-content {
         height: 100%;
         min-height: 0;
         border: none;
+        border-radius: 0;
     }
     .chat-header { border-radius: 0; padding: 10px 14px; }
     .chat-box {
@@ -730,12 +723,47 @@ main.main-content {
         padding: 8px 10px;
         padding-bottom: calc(8px + max(0px, env(safe-area-inset-bottom)));
         border-radius: 0;
-        min-height: var(--composer-h);
+        min-height: 54px;
     }
-    .sticker-panel { bottom: calc(var(--composer-h) + max(0px, env(safe-area-inset-bottom))); }
+    .sticker-panel { bottom: 54px; }
     .sticker-grid { gap: 3px; padding: 8px 10px; }
     .sticker-item { font-size: 1.25rem; padding: 4px; }
     #scrollDownBtn { bottom: calc(62px + max(0px, env(safe-area-inset-bottom))); }
+}
+
+@media (max-width: 480px) {
+    main.main-content {
+        height: 100dvh;
+        height: -webkit-fill-available;
+        padding: 0;
+        padding-top: env(safe-area-inset-top);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .message { max-width: 90%; }
+    .msg-avatar { width: 26px; height: 26px; font-size: 0.65rem; }
+    .chat-container {
+        height: 100%;
+        height: -webkit-fill-available;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .chat-box {
+        flex: 1;
+    }
+    .chat-form {
+        padding: 6px 10px;
+        padding-bottom: calc(6px + max(10px, env(safe-area-inset-bottom)));
+        min-height: 52px;
+        align-items: flex-end;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(10px);
+    }
+    .sticker-toggle,
+    .send-btn { width: 38px; height: 38px; }
+    .sticker-panel { bottom: 52px; }
 }
 </style>
 {% endblock %}
@@ -970,16 +998,40 @@ function cancelReply() {
     document.getElementById("replyToInput").value = "";
 }
 
-const chatBox = document.getElementById("chatBox");
-const chatForm = document.getElementById("chatForm");
-const stickerPanel = document.getElementById("stickerPanel");
-const stickerToggle = document.getElementById("stickerToggle");
-const messageInput = document.getElementById('messageInput');
+/* =========================================================
+   MOBILE KEYBOARD FIX — visualViewport API
+   iOS/Android da klaviatura ochilganda forma ko'rinmay qolmasin
+   ========================================================= */
+(function () {
+    const container = document.querySelector('.chat-container');
+    const mainEl    = document.querySelector('main.main-content');
+    if (!container || !mainEl) return;
 
+    function applyViewport() {
+        const vv = window.visualViewport;
+        if (!vv) return;
+        const h = vv.height;
+        // faqat mobil qurilmalarda
+        if (window.innerWidth <= 900) {
+            mainEl.style.height  = h + 'px';
+            container.style.height = h + 'px';
+            // scroll ni pastga ushlab tur
+            if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    }
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', applyViewport);
+        window.visualViewport.addEventListener('scroll', applyViewport);
+        applyViewport();
+    }
+})();
 
 /* =========================================================
    AUTO-GROW TEXTAREA
    ========================================================= */
+const messageInput = document.getElementById('messageInput');
+
 function autoGrow(el) {
     if (!el) return;
     el.style.height = 'auto';
@@ -1095,6 +1147,10 @@ if (messageInput) {
 /* =========================================================
    STICKER PANEL
    ========================================================= */
+const stickerPanel  = document.getElementById("stickerPanel");
+const stickerToggle = document.getElementById("stickerToggle");
+const chatBox       = document.getElementById("chatBox");
+
 if (stickerToggle && stickerPanel) {
     stickerToggle.addEventListener("click", function (e) {
         e.stopPropagation();
@@ -1194,6 +1250,7 @@ if (chatBox) {
 /* =========================================================
    FORM SUBMIT
    ========================================================= */
+const chatForm = document.getElementById("chatForm");
 if (chatForm) {
     chatForm.addEventListener("submit", function (e) {
         // textarea uchun bo'sh tekshiruv
