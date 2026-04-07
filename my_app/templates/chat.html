@@ -5,39 +5,114 @@
 
 {% block extra_css %}
 <style>
-/* ===== CHAT CONTAINER ===== */
+/* =====================================================
+   LAYOUT — uchta qatlam: header / messages / input
+   ===================================================== */
+main.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px 16px;
+    min-height: calc(100dvh - 60px);
+}
+
 .chat-container {
-    max-width: 900px;
-    margin: 20px auto;
+    width: 100%;
+    max-width: 860px;
     background: var(--bg-surface);
     border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border-radius: 20px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.55);
     display: flex;
     flex-direction: column;
-    height: min(75vh, calc(100dvh - 100px));
-    min-height: 500px;
+    height: min(82vh, calc(100dvh - 100px));
+    min-height: 520px;
     overflow: hidden;
     position: relative;
 }
 
-/* ===== HEADER ===== */
+/* =====================================================
+   HEADER
+   ===================================================== */
 .chat-header {
-    padding: 20px;
-    background: rgba(0,0,0,0.2);
-    border-bottom: 1px solid var(--glass-border);
-    font-size: 1.4rem;
-    font-weight: 800;
-    text-align: center;
-    border-radius: 16px 16px 0 0;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: rgba(0,0,0,0.25);
+    border-bottom: 1px solid var(--glass-border);
+    border-radius: 20px 20px 0 0;
+    backdrop-filter: blur(10px);
 }
 
-/* ===== LOADING OLDER MESSAGES ===== */
+.chat-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent, #00f3ff) 0%, rgba(0,243,255,0.3) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    color: #000;
+}
+
+.chat-header-info {
+    flex: 1;
+}
+
+.chat-header-info h2 {
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.chat-header-info span {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+}
+
+.online-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* =====================================================
+   MESSAGES SCROLL AREA — butun bo'sh joyni egallaydi
+   ===================================================== */
+.chat-box {
+    flex: 1;
+    min-height: 0;          /* <-- asosiy tuzatish: flex child'ga shrink ruxsati */
+    padding: 16px 18px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+}
+
+.chat-box::-webkit-scrollbar { width: 5px; }
+.chat-box::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 5px;
+}
+
+/* =====================================================
+   LOAD MORE
+   ===================================================== */
 .load-more-wrapper {
     display: flex;
     justify-content: center;
-    padding: 10px 0 4px;
+    padding: 6px 0 10px;
     flex-shrink: 0;
 }
 
@@ -45,281 +120,372 @@
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     color: var(--text-dim);
-    padding: 6px 18px;
+    padding: 5px 16px;
     border-radius: 20px;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     cursor: pointer;
     transition: 0.2s;
-    display: none; /* shown via JS if there are more pages */
+    display: none;
 }
+#loadMoreBtn:hover { border-color: var(--accent); color: var(--accent); }
+#loadMoreBtn.loading { opacity: 0.45; pointer-events: none; }
 
-#loadMoreBtn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-}
+#topSentinel { height: 1px; flex-shrink: 0; }
 
-#loadMoreBtn.loading {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-/* Sentinel div for IntersectionObserver (top of chat) */
-#topSentinel {
-    height: 1px;
-    flex-shrink: 0;
-}
-
-/* ===== CHAT BOX ===== */
-.chat-box {
-    flex: 1;
-    min-height: 0;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    overscroll-behavior: contain;
-    scroll-behavior: smooth;
-}
-
-.chat-box::-webkit-scrollbar {
-    width: 6px;
-}
-.chat-box::-webkit-scrollbar-thumb {
-    background: var(--glass-border);
-    border-radius: 6px;
-}
-
-/* ===== MESSAGES ===== */
+/* =====================================================
+   MESSAGE GROUPS — consecutive messages from same user
+   ===================================================== */
 .message-wrapper {
     display: flex;
+    align-items: flex-end;
+    gap: 8px;
     width: 100%;
-    animation: msgIn 0.2s ease;
+    animation: msgIn 0.18s ease;
 }
 
 @keyframes msgIn {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Own messages — o'ngga */
 .message-wrapper[data-own="true"] {
-    justify-content: flex-end;
+    flex-direction: row-reverse;
 }
 
+/* Avatar */
+.msg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    align-self: flex-end;
+}
+
+.message-wrapper[data-own="true"] .msg-avatar {
+    background: linear-gradient(135deg, var(--accent, #00f3ff) 0%, #0066ff 100%);
+    color: #000;
+}
+
+/* Bubble */
 .message {
-    max-width: 75%;
-    background: var(--glass-bg);
-    padding: 15px;
-    border-radius: 12px;
+    max-width: 68%;
+    background: var(--glass-bg, rgba(255,255,255,0.06));
+    padding: 10px 13px 8px;
+    border-radius: 18px 18px 18px 4px;
     border: 1px solid var(--glass-border);
     position: relative;
+    word-break: break-word;
 }
 
 .message-wrapper[data-own="true"] .message {
-    background: rgba(0, 243, 255, 0.1);
-    border-color: rgba(0, 243, 255, 0.2);
+    background: rgba(0, 243, 255, 0.12);
+    border-color: rgba(0, 243, 255, 0.25);
+    border-radius: 18px 18px 4px 18px;
 }
 
-.message-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-    font-size: 0.85rem;
-    color: var(--text-dim);
-}
-
-.username {
+/* Username (faqat boshqalar xabarlarida) */
+.message-username {
+    font-size: 0.78rem;
     font-weight: 800;
-    color: var(--text-light);
-}
-
-.message-wrapper[data-own="true"] .username {
-    color: var(--accent);
-}
-
-.actions {
+    color: var(--accent, #00f3ff);
+    margin-bottom: 3px;
     display: flex;
-    gap: 10px;
-    opacity: 0;
-    transition: 0.3s;
+    align-items: center;
+    gap: 5px;
 }
 
-.message:hover .actions {
-    opacity: 1;
-}
-
-.actions i, .actions a {
-    color: var(--text-dim);
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.actions i:hover,
-.actions a:hover i {
-    color: var(--accent);
+.message-wrapper[data-own="true"] .message-username {
+    display: none; /* o'z xabarida ismsiz */
 }
 
 .message-body {
-    font-size: 1rem;
-    line-height: 1.5;
-    word-break: break-word;
+    font-size: 0.95rem;
+    line-height: 1.55;
 }
 
-.reply-info {
-    background: rgba(0,0,0,0.3);
-    padding: 8px 12px;
-    border-left: 3px solid var(--accent);
-    border-radius: 4px;
+/* Vaqt + tahrirlangan */
+.message-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 4px;
+}
+
+.message-time {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    opacity: 0.75;
+}
+
+.edited-badge {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    opacity: 0.6;
+}
+
+/* =====================================================
+   ACTION BUTTONS — xabarga hover qilganda chiqadi
+   ===================================================== */
+.msg-actions {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s;
+    background: var(--bg-surface, #1a1a2e);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 3px 8px;
+    z-index: 5;
+}
+
+.message-wrapper[data-own="true"] .msg-actions {
+    right: auto;
+    left: 8px;
+}
+
+.message:hover .msg-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.msg-actions i,
+.msg-actions a {
+    color: var(--text-dim);
+    cursor: pointer;
+    text-decoration: none;
     font-size: 0.85rem;
-    margin-top: 10px;
+    transition: color 0.15s;
+    display: flex;
+    align-items: center;
+}
+
+.msg-actions i:hover,
+.msg-actions a:hover i {
+    color: var(--accent, #00f3ff);
+}
+
+/* =====================================================
+   REPLY QUOTE (xabar ichida)
+   ===================================================== */
+.reply-info {
+    background: rgba(0,0,0,0.28);
+    padding: 6px 10px;
+    border-left: 3px solid var(--accent, #00f3ff);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.8rem;
+    margin-bottom: 6px;
     color: var(--text-dim);
     word-break: break-word;
 }
 
-/* ===== EDIT FORM ===== */
+/* =====================================================
+   EDIT FORM
+   ===================================================== */
 .edit-form {
-    display: flex;
+    display: none;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 8px;
+    margin-top: 8px;
 }
 
 .edit-form label {
     display: block;
     width: 100%;
     margin-bottom: 2px;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--text-dim);
 }
 
 .edit-form input {
     flex: 1;
     min-width: 0;
-    padding: 8px;
+    padding: 7px 10px;
     background: var(--bg-base);
     border: 1px solid var(--glass-border);
     color: white;
-    border-radius: 4px;
+    border-radius: 6px;
     font-family: inherit;
+    font-size: 0.9rem;
     outline: none;
 }
 
-.edit-form input:focus {
-    border-color: var(--accent);
-}
+.edit-form input:focus { border-color: var(--accent); }
 
 .edit-form button {
-    padding: 8px 12px;
+    padding: 7px 12px;
     background: var(--glass-bg);
     color: white;
     border: 1px solid var(--glass-border);
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-family: inherit;
+    font-size: 0.85rem;
 }
 
 .edit-form button[type="submit"] {
     background: var(--accent);
     border-color: var(--accent);
+    color: #000;
+    font-weight: 700;
 }
 
-/* ===== REPLY PREVIEW — part of flex flow, NOT absolute ===== */
+/* =====================================================
+   REPLY PREVIEW — input ustida ko'rinadi, scroll'ni siqmaydi
+   ===================================================== */
 .reply-preview {
     flex-shrink: 0;
-    background: rgba(0, 243, 255, 0.08);
-    padding: 10px 20px;
-    border-top: 1px solid rgba(0, 243, 255, 0.2);
-    border-bottom: 1px solid rgba(0, 243, 255, 0.1);
-    display: none; /* shown via JS */
-    justify-content: space-between;
+    background: rgba(0, 243, 255, 0.07);
+    padding: 8px 16px;
+    border-top: 1px solid rgba(0, 243, 255, 0.18);
+    display: none;
     align-items: center;
-    font-size: 0.9rem;
     gap: 10px;
+    font-size: 0.85rem;
 }
 
-.reply-preview span {
+.reply-preview-bar {
+    width: 3px;
+    height: 32px;
+    background: var(--accent, #00f3ff);
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.reply-preview-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.reply-preview-content strong {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--accent, #00f3ff);
+    margin-bottom: 2px;
+}
+
+.reply-preview-content span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--text-dim);
+    font-size: 0.82rem;
+    display: block;
 }
 
-.reply-preview button {
+.reply-cancel-btn {
     flex-shrink: 0;
     background: transparent;
-    color: var(--accent);
+    color: var(--text-dim);
     border: none;
     cursor: pointer;
-    font-weight: 800;
-    font-size: 0.85rem;
+    font-size: 1rem;
+    padding: 4px;
+    border-radius: 50%;
+    transition: color 0.15s;
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
+.reply-cancel-btn:hover { color: var(--accent); }
 
-/* ===== STICKER PANEL — part of flex flow, NOT absolute ===== */
+/* =====================================================
+   STICKER PANEL — overlay, scroll'ni SIQMAYDI
+   Absolute positioning, chat-container ichida pastdan chiqadi
+   ===================================================== */
 .sticker-panel {
-    flex-shrink: 0;
+    position: absolute;
+    bottom: 70px;      /* input paneli balandligi */
+    left: 0;
+    right: 0;
     max-height: 0;
     overflow: hidden;
-    background: rgba(0,0,0,0.25);
+    background: rgba(10,10,20,0.96);
     border-top: 1px solid var(--glass-border);
-    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 0 12px;
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 30;
 }
 
 .sticker-panel.open {
-    max-height: 200px;
-    padding: 10px 12px;
+    max-height: 180px;
     overflow-y: auto;
 }
 
+.sticker-panel::-webkit-scrollbar { height: 4px; width: 4px; }
+.sticker-panel::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 4px;
+}
+
 .sticker-grid {
-    display: grid;
-    grid-template-columns: repeat(10, minmax(0, 1fr));
-    gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 10px 14px;
 }
 
 .sticker-item {
     border: 1px solid transparent;
     border-radius: 8px;
     background: transparent;
-    font-size: 1.35rem;
+    font-size: 1.45rem;
     line-height: 1;
-    padding: 6px;
+    padding: 5px;
     cursor: pointer;
-    transition: 0.15s;
+    transition: transform 0.12s, background 0.12s;
 }
-
 .sticker-item:hover {
     border-color: var(--glass-border);
-    background: rgba(255,255,255,0.06);
-    transform: scale(1.15);
+    background: rgba(255,255,255,0.07);
+    transform: scale(1.2);
 }
 
-/* ===== CHAT FORM — part of flex flow, NOT absolute ===== */
+/* =====================================================
+   INPUT PANEL — doim pastda, balandligi o'zgarmaydi
+   ===================================================== */
 .chat-form {
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    padding: 14px 20px;
-    background: var(--bg-surface);
+    padding: 10px 14px;
+    background: rgba(0,0,0,0.3);
     border-top: 1px solid var(--glass-border);
-    gap: 10px;
-    border-radius: 0 0 16px 16px;
+    gap: 8px;
+    border-radius: 0 0 20px 20px;
+    min-height: 64px;
+    position: relative;
+    z-index: 10;
 }
 
 .sticker-toggle {
     flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
     border: 1px solid var(--glass-border);
-    background: var(--bg-base);
+    background: transparent;
     color: var(--text-light);
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sticker-toggle:hover,
@@ -328,83 +494,93 @@
     background: rgba(0, 243, 255, 0.1);
 }
 
-.chat-form input[type="text"] {
+.input-wrapper {
     flex: 1;
     min-width: 0;
-    background: var(--bg-base);
+    position: relative;
+}
+
+.chat-form input[type="text"] {
+    width: 100%;
+    background: var(--bg-base, rgba(255,255,255,0.05));
     border: 1px solid var(--glass-border);
-    padding: 13px 15px;
-    border-radius: 8px;
+    padding: 11px 14px;
+    border-radius: 22px;
     color: white;
     outline: none;
     font-family: inherit;
-    font-size: 1rem;
-    transition: 0.2s;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
 }
 
 .chat-form input[type="text"]:focus {
-    border-color: var(--accent);
+    border-color: var(--accent, #00f3ff);
+    box-shadow: 0 0 0 3px rgba(0, 243, 255, 0.08);
+}
+
+.chat-form input[type="text"]:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 .send-btn {
     flex-shrink: 0;
-    background: var(--accent);
-    color: white;
+    background: var(--accent, #00f3ff);
+    color: #000;
     border: none;
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 1.4rem;
-    transition: 0.2s;
+    font-size: 1.1rem;
+    transition: transform 0.15s, box-shadow 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: 800;
 }
 
 .send-btn:hover {
-    background: var(--accent-hover);
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 0 14px rgba(0, 243, 255, 0.5);
 }
 
-/* ===== SCROLL-TO-BOTTOM BUTTON ===== */
+.send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* =====================================================
+   SCROLL-TO-BOTTOM FLOATING BUTTON
+   ===================================================== */
 #scrollDownBtn {
     position: absolute;
-    bottom: 90px;
+    bottom: 78px;
     right: 16px;
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background: var(--bg-surface);
     border: 1px solid var(--glass-border);
     color: var(--text-light);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     cursor: pointer;
     display: none;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    z-index: 20;
-    transition: 0.2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    z-index: 25;
+    transition: border-color 0.2s, color 0.2s;
 }
 
-#scrollDownBtn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-}
+#scrollDownBtn:hover { border-color: var(--accent); color: var(--accent); }
+#scrollDownBtn.visible { display: flex; }
 
-#scrollDownBtn.visible {
-    display: flex;
-}
-
-/* Unread badge on scroll button */
-#scrollDownBtn .badge {
+.badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    background: var(--accent);
+    top: -5px;
+    right: -5px;
+    background: var(--accent, #00f3ff);
     color: #000;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 800;
     width: 18px;
     height: 18px;
@@ -413,63 +589,64 @@
     align-items: center;
     justify-content: center;
 }
+.badge.show { display: flex; }
 
-#scrollDownBtn .badge.show {
-    display: flex;
+/* =====================================================
+   EMPTY STATE
+   ===================================================== */
+.chat-empty {
+    text-align: center;
+    color: var(--text-dim);
+    margin: auto;
+    padding: 30px 20px;
+    font-size: 0.95rem;
 }
 
-/* ===== ACCESSIBILITY ===== */
+/* =====================================================
+   ACCESSIBILITY
+   ===================================================== */
 .sr-only {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
     overflow: hidden;
     clip: rect(0,0,0,0);
     border: 0;
 }
 
-/* ===== EMPTY STATE ===== */
-.chat-empty {
-    text-align: center;
-    color: var(--text-dim);
-    margin: auto 0;
-    padding: 20px;
-}
-
-/* ===== RESPONSIVE ===== */
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
 @media (max-width: 768px) {
     main.main-content {
-        margin-top: 68px;
         padding: 0;
-        min-height: calc(100dvh - 68px);
-        display: flex;
+        align-items: stretch;
+        min-height: 100dvh;
     }
     .chat-container {
         width: 100%;
+        max-width: 100%;
         margin: 0;
         border-radius: 0;
-        height: calc(100dvh - 68px);
+        height: 100dvh;
         min-height: 0;
+        border: none;
+        border-radius: 0;
     }
-    .chat-header { padding: 14px; font-size: 1.1rem; }
-    .chat-box { padding: 12px; gap: 10px; }
-    .message { max-width: 92%; padding: 12px; }
-    .message-body { font-size: 0.92rem; }
-    .chat-form { padding: 10px; border-radius: 0; }
-    .sticker-toggle,
-    .send-btn { width: 42px; height: 42px; }
-    .sticker-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
-    .reply-preview { padding: 10px 14px; }
-    .message-header { align-items: flex-start; flex-direction: column; }
-    #scrollDownBtn { bottom: 76px; }
+    .chat-header { border-radius: 0; padding: 10px 14px; }
+    .chat-box { padding: 10px 12px; }
+    .message { max-width: 82%; }
+    .message-body { font-size: 0.9rem; }
+    .chat-form { padding: 8px 10px; border-radius: 0; min-height: 58px; }
+    .sticker-panel { bottom: 58px; }
+    .sticker-grid { gap: 3px; padding: 8px 10px; }
+    .sticker-item { font-size: 1.25rem; padding: 4px; }
+    #scrollDownBtn { bottom: 70px; }
 }
 
 @media (max-width: 480px) {
-    .message { max-width: 100%; }
-    .chat-form { gap: 8px; }
-    .sticker-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .message { max-width: 90%; }
+    .msg-avatar { width: 26px; height: 26px; font-size: 0.65rem; }
 }
 </style>
 {% endblock %}
@@ -478,18 +655,26 @@
 <main class="main-content">
     <div class="chat-container">
 
-        <!-- HEADER -->
+        <!-- ═══════════════════════════════════════
+             HEADER
+        ══════════════════════════════════════════ -->
         <div class="chat-header">
-            Umumiy Chat
+            <div class="chat-header-icon">
+                <i class='bx bx-chat'></i>
+            </div>
+            <div class="chat-header-info">
+                <h2>Umumiy Chat</h2>
+                <span><span class="online-dot"></span>Faol</span>
+            </div>
         </div>
 
-        <!-- CHAT BOX -->
+        <!-- ═══════════════════════════════════════
+             MESSAGES SCROLL AREA
+        ══════════════════════════════════════════ -->
         <div class="chat-box" id="chatBox">
 
-            <!-- Sentinel: scroll to top triggers load more -->
             <div id="topSentinel"></div>
 
-            <!-- Load More button (fallback) -->
             <div class="load-more-wrapper">
                 <button id="loadMoreBtn" type="button" onclick="loadOlderMessages()">
                     ↑ Eski xabarlarni yuklash
@@ -500,59 +685,62 @@
             <div class="message-wrapper"
                  data-msg-id="{{ msg.id }}"
                  {% if msg.user == request.user %}data-own="true"{% endif %}>
-                <div class="message">
-                    <div class="message-header">
-                        <span class="username">
-                            {{ msg.user.username }}
-                            {% if msg.user.is_admin_user %}
-                                <i class='bx bx-crown' title="Admin" style="color: #ffc107;"></i>
-                            {% endif %}
-                        </span>
 
-                        <div style="display: flex; gap: 15px; align-items: center;">
-                            <span class="time">
-                                {% if msg.edited %}
-                                    <span style="opacity: 0.5; font-size: 0.75rem;">(tahrirlangan)</span>
-                                {% endif %}
-                                {{ msg.local_created_at|date:"H:i" }}
-                            </span>
-                            <div class="actions">
-                                {% if msg.user == request.user or request.user.is_admin_user %}
-                                    <i class='bx bx-edit-alt'
-                                       title="Tahrirlash"
-                                       onclick="openEdit({{ msg.id }})"></i>
-                                    <a href="{% url 'delete_message' msg.id %}" title="O'chirish">
-                                        <i class='bx bx-trash'></i>
-                                    </a>
-                                {% endif %}
-                                {% if request.user.is_admin_user and not msg.user.is_admin_user %}
-                                    <a href="{% url 'ban_user' msg.user.id %}" title="Bloklash">
-                                        <i class='bx bx-block'></i>
-                                    </a>
-                                {% endif %}
-                                <i class='bx bx-reply'
-                                   title="Javob berish"
-                                   onclick="replyMessage({{ msg.id }}, '{{ msg.user.username|escapejs }}', '{{ msg.message|escapejs }}')"></i>
-                            </div>
-                        </div>
+                <!-- Avatar -->
+                <div class="msg-avatar" title="{{ msg.user.username }}">
+                    {{ msg.user.username|first }}
+                </div>
+
+                <!-- Bubble -->
+                <div class="message">
+
+                    <!-- Action buttons (hover'da ko'rinadi) -->
+                    <div class="msg-actions">
+                        {% if msg.user == request.user or request.user.is_admin_user %}
+                            <i class='bx bx-edit-alt'
+                               title="Tahrirlash"
+                               onclick="openEdit({{ msg.id }})"></i>
+                            <a href="{% url 'delete_message' msg.id %}" title="O'chirish">
+                                <i class='bx bx-trash'></i>
+                            </a>
+                        {% endif %}
+                        {% if request.user.is_admin_user and not msg.user.is_admin_user %}
+                            <a href="{% url 'ban_user' msg.user.id %}" title="Bloklash">
+                                <i class='bx bx-block'></i>
+                            </a>
+                        {% endif %}
+                        <i class='bx bx-reply'
+                           title="Javob berish"
+                           onclick="replyMessage({{ msg.id }}, '{{ msg.user.username|escapejs }}', '{{ msg.message|escapejs }}')"></i>
                     </div>
 
-                    <div class="message-body" id="text-{{ msg.id }}">
-                        {{ msg.message }}
-                        {% if msg.reply_to %}
-                            <div class="reply-info">
-                                <i class='bx bx-message-square-dots'></i>
-                                <strong>{{ msg.reply_to.user.username }}</strong>
-                                ga javoban: "{{ msg.reply_to.message }}"
-                            </div>
+                    <!-- Username (boshqalar uchun) -->
+                    <div class="message-username">
+                        {{ msg.user.username }}
+                        {% if msg.user.is_admin_user %}
+                            <i class='bx bx-crown' title="Admin" style="color:#ffc107;font-size:0.8rem;"></i>
                         {% endif %}
                     </div>
 
+                    <!-- Reply quote -->
+                    {% if msg.reply_to %}
+                    <div class="reply-info">
+                        <i class='bx bx-message-square-dots' style="margin-right:4px;"></i>
+                        <strong>{{ msg.reply_to.user.username }}</strong>:
+                        "{{ msg.reply_to.message|truncatechars:80 }}"
+                    </div>
+                    {% endif %}
+
+                    <!-- Message text -->
+                    <div class="message-body" id="text-{{ msg.id }}">
+                        {{ msg.message }}
+                    </div>
+
+                    <!-- Edit form -->
                     <form method="POST"
                           action="{% url 'edit_message' msg.id %}"
                           class="edit-form"
-                          id="edit-form-{{ msg.id }}"
-                          style="display:none;">
+                          id="edit-form-{{ msg.id }}">
                         {% csrf_token %}
                         <label for="edit-message-{{ msg.id }}">Xabarni tahrirlash</label>
                         <input id="edit-message-{{ msg.id }}"
@@ -567,26 +755,42 @@
                         </button>
                         <button type="button" onclick="closeEdit({{ msg.id }})">Bekor</button>
                     </form>
-                </div>
-            </div>
+
+                    <!-- Time + edited -->
+                    <div class="message-meta">
+                        {% if msg.edited %}
+                            <span class="edited-badge">(tahrirlangan)</span>
+                        {% endif %}
+                        <span class="message-time">{{ msg.local_created_at|date:"H:i" }}</span>
+                    </div>
+
+                </div><!-- .message -->
+            </div><!-- .message-wrapper -->
             {% empty %}
             <div class="chat-empty">
-                <p>Hali xabar yo'q. Birinchi bo'lib yozing! 👋</p>
+                <p>💬 Hali xabar yo'q. Birinchi bo'lib yozing! 👋</p>
             </div>
             {% endfor %}
-        </div>
 
-        <!-- REPLY PREVIEW — flex item, not absolute -->
+        </div><!-- .chat-box -->
+
+        <!-- ═══════════════════════════════════════
+             REPLY PREVIEW — scroll oynasini siqmaydi
+        ══════════════════════════════════════════ -->
         <div id="replyPreview" class="reply-preview">
-            <span>
-                Javob:
+            <div class="reply-preview-bar"></div>
+            <div class="reply-preview-content">
                 <strong id="replyUsername"></strong>
-                — "<span id="replyMessage"></span>"
-            </span>
-            <button type="button" onclick="cancelReply()">✕ Bekor</button>
+                <span id="replyMessage"></span>
+            </div>
+            <button class="reply-cancel-btn" type="button" onclick="cancelReply()" title="Bekor">
+                <i class='bx bx-x'></i>
+            </button>
         </div>
 
-        <!-- STICKER PANEL — flex item, not absolute -->
+        <!-- ═══════════════════════════════════════
+             STICKER PANEL — absolute, scroll'ni SIQMAYDI
+        ══════════════════════════════════════════ -->
         <div class="sticker-panel" id="stickerPanel" aria-label="Sticker panel">
             <div class="sticker-grid">
                 {% for sticker in "😀😎😍😂😢😡🤯😴👍🔥❤️💯🎉😅🤔😉😮🙈🤝🤟💪🫡🫶😏😤🥳🤩🫠😬🧐🤭😇🥺😌😑😶🤐🥱😪🤤😋😛😜😝🤑😈💀👻🤡👾🎭"|make_list %}
@@ -595,23 +799,28 @@
             </div>
         </div>
 
-        <!-- CHAT FORM — flex item, not absolute -->
+        <!-- ═══════════════════════════════════════
+             INPUT PANEL — doim pastda qoladi
+        ══════════════════════════════════════════ -->
         <form method="POST" class="chat-form" id="chatForm">
             {% csrf_token %}
             <input type="hidden" name="reply_to" id="replyToInput" value="">
+
             <button type="button"
                     class="sticker-toggle"
                     id="stickerToggle"
-                    aria-label="Sticker panelni ochish">😊</button>
+                    aria-label="Sticker panel">😊</button>
 
-            <label class="sr-only" for="messageInput">Xabaringizni yozing</label>
-            <input type="text"
-                   name="message"
-                   placeholder="Xabaringizni yozing…"
-                   id="messageInput"
-                   {% if request.user.is_banned %}disabled{% endif %}
-                   required
-                   autocomplete="off">
+            <div class="input-wrapper">
+                <label class="sr-only" for="messageInput">Xabaringizni yozing</label>
+                <input type="text"
+                       name="message"
+                       placeholder="Xabaringizni yozing…"
+                       id="messageInput"
+                       {% if request.user.is_banned %}disabled{% endif %}
+                       required
+                       autocomplete="off">
+            </div>
 
             <button type="submit"
                     class="send-btn"
@@ -627,7 +836,7 @@
             <span class="badge" id="unreadBadge"></span>
         </button>
 
-    </div>
+    </div><!-- .chat-container -->
 </main>
 
 <script>
@@ -635,22 +844,27 @@
    EDIT / CLOSE EDIT
    ========================================================= */
 function openEdit(id) {
-    document.getElementById("text-" + id).style.display = "none";
-    document.getElementById("edit-form-" + id).style.display = "flex";
+    const textEl = document.getElementById("text-" + id);
+    const formEl = document.getElementById("edit-form-" + id);
+    if (textEl) textEl.style.display = "none";
+    if (formEl) { formEl.style.display = "flex"; }
     const input = document.getElementById("edit-message-" + id);
     if (input) { input.focus(); input.select(); }
 }
 
 function closeEdit(id) {
-    document.getElementById("text-" + id).style.display = "block";
-    document.getElementById("edit-form-" + id).style.display = "none";
+    const textEl = document.getElementById("text-" + id);
+    const formEl = document.getElementById("edit-form-" + id);
+    if (textEl) textEl.style.display = "block";
+    if (formEl) formEl.style.display = "none";
 }
 
 /* =========================================================
    REPLY
    ========================================================= */
 function replyMessage(messageId, username, message) {
-    const preview  = document.getElementById("replyPreview");
+    const preview = document.getElementById("replyPreview");
+    if (!preview) return;
     preview.style.display = "flex";
     document.getElementById("replyUsername").innerText = username;
     const msgEl = document.getElementById("replyMessage");
@@ -660,7 +874,8 @@ function replyMessage(messageId, username, message) {
 }
 
 function cancelReply() {
-    document.getElementById("replyPreview").style.display = "none";
+    const preview = document.getElementById("replyPreview");
+    if (preview) preview.style.display = "none";
     document.getElementById("replyToInput").value = "";
 }
 
@@ -673,7 +888,8 @@ const messageInput  = document.getElementById("messageInput");
 const chatBox       = document.getElementById("chatBox");
 
 if (stickerToggle && stickerPanel) {
-    stickerToggle.addEventListener("click", function () {
+    stickerToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
         const isOpen = stickerPanel.classList.toggle("open");
         stickerToggle.classList.toggle("active", isOpen);
     });
@@ -690,16 +906,22 @@ document.querySelectorAll(".sticker-item").forEach(function (item) {
     });
 });
 
+document.addEventListener("click", function (e) {
+    if (!stickerPanel || !stickerToggle) return;
+    if (!stickerPanel.contains(e.target) && e.target !== stickerToggle && !stickerToggle.contains(e.target)) {
+        stickerPanel.classList.remove("open");
+        stickerToggle.classList.remove("active");
+    }
+});
+
 /* =========================================================
    SCROLL HELPERS
    ========================================================= */
-/** Returns true if user is near the bottom (within 150px) */
 function isNearBottom() {
     if (!chatBox) return true;
     return chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < 150;
 }
 
-/** Instantly jump to the very last message — no animation */
 function scrollToBottom(instant) {
     if (!chatBox) return;
     if (instant) {
@@ -712,7 +934,7 @@ function scrollToBottom(instant) {
 }
 
 /* =========================================================
-   SCROLL-TO-BOTTOM BUTTON + UNREAD COUNTER
+   SCROLL-TO-BOTTOM BUTTON
    ========================================================= */
 const scrollDownBtn = document.getElementById("scrollDownBtn");
 const unreadBadge   = document.getElementById("unreadBadge");
@@ -739,13 +961,12 @@ if (chatBox && scrollDownBtn) {
 }
 
 /* =========================================================
-   INITIAL SCROLL — jump to bottom on page load
+   INITIAL SCROLL
    ========================================================= */
 window.addEventListener("load", function () {
-    scrollToBottom(true); // instant, no animation
+    scrollToBottom(true);
 });
 
-/* Also attempt early (before full load) */
 if (chatBox) {
     chatBox.style.scrollBehavior = "auto";
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -753,47 +974,33 @@ if (chatBox) {
 }
 
 /* =========================================================
-   FORM SUBMIT — keep user at bottom after sending
+   FORM SUBMIT
    ========================================================= */
 const chatForm = document.getElementById("chatForm");
 if (chatForm) {
     chatForm.addEventListener("submit", function () {
-        // Mark that we want to scroll after page reload
         sessionStorage.setItem("chatScrollToBottom", "1");
     });
 }
 
-// On page load, if we just submitted a form, scroll to bottom
 if (sessionStorage.getItem("chatScrollToBottom") === "1") {
     sessionStorage.removeItem("chatScrollToBottom");
     window.addEventListener("load", function () { scrollToBottom(true); });
 }
 
 /* =========================================================
-   LOAD OLDER MESSAGES (Infinite Scroll — Telegram style)
-
-   Backend needs a view that accepts:
-     GET /chat/messages/?before=<oldest_msg_id>&limit=20
-   and returns JSON:
-     { messages: [...], has_more: true/false }
-
-   Each message object should have:
-     id, user, username, is_admin, is_own, message,
-     time, edited, reply_to (nullable)
+   LOAD OLDER MESSAGES (Telegram uslubi)
    ========================================================= */
-
-// Oldest message id currently in DOM
 function getOldestMsgId() {
     const wrappers = chatBox.querySelectorAll(".message-wrapper[data-msg-id]");
     if (!wrappers.length) return null;
     return wrappers[0].getAttribute("data-msg-id");
 }
 
-let isLoadingMore  = false;
-let hasMoreMessages = {{ has_more|default:"false"|lower }};  // set from Django context
-const loadMoreBtn  = document.getElementById("loadMoreBtn");
+let isLoadingMore   = false;
+let hasMoreMessages = {{ has_more|default:"false"|lower }};
+const loadMoreBtn   = document.getElementById("loadMoreBtn");
 
-// Show/hide "load more" button
 if (hasMoreMessages && loadMoreBtn) {
     loadMoreBtn.style.display = "block";
 }
@@ -822,18 +1029,15 @@ function loadOlderMessages() {
         hasMoreMessages = data.has_more;
         if (!hasMoreMessages && loadMoreBtn) loadMoreBtn.style.display = "none";
 
-        // Build and insert messages above existing ones
         const sentinel = document.getElementById("topSentinel");
         const wrapper  = loadMoreBtn ? loadMoreBtn.closest(".load-more-wrapper") : null;
 
         data.messages.forEach(function (msg) {
             const el = buildMessageEl(msg);
-            // Insert after sentinel / load-more wrapper
             const insertAfter = wrapper || sentinel;
             insertAfter.insertAdjacentElement("afterend", el);
         });
 
-        // Restore scroll position so user doesn't jump
         chatBox.style.scrollBehavior = "auto";
         chatBox.scrollTop = chatBox.scrollHeight - prevScrollHeight;
         chatBox.style.scrollBehavior = "";
@@ -845,39 +1049,36 @@ function loadOlderMessages() {
     });
 }
 
-/** Build a message DOM element from API response data */
 function buildMessageEl(msg) {
     const wrapper = document.createElement("div");
     wrapper.className = "message-wrapper";
     wrapper.setAttribute("data-msg-id", msg.id);
     if (msg.is_own) wrapper.setAttribute("data-own", "true");
 
-    const crownHtml = msg.is_admin
-        ? `<i class='bx bx-crown' title="Admin" style="color: #ffc107;"></i>`
+    const crownHtml   = msg.is_admin
+        ? `<i class='bx bx-crown' title="Admin" style="color:#ffc107;font-size:0.8rem;"></i>`
         : "";
-
-    const editedHtml = msg.edited
-        ? `<span style="opacity:0.5;font-size:0.75rem;">(tahrirlangan)</span> ` : "";
-
-    const replyHtml = msg.reply_to
+    const editedHtml  = msg.edited
+        ? `<span class="edited-badge">(tahrirlangan)</span>` : "";
+    const replyHtml   = msg.reply_to
         ? `<div class="reply-info">
-               <i class='bx bx-message-square-dots'></i>
-               <strong>${escHtml(msg.reply_to.username)}</strong>
-               ga javoban: "${escHtml(msg.reply_to.message)}"
+               <i class='bx bx-message-square-dots' style="margin-right:4px;"></i>
+               <strong>${escHtml(msg.reply_to.username)}</strong>:
+               "${escHtml(msg.reply_to.message)}"
            </div>`
         : "";
+    const avatarLetter = (msg.username || "?")[0].toUpperCase();
 
     wrapper.innerHTML = `
+      <div class="msg-avatar" title="${escHtml(msg.username)}">${avatarLetter}</div>
       <div class="message">
-        <div class="message-header">
-          <span class="username">${escHtml(msg.username)} ${crownHtml}</span>
-          <div style="display:flex;gap:15px;align-items:center;">
-            <span class="time">${editedHtml}${escHtml(msg.time)}</span>
-          </div>
+        <div class="msg-actions">
+          <i class='bx bx-reply' title="Javob" onclick="replyMessage(${msg.id},'${escHtml(msg.username)}','${escHtml(msg.message)}')"></i>
         </div>
-        <div class="message-body" id="text-${msg.id}">
-          ${escHtml(msg.message)}${replyHtml}
-        </div>
+        <div class="message-username">${escHtml(msg.username)} ${crownHtml}</div>
+        ${replyHtml}
+        <div class="message-body" id="text-${msg.id}">${escHtml(msg.message)}</div>
+        <div class="message-meta">${editedHtml}<span class="message-time">${escHtml(msg.time)}</span></div>
       </div>`;
     return wrapper;
 }
@@ -891,27 +1092,14 @@ function escHtml(str) {
         .replace(/"/g,"&quot;");
 }
 
-/* IntersectionObserver: auto-trigger load when user scrolls to top sentinel */
+/* IntersectionObserver — tepaga scroll qilganda avtomatik yuklash */
 if (chatBox && hasMoreMessages) {
     const observer = new IntersectionObserver(function (entries) {
-        if (entries[0].isIntersecting) {
-            loadOlderMessages();
-        }
+        if (entries[0].isIntersecting) loadOlderMessages();
     }, { root: chatBox, rootMargin: "0px", threshold: 0.1 });
 
     const sentinel = document.getElementById("topSentinel");
     if (sentinel) observer.observe(sentinel);
 }
-
-/* =========================================================
-   CLOSE STICKER PANEL when clicking outside
-   ========================================================= */
-document.addEventListener("click", function (e) {
-    if (!stickerPanel || !stickerToggle) return;
-    if (!stickerPanel.contains(e.target) && e.target !== stickerToggle) {
-        stickerPanel.classList.remove("open");
-        stickerToggle.classList.remove("active");
-    }
-});
 </script>
 {% endblock %}
