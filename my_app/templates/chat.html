@@ -13,7 +13,8 @@ main.main-content {
     justify-content: center;
     align-items: flex-start;
     padding: 20px 16px;
-    min-height: 100dvh;
+    height: 100dvh;
+    overflow: hidden;
 }
 
 .chat-container {
@@ -25,7 +26,7 @@ main.main-content {
     box-shadow: 0 16px 48px rgba(0,0,0,0.55);
     display: flex;
     flex-direction: column;
-    height: min(80vh, calc(100dvh - 80px));
+    height: min(80vh, calc(100dvh - 60px));
     min-height: 520px;
     overflow: hidden;
     position: relative;
@@ -624,14 +625,15 @@ main.main-content {
         padding: 0;
         padding-top: max(8px, env(safe-area-inset-top));
         align-items: stretch;
-        min-height: 100dvh;
+        height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        overflow: hidden;
     }
     .chat-container {
         width: 100%;
         max-width: 100%;
         margin: 0;
         border-radius: 0;
-        height: calc(100dvh - max(0px, env(safe-area-inset-top)));
+        height: 100%;
         min-height: 0;
         border: none;
         border-radius: 0;
@@ -652,15 +654,27 @@ main.main-content {
     .sticker-panel { bottom: 54px; }
     .sticker-grid { gap: 3px; padding: 8px 10px; }
     .sticker-item { font-size: 1.25rem; padding: 4px; }
-    #scrollDownBtn { bottom: calc(60px + max(0px, env(safe-area-inset-bottom))); }
+    #scrollDownBtn { bottom: calc(62px + max(0px, env(safe-area-inset-bottom))); }
 }
 
 @media (max-width: 480px) {
     main.main-content { padding: 0; }
+    main.main-content {
+        height: 100dvh;
+        padding: 0;
+        padding-top: env(safe-area-inset-top);
+        overflow: hidden;
+    }
     .message { max-width: 90%; }
     .msg-avatar { width: 26px; height: 26px; font-size: 0.65rem; }
     .chat-container { height: 100dvh; }
+    .chat-container { height: 100%; }
     .chat-form { min-height: 52px; padding: 6px 10px; }
+    .chat-form {
+        padding: 6px 10px;
+        padding-bottom: calc(6px + max(0px, env(safe-area-inset-bottom)));
+        min-height: 52px;
+    }
     .sticker-toggle,
     .send-btn { width: 38px; height: 38px; }
     .sticker-panel { bottom: 52px; }
