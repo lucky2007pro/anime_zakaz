@@ -1,5 +1,4 @@
 {% load static %}
-{% static 'images/anibest-logo.svg' as brand_logo %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -24,6 +23,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    <link rel="alternate icon" href="{% static 'images/favicon.svg' %}">
 
     <style>
         :root {
@@ -96,12 +97,7 @@
         .nav-brand-logo {
             width: 46px;
             height: 46px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 1px solid rgba(125, 227, 255, 0.35);
-            background: transparent;
-            flex-shrink: 0;
-            box-shadow: 0 0 12px rgba(125, 227, 255, 0.25);
+            display: none;
         }
 
         .nav-brand-text {
@@ -409,7 +405,6 @@
 
 <nav class="navbar" id="navbar">
     <a href="{% url 'home' %}" class="nav-brand" aria-label="BESTMEDIA bosh sahifa">
-        <img src="{{ brand_logo }}" alt="Ani Best logo" class="nav-brand-logo">
         <span class="nav-brand-text">ANI <span>BEST</span></span>
     </a>
 

@@ -1,5 +1,4 @@
 {% load static %}
-{% static 'images/anibest-logo.svg' as brand_logo %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -9,6 +8,8 @@
     <!-- Include fonts and icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    <link rel="alternate icon" href="{% static 'images/favicon.svg' %}">
     <style>
         :root {
             --bg-dark: #000000;
@@ -47,12 +48,7 @@
         .brand-logo {
             width: 42px;
             height: 42px;
-            object-fit: cover;
-            border-radius: 10px;
-            background: transparent;
-            border: 1px solid rgba(125, 227, 255, 0.35);
-            box-shadow: 0 0 12px rgba(125, 227, 255, 0.25);
-            flex-shrink: 0;
+            display: none;
         }
         .brand-text { font-size: 1.15rem; font-weight: 900; letter-spacing: 1.5px; }
         .brand-text span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
@@ -156,7 +152,6 @@
 
     <aside class="sidebar">
         <a href="{% url 'home' %}" class="brand" aria-label="Ani Best bosh sahifa">
-            <img src="{{ brand_logo }}" alt="Ani Best logo" class="brand-logo">
             <span class="brand-text">ANI <span>BEST</span></span>
         </a>
         <span class="brand-sub">Admin panel</span>
