@@ -102,7 +102,6 @@ main.main-content {
     overscroll-behavior-y: contain;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
 }
 
 .chat-box::-webkit-scrollbar { width: 5px; }
@@ -146,7 +145,6 @@ main.main-content {
     gap: 8px;
     width: 100%;
     animation: msgIn 0.18s ease;
-    touch-action: pan-y;
 }
 
 @keyframes msgIn {
@@ -699,76 +697,56 @@ main.main-content {
 
 @media (max-width: 768px) {
     main.main-content {
-        padding: 6px;
-        padding-top: max(6px, env(safe-area-inset-top));
+        height: var(--app-height, 100dvh);
+        padding: 0;
         align-items: stretch;
-        height: calc(100dvh - 72px);
-        height: calc(100svh - 72px);
-        overflow: hidden;
     }
     .chat-container {
         width: 100%;
         max-width: 100%;
         margin: 0;
-        border-radius: 14px;
+        border-radius: 0;
+        border: none;
         height: 100%;
         min-height: 0;
-        border: 1px solid var(--glass-border);
     }
-    .chat-header { border-radius: 14px 14px 0 0; padding: 10px 14px; }
+    .chat-header {
+        border-radius: 0;
+        padding: 10px 14px;
+    }
     .chat-box {
-        padding: 10px 12px;
+        padding: 12px 10px;
         padding-bottom: 8px;
     }
-    .message { max-width: 82%; }
-    .message-body { font-size: 0.9rem; }
+    .message-wrapper[data-own="true"] .msg-avatar {
+        display: none;
+    }
+    .message {
+        max-width: 85%;
+    }
+    .message-body {
+        font-size: 0.95rem;
+    }
     .chat-form {
         padding: 8px 10px;
         padding-bottom: calc(8px + max(0px, env(safe-area-inset-bottom)));
-        border-radius: 0 0 14px 14px;
-        min-height: 54px;
+        border-radius: 0;
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
     }
-    .sticker-panel { bottom: 54px; }
-    .sticker-grid { gap: 3px; padding: 8px 10px; }
-    .sticker-item { font-size: 1.25rem; padding: 4px; }
-    #scrollDownBtn { bottom: calc(62px + max(0px, env(safe-area-inset-bottom))); }
+    .sticker-panel {
+        bottom: 54px;
+    }
 }
 
 @media (max-width: 480px) {
-    main.main-content {
-        height: calc(100dvh - 72px);
-        height: calc(100svh - 72px);
-        padding: 4px;
-        padding-top: max(4px, env(safe-area-inset-top));
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-    .message { max-width: 90%; }
-    .msg-avatar { width: 26px; height: 26px; font-size: 0.65rem; }
-    .chat-container {
-        height: 100%;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        border-radius: 12px;
-        border: 1px solid var(--glass-border);
-    }
     .chat-box {
-        flex: 1;
+        padding: 12px 10px;
     }
-    .chat-form {
-        padding: 6px 10px;
-        padding-bottom: calc(6px + max(10px, env(safe-area-inset-bottom)));
-        min-height: 52px;
-        align-items: flex-end;
-        background: rgba(0,0,0,0.45);
-        backdrop-filter: blur(10px);
-        border-radius: 0 0 12px 12px;
+    .message {
+        max-width: 85%;
     }
-    .sticker-toggle,
-    .send-btn { width: 38px; height: 38px; }
-    .sticker-panel { bottom: 52px; }
 }
 </style>
 {% endblock %}
@@ -1004,25 +982,19 @@ function cancelReply() {
 }
 
 /* =========================================================
-   MOBILE KEYBOARD FIX — visualViewport API
-   iOS/Android da klaviatura ochilganda forma ko'rinmay qolmasin
+   MOBILE KEYBOARD FIX — CSS Variables bilan (YANGILANGAN)
    ========================================================= */
 (function () {
-    const container = document.querySelector('.chat-container');
-    const mainEl    = document.querySelector('main.main-content');
     const chatBoxEl = document.getElementById('chatBox');
-    if (!container || !mainEl) return;
 
     function applyViewport() {
         const vv = window.visualViewport;
         if (!vv) return;
-        const h = vv.height;
-        // faqat mobil qurilmalarda
-        if (window.innerWidth <= 900) {
-            mainEl.style.height  = h + 'px';
-            container.style.height = h + 'px';
-            // scroll ni pastga ushlab tur
-            if (chatBoxEl) chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
+
+        document.documentElement.style.setProperty('--app-height', `${vv.height}px`);
+
+        if (window.innerWidth <= 900 && chatBoxEl) {
+            chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
         }
     }
 
