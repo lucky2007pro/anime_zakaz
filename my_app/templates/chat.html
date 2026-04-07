@@ -1053,9 +1053,6 @@ if (messageInput) {
     });
 }
 
-// Temporarily disabled to isolate mobile Chrome scrolling issues.
-const ENABLE_TOUCH_GESTURES = false;
-
 /* =========================================================
    ENTER — yuborish | Shift+Enter — yangi qator
    ========================================================= */
@@ -1072,7 +1069,7 @@ if (messageInput) {
 /* =========================================================
    TOUCH — uzun bosish bilan xabar menyusini ochish
    ========================================================= */
-if (ENABLE_TOUCH_GESTURES) (function () {
+(function () {
     let pressTimer = null;
 
     function clearActive() {
@@ -1106,9 +1103,9 @@ if (ENABLE_TOUCH_GESTURES) (function () {
 })();
 
 /* =========================================================
-   SWIPE-TO-REPLY (mobil uchun)
+   SWIPE-TO-REPLY (mobil uchun) - TO'G'RILANGAN VERSIYA
    ========================================================= */
-if (ENABLE_TOUCH_GESTURES) (function () {
+(function () {
     let startX = 0;
     let startY = 0;
     let currentDx = 0;
@@ -1127,6 +1124,12 @@ if (ENABLE_TOUCH_GESTURES) (function () {
         if (!activeWrapper) return;
         const dx = e.touches[0].clientX - startX;
         const dy = Math.abs(e.touches[0].clientY - startY);
+
+        // Agar barmoq vertikal yo'nalishda harakatlansa, oddiy scroll ishlashi kerak.
+        if (dy > dx) {
+            return;
+        }
+
         currentDx = dx;
         currentDy = dy;
 
