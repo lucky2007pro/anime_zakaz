@@ -1,4 +1,5 @@
 {% load static %}
+{% static 'images/anibest-logo.svg' as brand_logo %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -84,16 +85,32 @@
         }
 
         .nav-brand {
-            font-size: 1.8rem;
-            font-weight: 900;
             color: var(--text-light);
             text-decoration: none;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 10px;
+            min-width: 0;
         }
 
-        .nav-brand span {
+        .nav-brand-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        .nav-brand-text {
+            font-size: 1.16rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+        }
+
+        .nav-brand-text span {
             color: var(--accent);
             text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
         }
@@ -351,7 +368,12 @@
             .navbar { padding: 12px 4%; }
             .nav-menu { display: none; }
             .hamburger { display: flex; }
-            .nav-brand { font-size: 1.4rem; }
+            .nav-brand-logo {
+                width: 38px;
+                height: 38px;
+                border-radius: 8px;
+            }
+            .nav-brand-text { font-size: 0.98rem; }
             .nav-actions .action-icon:not(.profile-btn) { display: none; }
             .nav-actions { gap: 8px; }
             .action-icon, .profile-btn {
@@ -365,7 +387,15 @@
         }
         @media (max-width: 480px) {
             .navbar { padding: 10px 3.5%; }
-            .nav-brand { font-size: 1.12rem; }
+            .nav-brand-logo {
+                width: 34px;
+                height: 34px;
+                border-radius: 8px;
+            }
+            .nav-brand-text {
+                font-size: 0.88rem;
+                letter-spacing: 0.05em;
+            }
             .profile-sidebar { padding: 16px; }
             .mobile-nav-overlay a, .mobile-profile-btn { font-size: 1.15rem; }
             .hamburger span { width: 22px; }
@@ -377,7 +407,10 @@
 <body>
 
 <nav class="navbar" id="navbar">
-    <a href="{% url 'home' %}" class="nav-brand">BEST<span>MEDIA</span></a>
+    <a href="{% url 'home' %}" class="nav-brand" aria-label="BESTMEDIA bosh sahifa">
+        <img src="{{ brand_logo }}" alt="Ani Best logo" class="nav-brand-logo">
+        <span class="nav-brand-text">ANI <span>BEST</span></span>
+    </a>
 
     <div class="nav-menu">
         <a href="{% url 'anime_catalog' %}" class="pill-nav-item"><i class='bx bx-play-circle'></i> KATALOG</a>

@@ -1,4 +1,5 @@
 {% load static %}
+{% static 'images/anibest-logo.svg' as brand_logo %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -35,8 +36,25 @@
             background: rgba(0,0,0,0.65);
             z-index: 18;
         }
-        .brand { font-size: 1.8rem; font-weight: 900; margin-bottom: 5px; color: white; text-decoration: none; display:block; letter-spacing: 2px;}
-        .brand span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
+        .brand {
+            margin-bottom: 5px;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #fff;
+            border: 1px solid rgba(255,255,255,0.15);
+            flex-shrink: 0;
+        }
+        .brand-text { font-size: 1.15rem; font-weight: 900; letter-spacing: 1.5px; }
+        .brand-text span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
         .brand-sub { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 40px; display:block;}
         
         .menu-title { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 15px; letter-spacing: 2px; }
@@ -124,6 +142,8 @@
             .page-title { font-size: 0.95rem; }
             .user-role { padding: 4px 10px; }
             .sidebar { width: min(88vw, 320px); padding: 24px 16px; }
+            .brand-logo { width: 36px; height: 36px; border-radius: 8px; }
+            .brand-text { font-size: 1rem; }
         }
 
         {% block extra_css %}{% endblock %}
@@ -134,7 +154,10 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleAdminSidebar(false)"></div>
 
     <aside class="sidebar">
-        <a href="{% url 'home' %}" class="brand">BEST<span>MEDIA</span></a>
+        <a href="{% url 'home' %}" class="brand" aria-label="Ani Best bosh sahifa">
+            <img src="{{ brand_logo }}" alt="Ani Best logo" class="brand-logo">
+            <span class="brand-text">ANI <span>BEST</span></span>
+        </a>
         <span class="brand-sub">Admin panel</span>
 
         <h4 class="menu-title">UMUMIY</h4>

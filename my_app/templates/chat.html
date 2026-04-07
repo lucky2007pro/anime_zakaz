@@ -14,7 +14,9 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
-    height: 75vh;
+    height: min(75vh, calc(100dvh - 120px));
+    min-height: 500px;
+    overflow: hidden;
 }
 
 .chat-header {
@@ -34,6 +36,7 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    overscroll-behavior: contain;
 }
 
 .chat-box::-webkit-scrollbar {
@@ -124,11 +127,30 @@
 
 .chat-form {
     display: flex;
+    align-items: center;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
     padding: 20px;
     background: rgba(0,0,0,0.2);
     border-top: 1px solid var(--glass-border);
     gap: 10px;
     border-radius: 0 0 16px 16px;
+}
+
+.sticker-toggle {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--bg-base);
+    color: var(--text-light);
+    font-size: 1.35rem;
+    cursor: pointer;
+}
+
+.sticker-toggle:hover {
+    border-color: var(--accent);
 }
 
 .chat-form input {
@@ -214,23 +236,70 @@
     font-weight: 800;
 }
 
+.sticker-panel {
+    display: none;
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.25);
+    border-top: 1px solid var(--glass-border);
+}
+
+.sticker-panel.open {
+    display: block;
+}
+
+.sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.sticker-item {
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 1.35rem;
+    line-height: 1;
+    padding: 6px;
+    cursor: pointer;
+}
+
+.sticker-item:hover {
+    border-color: var(--glass-border);
+    background: rgba(255,255,255,0.04);
+}
+
 @media (max-width: 768px) {
-    .chat-container { height: calc(100vh - 120px); margin: 10px auto; border-radius: 12px; }
+    main.main-content {
+        margin-top: 68px;
+        padding: 8px 3% max(8px, env(safe-area-inset-bottom));
+        min-height: calc(100dvh - 68px);
+        display: flex;
+    }
+    .chat-container {
+        width: 100%;
+        margin: 0;
+        border-radius: 12px;
+        height: calc(100dvh - 82px);
+        min-height: 0;
+    }
     .chat-header { padding: 14px; font-size: 1.1rem; }
     .chat-box { padding: 12px; gap: 10px; }
     .message { max-width: 92%; padding: 12px; }
     .message-body { font-size: 0.92rem; }
-    .chat-form { padding: 12px; }
+    .chat-form { padding: 10px; }
     .chat-form input { padding: 12px; }
+    .sticker-toggle,
+    .chat-form button { width: 44px; height: 44px; }
+    .sticker-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
     .reply-preview { padding: 10px 14px; gap: 10px; flex-direction: column; align-items: flex-start; }
     .message-header { align-items: flex-start; flex-direction: column; }
 }
 
 @media (max-width: 480px) {
-    .chat-container { height: calc(100vh - 100px); }
+    .chat-container { height: calc(100dvh - 76px); }
     .message { max-width: 100%; }
     .chat-form { gap: 8px; }
-    .chat-form button { width: 44px; }
+    .sticker-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 }
 </style>
 {% endblock %}
@@ -302,9 +371,35 @@
             {% endfor %}
         </div>
 
+        <div class="sticker-panel" id="stickerPanel" aria-label="Sticker panel">
+            <div class="sticker-grid">
+                <button type="button" class="sticker-item" data-sticker="😀">😀</button>
+                <button type="button" class="sticker-item" data-sticker="😎">😎</button>
+                <button type="button" class="sticker-item" data-sticker="😍">😍</button>
+                <button type="button" class="sticker-item" data-sticker="😂">😂</button>
+                <button type="button" class="sticker-item" data-sticker="😢">😢</button>
+                <button type="button" class="sticker-item" data-sticker="😡">😡</button>
+                <button type="button" class="sticker-item" data-sticker="🤯">🤯</button>
+                <button type="button" class="sticker-item" data-sticker="😴">😴</button>
+                <button type="button" class="sticker-item" data-sticker="👍">👍</button>
+                <button type="button" class="sticker-item" data-sticker="🔥">🔥</button>
+                <button type="button" class="sticker-item" data-sticker="❤️">❤️</button>
+                <button type="button" class="sticker-item" data-sticker="💯">💯</button>
+                <button type="button" class="sticker-item" data-sticker="🎉">🎉</button>
+                <button type="button" class="sticker-item" data-sticker="😅">😅</button>
+                <button type="button" class="sticker-item" data-sticker="🤔">🤔</button>
+                <button type="button" class="sticker-item" data-sticker="😉">😉</button>
+                <button type="button" class="sticker-item" data-sticker="😮">😮</button>
+                <button type="button" class="sticker-item" data-sticker="🙈">🙈</button>
+                <button type="button" class="sticker-item" data-sticker="🤝">🤝</button>
+                <button type="button" class="sticker-item" data-sticker="🤟">🤟</button>
+            </div>
+        </div>
+
         <form method="POST" class="chat-form">
             {% csrf_token %}
             <input type="hidden" name="reply_to" id="replyToInput" value="">
+            <button type="button" class="sticker-toggle" id="stickerToggle" aria-label="Sticker panel">😊</button>
             <label class="sr-only" for="messageInput">Xabaringizni yozing</label>
             <input type="text" name="message" placeholder="Xabaringizni yozing..." id="messageInput" {% if request.user.is_banned %}disabled{% endif %} required autocomplete="off">
             <button type="submit" {% if request.user.is_banned %}disabled{% endif %}><i class='bx bx-send'></i></button>
@@ -337,6 +432,27 @@
     }
 
     const chatBox = document.getElementById('chatBox');
-    chatBox.scrollTop = chatBox.scrollHeight;
+    const stickerPanel = document.getElementById('stickerPanel');
+    const stickerToggle = document.getElementById('stickerToggle');
+    const messageInput = document.getElementById('messageInput');
+
+    if (chatBox) {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    if (stickerToggle && stickerPanel) {
+        stickerToggle.addEventListener('click', function () {
+            stickerPanel.classList.toggle('open');
+        });
+    }
+
+    document.querySelectorAll('.sticker-item').forEach(function (item) {
+        item.addEventListener('click', function () {
+            const sticker = this.getAttribute('data-sticker') || '';
+            if (!messageInput || !sticker) return;
+            messageInput.value = (messageInput.value + ' ' + sticker).trim();
+            messageInput.focus();
+        });
+    });
 </script>
 {% endblock %}
