@@ -741,7 +741,30 @@ main.main-content {
 }
 
 @media (max-width: 480px) {
+    body {
+        overflow: hidden;
+    }
+    main.main-content {
+        height: 100vh;
+        height: -webkit-fill-available;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .chat-container {
+        flex: 1;
+        height: auto;
+        border-radius: 0;
+        border: none;
+        display: flex;
+        flex-direction: column;
+    }
     .chat-box {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         padding: 12px 10px;
     }
     .message {
@@ -1030,6 +1053,9 @@ if (messageInput) {
     });
 }
 
+// Temporarily disabled to isolate mobile Chrome scrolling issues.
+const ENABLE_TOUCH_GESTURES = false;
+
 /* =========================================================
    ENTER — yuborish | Shift+Enter — yangi qator
    ========================================================= */
@@ -1046,7 +1072,7 @@ if (messageInput) {
 /* =========================================================
    TOUCH — uzun bosish bilan xabar menyusini ochish
    ========================================================= */
-(function () {
+if (ENABLE_TOUCH_GESTURES) (function () {
     let pressTimer = null;
 
     function clearActive() {
@@ -1082,7 +1108,7 @@ if (messageInput) {
 /* =========================================================
    SWIPE-TO-REPLY (mobil uchun)
    ========================================================= */
-(function () {
+if (ENABLE_TOUCH_GESTURES) (function () {
     let startX = 0;
     let startY = 0;
     let currentDx = 0;
