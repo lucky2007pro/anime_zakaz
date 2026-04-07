@@ -1244,21 +1244,37 @@ window.addEventListener("resize", function () {
 });
 
 /* =========================================================
-   INITIAL SCROLL (SAHIFA OCHILGANDA ENG PASTGA TUSHISH)
+   INITIAL SCROLL (MOBIL UCHUN KUCHAYTIRILGAN)
    ========================================================= */
 function forceScrollToBottom() {
-    if (!chatBox) return;
-    chatBox.style.scrollBehavior = "auto";
-    chatBox.scrollTop = chatBox.scrollHeight;
-    chatBox.style.scrollBehavior = "";
+    const box = document.getElementById("chatBox");
+    if (!box) return;
+
+    // Vaqtincha silliq scrollni o'chiramiz, darhol sakrashi uchun
+    box.style.scrollBehavior = "auto";
+    box.scrollTop = box.scrollHeight;
+
+    // Asliga qaytaramiz
+    box.style.scrollBehavior = "";
 }
 
+// 1. HTML tuzilishi o'qilishi bilanoq pastga tushiramiz
 document.addEventListener("DOMContentLoaded", forceScrollToBottom);
 
+// 2. Barcha rasmlar va shriftlar yuklangandan keyin ham pastga tushiramiz
 window.addEventListener("load", function () {
     forceScrollToBottom();
-    setTimeout(forceScrollToBottom, 150);
+
+    // 3. Mobil brauzer viewport qayta hisoblanganda ham oxirgi xabarga qaytarib qo'yamiz
+    setTimeout(forceScrollToBottom, 50);
+    setTimeout(forceScrollToBottom, 200);
+    setTimeout(forceScrollToBottom, 500);
 });
+
+// Zaxira: agar skript kech yuklansa ham bir marta ishlasin
+if (document.readyState === "complete") {
+    forceScrollToBottom();
+}
 
 /* =========================================================
    FORM SUBMIT
