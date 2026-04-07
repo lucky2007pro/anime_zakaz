@@ -13,10 +13,11 @@ main.main-content {
     justify-content: center;
     align-items: flex-start;
     padding: 20px 16px;
-    height: 100dvh;
-    height: -webkit-fill-available;
+    height: calc(100dvh - 80px);
+    height: calc(100svh - 80px);
     overflow: hidden;
     position: relative;
+    box-sizing: border-box;
 }
 
 .chat-container {
@@ -696,10 +697,11 @@ main.main-content {
 
 @media (max-width: 768px) {
     main.main-content {
+        margin-top: 72px;
         padding: 0;
-        padding-top: max(8px, env(safe-area-inset-top));
         align-items: stretch;
-        height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        height: calc(100dvh - 72px);
+        height: calc(100svh - 72px);
         overflow: hidden;
     }
     .chat-container {
@@ -733,10 +735,10 @@ main.main-content {
 
 @media (max-width: 480px) {
     main.main-content {
-        height: 100dvh;
-        height: -webkit-fill-available;
+        margin-top: 72px;
+        height: calc(100dvh - 72px);
+        height: calc(100svh - 72px);
         padding: 0;
-        padding-top: env(safe-area-inset-top);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -745,7 +747,7 @@ main.main-content {
     .msg-avatar { width: 26px; height: 26px; font-size: 0.65rem; }
     .chat-container {
         height: 100%;
-        height: -webkit-fill-available;
+        min-height: 0;
         flex: 1;
         display: flex;
         flex-direction: column;
@@ -1005,12 +1007,14 @@ function cancelReply() {
 (function () {
     const container = document.querySelector('.chat-container');
     const mainEl    = document.querySelector('main.main-content');
+    const navbar    = document.querySelector('.navbar');
     if (!container || !mainEl) return;
 
     function applyViewport() {
         const vv = window.visualViewport;
         if (!vv) return;
-        const h = vv.height;
+        const navHeight = navbar ? navbar.offsetHeight : 72;
+        const h = Math.max(320, vv.height - navHeight);
         // faqat mobil qurilmalarda
         if (window.innerWidth <= 900) {
             mainEl.style.height  = h + 'px';
