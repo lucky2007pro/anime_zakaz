@@ -14,6 +14,7 @@ main.main-content {
     align-items: flex-start;
     padding: 20px 16px;
     height: 100dvh;
+    height: -webkit-fill-available;
     overflow: hidden;
 }
 
@@ -462,7 +463,7 @@ main.main-content {
 .chat-form {
     flex-shrink: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     padding: 10px 14px;
     background: rgba(0,0,0,0.3);
     border-top: 1px solid var(--glass-border);
@@ -472,6 +473,7 @@ main.main-content {
     position: relative;
     z-index: 10;
     padding-bottom: calc(10px + max(0px, env(safe-area-inset-bottom)));
+    box-sizing: border-box;
 }
 
 .sticker-toggle {
@@ -517,11 +519,35 @@ main.main-content {
     box-sizing: border-box;
 }
 
+/* Auto-growing textarea */
+.chat-form textarea {
+    width: 100%;
+    background: var(--bg-base, rgba(255,255,255,0.05));
+    border: 1px solid var(--glass-border);
+    padding: 11px 14px;
+    border-radius: 22px;
+    color: white;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    resize: none;
+    overflow: hidden;
+    min-height: 42px;
+    max-height: 120px;
+    overflow-y: auto;
+    display: block;
+}
+
+.chat-form textarea:focus,
 .chat-form input[type="text"]:focus {
     border-color: var(--accent, #00f3ff);
     box-shadow: 0 0 0 3px rgba(0, 243, 255, 0.08);
 }
 
+.chat-form textarea:disabled,
 .chat-form input[type="text"]:disabled {
     opacity: 0.45;
     cursor: not-allowed;
@@ -617,9 +643,56 @@ main.main-content {
     border: 0;
 }
 
-/* =====================================================
-   RESPONSIVE
-   ===================================================== */
+/* Touch devices — actions always visible (telefonlarda hover yo'q) */
+@media (hover: none) {
+    .msg-actions {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+    }
+    .message-wrapper.touch-active .msg-actions {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+/* Char counter */
+.char-counter {
+    position: absolute;
+    bottom: -18px;
+    right: 4px;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+.char-counter.warn { color: #f59e0b; opacity: 1; }
+.char-counter.danger { color: #ef4444; opacity: 1; }
+
+/* Typing hint */
+.input-hint {
+    display: none;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    opacity: 0.6;
+    margin-top: 2px;
+    text-align: right;
+    user-select: none;
+}
+@media (min-width: 769px) {
+    .input-hint { display: block; }
+}
+
+/* Swipe-to-reply visual feedback */
+.message-wrapper.swiping .message {
+    transition: transform 0.1s;
+}
+.message-wrapper.swiped-right .message {
+    transform: translateX(40px);
+}
+
+
 @media (max-width: 768px) {
     main.main-content {
         padding: 0;
@@ -658,22 +731,24 @@ main.main-content {
 }
 
 @media (max-width: 480px) {
-    main.main-content { padding: 0; }
     main.main-content {
         height: 100dvh;
+        height: -webkit-fill-available;
         padding: 0;
         padding-top: env(safe-area-inset-top);
         overflow: hidden;
     }
     .message { max-width: 90%; }
     .msg-avatar { width: 26px; height: 26px; font-size: 0.65rem; }
-    .chat-container { height: 100dvh; }
-    .chat-container { height: 100%; }
-    .chat-form { min-height: 52px; padding: 6px 10px; }
+    .chat-container {
+        height: 100%;
+        height: -webkit-fill-available;
+    }
     .chat-form {
         padding: 6px 10px;
         padding-bottom: calc(6px + max(0px, env(safe-area-inset-bottom)));
         min-height: 52px;
+        align-items: flex-end;
     }
     .sticker-toggle,
     .send-btn { width: 38px; height: 38px; }
@@ -844,13 +919,15 @@ main.main-content {
 
             <div class="input-wrapper">
                 <label class="sr-only" for="messageInput">Xabaringizni yozing</label>
-                <input type="text"
+                <textarea
                        name="message"
                        placeholder="Xabaringizni yozing…"
                        id="messageInput"
+                       rows="1"
                        {% if request.user.is_banned %}disabled{% endif %}
-                       required
-                       autocomplete="off">
+                       autocomplete="off"></textarea>
+                <span class="char-counter" id="charCounter"></span>
+                <div class="input-hint">Enter — yuborish &nbsp;·&nbsp; Shift+Enter — yangi qator</div>
             </div>
 
             <button type="submit"
@@ -911,11 +988,156 @@ function cancelReply() {
 }
 
 /* =========================================================
+   MOBILE KEYBOARD FIX — visualViewport API
+   iOS/Android da klaviatura ochilganda forma ko'rinmay qolmasin
+   ========================================================= */
+(function () {
+    const container = document.querySelector('.chat-container');
+    const mainEl    = document.querySelector('main.main-content');
+    if (!container || !mainEl) return;
+
+    function applyViewport() {
+        const vv = window.visualViewport;
+        if (!vv) return;
+        const h = vv.height;
+        // faqat mobil qurilmalarda
+        if (window.innerWidth <= 900) {
+            mainEl.style.height  = h + 'px';
+            container.style.height = h + 'px';
+            // scroll ni pastga ushlab tur
+            if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    }
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', applyViewport);
+        window.visualViewport.addEventListener('scroll', applyViewport);
+        applyViewport();
+    }
+})();
+
+/* =========================================================
+   AUTO-GROW TEXTAREA
+   ========================================================= */
+const messageInput = document.getElementById('messageInput');
+
+function autoGrow(el) {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+if (messageInput) {
+    messageInput.addEventListener('input', function () {
+        autoGrow(this);
+        // Char counter
+        const len = this.value.length;
+        const counter = document.getElementById('charCounter');
+        if (counter) {
+            counter.textContent = len > 200 ? len + '/500' : '';
+            counter.className = 'char-counter' +
+                (len > 450 ? ' danger' : len > 350 ? ' warn' : '');
+        }
+    });
+}
+
+/* =========================================================
+   ENTER — yuborish | Shift+Enter — yangi qator
+   ========================================================= */
+if (messageInput) {
+    messageInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            const form = document.getElementById('chatForm');
+            if (form && this.value.trim()) form.requestSubmit();
+        }
+    });
+}
+
+/* =========================================================
+   TOUCH — uzun bosish bilan xabar menyusini ochish
+   ========================================================= */
+(function () {
+    let pressTimer = null;
+
+    function clearActive() {
+        document.querySelectorAll('.message-wrapper.touch-active')
+            .forEach(function (el) { el.classList.remove('touch-active'); });
+    }
+
+    document.addEventListener('touchstart', function (e) {
+        const wrapper = e.target.closest('.message-wrapper');
+        if (!wrapper) { clearActive(); return; }
+        pressTimer = setTimeout(function () {
+            clearActive();
+            wrapper.classList.add('touch-active');
+        }, 400); // 400ms uzun bosish
+    }, { passive: true });
+
+    document.addEventListener('touchend', function () {
+        clearTimeout(pressTimer);
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function () {
+        clearTimeout(pressTimer);
+    }, { passive: true });
+
+    // Boshqa joyga topsak — menyuni yopamiz
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.msg-actions') && !e.target.closest('.message')) {
+            clearActive();
+        }
+    });
+})();
+
+/* =========================================================
+   SWIPE-TO-REPLY (mobil uchun)
+   ========================================================= */
+(function () {
+    let startX = 0;
+    let startY = 0;
+    let activeWrapper = null;
+
+    document.addEventListener('touchstart', function (e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        activeWrapper = e.target.closest('.message-wrapper');
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function (e) {
+        if (!activeWrapper) return;
+        const dx = e.touches[0].clientX - startX;
+        const dy = Math.abs(e.touches[0].clientY - startY);
+        // Faqat chapdan o'nga swipe, vertikal scroll emas
+        if (dx > 20 && dy < 40) {
+            activeWrapper.classList.add('swiped-right');
+        } else {
+            activeWrapper.classList.remove('swiped-right');
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchend', function () {
+        if (!activeWrapper) return;
+        if (activeWrapper.classList.contains('swiped-right')) {
+            const msgId   = activeWrapper.getAttribute('data-msg-id');
+            const nameEl  = activeWrapper.querySelector('.message-username');
+            const bodyEl  = activeWrapper.querySelector('.message-body');
+            if (msgId && nameEl && bodyEl) {
+                replyMessage(msgId, nameEl.textContent.trim(), bodyEl.textContent.trim());
+            }
+            activeWrapper.classList.remove('swiped-right');
+        }
+        activeWrapper = null;
+    }, { passive: true });
+})();
+
+
+
+/* =========================================================
    STICKER PANEL
    ========================================================= */
 const stickerPanel  = document.getElementById("stickerPanel");
 const stickerToggle = document.getElementById("stickerToggle");
-const messageInput  = document.getElementById("messageInput");
 const chatBox       = document.getElementById("chatBox");
 
 if (stickerToggle && stickerPanel) {
@@ -931,6 +1153,7 @@ document.querySelectorAll(".sticker-item").forEach(function (item) {
         const sticker = this.getAttribute("data-sticker") || "";
         if (!messageInput || !sticker) return;
         messageInput.value = (messageInput.value + " " + sticker).trim();
+        autoGrow(messageInput);
         messageInput.focus();
         stickerPanel.classList.remove("open");
         stickerToggle.classList.remove("active");
@@ -1018,7 +1241,12 @@ if (chatBox) {
    ========================================================= */
 const chatForm = document.getElementById("chatForm");
 if (chatForm) {
-    chatForm.addEventListener("submit", function () {
+    chatForm.addEventListener("submit", function (e) {
+        // textarea uchun bo'sh tekshiruv
+        if (messageInput && !messageInput.value.trim()) {
+            e.preventDefault();
+            return;
+        }
         sessionStorage.setItem("chatScrollToBottom", "1");
     });
 }
