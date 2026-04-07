@@ -143,7 +143,7 @@
                     {% elif type == 'chat' %}
                     <a href="{% url 'admin_message_edit' item.id %}" class="action-btn">Tahrirlash</a>
                     <a href="{% url 'admin_message_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
-                    {% else %}
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}

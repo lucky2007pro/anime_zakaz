@@ -1244,37 +1244,40 @@ window.addEventListener("resize", function () {
 });
 
 /* =========================================================
-   INITIAL SCROLL (MOBIL UCHUN KUCHAYTIRILGAN)
+   INITIAL SCROLL (MOBIL UCHUN ENG ISHONCHLI USUL)
    ========================================================= */
 function forceScrollToBottom() {
     const box = document.getElementById("chatBox");
     if (!box) return;
 
-    // Vaqtincha silliq scrollni o'chiramiz, darhol sakrashi uchun
+    // Vaqtincha silliq skrollni o'chiramiz
     box.style.scrollBehavior = "auto";
+
+    // 1-usul: Butun qutini pastga tortish
     box.scrollTop = box.scrollHeight;
 
-    // Asliga qaytaramiz
-    box.style.scrollBehavior = "";
+    // 2-usul: Eng oxirgi xabarni topib, aynan o'shanga sakrash
+    const messages = box.querySelectorAll('.message-wrapper');
+    if (messages.length > 0) {
+        messages[messages.length - 1].scrollIntoView(false);
+    }
+
+    // Brauzer ulgurishi uchun scrollBehavior ni biroz keyin tiklaymiz
+    setTimeout(() => {
+        box.style.scrollBehavior = "";
+    }, 10);
 }
 
-// 1. HTML tuzilishi o'qilishi bilanoq pastga tushiramiz
 document.addEventListener("DOMContentLoaded", forceScrollToBottom);
 
-// 2. Barcha rasmlar va shriftlar yuklangandan keyin ham pastga tushiramiz
 window.addEventListener("load", function () {
     forceScrollToBottom();
 
-    // 3. Mobil brauzer viewport qayta hisoblanganda ham oxirgi xabarga qaytarib qo'yamiz
-    setTimeout(forceScrollToBottom, 50);
-    setTimeout(forceScrollToBottom, 200);
-    setTimeout(forceScrollToBottom, 500);
+    // Mobil tarmoq va eski telefonlar uchun qayta urinishlar
+    setTimeout(forceScrollToBottom, 150);
+    setTimeout(forceScrollToBottom, 400);
+    setTimeout(forceScrollToBottom, 800);
 });
-
-// Zaxira: agar skript kech yuklansa ham bir marta ishlasin
-if (document.readyState === "complete") {
-    forceScrollToBottom();
-}
 
 /* =========================================================
    FORM SUBMIT
