@@ -99,7 +99,6 @@ main.main-content {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    overscroll-behavior-y: contain;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
 }
@@ -1005,7 +1004,7 @@ function cancelReply() {
 }
 
 /* =========================================================
-   MOBILE KEYBOARD FIX — CSS Variables bilan (YANGILANGAN)
+   MOBILE KEYBOARD FIX — (TO'G'RILANGAN VERSIYA)
    ========================================================= */
 (function () {
     const chatBoxEl = document.getElementById('chatBox');
@@ -1014,16 +1013,20 @@ function cancelReply() {
         const vv = window.visualViewport;
         if (!vv) return;
 
+        // Ekranning real balandligini doim yangilab boramiz
         document.documentElement.style.setProperty('--app-height', `${vv.height}px`);
 
+        // Faqat input/textarea fokus bo'lganda pastga tushiramiz (keyboard holati)
         if (window.innerWidth <= 900 && chatBoxEl) {
-            chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
+            const activeEl = document.activeElement;
+            if (activeEl && (activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'INPUT')) {
+                chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
+            }
         }
     }
 
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', applyViewport);
-        window.visualViewport.addEventListener('scroll', applyViewport);
         applyViewport();
     }
 })();
