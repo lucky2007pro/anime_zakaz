@@ -12,6 +12,8 @@ main.main-content {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    margin: 80px 0 0 0;
+    width: 100%;
     padding: 20px 16px;
     height: calc(100dvh - 80px);
     height: calc(100svh - 80px);
@@ -29,7 +31,8 @@ main.main-content {
     box-shadow: 0 16px 48px rgba(0,0,0,0.55);
     display: flex;
     flex-direction: column;
-    height: min(80vh, calc(100dvh - 60px));
+    height: 100%;
+    max-height: 100%;
     min-height: 520px;
     overflow: hidden;
     position: relative;
@@ -697,7 +700,7 @@ main.main-content {
 
 @media (max-width: 768px) {
     main.main-content {
-        margin-top: 72px;
+        margin: 72px 0 0 0;
         padding: 0;
         align-items: stretch;
         height: calc(100dvh - 72px);
@@ -735,7 +738,7 @@ main.main-content {
 
 @media (max-width: 480px) {
     main.main-content {
-        margin-top: 72px;
+        margin: 72px 0 0 0;
         height: calc(100dvh - 72px);
         height: calc(100svh - 72px);
         padding: 0;
@@ -1000,6 +1003,12 @@ function cancelReply() {
     document.getElementById("replyToInput").value = "";
 }
 
+const chatBox = document.getElementById("chatBox");
+const chatForm = document.getElementById("chatForm");
+const stickerPanel = document.getElementById("stickerPanel");
+const stickerToggle = document.getElementById("stickerToggle");
+const messageInput = document.getElementById('messageInput');
+
 /* =========================================================
    MOBILE KEYBOARD FIX — visualViewport API
    iOS/Android da klaviatura ochilganda forma ko'rinmay qolmasin
@@ -1034,8 +1043,6 @@ function cancelReply() {
 /* =========================================================
    AUTO-GROW TEXTAREA
    ========================================================= */
-const messageInput = document.getElementById('messageInput');
-
 function autoGrow(el) {
     if (!el) return;
     el.style.height = 'auto';
@@ -1151,10 +1158,6 @@ if (messageInput) {
 /* =========================================================
    STICKER PANEL
    ========================================================= */
-const stickerPanel  = document.getElementById("stickerPanel");
-const stickerToggle = document.getElementById("stickerToggle");
-const chatBox       = document.getElementById("chatBox");
-
 if (stickerToggle && stickerPanel) {
     stickerToggle.addEventListener("click", function (e) {
         e.stopPropagation();
@@ -1254,7 +1257,6 @@ if (chatBox) {
 /* =========================================================
    FORM SUBMIT
    ========================================================= */
-const chatForm = document.getElementById("chatForm");
 if (chatForm) {
     chatForm.addEventListener("submit", function (e) {
         // textarea uchun bo'sh tekshiruv
