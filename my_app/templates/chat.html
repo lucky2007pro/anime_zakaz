@@ -101,6 +101,8 @@ main.main-content {
     gap: 4px;
     overscroll-behavior: contain;
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
 }
 
 .chat-box::-webkit-scrollbar { width: 5px; }
@@ -144,6 +146,7 @@ main.main-content {
     gap: 8px;
     width: 100%;
     animation: msgIn 0.18s ease;
+    touch-action: manipulation;
 }
 
 @keyframes msgIn {
@@ -699,7 +702,7 @@ main.main-content {
         padding: 0;
         padding-top: max(8px, env(safe-area-inset-top));
         align-items: stretch;
-        height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        height: calc(100dvh - max(0px, env(safe-area-inset-top)) - max(0px, env(safe-area-inset-bottom)) + 12px);
         overflow: hidden;
     }
     .chat-container {
@@ -733,7 +736,7 @@ main.main-content {
 
 @media (max-width: 480px) {
     main.main-content {
-        height: 100dvh;
+        height: calc(100dvh + 12px);
         height: -webkit-fill-available;
         padding: 0;
         padding-top: env(safe-area-inset-top);
@@ -1107,11 +1110,15 @@ if (messageInput) {
 (function () {
     let startX = 0;
     let startY = 0;
+    let currentDx = 0;
+    let currentDy = 0;
     let activeWrapper = null;
 
     document.addEventListener('touchstart', function (e) {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
+        currentDx = 0;
+        currentDy = 0;
         activeWrapper = e.target.closest('.message-wrapper');
     }, { passive: true });
 
@@ -1119,25 +1126,33 @@ if (messageInput) {
         if (!activeWrapper) return;
         const dx = e.touches[0].clientX - startX;
         const dy = Math.abs(e.touches[0].clientY - startY);
-        // Faqat chapdan o'nga swipe, vertikal scroll emas
-        if (dx > 20 && dy < 40) {
+        currentDx = dx;
+        currentDy = dy;
+
+        // Faqat yengil vizual feedback, scrollga halaqit bermaydi
+        if (dx > 14 && dy < 44) {
             activeWrapper.classList.add('swiped-right');
+            const move = Math.min(dx * 0.25, 28);
+            activeWrapper.style.transform = `translateX(${move}px)`;
         } else {
             activeWrapper.classList.remove('swiped-right');
+            activeWrapper.style.transform = '';
         }
     }, { passive: true });
 
     document.addEventListener('touchend', function () {
         if (!activeWrapper) return;
-        if (activeWrapper.classList.contains('swiped-right')) {
+        // O'ngga aniq swipe bo'lsa reply ishlaydi
+        if (activeWrapper.classList.contains('swiped-right') && currentDx > 58 && currentDy < 44) {
             const msgId   = activeWrapper.getAttribute('data-msg-id');
             const nameEl  = activeWrapper.querySelector('.message-username');
             const bodyEl  = activeWrapper.querySelector('.message-body');
             if (msgId && nameEl && bodyEl) {
                 replyMessage(msgId, nameEl.textContent.trim(), bodyEl.textContent.trim());
             }
-            activeWrapper.classList.remove('swiped-right');
         }
+        activeWrapper.classList.remove('swiped-right');
+        activeWrapper.style.transform = '';
         activeWrapper = null;
     }, { passive: true });
 })();
