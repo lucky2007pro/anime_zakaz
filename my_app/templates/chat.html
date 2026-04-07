@@ -697,21 +697,29 @@ main.main-content {
 @media (max-width: 768px) {
     main.main-content {
         height: var(--app-height, 100dvh);
-        padding: 0;
-        align-items: stretch;
+        padding: 10px;
+        align-items: center;
     }
     .chat-container {
         width: 100%;
         max-width: 100%;
         margin: 0;
-        border-radius: 0;
-        border: none;
+        border-radius: 16px;
+        border: 1px solid var(--glass-border);
         height: 100%;
         min-height: 0;
     }
     .chat-header {
-        border-radius: 0;
+        border-radius: 16px 16px 0 0;
         padding: 10px 14px;
+    }
+    .chat-form {
+        border-radius: 0 0 16px 16px;
+        padding: 8px 10px;
+        padding-bottom: calc(8px + max(0px, env(safe-area-inset-bottom)));
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
     }
     .chat-box {
         padding: 12px 10px;
@@ -726,14 +734,6 @@ main.main-content {
     .message-body {
         font-size: 0.95rem;
     }
-    .chat-form {
-        padding: 8px 10px;
-        padding-bottom: calc(8px + max(0px, env(safe-area-inset-bottom)));
-        border-radius: 0;
-        border-bottom: none;
-        border-left: none;
-        border-right: none;
-    }
     .sticker-panel {
         bottom: 54px;
     }
@@ -744,31 +744,18 @@ main.main-content {
         overflow: hidden;
     }
     main.main-content {
-        height: 100vh;
-        height: -webkit-fill-available;
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
+        height: var(--app-height, 100vh);
+        padding: 8px;
         display: flex;
         flex-direction: column;
     }
     .chat-container {
         flex: 1;
-        height: auto;
-        border-radius: 0;
-        border: none;
-        display: flex;
-        flex-direction: column;
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
     }
-    .chat-box {
-        flex: 1;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        padding: 12px 10px;
-    }
-    .message {
-        max-width: 85%;
-    }
+    .chat-header { border-radius: 14px 14px 0 0; }
+    .chat-form { border-radius: 0 0 14px 14px; }
 }
 </style>
 {% endblock %}
@@ -1257,17 +1244,21 @@ window.addEventListener("resize", function () {
 });
 
 /* =========================================================
-   INITIAL SCROLL
+   INITIAL SCROLL (SAHIFA OCHILGANDA ENG PASTGA TUSHISH)
    ========================================================= */
-window.addEventListener("load", function () {
-    scrollToBottom(true);
-});
-
-if (chatBox) {
+function forceScrollToBottom() {
+    if (!chatBox) return;
     chatBox.style.scrollBehavior = "auto";
     chatBox.scrollTop = chatBox.scrollHeight;
     chatBox.style.scrollBehavior = "";
 }
+
+document.addEventListener("DOMContentLoaded", forceScrollToBottom);
+
+window.addEventListener("load", function () {
+    forceScrollToBottom();
+    setTimeout(forceScrollToBottom, 150);
+});
 
 /* =========================================================
    FORM SUBMIT
