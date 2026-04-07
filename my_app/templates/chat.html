@@ -17,6 +17,7 @@
     height: min(75vh, calc(100dvh - 100px));
     min-height: 500px;
     overflow: hidden;
+    position: relative;
 }
 
 .chat-header {
@@ -38,6 +39,7 @@
     flex-direction: column;
     gap: 15px;
     overscroll-behavior: contain;
+    padding-bottom: 80px;
 }
 
 .chat-box::-webkit-scrollbar {
@@ -129,12 +131,16 @@
 .chat-form {
     display: flex;
     align-items: center;
-    flex-shrink: 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
     padding: 20px;
-    background: rgba(0,0,0,0.2);
+    background: var(--bg-surface);
     border-top: 1px solid var(--glass-border);
     gap: 10px;
-    border-radius: 0 0 16px 16px;
+    border-radius: 0;
 }
 
 .sticker-toggle {
@@ -237,13 +243,21 @@
 
 .sticker-panel {
     display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    max-height: 0;
     padding: 10px 12px;
     background: rgba(0,0,0,0.25);
     border-top: 1px solid var(--glass-border);
+    overflow-y: auto;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sticker-panel.open {
-    display: block;
+    max-height: 200px;
 }
 
 .sticker-grid {
@@ -283,9 +297,10 @@
     }
     .chat-header { padding: 14px; font-size: 1.1rem; }
     .chat-box { padding: 12px; gap: 10px; }
+    .chat-box { padding-bottom: 90px; }
     .message { max-width: 92%; padding: 12px; }
     .message-body { font-size: 0.92rem; }
-    .chat-form { padding: 10px; }
+    .chat-form { padding: 10px; border-radius: 0; }
     .chat-form input { padding: 12px; }
     .sticker-toggle,
     .chat-form button { width: 44px; height: 44px; }
@@ -441,6 +456,7 @@
 
     if (stickerToggle && stickerPanel) {
         stickerToggle.addEventListener('click', function () {
+            stickerToggle.style.background = stickerPanel.classList.contains('open') ? 'var(--bg-base)' : 'rgba(125, 227, 255, 0.15)';
             stickerPanel.classList.toggle('open');
         });
     }
@@ -451,6 +467,8 @@
             if (!messageInput || !sticker) return;
             messageInput.value = (messageInput.value + ' ' + sticker).trim();
             messageInput.focus();
+            stickerPanel.classList.remove('open');
+            if (stickerToggle) stickerToggle.style.background = 'var(--bg-base)';
         });
     });
 </script>
