@@ -140,10 +140,10 @@
                         <input type="hidden" name="value" value="{% if item.is_superuser %}0{% else %}1{% endif %}">
                         <button type="submit" class="action-btn delete" onclick="return confirm('Superadmin vakolatini o‘zgartirishga ishonchingiz komilmi?');">{% if item.is_superuser %}Superadminni olish{% else %}Superadmin qilish{% endif %}</button>
                     </form>
+                    {% elif type == 'chat' %}
+                    <a href="{% url 'admin_message_edit' item.id %}" class="action-btn">Tahrirlash</a>
+                    <a href="{% url 'admin_message_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
                     {% else %}
-                    <button class="action-btn" style="opacity:0.5; pointer-events:none;">Tahrirlash</button>
-                    <button class="action-btn delete" style="opacity:0.5; pointer-events:none;">O'chirish</button>
-                    {% endif %}
                 </td>
             </tr>
             {% empty %}

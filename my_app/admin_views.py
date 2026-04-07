@@ -25,6 +25,7 @@ def admin_dashboard(request):
         'total_users': CustomUser.objects.count(),
         'latest_animes': Movie.objects.all().order_by('-created_at')[:5],
         'latest_users': CustomUser.objects.all().order_by('-date_joined')[:5],
+        'latest_messages': ChatMessage.objects.all().order_by('-created_at')[:10],
     }
     return render(request, 'custom_admin/dashboard.html', context)
 
@@ -240,3 +241,26 @@ def admin_genre_delete(request, pk):
     genre.delete()
     messages.success(request, "Janr o'chirildi!")
     return redirect('admin_genres')
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_message_edit(request, pk):
+    msg = get_object_or_404(ChatMessage, pk=pk)
+    if request.method == 'POST':
+        new_message = request.POST.get('message')
+        if new_message:
+            msg.message = new_message
+            msg.edited = True
+            msg.save()
+            messages.success(request, "Xabar muvaffaqiyatli tahrirlandi!")
+            return redirect('admin_chat')
+    
+    return render(request, 'custom_admin/message_form.html', {'message': msg})
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_message_delete(request, pk):
+    msg = get_object_or_404(ChatMessage, pk=pk)
+    msg.delete()
+    messages.success(request, "Xabar o'chirildi!")
+    return redirect('admin_chat')

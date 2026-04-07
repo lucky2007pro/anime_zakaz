@@ -40,6 +40,8 @@ urlpatterns = [
     path('control-panel/episodes/<int:pk>/edit/', admin_episode_form, name='admin_episode_form'),
     path('control-panel/episodes/<int:pk>/delete/', admin_episode_delete, name='admin_episode_delete'),
     path('control-panel/chat/', admin_chat, name='admin_chat'),
+    path('control-panel/chat/edit/<int:pk>/', admin_message_edit, name='admin_message_edit'),
+    path('control-panel/chat/delete/<int:pk>/', admin_message_delete, name='admin_message_delete'),
 ]
 
 
