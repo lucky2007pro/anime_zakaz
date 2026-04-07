@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <style>
+/* ===== CHAT CONTAINER ===== */
 .chat-container {
     max-width: 900px;
     margin: 20px auto;
@@ -20,6 +21,7 @@
     position: relative;
 }
 
+/* ===== HEADER ===== */
 .chat-header {
     padding: 20px;
     background: rgba(0,0,0,0.2);
@@ -28,8 +30,46 @@
     font-weight: 800;
     text-align: center;
     border-radius: 16px 16px 0 0;
+    flex-shrink: 0;
 }
 
+/* ===== LOADING OLDER MESSAGES ===== */
+.load-more-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0 4px;
+    flex-shrink: 0;
+}
+
+#loadMoreBtn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: none; /* shown via JS if there are more pages */
+}
+
+#loadMoreBtn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+#loadMoreBtn.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Sentinel div for IntersectionObserver (top of chat) */
+#topSentinel {
+    height: 1px;
+    flex-shrink: 0;
+}
+
+/* ===== CHAT BOX ===== */
 .chat-box {
     flex: 1;
     min-height: 0;
@@ -39,7 +79,7 @@
     flex-direction: column;
     gap: 15px;
     overscroll-behavior: contain;
-    padding-bottom: 80px;
+    scroll-behavior: smooth;
 }
 
 .chat-box::-webkit-scrollbar {
@@ -50,9 +90,16 @@
     border-radius: 6px;
 }
 
+/* ===== MESSAGES ===== */
 .message-wrapper {
     display: flex;
     width: 100%;
+    animation: msgIn 0.2s ease;
+}
+
+@keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .message-wrapper[data-own="true"] {
@@ -109,13 +156,15 @@
     text-decoration: none;
 }
 
-.actions i:hover {
+.actions i:hover,
+.actions a:hover i {
     color: var(--accent);
 }
 
 .message-body {
     font-size: 1rem;
     line-height: 1.5;
+    word-break: break-word;
 }
 
 .reply-info {
@@ -126,81 +175,39 @@
     font-size: 0.85rem;
     margin-top: 10px;
     color: var(--text-dim);
+    word-break: break-word;
 }
 
-.chat-form {
-    display: flex;
-    align-items: center;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    padding: 20px;
-    background: var(--bg-surface);
-    border-top: 1px solid var(--glass-border);
-    gap: 10px;
-    border-radius: 0;
-}
-
-.sticker-toggle {
-    width: 50px;
-    height: 50px;
-    border-radius: 8px;
-    border: 1px solid var(--glass-border);
-    background: var(--bg-base);
-    color: var(--text-light);
-    font-size: 1.35rem;
-    cursor: pointer;
-}
-
-.sticker-toggle:hover {
-    border-color: var(--accent);
-}
-
-.chat-form input {
-    flex: 1;
-    background: var(--bg-base);
-    border: 1px solid var(--glass-border);
-    padding: 15px;
-    border-radius: 8px;
-    color: white;
-    outline: none;
-    font-family: inherit;
-}
-
-.chat-form input:focus {
-    border-color: var(--accent);
-}
-
-.chat-form button {
-    background: var(--accent);
-    color: white;
-    border: none;
-    width: 50px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.4rem;
-    transition: 0.3s;
-}
-
-.chat-form button:hover {
-    background: var(--accent-hover);
-}
-
+/* ===== EDIT FORM ===== */
 .edit-form {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
 }
 
+.edit-form label {
+    display: block;
+    width: 100%;
+    margin-bottom: 2px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
 .edit-form input {
     flex: 1;
+    min-width: 0;
     padding: 8px;
     background: var(--bg-base);
     border: 1px solid var(--glass-border);
     color: white;
     border-radius: 4px;
+    font-family: inherit;
+    outline: none;
+}
+
+.edit-form input:focus {
+    border-color: var(--accent);
 }
 
 .edit-form button {
@@ -210,54 +217,61 @@
     border: 1px solid var(--glass-border);
     border-radius: 4px;
     cursor: pointer;
+    font-family: inherit;
 }
 
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    border: 0;
+.edit-form button[type="submit"] {
+    background: var(--accent);
+    border-color: var(--accent);
 }
 
+/* ===== REPLY PREVIEW — part of flex flow, NOT absolute ===== */
 .reply-preview {
-    background: rgba(0, 243, 255, 0.1);
+    flex-shrink: 0;
+    background: rgba(0, 243, 255, 0.08);
     padding: 10px 20px;
-    border-left: 3px solid var(--accent);
-    display: flex;
+    border-top: 1px solid rgba(0, 243, 255, 0.2);
+    border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+    display: none; /* shown via JS */
     justify-content: space-between;
     align-items: center;
     font-size: 0.9rem;
+    gap: 10px;
+}
+
+.reply-preview span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-dim);
 }
 
 .reply-preview button {
+    flex-shrink: 0;
     background: transparent;
     color: var(--accent);
     border: none;
     cursor: pointer;
     font-weight: 800;
+    font-size: 0.85rem;
 }
 
+/* ===== STICKER PANEL — part of flex flow, NOT absolute ===== */
 .sticker-panel {
-    display: none;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 5;
+    flex-shrink: 0;
     max-height: 0;
-    padding: 10px 12px;
+    overflow: hidden;
     background: rgba(0,0,0,0.25);
     border-top: 1px solid var(--glass-border);
-    overflow-y: auto;
-    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 12px;
 }
 
 .sticker-panel.open {
     max-height: 200px;
+    padding: 10px 12px;
+    overflow-y: auto;
 }
 
 .sticker-grid {
@@ -274,13 +288,157 @@
     line-height: 1;
     padding: 6px;
     cursor: pointer;
+    transition: 0.15s;
 }
 
 .sticker-item:hover {
     border-color: var(--glass-border);
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.06);
+    transform: scale(1.15);
 }
 
+/* ===== CHAT FORM — part of flex flow, NOT absolute ===== */
+.chat-form {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--glass-border);
+    gap: 10px;
+    border-radius: 0 0 16px 16px;
+}
+
+.sticker-toggle {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--bg-base);
+    color: var(--text-light);
+    font-size: 1.35rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.sticker-toggle:hover,
+.sticker-toggle.active {
+    border-color: var(--accent);
+    background: rgba(0, 243, 255, 0.1);
+}
+
+.chat-form input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-base);
+    border: 1px solid var(--glass-border);
+    padding: 13px 15px;
+    border-radius: 8px;
+    color: white;
+    outline: none;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+
+.chat-form input[type="text"]:focus {
+    border-color: var(--accent);
+}
+
+.send-btn {
+    flex-shrink: 0;
+    background: var(--accent);
+    color: white;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.send-btn:hover {
+    background: var(--accent-hover);
+    transform: scale(1.05);
+}
+
+/* ===== SCROLL-TO-BOTTOM BUTTON ===== */
+#scrollDownBtn {
+    position: absolute;
+    bottom: 90px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 1px solid var(--glass-border);
+    color: var(--text-light);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    z-index: 20;
+    transition: 0.2s;
+}
+
+#scrollDownBtn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+#scrollDownBtn.visible {
+    display: flex;
+}
+
+/* Unread badge on scroll button */
+#scrollDownBtn .badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--accent);
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 800;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+#scrollDownBtn .badge.show {
+    display: flex;
+}
+
+/* ===== ACCESSIBILITY ===== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+/* ===== EMPTY STATE ===== */
+.chat-empty {
+    text-align: center;
+    color: var(--text-dim);
+    margin: auto 0;
+    padding: 20px;
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     main.main-content {
         margin-top: 68px;
@@ -291,26 +449,24 @@
     .chat-container {
         width: 100%;
         margin: 0;
-        border-radius: 12px;
-        height: 100%;
+        border-radius: 0;
+        height: calc(100dvh - 68px);
         min-height: 0;
     }
     .chat-header { padding: 14px; font-size: 1.1rem; }
     .chat-box { padding: 12px; gap: 10px; }
-    .chat-box { padding-bottom: 90px; }
     .message { max-width: 92%; padding: 12px; }
     .message-body { font-size: 0.92rem; }
     .chat-form { padding: 10px; border-radius: 0; }
-    .chat-form input { padding: 12px; }
     .sticker-toggle,
-    .chat-form button { width: 44px; height: 44px; }
+    .send-btn { width: 42px; height: 42px; }
     .sticker-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
-    .reply-preview { padding: 10px 14px; gap: 10px; flex-direction: column; align-items: flex-start; }
+    .reply-preview { padding: 10px 14px; }
     .message-header { align-items: flex-start; flex-direction: column; }
+    #scrollDownBtn { bottom: 76px; }
 }
 
 @media (max-width: 480px) {
-    .chat-container { height: calc(100dvh - 76px); }
     .message { max-width: 100%; }
     .chat-form { gap: 8px; }
     .sticker-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
@@ -321,18 +477,29 @@
 {% block content %}
 <main class="main-content">
     <div class="chat-container">
+
+        <!-- HEADER -->
         <div class="chat-header">
             Umumiy Chat
         </div>
 
-        <div id="replyPreview" style="display:none;" class="reply-preview">
-            <span>Javob: <strong id="replyUsername"></strong> - "<span id="replyMessage"></span>"</span>
-            <button type="button" onclick="cancelReply()">✕ Bekor</button>
-        </div>
-
+        <!-- CHAT BOX -->
         <div class="chat-box" id="chatBox">
+
+            <!-- Sentinel: scroll to top triggers load more -->
+            <div id="topSentinel"></div>
+
+            <!-- Load More button (fallback) -->
+            <div class="load-more-wrapper">
+                <button id="loadMoreBtn" type="button" onclick="loadOlderMessages()">
+                    ↑ Eski xabarlarni yuklash
+                </button>
+            </div>
+
             {% for msg in messages %}
-            <div class="message-wrapper" {% if msg.user == request.user %}data-own="true"{% endif %}>
+            <div class="message-wrapper"
+                 data-msg-id="{{ msg.id }}"
+                 {% if msg.user == request.user %}data-own="true"{% endif %}>
                 <div class="message">
                     <div class="message-header">
                         <span class="username">
@@ -341,23 +508,31 @@
                                 <i class='bx bx-crown' title="Admin" style="color: #ffc107;"></i>
                             {% endif %}
                         </span>
-                        
+
                         <div style="display: flex; gap: 15px; align-items: center;">
                             <span class="time">
-                                {% if msg.edited %}<span style="opacity: 0.5; font-size: 0.75rem;">(edited)</span>{% endif %}
+                                {% if msg.edited %}
+                                    <span style="opacity: 0.5; font-size: 0.75rem;">(tahrirlangan)</span>
+                                {% endif %}
                                 {{ msg.local_created_at|date:"H:i" }}
                             </span>
                             <div class="actions">
                                 {% if msg.user == request.user or request.user.is_admin_user %}
-                                    <i class='bx bx-edit-alt' onclick="openEdit({{ msg.id }})"></i>
-                                    <a href="{% url 'delete_message' msg.id %}"><i class='bx bx-trash'></i></a>
+                                    <i class='bx bx-edit-alt'
+                                       title="Tahrirlash"
+                                       onclick="openEdit({{ msg.id }})"></i>
+                                    <a href="{% url 'delete_message' msg.id %}" title="O'chirish">
+                                        <i class='bx bx-trash'></i>
+                                    </a>
                                 {% endif %}
-
                                 {% if request.user.is_admin_user and not msg.user.is_admin_user %}
-                                    <a href="{% url 'ban_user' msg.user.id %}" title="Ban foydalanuvchi"><i class='bx bx-block'></i></a>
+                                    <a href="{% url 'ban_user' msg.user.id %}" title="Bloklash">
+                                        <i class='bx bx-block'></i>
+                                    </a>
                                 {% endif %}
-
-                                <i class='bx bx-reply' onclick="replyMessage({{ msg.id }}, '{{ msg.user.username|escapejs }}', '{{ msg.message|escapejs }}')"></i>
+                                <i class='bx bx-reply'
+                                   title="Javob berish"
+                                   onclick="replyMessage({{ msg.id }}, '{{ msg.user.username|escapejs }}', '{{ msg.message|escapejs }}')"></i>
                             </div>
                         </div>
                     </div>
@@ -366,110 +541,377 @@
                         {{ msg.message }}
                         {% if msg.reply_to %}
                             <div class="reply-info">
-                                <i class='bx bx-message-square-dots'></i> <strong>{{ msg.reply_to.user.username }}</strong> ga javoban: "{{ msg.reply_to.message }}"
+                                <i class='bx bx-message-square-dots'></i>
+                                <strong>{{ msg.reply_to.user.username }}</strong>
+                                ga javoban: "{{ msg.reply_to.message }}"
                             </div>
                         {% endif %}
                     </div>
 
-                    <form method="POST" action="{% url 'edit_message' msg.id %}" class="edit-form" id="edit-form-{{ msg.id }}" style="display:none;">
+                    <form method="POST"
+                          action="{% url 'edit_message' msg.id %}"
+                          class="edit-form"
+                          id="edit-form-{{ msg.id }}"
+                          style="display:none;">
                         {% csrf_token %}
-                        <label for="edit-message-{{ msg.id }}" style="display:block; width:100%; margin-bottom:6px; font-size:0.75rem; color:var(--text-dim);">Xabarni tahrirlash</label>
-                        <input id="edit-message-{{ msg.id }}" type="text" name="message" aria-label="Xabarni tahrirlash" value="{{ msg.message }}" {% if request.user.is_banned %}disabled{% endif %} required>
-                        <button type="submit" aria-label="Xabarni saqlash" title="Xabarni saqlash" {% if request.user.is_banned %}disabled{% endif %} style="background: var(--accent); border-color: var(--accent);">Saqlash</button>
+                        <label for="edit-message-{{ msg.id }}">Xabarni tahrirlash</label>
+                        <input id="edit-message-{{ msg.id }}"
+                               type="text"
+                               name="message"
+                               value="{{ msg.message }}"
+                               {% if request.user.is_banned %}disabled{% endif %}
+                               required>
+                        <button type="submit"
+                                {% if request.user.is_banned %}disabled{% endif %}>
+                            Saqlash
+                        </button>
                         <button type="button" onclick="closeEdit({{ msg.id }})">Bekor</button>
                     </form>
                 </div>
             </div>
             {% empty %}
-            <p style="text-align: center; color: var(--text-dim); margin-top: 20px;">Hali xabar yo‘q. Birinchi bo'lib yozing!</p>
+            <div class="chat-empty">
+                <p>Hali xabar yo'q. Birinchi bo'lib yozing! 👋</p>
+            </div>
             {% endfor %}
         </div>
 
+        <!-- REPLY PREVIEW — flex item, not absolute -->
+        <div id="replyPreview" class="reply-preview">
+            <span>
+                Javob:
+                <strong id="replyUsername"></strong>
+                — "<span id="replyMessage"></span>"
+            </span>
+            <button type="button" onclick="cancelReply()">✕ Bekor</button>
+        </div>
+
+        <!-- STICKER PANEL — flex item, not absolute -->
         <div class="sticker-panel" id="stickerPanel" aria-label="Sticker panel">
             <div class="sticker-grid">
-                <button type="button" class="sticker-item" data-sticker="😀">😀</button>
-                <button type="button" class="sticker-item" data-sticker="😎">😎</button>
-                <button type="button" class="sticker-item" data-sticker="😍">😍</button>
-                <button type="button" class="sticker-item" data-sticker="😂">😂</button>
-                <button type="button" class="sticker-item" data-sticker="😢">😢</button>
-                <button type="button" class="sticker-item" data-sticker="😡">😡</button>
-                <button type="button" class="sticker-item" data-sticker="🤯">🤯</button>
-                <button type="button" class="sticker-item" data-sticker="😴">😴</button>
-                <button type="button" class="sticker-item" data-sticker="👍">👍</button>
-                <button type="button" class="sticker-item" data-sticker="🔥">🔥</button>
-                <button type="button" class="sticker-item" data-sticker="❤️">❤️</button>
-                <button type="button" class="sticker-item" data-sticker="💯">💯</button>
-                <button type="button" class="sticker-item" data-sticker="🎉">🎉</button>
-                <button type="button" class="sticker-item" data-sticker="😅">😅</button>
-                <button type="button" class="sticker-item" data-sticker="🤔">🤔</button>
-                <button type="button" class="sticker-item" data-sticker="😉">😉</button>
-                <button type="button" class="sticker-item" data-sticker="😮">😮</button>
-                <button type="button" class="sticker-item" data-sticker="🙈">🙈</button>
-                <button type="button" class="sticker-item" data-sticker="🤝">🤝</button>
-                <button type="button" class="sticker-item" data-sticker="🤟">🤟</button>
+                {% for sticker in "😀😎😍😂😢😡🤯😴👍🔥❤️💯🎉😅🤔😉😮🙈🤝🤟💪🫡🫶😏😤🥳🤩🫠😬🧐🤭😇🥺😌😑😶🤐🥱😪🤤😋😛😜😝🤑😈💀👻🤡👾🎭"|make_list %}
+                <button type="button" class="sticker-item" data-sticker="{{ sticker }}">{{ sticker }}</button>
+                {% endfor %}
             </div>
         </div>
 
-        <form method="POST" class="chat-form">
+        <!-- CHAT FORM — flex item, not absolute -->
+        <form method="POST" class="chat-form" id="chatForm">
             {% csrf_token %}
             <input type="hidden" name="reply_to" id="replyToInput" value="">
-            <button type="button" class="sticker-toggle" id="stickerToggle" aria-label="Sticker panel">😊</button>
+            <button type="button"
+                    class="sticker-toggle"
+                    id="stickerToggle"
+                    aria-label="Sticker panelni ochish">😊</button>
+
             <label class="sr-only" for="messageInput">Xabaringizni yozing</label>
-            <input type="text" name="message" placeholder="Xabaringizni yozing..." id="messageInput" {% if request.user.is_banned %}disabled{% endif %} required autocomplete="off">
-            <button type="submit" {% if request.user.is_banned %}disabled{% endif %}><i class='bx bx-send'></i></button>
+            <input type="text"
+                   name="message"
+                   placeholder="Xabaringizni yozing…"
+                   id="messageInput"
+                   {% if request.user.is_banned %}disabled{% endif %}
+                   required
+                   autocomplete="off">
+
+            <button type="submit"
+                    class="send-btn"
+                    {% if request.user.is_banned %}disabled{% endif %}
+                    aria-label="Yuborish">
+                <i class='bx bx-send'></i>
+            </button>
         </form>
+
+        <!-- Scroll-to-bottom floating button -->
+        <button id="scrollDownBtn" aria-label="Oxirgi xabarga o'tish">
+            <i class='bx bx-chevron-down'></i>
+            <span class="badge" id="unreadBadge"></span>
+        </button>
+
     </div>
 </main>
 
 <script>
-    function openEdit(id) {
-        document.getElementById("text-" + id).style.display = "none";
-        document.getElementById("edit-form-" + id).style.display = "flex";
-    }
+/* =========================================================
+   EDIT / CLOSE EDIT
+   ========================================================= */
+function openEdit(id) {
+    document.getElementById("text-" + id).style.display = "none";
+    document.getElementById("edit-form-" + id).style.display = "flex";
+    const input = document.getElementById("edit-message-" + id);
+    if (input) { input.focus(); input.select(); }
+}
 
-    function closeEdit(id) {
-        document.getElementById("text-" + id).style.display = "block";
-        document.getElementById("edit-form-" + id).style.display = "none";
-    }
+function closeEdit(id) {
+    document.getElementById("text-" + id).style.display = "block";
+    document.getElementById("edit-form-" + id).style.display = "none";
+}
 
-    function replyMessage(messageId, username, message) {
-        document.getElementById("replyPreview").style.display = "flex";
-        document.getElementById("replyUsername").innerText = username;
-        document.getElementById("replyMessage").innerText = message;
-        document.getElementById("messageInput").focus();
-        document.getElementById("replyToInput").value = messageId;
-    }
+/* =========================================================
+   REPLY
+   ========================================================= */
+function replyMessage(messageId, username, message) {
+    const preview  = document.getElementById("replyPreview");
+    preview.style.display = "flex";
+    document.getElementById("replyUsername").innerText = username;
+    const msgEl = document.getElementById("replyMessage");
+    msgEl.innerText = message.length > 80 ? message.slice(0, 80) + "…" : message;
+    document.getElementById("replyToInput").value = messageId;
+    document.getElementById("messageInput").focus();
+}
 
-    function cancelReply() {
-        document.getElementById("replyPreview").style.display = "none";
-        document.getElementById("replyToInput").value = '';
-    }
+function cancelReply() {
+    document.getElementById("replyPreview").style.display = "none";
+    document.getElementById("replyToInput").value = "";
+}
 
-    const chatBox = document.getElementById('chatBox');
-    const stickerPanel = document.getElementById('stickerPanel');
-    const stickerToggle = document.getElementById('stickerToggle');
-    const messageInput = document.getElementById('messageInput');
+/* =========================================================
+   STICKER PANEL
+   ========================================================= */
+const stickerPanel  = document.getElementById("stickerPanel");
+const stickerToggle = document.getElementById("stickerToggle");
+const messageInput  = document.getElementById("messageInput");
+const chatBox       = document.getElementById("chatBox");
 
-    if (chatBox) {
+if (stickerToggle && stickerPanel) {
+    stickerToggle.addEventListener("click", function () {
+        const isOpen = stickerPanel.classList.toggle("open");
+        stickerToggle.classList.toggle("active", isOpen);
+    });
+}
+
+document.querySelectorAll(".sticker-item").forEach(function (item) {
+    item.addEventListener("click", function () {
+        const sticker = this.getAttribute("data-sticker") || "";
+        if (!messageInput || !sticker) return;
+        messageInput.value = (messageInput.value + " " + sticker).trim();
+        messageInput.focus();
+        stickerPanel.classList.remove("open");
+        stickerToggle.classList.remove("active");
+    });
+});
+
+/* =========================================================
+   SCROLL HELPERS
+   ========================================================= */
+/** Returns true if user is near the bottom (within 150px) */
+function isNearBottom() {
+    if (!chatBox) return true;
+    return chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < 150;
+}
+
+/** Instantly jump to the very last message — no animation */
+function scrollToBottom(instant) {
+    if (!chatBox) return;
+    if (instant) {
+        chatBox.style.scrollBehavior = "auto";
+        chatBox.scrollTop = chatBox.scrollHeight;
+        chatBox.style.scrollBehavior = "";
+    } else {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
+}
 
-    if (stickerToggle && stickerPanel) {
-        stickerToggle.addEventListener('click', function () {
-            stickerToggle.style.background = stickerPanel.classList.contains('open') ? 'var(--bg-base)' : 'rgba(125, 227, 255, 0.15)';
-            stickerPanel.classList.toggle('open');
-        });
-    }
+/* =========================================================
+   SCROLL-TO-BOTTOM BUTTON + UNREAD COUNTER
+   ========================================================= */
+const scrollDownBtn = document.getElementById("scrollDownBtn");
+const unreadBadge   = document.getElementById("unreadBadge");
+let unreadCount = 0;
 
-    document.querySelectorAll('.sticker-item').forEach(function (item) {
-        item.addEventListener('click', function () {
-            const sticker = this.getAttribute('data-sticker') || '';
-            if (!messageInput || !sticker) return;
-            messageInput.value = (messageInput.value + ' ' + sticker).trim();
-            messageInput.focus();
-            stickerPanel.classList.remove('open');
-            if (stickerToggle) stickerToggle.style.background = 'var(--bg-base)';
-        });
+if (chatBox && scrollDownBtn) {
+    chatBox.addEventListener("scroll", function () {
+        if (isNearBottom()) {
+            scrollDownBtn.classList.remove("visible");
+            unreadCount = 0;
+            unreadBadge.innerText = "";
+            unreadBadge.classList.remove("show");
+        } else {
+            scrollDownBtn.classList.add("visible");
+        }
     });
+
+    scrollDownBtn.addEventListener("click", function () {
+        scrollToBottom(false);
+        unreadCount = 0;
+        unreadBadge.innerText = "";
+        unreadBadge.classList.remove("show");
+    });
+}
+
+/* =========================================================
+   INITIAL SCROLL — jump to bottom on page load
+   ========================================================= */
+window.addEventListener("load", function () {
+    scrollToBottom(true); // instant, no animation
+});
+
+/* Also attempt early (before full load) */
+if (chatBox) {
+    chatBox.style.scrollBehavior = "auto";
+    chatBox.scrollTop = chatBox.scrollHeight;
+    chatBox.style.scrollBehavior = "";
+}
+
+/* =========================================================
+   FORM SUBMIT — keep user at bottom after sending
+   ========================================================= */
+const chatForm = document.getElementById("chatForm");
+if (chatForm) {
+    chatForm.addEventListener("submit", function () {
+        // Mark that we want to scroll after page reload
+        sessionStorage.setItem("chatScrollToBottom", "1");
+    });
+}
+
+// On page load, if we just submitted a form, scroll to bottom
+if (sessionStorage.getItem("chatScrollToBottom") === "1") {
+    sessionStorage.removeItem("chatScrollToBottom");
+    window.addEventListener("load", function () { scrollToBottom(true); });
+}
+
+/* =========================================================
+   LOAD OLDER MESSAGES (Infinite Scroll — Telegram style)
+
+   Backend needs a view that accepts:
+     GET /chat/messages/?before=<oldest_msg_id>&limit=20
+   and returns JSON:
+     { messages: [...], has_more: true/false }
+
+   Each message object should have:
+     id, user, username, is_admin, is_own, message,
+     time, edited, reply_to (nullable)
+   ========================================================= */
+
+// Oldest message id currently in DOM
+function getOldestMsgId() {
+    const wrappers = chatBox.querySelectorAll(".message-wrapper[data-msg-id]");
+    if (!wrappers.length) return null;
+    return wrappers[0].getAttribute("data-msg-id");
+}
+
+let isLoadingMore  = false;
+let hasMoreMessages = {{ has_more|default:"false"|lower }};  // set from Django context
+const loadMoreBtn  = document.getElementById("loadMoreBtn");
+
+// Show/hide "load more" button
+if (hasMoreMessages && loadMoreBtn) {
+    loadMoreBtn.style.display = "block";
+}
+
+function loadOlderMessages() {
+    if (isLoadingMore || !hasMoreMessages) return;
+    const oldestId = getOldestMsgId();
+    if (!oldestId) return;
+
+    isLoadingMore = true;
+    if (loadMoreBtn) loadMoreBtn.classList.add("loading");
+
+    const prevScrollHeight = chatBox.scrollHeight;
+
+    fetch(`/chat/messages/?before=${oldestId}&limit=20`, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.messages || !data.messages.length) {
+            hasMoreMessages = false;
+            if (loadMoreBtn) loadMoreBtn.style.display = "none";
+            return;
+        }
+
+        hasMoreMessages = data.has_more;
+        if (!hasMoreMessages && loadMoreBtn) loadMoreBtn.style.display = "none";
+
+        // Build and insert messages above existing ones
+        const sentinel = document.getElementById("topSentinel");
+        const wrapper  = loadMoreBtn ? loadMoreBtn.closest(".load-more-wrapper") : null;
+
+        data.messages.forEach(function (msg) {
+            const el = buildMessageEl(msg);
+            // Insert after sentinel / load-more wrapper
+            const insertAfter = wrapper || sentinel;
+            insertAfter.insertAdjacentElement("afterend", el);
+        });
+
+        // Restore scroll position so user doesn't jump
+        chatBox.style.scrollBehavior = "auto";
+        chatBox.scrollTop = chatBox.scrollHeight - prevScrollHeight;
+        chatBox.style.scrollBehavior = "";
+    })
+    .catch(err => console.error("Xabarlarni yuklashda xato:", err))
+    .finally(() => {
+        isLoadingMore = false;
+        if (loadMoreBtn) loadMoreBtn.classList.remove("loading");
+    });
+}
+
+/** Build a message DOM element from API response data */
+function buildMessageEl(msg) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "message-wrapper";
+    wrapper.setAttribute("data-msg-id", msg.id);
+    if (msg.is_own) wrapper.setAttribute("data-own", "true");
+
+    const crownHtml = msg.is_admin
+        ? `<i class='bx bx-crown' title="Admin" style="color: #ffc107;"></i>`
+        : "";
+
+    const editedHtml = msg.edited
+        ? `<span style="opacity:0.5;font-size:0.75rem;">(tahrirlangan)</span> ` : "";
+
+    const replyHtml = msg.reply_to
+        ? `<div class="reply-info">
+               <i class='bx bx-message-square-dots'></i>
+               <strong>${escHtml(msg.reply_to.username)}</strong>
+               ga javoban: "${escHtml(msg.reply_to.message)}"
+           </div>`
+        : "";
+
+    wrapper.innerHTML = `
+      <div class="message">
+        <div class="message-header">
+          <span class="username">${escHtml(msg.username)} ${crownHtml}</span>
+          <div style="display:flex;gap:15px;align-items:center;">
+            <span class="time">${editedHtml}${escHtml(msg.time)}</span>
+          </div>
+        </div>
+        <div class="message-body" id="text-${msg.id}">
+          ${escHtml(msg.message)}${replyHtml}
+        </div>
+      </div>`;
+    return wrapper;
+}
+
+function escHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
+}
+
+/* IntersectionObserver: auto-trigger load when user scrolls to top sentinel */
+if (chatBox && hasMoreMessages) {
+    const observer = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) {
+            loadOlderMessages();
+        }
+    }, { root: chatBox, rootMargin: "0px", threshold: 0.1 });
+
+    const sentinel = document.getElementById("topSentinel");
+    if (sentinel) observer.observe(sentinel);
+}
+
+/* =========================================================
+   CLOSE STICKER PANEL when clicking outside
+   ========================================================= */
+document.addEventListener("click", function (e) {
+    if (!stickerPanel || !stickerToggle) return;
+    if (!stickerPanel.contains(e.target) && e.target !== stickerToggle) {
+        stickerPanel.classList.remove("open");
+        stickerToggle.classList.remove("active");
+    }
+});
 </script>
 {% endblock %}
