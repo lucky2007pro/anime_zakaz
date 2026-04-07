@@ -11,10 +11,11 @@
 main.main-content {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    margin: 80px 0 0 0;
+    align-items: stretch;
+    margin: 80px auto 0;
     width: 100%;
-    padding: 20px 16px;
+    max-width: 100%;
+    padding: 16px;
     height: calc(100dvh - 80px);
     height: calc(100svh - 80px);
     overflow: hidden;
@@ -23,6 +24,7 @@ main.main-content {
 }
 
 .chat-container {
+    --composer-h: 56px;
     width: 100%;
     max-width: 860px;
     background: var(--bg-surface);
@@ -33,7 +35,7 @@ main.main-content {
     flex-direction: column;
     height: 100%;
     max-height: 100%;
-    min-height: 520px;
+    min-height: 0;
     overflow: hidden;
     position: relative;
 }
@@ -415,7 +417,7 @@ main.main-content {
    ===================================================== */
 .sticker-panel {
     position: absolute;
-    bottom: 70px;      /* input paneli balandligi */
+    bottom: calc(var(--composer-h) + max(0px, env(safe-area-inset-bottom)));
     left: 0;
     right: 0;
     max-height: 0;
@@ -474,7 +476,7 @@ main.main-content {
     border-top: 1px solid var(--glass-border);
     gap: 8px;
     border-radius: 0 0 20px 20px;
-    min-height: 56px;
+    min-height: var(--composer-h);
     position: relative;
     z-index: 10;
     padding-bottom: calc(10px + max(0px, env(safe-area-inset-bottom)));
@@ -708,6 +710,7 @@ main.main-content {
         overflow: hidden;
     }
     .chat-container {
+        --composer-h: 52px;
         width: 100%;
         max-width: 100%;
         margin: 0;
@@ -715,7 +718,6 @@ main.main-content {
         height: 100%;
         min-height: 0;
         border: none;
-        border-radius: 0;
     }
     .chat-header { border-radius: 0; padding: 10px 14px; }
     .chat-box {
@@ -728,47 +730,12 @@ main.main-content {
         padding: 8px 10px;
         padding-bottom: calc(8px + max(0px, env(safe-area-inset-bottom)));
         border-radius: 0;
-        min-height: 54px;
+        min-height: var(--composer-h);
     }
-    .sticker-panel { bottom: 54px; }
+    .sticker-panel { bottom: calc(var(--composer-h) + max(0px, env(safe-area-inset-bottom))); }
     .sticker-grid { gap: 3px; padding: 8px 10px; }
     .sticker-item { font-size: 1.25rem; padding: 4px; }
     #scrollDownBtn { bottom: calc(62px + max(0px, env(safe-area-inset-bottom))); }
-}
-
-@media (max-width: 480px) {
-    main.main-content {
-        margin: 72px 0 0 0;
-        height: calc(100dvh - 72px);
-        height: calc(100svh - 72px);
-        padding: 0;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-    .message { max-width: 90%; }
-    .msg-avatar { width: 26px; height: 26px; font-size: 0.65rem; }
-    .chat-container {
-        height: 100%;
-        min-height: 0;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    .chat-box {
-        flex: 1;
-    }
-    .chat-form {
-        padding: 6px 10px;
-        padding-bottom: calc(6px + max(10px, env(safe-area-inset-bottom)));
-        min-height: 52px;
-        align-items: flex-end;
-        background: rgba(0,0,0,0.45);
-        backdrop-filter: blur(10px);
-    }
-    .sticker-toggle,
-    .send-btn { width: 38px; height: 38px; }
-    .sticker-panel { bottom: 52px; }
 }
 </style>
 {% endblock %}
@@ -1009,36 +976,6 @@ const stickerPanel = document.getElementById("stickerPanel");
 const stickerToggle = document.getElementById("stickerToggle");
 const messageInput = document.getElementById('messageInput');
 
-/* =========================================================
-   MOBILE KEYBOARD FIX — visualViewport API
-   iOS/Android da klaviatura ochilganda forma ko'rinmay qolmasin
-   ========================================================= */
-(function () {
-    const container = document.querySelector('.chat-container');
-    const mainEl    = document.querySelector('main.main-content');
-    const navbar    = document.querySelector('.navbar');
-    if (!container || !mainEl) return;
-
-    function applyViewport() {
-        const vv = window.visualViewport;
-        if (!vv) return;
-        const navHeight = navbar ? navbar.offsetHeight : 72;
-        const h = Math.max(320, vv.height - navHeight);
-        // faqat mobil qurilmalarda
-        if (window.innerWidth <= 900) {
-            mainEl.style.height  = h + 'px';
-            container.style.height = h + 'px';
-            // scroll ni pastga ushlab tur
-            if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    }
-
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', applyViewport);
-        window.visualViewport.addEventListener('scroll', applyViewport);
-        applyViewport();
-    }
-})();
 
 /* =========================================================
    AUTO-GROW TEXTAREA
