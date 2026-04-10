@@ -130,6 +130,14 @@ def home(request):
 @login_required
 def movie_detail(request, id):
     movie = get_object_or_404(Movie, id=id)
+
+    if request.method == "POST":
+        text = request.POST.get("comment", "").strip()
+        if text:
+            from .models import MovieComment
+            MovieComment.objects.create(movie=movie, user=request.user, text=text)
+        return redirect('movie_detail', id=movie.id)
+
     episodes = movie.episodes.all().order_by('episode_number')
     
     # Increment views remotely safely
@@ -162,6 +170,11 @@ def movie_detail(request, id):
     if tier == 'vip' or is_staff_or_admin:
         max_quality = '4K'
 
+    comments = movie.comments.select_related('user', 'user__avatar').all()
+    tz = ZoneInfo('Asia/Tashkent')
+    for c in comments:
+        c.local_created_at = localtime(c.created_at, tz)
+
     return render(request, 'movie_detail.html', {
         'movie': movie,
         'episodes': episodes,
@@ -171,7 +184,8 @@ def movie_detail(request, id):
         'show_ads': show_ads,
         'can_download': can_download,
         'max_quality': max_quality,
-        'user_tier': tier
+        'user_tier': tier,
+        'comments': comments
     })
 
 

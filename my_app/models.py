@@ -23,6 +23,11 @@ class CustomUser(AbstractUser):
     is_admin_user = models.BooleanField(default=False)  # Admin panelga kirish
     avatar = models.ForeignKey('ProfileAvatar', on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
 
+    def active_tier(self):
+        if not hasattr(self, 'vip_data'):
+            return 'basic'
+        return self.vip_data.get_tier()
+
     def __str__(self):
         return self.username if self.username else f"User-{self.id}"
 
@@ -264,6 +269,21 @@ class WatchHistory(models.Model):
 
     class Meta:
         unique_together = ('user', 'movie')
+
+# =======================
+# MOVIE COMMENTS
+# =======================
+class MovieComment(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='movie_comments')
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.movie.title} - {self.text[:20]}"
 
 # =======================
 # ACTIVE SESSIONS (DEVICE LIMITS)

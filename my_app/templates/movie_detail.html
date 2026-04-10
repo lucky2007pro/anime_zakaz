@@ -403,6 +403,135 @@
     .episode-btn{flex:1 1 46%;font-size:0.85rem;}
     .episodes-box, .movie-info { padding: 14px; }
 }
+
+/* ======================= COMMENTS STYLES ======================= */
+.comments-section {
+    background: rgba(17,17,24,0.88);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-top: 10px;
+    box-shadow: 0 18px 42px rgba(0,0,0,0.42);
+}
+.comments-section h3 {
+    font-size: 1.4rem;
+    font-weight: 900;
+    margin-bottom: 24px;
+}
+.comment-form {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 30px;
+}
+.comment-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #333;
+}
+.comment-input-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.comment-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    font-size: 1rem;
+    padding: 8px 0;
+    resize: none;
+    outline: none;
+    transition: 0.3s;
+}
+.comment-input:focus {
+    border-bottom-color: var(--accent);
+}
+.comment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.comment-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.comment-btn:disabled {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.3);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+.comment-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,243,255,0.3);
+}
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.comment-item {
+    display: flex;
+    gap: 16px;
+}
+.comment-body {
+    flex-grow: 1;
+}
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.comment-username {
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+.vip-badge-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.7rem;
+    background: rgba(244,63,94,0.15);
+    color: #f43f5e;
+    border: 1px solid rgba(244,63,94,0.3);
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-weight: 800;
+}
+.admin-badge-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.7rem;
+    background: rgba(74,222,128,0.15);
+    color: #4ade80;
+    border: 1px solid rgba(74,222,128,0.3);
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-weight: 800;
+}
+.comment-time {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+.comment-text {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
 </style>
 {% endblock %}
 
@@ -560,6 +689,56 @@
                 </div>
             </aside>
         </div>
+
+        <!-- YOUTUBE STYLE COMMENTS SECTION -->
+        <section class="comments-section" id="comments">
+            <h3>Izohlar ({{ comments.count|default:"0" }})</h3>
+
+            {% if request.user.is_authenticated %}
+            <form class="comment-form" method="POST" action="{% url 'movie_detail' movie.id %}#comments">
+                {% csrf_token %}
+                <img src="{% if request.user.avatar %}{{ request.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}" alt="Avatar" class="comment-avatar">
+                <div class="comment-input-wrapper">
+                    <textarea name="comment" class="comment-input" rows="1" placeholder="Fikr bildiring..." required oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                    <div class="comment-actions">
+                        <button type="submit" class="comment-btn">Izoh qoldirish</button>
+                    </div>
+                </div>
+            </form>
+            {% else %}
+            <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 30px;">
+                <p style="color: var(--text-dim); margin-bottom: 10px;">Izoh qoldirish uchun tizimga kiring.</p>
+                <a href="{% url 'login' %}" class="btn-back" style="background: var(--accent); color: #000; border: none;">Kirish</a>
+            </div>
+            {% endif %}
+
+            <div class="comments-list">
+                {% for comment in comments %}
+                <div class="comment-item">
+                    <img src="{% if comment.user.avatar %}{{ comment.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}" alt="Avatar" class="comment-avatar">
+                    <div class="comment-body">
+                        <div class="comment-header">
+                            <span class="comment-username">{{ comment.user.username }}</span>
+                            {% if comment.user.is_superuser or comment.user.is_admin_user or comment.user.is_staff %}
+                                <span class="admin-badge-sm">Admin</span>
+                            {% elif comment.user.active_tier == 'vip' %}
+                                <span class="vip-badge-sm" style="color: #f43f5e; border-color: rgba(244,63,94,0.3); background: rgba(244,63,94,0.15);">VIP</span>
+                            {% elif comment.user.active_tier == 'premium' %}
+                                <span class="vip-badge-sm" style="color: #fbbf24; border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.15);">Premium</span>
+                            {% endif %}
+                            <span class="comment-time">{{ comment.local_created_at|date:"d M Y, H:i" }}</span>
+                        </div>
+                        <div class="comment-text">
+                            {{ comment.text|linebreaksbr }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; color: var(--text-dim); padding: 20px 0;">Hali izohlar yo'q. Birinchi bo'lib fikr bildiring!</div>
+                {% endfor %}
+            </div>
+        </section>
+
     </div>
 </main>
 
