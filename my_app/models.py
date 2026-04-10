@@ -28,16 +28,32 @@ class CustomUser(AbstractUser):
 
 
 class VipUser(models.Model):
+    TIER_CHOICES = [
+        ('basic', 'Asosiy (Free)'),
+        ('premium', 'Premium'),
+        ('vip', 'VIP'),
+    ]
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
         related_name='vip_data'
     )
     is_vip = models.BooleanField(default=False)
+    tier = models.CharField(max_length=10, choices=TIER_CHOICES, default='basic')
     vip_expire = models.DateTimeField(null=True, blank=True)
 
     def vip_active(self):
         return self.is_vip and self.vip_expire and self.vip_expire > timezone.now()
+
+    def get_tier(self):
+        if not self.vip_active():
+            return 'basic'
+        return self.tier
+
+    def has_access(self, required_tier):
+        current = self.get_tier()
+        tiers = ['basic', 'premium', 'vip']
+        return tiers.index(current) >= tiers.index(required_tier)
 
     def __str__(self):
         return f"{self.user.username} - VIP"if self.user.username else f"User-{self.user.id} - VIP"
@@ -47,12 +63,23 @@ class VipUser(models.Model):
 # MOVIE
 # =======================
 class Movie(models.Model):
+    TIER_CHOICES = [
+        ('basic', 'Asosiy (Free)'),
+        ('premium', 'Premium'),
+        ('vip', 'VIP'),
+    ]
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='movies/')
     description = models.TextField(blank=True, null=True)
     is_premium = models.BooleanField(
         default=False, 
-        help_text="Faqat premium obunachilar ko'ra oladi"
+        help_text="Faqat premium obunachilar ko'ra oladi (Eski tizim)"
+    )
+    minimum_tier = models.CharField(
+        max_length=10, 
+        choices=TIER_CHOICES, 
+        default='basic',
+        help_text="Qaysi tarifdan boshlab ko'rish mumkin"
     )
     is_home_featured = models.BooleanField(
         default=False,
@@ -231,3 +258,14 @@ class WatchHistory(models.Model):
 
     class Meta:
         unique_together = ('user', 'movie')
+
+# =======================
+# ACTIVE SESSIONS (DEVICE LIMITS)
+# =======================
+class ActiveSession(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='active_sessions')
+    session_key = models.CharField(max_length=40, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.session_key}"

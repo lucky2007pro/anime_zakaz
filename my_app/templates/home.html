@@ -472,7 +472,9 @@
                   </div>
                   <div class="card-meta" style="justify-content:space-between; margin-top:6px;">
                        <span style="display:flex; align-items:center; gap:4px; font-size:0.8rem; color:var(--text-dim);"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</span>
-                       {% if anime.is_premium %}
+                       {% if anime.minimum_tier == 'vip' %}
+                       <span style="display:flex; align-items:center; gap:3px; font-size:0.8rem; color:#f43f5e; font-weight:800;"><i class='bx bxs-diamond'></i> VIP</span>
+                       {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
                        <span style="display:flex; align-items:center; gap:3px; font-size:0.8rem; color:#fbbf24; font-weight:800;"><i class='bx bxs-crown'></i> Premium</span>
                        {% else %}
                        <span style="font-size:0.8rem; color:#4ade80; font-weight:800;">Bepul</span>

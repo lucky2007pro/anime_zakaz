@@ -144,13 +144,20 @@ def movie_detail(request, id):
     is_favorited = FavoriteAnime.objects.filter(user=request.user, movie=movie).exists()
 
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
-    has_access = not movie.is_premium or vip_data.vip_active() or request.user.is_staff or request.user.is_admin_user
+    
+    # Old premium fallback + new tier logic
+    is_staff_or_admin = request.user.is_staff or request.user.is_admin_user
+    has_access = is_staff_or_admin or (not movie.is_premium and movie.minimum_tier == 'basic') or vip_data.has_access(movie.minimum_tier) or (movie.is_premium and vip_data.vip_active())
+
+    tier_labels = dict(Movie.TIER_CHOICES)
+    required_tier_label = tier_labels.get(movie.minimum_tier, movie.minimum_tier)
 
     return render(request, 'movie_detail.html', {
         'movie': movie,
         'episodes': episodes,
         'has_access': has_access,
-        'is_favorited': is_favorited
+        'is_favorited': is_favorited,
+        'required_tier_label': required_tier_label
     })
 
 

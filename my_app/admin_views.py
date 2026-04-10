@@ -122,7 +122,7 @@ def admin_movie_form(request, pk=None):
         vid_url = request.POST.get('video_url')
         tg_link = request.POST.get('telegram_link')
         is_home_featured = request.POST.get('is_home_featured') == 'on'
-        is_premium = request.POST.get('is_premium') == 'on'
+        minimum_tier = request.POST.get('minimum_tier', 'basic')
         release_year = request.POST.get('release_year', '').strip()
         try:
             home_featured_order = int(request.POST.get('home_featured_order', 0) or 0)
@@ -140,7 +140,11 @@ def admin_movie_form(request, pk=None):
         movie.telegram_link = tg_link
         movie.release_year = release_year
         movie.is_home_featured = is_home_featured
-        movie.is_premium = is_premium
+        movie.minimum_tier = minimum_tier
+        if minimum_tier in ['premium', 'vip']:
+            movie.is_premium = True
+        else:
+            movie.is_premium = False
         movie.home_featured_order = home_featured_order
         if cat_id:
             movie.category = Category.objects.get(id=cat_id)
@@ -300,13 +304,16 @@ def admin_subscription_action(request, pk, action):
         
         if receipt.plan == '1_month':
             vip_user.vip_expire = start_time + timedelta(days=30)
+            if vip_user.tier == 'basic':
+                vip_user.tier = 'premium'
         else:
             vip_user.vip_expire = start_time + timedelta(days=365)
+            vip_user.tier = 'vip'
         
         vip_user.is_vip = True
         vip_user.save()
         receipt.save()
-        messages.success(request, f"{receipt.user.username} obunasi tasdiqlandi!")
+        messages.success(request, f"{receipt.user.username} ga VIP vaqti qo'shildi! ({receipt.plan})")
         
     elif action == 'reject':
         receipt.is_approved = False

@@ -57,6 +57,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    # Custom Device Session Limits
+    'my_app.middleware.DeviceLimitMiddleware',
 ]
 
 ROOT_URLCONF = 'src.urls'
