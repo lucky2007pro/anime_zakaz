@@ -123,6 +123,7 @@ def admin_movie_form(request, pk=None):
         tg_link = request.POST.get('telegram_link')
         is_home_featured = request.POST.get('is_home_featured') == 'on'
         is_premium = request.POST.get('is_premium') == 'on'
+        release_year = request.POST.get('release_year', '').strip()
         try:
             home_featured_order = int(request.POST.get('home_featured_order', 0) or 0)
         except (TypeError, ValueError):
@@ -137,6 +138,7 @@ def admin_movie_form(request, pk=None):
         movie.description = desc
         movie.video_url = vid_url
         movie.telegram_link = tg_link
+        movie.release_year = release_year
         movie.is_home_featured = is_home_featured
         movie.is_premium = is_premium
         movie.home_featured_order = home_featured_order

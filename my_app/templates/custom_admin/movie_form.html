@@ -93,6 +93,11 @@
         </div>
 
         <div class="form-group">
+            <label for="movie-release-year">Chiqarilgan Yili (Masalan: 2026)</label>
+            <input id="movie-release-year" type="text" name="release_year" class="form-control" value="{{ movie.release_year|default:'' }}">
+        </div>
+
+        <div class="form-group">
             <label for="movie-description">Tavsifi (Ixtiyoriy)</label>
             <textarea id="movie-description" name="description" class="form-control" rows="4">{{ movie.description|default:'' }}</textarea>
         </div>

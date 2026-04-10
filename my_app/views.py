@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 from django.db.models import Max
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.db.models import F
 
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar
@@ -97,7 +98,10 @@ def home(request):
     categories = Category.objects.all()
 
     mp3_to_play = None
+    fav_ids = []
     if request.user.is_authenticated:
+        from .models import FavoriteAnime
+        fav_ids = list(FavoriteAnime.objects.filter(user=request.user).values_list('movie_id', flat=True))
         try:
             mp3_obj = MP3.objects.latest('created_at')
             mp3_file = mp3_obj.file.url
@@ -114,6 +118,7 @@ def home(request):
         'mp3_file': mp3_to_play,
         'total_users': User.objects.count(),
         'user_id': request.user.id if request.user.is_authenticated else None,
+        'fav_ids': fav_ids,
     }
 
     return render(request, 'home.html', context)
@@ -127,13 +132,74 @@ def movie_detail(request, id):
     movie = get_object_or_404(Movie, id=id)
     episodes = movie.episodes.all().order_by('episode_number')
     
+    # Increment views remotely safely
+    Movie.objects.filter(id=id).update(views_count=F('views_count') + 1)
+    movie.refresh_from_db()
+
+    # Add to watch history
+    from .models import WatchHistory, FavoriteAnime
+    WatchHistory.objects.update_or_create(user=request.user, movie=movie, defaults={'last_watched': timezone.now()})
+
+    # Check if favorited
+    is_favorited = FavoriteAnime.objects.filter(user=request.user, movie=movie).exists()
+
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     has_access = not movie.is_premium or vip_data.vip_active() or request.user.is_staff or request.user.is_admin_user
 
     return render(request, 'movie_detail.html', {
         'movie': movie,
         'episodes': episodes,
-        'has_access': has_access
+        'has_access': has_access,
+        'is_favorited': is_favorited
+    })
+
+
+# =======================
+# FAVORITE TOGGLE
+# =======================
+@login_required
+def toggle_favorite(request, movie_id):
+    from .models import FavoriteAnime
+    movie = get_object_or_404(Movie, id=movie_id)
+    fav, created = FavoriteAnime.objects.get_or_create(user=request.user, movie=movie)
+    if not created:
+        fav.delete()
+        is_favorited = False
+    else:
+        is_favorited = True
+    return JsonResponse({'is_favorited': is_favorited})
+
+
+# =======================
+# FAVORITES PAGE
+# =======================
+@login_required
+def favorites_page(request):
+    from .models import FavoriteAnime
+    favs = FavoriteAnime.objects.filter(user=request.user).select_related('movie').order_by('-created_at')
+    # Use Paginator if needed, but for now just pass list
+    movies = [f.movie for f in favs]
+    fav_ids = [m.id for m in movies]
+    return render(request, 'anime_catalog.html', {
+        'movies': movies,
+        'page_title': "Saqlangan Animelar",
+        'fav_ids': fav_ids,
+    })
+
+
+# =======================
+# WATCH HISTORY PAGE
+# =======================
+@login_required
+def watch_history_page(request):
+    from .models import WatchHistory, FavoriteAnime
+    hist = WatchHistory.objects.filter(user=request.user).select_related('movie').order_by('-last_watched')
+    movies = [h.movie for h in hist]
+    fav_ids = list(FavoriteAnime.objects.filter(user=request.user).values_list('movie_id', flat=True))
+    return render(request, 'anime_catalog.html', {
+        'movies': movies,
+        'page_title': "Ko'rishlar Tarixi",
+        'fav_ids': fav_ids,
     })
 
 
@@ -220,9 +286,15 @@ def search(request):
     else:
         movies = Movie.objects.all()
 
+    fav_ids = []
+    if request.user.is_authenticated:
+        from .models import FavoriteAnime
+        fav_ids = list(FavoriteAnime.objects.filter(user=request.user).values_list('movie_id', flat=True))
+
     return render(request, 'search.html', {
         'movies': movies,
         'query': query,
+        'fav_ids': fav_ids,
     })
 
 
@@ -234,9 +306,15 @@ def anime_catalog(request):
     paginator = Paginator(movies, 12)
     page_obj = paginator.get_page(request.GET.get('page'))
 
+    fav_ids = []
+    if request.user.is_authenticated:
+        from .models import FavoriteAnime
+        fav_ids = list(FavoriteAnime.objects.filter(user=request.user).values_list('movie_id', flat=True))
+
     return render(request, 'anime_catalog.html', {
         'page_obj': page_obj,
         'movies': page_obj.object_list,
+        'fav_ids': fav_ids,
     })
 
 

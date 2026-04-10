@@ -4,7 +4,7 @@ from .views import (
     register, login, home, movie_detail, check_username,
     profile, make_vip, search, anime_catalog,
     chat, chat_messages_api, edit_message, delete_message, ban_user,
-    logout_view, premium_page
+    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page
 )
 from .admin_views import *
 from django.conf import settings
@@ -17,6 +17,9 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('logout/', logout_view, name='logout'),
     path('movie/<int:id>/', movie_detail, name='movie_detail'),
+    path('toggle-favorite/<int:movie_id>/', toggle_favorite, name='toggle_favorite'),
+    path('favorites/', favorites_page, name='favorites_page'),
+    path('history/', watch_history_page, name='watch_history_page'),
     path('catalog/', anime_catalog, name='anime_catalog'),
     path('search/', search, name='search'),
     path('profile/', profile, name='profile'),

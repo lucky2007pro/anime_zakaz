@@ -131,6 +131,59 @@
     z-index: 10;
 }
 
+.top-badge-group {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+}
+
+.top-badge-episode {
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #FFC107;
+}
+
+.top-badge-year {
+    background: #eab308;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #000;
+}
+
+.fav-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 1.1rem;
+    z-index: 10;
+    transition: 0.3s;
+}
+.fav-badge:hover {
+    background: rgba(255,255,255,0.2);
+    color: #ff3366;
+}
+.fav-badge i.bxs-star {
+    color: #ff3366;
+}
+
 .card-info-bottom {
      display: flex;
      flex-direction: column;
@@ -206,26 +259,50 @@
         </form>
     </div>
 
-    <div class="cards-grid" id="movie-container">
+    <div class="cards-grid" id="mainGrid">
         {% for anime in movies %}
-        <a href="{% url 'movie_detail' anime.id %}" class="card-wrapper search-card" data-title="{{ anime.title|lower }}">
-            <div class="anime-card">
-                {% if anime.episodes.count > 0 %}
-                <div class="top-badge">{{ anime.episodes.count }} qism</div>
-                {% else %}
-                <div class="top-badge">Film</div>
-                {% endif %}
+        <div class="card-wrapper search-card" data-title="{{ anime.title|lower }}">
+            <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
+                <div class="top-badge-group">
+                    {% if anime.release_year %}
+                    <div class="top-badge-year">{{ anime.release_year }}</div>
+                    {% endif %}
+                    {% if anime.episodes.count > 0 %}
+                    <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
+                    {% else %}
+                    <div class="top-badge-episode">Film</div>
+                    {% endif %}
+                </div>
+
+                <div class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})">
+                    {% if anime.id in fav_ids %}
+                        <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
+                    {% else %}
+                        <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
+                    {% endif %}
+                </div>
+
                 <img src="{% if anime.image_url %}{{ anime.image_url }}{% elif anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
             </div>
 
-            <div class="card-info-bottom">
-                 <h4 class="card-title">{{ anime.title }}</h4>
-                 <div class="card-meta">
+            <div class="card-info-bottom" style="margin-top:8px;">
+                 <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                     <h4 class="card-title">{{ anime.title }}</h4>
+                 </a>
+                 <div class="card-meta" style="margin-top:4px;">
                       {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                      <span>{{ anime.created_at|date:"Y" }}</span>
+                      <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                 </div>
+                 <div class="card-meta" style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+                      <span style="display:flex; align-items:center; gap:4px; font-size:0.8rem; color:var(--text-dim);"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</span>
+                      {% if anime.is_premium %}
+                      <span style="display:flex; align-items:center; gap:3px; font-size:0.8rem; color:#fbbf24; font-weight:800;"><i class='bx bxs-crown'></i> Premium</span>
+                      {% else %}
+                      <span style="font-size:0.8rem; color:#4ade80; font-weight:800;">Bepul</span>
+                      {% endif %}
                  </div>
             </div>
-        </a>
+        </div>
         {% endfor %}
     </div>
 </main>
@@ -233,7 +310,7 @@
 <script>
 const searchInput = document.getElementById('search-input');
 const cards = document.querySelectorAll('.search-card');
-const container = document.getElementById('movie-container');
+const container = document.getElementById('mainGrid');
 
 searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase().trim();

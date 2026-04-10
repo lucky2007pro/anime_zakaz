@@ -242,6 +242,34 @@
         opacity: 1;
     }
 
+    .top-badge-group {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        display: flex;
+        gap: 4px;
+        z-index: 10;
+    }
+
+    .top-badge-episode {
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(5px);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #FFC107;
+    }
+
+    .top-badge-year {
+        background: #eab308;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #000;
+    }
+
     .top-badge {
         position: absolute;
         top: 8px;
@@ -256,6 +284,31 @@
         display: flex;
         align-items: center;
         gap: 2px;
+    }
+
+    .fav-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-size: 1.1rem;
+        z-index: 10;
+        transition: 0.3s;
+    }
+    .fav-badge:hover {
+        background: rgba(255,255,255,0.2);
+        color: #ff3366;
+    }
+    .fav-badge i.bxs-star {
+        color: #ff3366;
     }
 
 
@@ -329,9 +382,9 @@
         .btn-main { padding: 10px 16px; font-size: 0.85rem; }
         .slider-controls { bottom: 15px; }
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-        .anime-card { height: 180px; }
-        .card-title { font-size: 0.92rem; }
+        .anime-card { height: 140px; }
         .card-meta { font-size: 0.7rem; }
+        .top-badge-episode, .top-badge-year { font-size: 0.62rem; padding: 3px 6px; }
         .top-badge { font-size: 0.62rem; padding: 3px 6px; }
     }
 </style>
@@ -385,24 +438,48 @@
 
     <div class="cards-grid">
         {% for anime in movies %}
-        <a href="{% url 'movie_detail' anime.id %}" class="card-wrapper">
-            <div class="anime-card">
-                {% if anime.episodes.count > 0 %}
-                <div class="top-badge">{{ anime.episodes.count }} qism</div>
-                {% else %}
-                <div class="top-badge">Film</div>
-                {% endif %}
+        <div class="card-wrapper">
+            <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
+                <div class="top-badge-group">
+                    {% if anime.release_year %}
+                    <div class="top-badge-year">{{ anime.release_year }}</div>
+                    {% endif %}
+                    {% if anime.episodes.count > 0 %}
+                    <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
+                    {% else %}
+                    <div class="top-badge-episode">Film</div>
+                    {% endif %}
+                </div>
+
+                <div class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})">
+                    {% if anime.id in fav_ids %}
+                        <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
+                    {% else %}
+                        <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
+                    {% endif %}
+                </div>
+
                 <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
             </div>
 
-            <div class="card-info-bottom">
-                 <h4 class="card-title">{{ anime.title }}</h4>
-                  <div class="card-meta">
+            <div class="card-info-bottom" style="margin-top:8px;">
+                 <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                     <h4 class="card-title">{{ anime.title }}</h4>
+                 </a>
+                  <div class="card-meta" style="margin-top:4px;">
                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                       <span>{{ anime.created_at|date:"Y" }}</span>
+                       <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                  </div>
+                  <div class="card-meta" style="justify-content:space-between; margin-top:6px;">
+                       <span style="display:flex; align-items:center; gap:4px; font-size:0.8rem; color:var(--text-dim);"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</span>
+                       {% if anime.is_premium %}
+                       <span style="display:flex; align-items:center; gap:3px; font-size:0.8rem; color:#fbbf24; font-weight:800;"><i class='bx bxs-crown'></i> Premium</span>
+                       {% else %}
+                       <span style="font-size:0.8rem; color:#4ade80; font-weight:800;">Bepul</span>
+                       {% endif %}
                   </div>
             </div>
-        </a>
+        </div>
         {% empty %}
         <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">Hozircha animelar kiritilmadi.</div>
         {% endfor %}

@@ -482,9 +482,16 @@
     </div>
 
     <div class="menu-section">
-        <h4 class="menu-title">MENING PROFILIM</h4>
+        <h4 class="menu-title">MENING HISOBIM</h4>
+        <a href="{% url 'profile' %}" class="menu-item"><span class="icon-left" style="color:#00f3ff;"><i class='bx bx-user-circle'></i></span> Mening Hisobim <span class="value" style="color:var(--text-light); font-weight:800;">{% if request.user.vip_data and request.user.vip_data.vip_active %}VIP{% else %}Oddiy{% endif %}</span> <span class="arrow">›</span></a>
+        <a href="{% url 'premium_page' %}" class="menu-item"><span class="icon-left" style="color:#fbbf24;"><i class='bx bxs-crown'></i></span> Premium Obuna <span class="value" style="color:var(--text-light); font-weight:800;">{% if request.user.vip_data and request.user.vip_data.vip_active %}Faol{% else %}Yo'q{% endif %}</span> <span class="arrow">›</span></a>
+        <a href="{% url 'favorites_page' %}" class="menu-item"><span class="icon-left" style="color:#ff3366;"><i class='bx bxs-bookmark-star'></i></span> Saqlanganlar <span class="arrow">›</span></a>
+        <a href="{% url 'watch_history_page' %}" class="menu-item"><span class="icon-left" style="color:#a855f7;"><i class='bx bx-history'></i></span> Ko'rishlar tarixi <span class="arrow">›</span></a>
+    </div>
+
+    <div class="menu-section">
+        <h4 class="menu-title">ASOSIY</h4>
         <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span> Umumiy chat <span class="arrow">›</span></a>
-        <a href="{% url 'profile' %}" class="menu-item"><span class="icon-left"><i class='bx bx-user'></i></span> Profilni tahrirlash <span class="arrow">›</span></a>
         <a href="{% url 'anime_catalog' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span> Katalog <span class="arrow">›</span></a>
         <a href="{% url 'home' %}" class="menu-item"><span class="icon-left"><i class='bx bx-home-alt'></i></span> Bosh sahifa <span class="arrow">›</span></a>
     </div>
@@ -563,6 +570,35 @@
             btn.classList.toggle('active');
             document.body.style.overflow = overlay.classList.contains('open') ? 'hidden' : '';
         }
+    }
+
+    /* Favoritelarga qo'shish uchun umumiy funksiya */
+    function toggleFavorite(e, movieId) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        fetch(`/toggle-favorite/${movieId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if(!response.ok) throw new Error("Avval tizimga kiring!");
+            return response.json();
+        })
+        .then(data => {
+            const icon = document.getElementById(`fav-icon-${movieId}`);
+            if (data.is_favorited) {
+                icon.className = "bx bxs-star";
+            } else {
+                icon.className = "bx bx-star";
+            }
+        })
+        .catch(err => {
+            alert(err.message);
+        });
     }
 </script>
 

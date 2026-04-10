@@ -63,6 +63,9 @@ class Movie(models.Model):
         help_text="Kichik raqam avval ko'rsatiladi"
     )
 
+    views_count = models.PositiveIntegerField(default=0, help_text="Umumiy ko'rishlar soni")
+    release_year = models.CharField(max_length=20, blank=True, null=True, help_text="Chiqarilgan yili, masalan: 2026")
+
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -196,19 +199,35 @@ class ProfileAvatar(models.Model):
 
 
 # =======================
-# SUBSCRIPTION RECEIPT
+# SUBSCRIPTION RECEIPTS
 # =======================
 class SubscriptionReceipt(models.Model):
-    PLAN_CHOICES = [
-        ('1_month', '1 Oylik'),
-        ('1_year', '1 Yillik'),
-    ]
-    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='receipts')
-    plan = models.CharField(max_length=20, choices=PLAN_CHOICES)
-    image = models.ImageField(upload_to='receipts/')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='receipts')
+    plan = models.CharField(max_length=50) # masalan: '1_month', '1_year'
+    image = models.ImageField(upload_to='receipts/%Y/%m/')
     is_approved = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     def __str__(self):
-        return f"{self.user.username} - {self.get_plan_display()}"
+        return f"{self.user.username} - {self.plan} ({'Tasdiqlangan' if self.is_approved else 'Rad etish' if self.is_rejected else 'Kutilmoqda'})"
+
+
+# =======================
+# FAVORITE & HISTORY
+# =======================
+class FavoriteAnime(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='favorites')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='favorited_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'movie')
+
+class WatchHistory(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='watch_history')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='watched_by')
+    last_watched = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'movie')
