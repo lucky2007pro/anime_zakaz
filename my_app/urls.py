@@ -18,6 +18,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('movie/<int:id>/', movie_detail, name='movie_detail'),
     path('catalog/', anime_catalog, name='anime_catalog'),
+    path('search/', search, name='search'),
     path('premium/', premium_page, name='premium_page'),
 
     path('chat/', chat, name='chat'),
