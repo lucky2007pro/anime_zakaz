@@ -552,7 +552,7 @@
     </div>
 </div>
 
-<!-- PROFESSIONAL FOOTER -->
+{% block footer %}
 <footer style="background: rgba(10,10,15,0.95); border-top: 1px solid rgba(255,255,255,0.05); padding: 60px 5% 30px; margin-top: 60px; color: var(--text-dim); font-size: 0.9rem;">
     <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-bottom: 40px;">
         <div>
@@ -589,6 +589,7 @@
         <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700;">ANI BEST JAMOASI TOMONIDAN YARATILGAN</p>
     </div>
 </footer>
+{% endblock footer %}
 
 {% if request.session.mp3_played == False and mp3_file and request.user.is_authenticated %}
 <audio preload="auto" autoplay>
