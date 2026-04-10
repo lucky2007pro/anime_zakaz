@@ -44,6 +44,10 @@
             <a href="/control-panel/genres/add/" class="btn">+ Qo'shish</a>
             {% elif type == 'user' %}
             <button class="btn" style="opacity:0.6; pointer-events:none;" title="Vakolatlar ro'yxatdan boshqariladi">+ Qo'shish</button>
+            {% elif type == 'receipt' %}
+            <button class="btn" style="opacity:0.6; pointer-events:none;" title="Fayllar foydalanuvchilar tomonidan yuklanadi">+ Qo'shish</button>
+            {% elif type == 'avatar' %}
+            <a href="{% url 'admin_avatar_form' %}" class="btn">+ Qo'shish</a>
             {% else %}
             <button class="btn" style="opacity:0.5; pointer-events:none;" title="Keyingi updatelarda qo'shiladi">+ Qo'shish</button>
             {% endif %}
@@ -64,6 +68,10 @@
                 <th>Foydalanuvchi</th><th>Xabar</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'user' %}
                 <th>Username</th><th>Email</th><th>Vakolat</th><th>Holat</th><th>Harakatlar</th>
+                {% elif type == 'receipt' %}
+                <th>Foydalanuvchi</th><th>Obuna reja</th><th>Chek rasmi</th><th>Holat</th><th>Harakatlar</th>
+                {% elif type == 'avatar' %}
+                <th>Nomi</th><th>Rasm</th><th>Sana</th><th>Harakatlar</th>
                 {% endif %}
             </tr>
         </thead>
@@ -109,6 +117,19 @@
                         <span style="color:#f87171; font-weight:700;">Nofaol</span>
                     {% endif %}
                 </td>
+                {% elif type == 'receipt' %}
+                <td style="font-weight:600;">{{ item.user.username }}</td>
+                <td>{{ item.get_plan_display }}</td>
+                <td><a href="{{ item.image.url }}" target="_blank" style="color:var(--accent);">Ko'rish</a></td>
+                <td>
+                    {% if item.is_approved %}<span style="color:#34d399; font-weight:700;">Tasdiqlangan</span>
+                    {% elif item.is_rejected %}<span style="color:#f87171; font-weight:700;">Rad etilgan</span>
+                    {% else %}<span style="color:yellow; font-weight:700;">Kutmoqda</span>{% endif %}
+                </td>
+                {% elif type == 'avatar' %}
+                <td style="font-weight:600;">{{ item.name|default:"Avatar" }}</td>
+                <td><img src="{{ item.image.url }}" alt="avatar" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"></td>
+                <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
                 {% endif %}
                 
                 <td>
@@ -143,11 +164,18 @@
                     {% elif type == 'chat' %}
                     <a href="{% url 'admin_message_edit' item.id %}" class="action-btn">Tahrirlash</a>
                     <a href="{% url 'admin_message_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                    {% elif type == 'receipt' %}
+                        {% if not item.is_approved and not item.is_rejected %}
+                        <a href="{% url 'admin_subscription_action' item.id 'approve' %}" class="action-btn" style="background:#34d399; color:black; border:none; margin-right:5px;">Tasdiqlash</a>
+                        <a href="{% url 'admin_subscription_action' item.id 'reject' %}" class="action-btn delete">Rad etish</a>
+                        {% endif %}
+                    {% elif type == 'avatar' %}
+                        <a href="{% url 'admin_avatar_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
                     {% endif %}
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="{% if type == 'movie' %}4{% elif type == 'genre' %}3{% elif type == 'episode' %}4{% elif type == 'chat' %}4{% elif type == 'user' %}5{% else %}4{% endif %}" style="text-align:center; padding:30px; color:gray;">Hech narsa topilmadi!</td></tr>
+            <tr><td colspan="{% if type == 'movie' %}4{% elif type == 'genre' %}3{% elif type == 'episode' %}4{% elif type == 'chat' %}4{% elif type == 'user' %}5{% elif type == 'receipt' %}5{% elif type == 'avatar' %}4{% else %}4{% endif %}" style="text-align:center; padding:30px; color:gray;">Hech narsa topilmadi!</td></tr>
             {% endfor %}
         </tbody>
     </table>

@@ -99,8 +99,12 @@
     <div class="profile-container">
         <h1 class="profile-title">Foydalanuvchi Profili</h1>
         
-        <div class="user-av" style="width: 100px; height: 100px; border-radius: 50%; background: var(--accent); margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 900;">
-            {{ user.username|make_list|first|upper }}
+        <div class="user-av" style="width: 100px; height: 100px; border-radius: 50%; background: var(--accent); margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 900; overflow: hidden;">
+            {% if user.avatar %}
+                <img src="{{ user.avatar.image.url }}" alt="avatar" style="width:100%; height:100%; object-fit:cover;">
+            {% else %}
+                {{ user.username|make_list|first|upper }}
+            {% endif %}
         </div>
 
         <div class="profile-info">
@@ -115,7 +119,7 @@
                 <strong>Status:</strong>
                 {% if vip_active %}
                     <span class="vip">
-                        <i class='bx bx-crown'></i> VIP
+                        <i class='bx bx-crown'></i> Premium
                     </span>
                 {% else %}
                     <span class="normal">
@@ -123,6 +127,25 @@
                     </span>
                 {% endif %}
             </p>
+        </div>
+
+        <!-- YANi: Avatar tanlash qismi -->
+        <div class="profile-info">
+            <h3 style="margin-bottom:15px; color:var(--accent);">Profil rasmini tanlash</h3>
+            <form method="POST" action="{% url 'profile' %}" style="display: flex; flex-direction:column; gap:15px; align-items:center;">
+                {% csrf_token %}
+                <div style="display:flex; flex-wrap:wrap; gap:15px; justify-content:center;">
+                    {% for av in avatars %}
+                        <label style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:5px;">
+                            <input type="radio" name="avatar_id" value="{{ av.id }}" {% if user.avatar and user.avatar.id == av.id %}checked{% endif %}>
+                            <img src="{{ av.image.url }}" alt="avatar" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid {% if user.avatar and user.avatar.id == av.id %}var(--accent){% else %}transparent{% endif %};">
+                        </label>
+                    {% empty %}
+                        <p style="color:var(--text-dim);">Hozircha admin profillar rasmini yuklamagan.</p>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn-main" style="padding:10px 20px; border-radius:8px; background:var(--accent); color:white; border:none; font-weight:bold; cursor:pointer;">Saqlash</button>
+            </form>
         </div>
 
         <div class="site-info">

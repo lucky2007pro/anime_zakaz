@@ -21,6 +21,7 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=15, blank=True, null=True)
     is_banned = models.BooleanField(default=False)
     is_admin_user = models.BooleanField(default=False)  # Admin panelga kirish
+    avatar = models.ForeignKey('ProfileAvatar', on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
 
     def __str__(self):
         return self.username if self.username else f"User-{self.id}"
@@ -49,6 +50,10 @@ class Movie(models.Model):
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='movies/')
     description = models.TextField(blank=True, null=True)
+    is_premium = models.BooleanField(
+        default=False, 
+        help_text="Faqat premium obunachilar ko'ra oladi"
+    )
     is_home_featured = models.BooleanField(
         default=False,
         help_text="Bosh sahifa hero fonida ko'rsatish uchun belgilang"
@@ -176,3 +181,34 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.message[:20]}"
+
+
+# =======================
+# PROFILE AVATAR
+# =======================
+class ProfileAvatar(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
+    image = models.ImageField(upload_to='avatars/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Avatar {self.id}"
+
+
+# =======================
+# SUBSCRIPTION RECEIPT
+# =======================
+class SubscriptionReceipt(models.Model):
+    PLAN_CHOICES = [
+        ('1_month', '1 Oylik'),
+        ('1_year', '1 Yillik'),
+    ]
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='receipts')
+    plan = models.CharField(max_length=20, choices=PLAN_CHOICES)
+    image = models.ImageField(upload_to='receipts/')
+    is_approved = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_plan_display()}"

@@ -1,0 +1,49 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}Yangi Avatar Qo'shish{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container { max-width: 500px; margin: 0 auto; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--text-dim); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+    .form-control {
+        width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-line);
+        color: white; border-radius: 4px; font-family: 'Outfit', sans-serif; font-size: 1rem; transition: 0.3s;
+    }
+    .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+
+    .btn-submit {
+        background: var(--accent); color: white; border: none; padding: 14px 20px; border-radius: 4px;
+        width: 100%; font-weight: 900; font-size: 1rem; cursor: pointer; transition: 0.3s;
+        text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .btn-submit:hover { background: white; color: black; box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+    @media (max-width: 768px) {
+        .form-container { max-width: 100%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel form-container">
+    <h2 style="margin-bottom: 25px; font-size: 1.8rem; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--border-line); padding-bottom: 10px;">
+        Yangi Avatar Qo'shish
+    </h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="avatar-name">Nomi (Ixtiyoriy)</label>
+            <input id="avatar-name" type="text" name="name" class="form-control" placeholder="Avatar uchun nom...">
+        </div>
+        <div class="form-group">
+            <label for="avatar-image">Rasm Fayli</label>
+            <input id="avatar-image" type="file" name="image" class="form-control" accept="image/*" required>
+        </div>
+
+        <button type="submit" class="btn-submit">SAQLASH <i class='bx bx-save'></i></button>
+    </form>
+</div>
+{% endblock %}

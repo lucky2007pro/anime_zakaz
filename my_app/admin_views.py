@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
-from .models import CustomUser, Movie, MovieEpisode, Category, ChatMessage
+from .models import CustomUser, Movie, MovieEpisode, Category, ChatMessage, SubscriptionReceipt, ProfileAvatar, VipUser
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
@@ -23,9 +23,11 @@ def admin_dashboard(request):
         'total_episodes': MovieEpisode.objects.count(),
         'total_genres': Category.objects.count(),
         'total_users': CustomUser.objects.count(),
+        'total_receipts': SubscriptionReceipt.objects.filter(is_approved=False, is_rejected=False).count(),
         'latest_animes': Movie.objects.all().order_by('-created_at')[:5],
         'latest_users': CustomUser.objects.all().order_by('-date_joined')[:5],
         'latest_messages': ChatMessage.objects.all().order_by('-created_at')[:10],
+        'latest_topics': SubscriptionReceipt.objects.all().order_by('-created_at')[:5], # latest_receipts o'rniga latest_topics dan foydalansak
     }
     return render(request, 'custom_admin/dashboard.html', context)
 
@@ -264,3 +266,79 @@ def admin_message_delete(request, pk):
     msg.delete()
     messages.success(request, "Xabar o'chirildi!")
     return redirect('admin_chat')
+
+
+@user_passes_test(is_super_admin, login_url='/')
+def admin_subscriptions(request):
+    receipts = SubscriptionReceipt.objects.all().order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Obuna So\'rovlari',
+        'items': receipts,
+        'type': 'receipt',
+    })
+
+
+@user_passes_test(is_super_admin, login_url='/')
+def admin_subscription_action(request, pk, action):
+    from datetime import timedelta
+    from django.utils import timezone
+    receipt = get_object_or_404(SubscriptionReceipt, pk=pk)
+    if action == 'approve':
+        receipt.is_approved = True
+        receipt.is_rejected = False
+        
+        vip_user, created = VipUser.objects.get_or_create(user=receipt.user)
+        if not vip_user.is_vip or not vip_user.vip_expire:
+            vip_user.vip_expire = timezone.now()
+        
+        # current time is less than expire then add to it, else add to now
+        start_time = max(timezone.now(), vip_user.vip_expire) if vip_user.is_vip else timezone.now()
+        
+        if receipt.plan == '1_month':
+            vip_user.vip_expire = start_time + timedelta(days=30)
+        else:
+            vip_user.vip_expire = start_time + timedelta(days=365)
+        
+        vip_user.is_vip = True
+        vip_user.save()
+        receipt.save()
+        messages.success(request, f"{receipt.user.username} obunasi tasdiqlandi!")
+        
+    elif action == 'reject':
+        receipt.is_approved = False
+        receipt.is_rejected = True
+        receipt.save()
+        messages.error(request, f"{receipt.user.username} obunasi rad etildi!")
+        
+    return redirect('admin_subscriptions')
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_avatars(request):
+    avatars = ProfileAvatar.objects.all().order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Profil Rasmlari (Avatarlar)',
+        'items': avatars,
+        'type': 'avatar',
+    })
+
+@user_passes_test(is_admin, login_url='/')
+def admin_avatar_form(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        image = request.FILES.get('image')
+        if image:
+            ProfileAvatar.objects.create(name=name, image=image)
+            messages.success(request, "Avatar muvaffaqiyatli saqlandi!")
+        else:
+            messages.error(request, "Rasm kiritilmadi!")
+        return redirect('admin_avatars')
+
+    return render(request, 'custom_admin/avatar_form.html')
+
+@user_passes_test(is_admin, login_url='/')
+def admin_avatar_delete(request, pk):
+    avatar = get_object_or_404(ProfileAvatar, pk=pk)
+    avatar.delete()
+    messages.success(request, "Avatar o'chirildi!")
+    return redirect('admin_avatars')

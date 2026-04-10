@@ -1,6 +1,11 @@
 # urls.py
 from django.urls import path
-from .views import *
+from .views import (
+    register, login, home, movie_detail, check_username,
+    profile, make_vip, search, anime_catalog,
+    chat, chat_messages_api, edit_message, delete_message, ban_user,
+    logout_view, premium_page
+)
 from .admin_views import *
 from django.conf import settings
 from django.conf.urls.static import static
@@ -13,11 +18,10 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('movie/<int:id>/', movie_detail, name='movie_detail'),
     path('catalog/', anime_catalog, name='anime_catalog'),
-    path('search/', search, name='search'),
-    path('profile/', profile, name='profile'),
-    path('check-username/', check_username, name='check_username'),
+    path('premium/', premium_page, name='premium_page'),
 
     path('chat/', chat, name='chat'),
+    path('chat/messages/', chat_messages_api, name='chat_messages_api'),
     path('ban_user/<int:user_id>/', ban_user, name='ban_user'),
     path('edit_message/<int:message_id>/', edit_message, name='edit_message'),
     path('delete_message/<int:message_id>/', delete_message, name='delete_message'),
@@ -42,8 +46,13 @@ urlpatterns = [
     path('control-panel/chat/', admin_chat, name='admin_chat'),
     path('control-panel/chat/edit/<int:pk>/', admin_message_edit, name='admin_message_edit'),
     path('control-panel/chat/delete/<int:pk>/', admin_message_delete, name='admin_message_delete'),
+    
+    path('control-panel/subscriptions/', admin_subscriptions, name='admin_subscriptions'),
+    path('control-panel/subscriptions/<int:pk>/<str:action>/', admin_subscription_action, name='admin_subscription_action'),
+    path('control-panel/avatars/', admin_avatars, name='admin_avatars'),
+    path('control-panel/avatars/add/', admin_avatar_form, name='admin_avatar_form'),
+    path('control-panel/avatars/<int:pk>/delete/', admin_avatar_delete, name='admin_avatar_delete'),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

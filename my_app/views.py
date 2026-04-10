@@ -12,8 +12,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 
 from .models import (
-    CustomUser, Category, Movie, MovieEpisode,
-    SiteSettings, MP3, ChatMessage, VipUser
+    CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar
 )
 
 User = get_user_model()
@@ -127,10 +126,14 @@ def home(request):
 def movie_detail(request, id):
     movie = get_object_or_404(Movie, id=id)
     episodes = movie.episodes.all().order_by('episode_number')
+    
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    has_access = not movie.is_premium or vip_data.vip_active() or request.user.is_staff or request.user.is_admin_user
 
     return render(request, 'movie_detail.html', {
         'movie': movie,
-        'episodes': episodes
+        'episodes': episodes,
+        'has_access': has_access
     })
 
 
@@ -146,27 +149,30 @@ def check_username(request):
 # =======================
 # PROFILE
 # =======================
-@login_required
+@login_required(login_url='login')
 def profile(request):
-    user = request.user
-    uz_time = ZoneInfo('Asia/Tashkent')
-    date_joined_uz = localtime(user.date_joined, uz_time).strftime("%d-%m-%Y %H:%M:%S")
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    avatars = ProfileAvatar.objects.all().order_by('-created_at')
 
-    try:
-        total_users = CustomUser.objects.latest('id').id
-    except CustomUser.DoesNotExist:
-        total_users = 0
+    if request.method == 'POST':
+        avatar_id = request.POST.get('avatar_id')
+        if avatar_id:
+            try:
+                selected_avatar = ProfileAvatar.objects.get(id=avatar_id)
+                user = request.user
+                user.avatar = selected_avatar
+                user.save()
+                messages.success(request, "Profil rasmingiz yangilandi!")
+            except ProfileAvatar.DoesNotExist:
+                messages.error(request, "Maxsus profil rasmi topilmadi.")
+        return redirect('profile')
 
-    # ✅ VIP tekshiruv
-    vip = getattr(user, 'vip_data', None)
-    vip_active = vip.vip_active() if vip else False
-
-    return render(request, 'profile.html', {
-        'user': user,
-        'date_joined_uz': date_joined_uz,
-        'total_users': total_users,
-        'vip_active': vip_active
-    })
+    context = {
+        'total_users': CustomUser.objects.count(),
+        'vip_active': vip_data.vip_active(),
+        'avatars': avatars,
+    }
+    return render(request, 'profile.html', context)
 
 
 # =======================
@@ -223,7 +229,14 @@ def anime_catalog(request):
 @login_required
 def chat(request):
     tz = ZoneInfo('Asia/Tashkent')
-    messages_list = ChatMessage.objects.select_related('user', 'reply_to').order_by('created_at')
+    messages_list = ChatMessage.objects.select_related('user', 'user__avatar', 'user__vip_data', 'reply_to').order_by('-created_at')[:40:-1]
+    
+    # fetch all messages up to limit
+    messages_count = ChatMessage.objects.count()
+    has_more = messages_count > 40
+    
+    messages_list = ChatMessage.objects.select_related('user', 'reply_to', 'user__avatar', 'user__vip_data').order_by('-created_at')[:40]
+    messages_list = reversed(messages_list)
 
     for msg in messages_list:
         msg.local_created_at = localtime(msg.created_at, tz)
@@ -254,7 +267,60 @@ def chat(request):
 
         return redirect('chat')
 
-    return render(request, 'chat.html', {'messages': messages_list})
+    return render(request, 'chat.html', {
+        'messages': messages_list,
+        'has_more': has_more
+    })
+
+
+# =======================
+# CHAT API (Load older messages)
+# =======================
+@login_required
+def chat_messages_api(request):
+    tz = ZoneInfo('Asia/Tashkent')
+    before_id = request.GET.get('before')
+    try:
+        limit = int(request.GET.get('limit', 20))
+    except ValueError:
+        limit = 20
+
+    qs = ChatMessage.objects.select_related('user', 'user__avatar', 'user__vip_data', 'reply_to').order_by('-created_at')
+    if before_id and before_id.isdigit():
+        qs = qs.filter(id__lt=before_id)
+
+    messages_list = list(qs[:limit])
+    messages_list.reverse()
+
+    data = []
+    for msg in messages_list:
+        reply_data = None
+        if msg.reply_to:
+            reply_data = {
+                'id': msg.reply_to.id,
+                'username': msg.reply_to.user.username,
+                'message': msg.reply_to.message
+            }
+            
+        avatar_url = msg.user.avatar.image.url if getattr(msg.user, 'avatar', None) and msg.user.avatar.image else None
+            
+        data.append({
+            'id': msg.id,
+            'message': msg.message,
+            'username': msg.user.username,
+            'avatar_url': avatar_url,
+            'time': localtime(msg.created_at, tz).strftime('%H:%M'),
+            'edited': msg.edited,
+            'is_own': msg.user == request.user,
+            'is_admin': msg.user.is_admin_user,
+            'is_vip': hasattr(msg.user, 'vip_data') and msg.user.vip_data.vip_active(),
+            'reply_to': reply_data,
+            'can_edit': (msg.user == request.user) or request.user.is_admin_user,
+            'can_ban': request.user.is_admin_user and not msg.user.is_admin_user,
+            'user_id': msg.user.id
+        })
+
+    return JsonResponse({'messages': data})
 
 
 # =======================
@@ -308,3 +374,30 @@ def ban_user(request, user_id):
         user_to_ban.save()
 
     return redirect('chat')
+
+
+# =======================
+# PREMIUM PAGE
+# =======================
+@login_required(login_url='login')
+def premium_page(request):
+    if request.method == 'POST':
+        plan = request.POST.get('plan')
+        receipt_image = request.FILES.get('receipt_image')
+        if not plan or not receipt_image:
+            messages.error(request, "Iltimos, obuna turini va to'lov chekini yuklang.")
+        else:
+            # Tekshiramiz, ayni shu userda kutilayotgan so'rov bormi?
+            if SubscriptionReceipt.objects.filter(user=request.user, is_approved=False, is_rejected=False).exists():
+                messages.warning(request, "Sizda allaqachon ko'rib chiqilayotgan so'rov bor. Iltimos kuting.")
+            else:
+                SubscriptionReceipt.objects.create(
+                    user=request.user,
+                    plan=plan,
+                    image=receipt_image
+                )
+                messages.success(request, "So'rovingiz yuborildi! Admin tez orada tasdiqlaydi.")
+        return redirect('premium_page')
+
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    return render(request, 'premium.html', {'vip_data': vip_data})

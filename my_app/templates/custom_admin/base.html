@@ -167,8 +167,10 @@
         <h4 class="menu-title">KONTENT</h4>
         <ul class="menu-list">
             <li><a href="{% url 'admin_genres' %}" class="{% if request.resolver_match.url_name == 'admin_genres' %}active{% endif %}"><i class='bx bxs-category'></i> Janrlar</a></li>
+            <li><a href="{% url 'admin_avatars' %}" class="{% if request.resolver_match.url_name == 'admin_avatars' or request.resolver_match.url_name == 'admin_avatar_form' %}active{% endif %}"><i class='bx bxs-user-rectangle'></i> Rasmlar</a></li>
             <li><a href="{% url 'admin_movies' %}" class="{% if request.resolver_match.url_name == 'admin_movies' or request.resolver_match.url_name == 'admin_movie_form' %}active{% endif %}"><i class='bx bx-movie-play'></i> Animelar</a></li>
             <li><a href="{% url 'admin_episodes' %}" class="{% if request.resolver_match.url_name == 'admin_episodes' or request.resolver_match.url_name == 'admin_episode_form' %}active{% endif %}"><i class='bx bx-list-ol'></i> Qismlar</a></li>
+            <li><a href="{% url 'admin_subscriptions' %}" class="{% if request.resolver_match.url_name == 'admin_subscriptions' %}active{% endif %}"><i class='bx bx-credit-card-front'></i> Obunalar</a></li>
             <li><a href="{% url 'admin_chat' %}" class="{% if request.resolver_match.url_name == 'admin_chat' %}active{% endif %}"><i class='bx bx-message-dots'></i> Chat</a></li>
         </ul>
 

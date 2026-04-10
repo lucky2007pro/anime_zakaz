@@ -796,8 +796,12 @@ main.main-content {
                  {% if msg.user == request.user %}data-own="true"{% endif %}>
 
                 <!-- Avatar -->
-                <div class="msg-avatar" title="{{ msg.user.username }}">
-                    {{ msg.user.username|first }}
+                <div class="msg-avatar" title="{{ msg.user.username }}" style="overflow:hidden; {% if msg.user.avatar %}background:none;{% endif %}">
+                    {% if msg.user.avatar %}
+                        <img src="{{ msg.user.avatar.image.url }}" alt="{{ msg.user.username }}" style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                        {{ msg.user.username|make_list|first|upper }}
+                    {% endif %}
                 </div>
 
                 <!-- Bubble -->
@@ -827,7 +831,10 @@ main.main-content {
                     <div class="message-username">
                         {{ msg.user.username }}
                         {% if msg.user.is_admin_user %}
-                            <i class='bx bx-crown' title="Admin" style="color:#ffc107;font-size:0.8rem;"></i>
+                            <i class='bx bx-shield' title="Admin" style="color:#ffc107;font-size:0.8rem; margin-left:4px;"></i>
+                        {% endif %}
+                        {% if msg.user.vip_data.vip_active %}
+                            <i class='bx bx-crown' title="Premium" style="color:var(--accent);font-size:0.8rem; margin-left:4px;"></i>
                         {% endif %}
                     </div>
 
@@ -1367,8 +1374,9 @@ function buildMessageEl(msg) {
     if (msg.is_own) wrapper.setAttribute("data-own", "true");
 
     const crownHtml   = msg.is_admin
-        ? `<i class='bx bx-crown' title="Admin" style="color:#ffc107;font-size:0.8rem;"></i>`
-        : "";
+        ? `<i class='bx bx-shield' title="Admin" style="color:#ffc107;font-size:0.8rem; margin-left:4px;"></i>` : "";
+    const vipHtml     = msg.is_vip
+        ? `<i class='bx bx-crown' title="Premium" style="color:var(--accent);font-size:0.8rem; margin-left:4px;"></i>` : "";
     const editedHtml  = msg.edited
         ? `<span class="edited-badge">(tahrirlangan)</span>` : "";
     const replyHtml   = msg.reply_to
@@ -1381,12 +1389,14 @@ function buildMessageEl(msg) {
     const avatarLetter = (msg.username || "?")[0].toUpperCase();
 
     wrapper.innerHTML = `
-      <div class="msg-avatar" title="${escHtml(msg.username)}">${avatarLetter}</div>
+      <div class="msg-avatar" title="${escHtml(msg.username)}" style="overflow:hidden; ${msg.avatar_url ? 'background:none;' : ''}">
+        ${msg.avatar_url ? `<img src="${msg.avatar_url}" style="width:100%; height:100%; object-fit:cover;">` : avatarLetter}
+      </div>
       <div class="message">
         <div class="msg-actions">
-          <i class='bx bx-reply' title="Javob" onclick="replyMessage(${msg.id},'${escHtml(msg.username)}','${escHtml(msg.message)}')"></i>
+          <i class='bx bx-reply' title="Javob b" onclick="replyMessage(${msg.id},'${escHtml(msg.username)}','${escHtml(msg.message)}')"></i>
         </div>
-        <div class="message-username">${escHtml(msg.username)} ${crownHtml}</div>
+        <div class="message-username">${escHtml(msg.username)} ${crownHtml} ${vipHtml}</div>
         ${replyHtml}
         <div class="message-body" id="text-${msg.id}">${escHtml(msg.message)}</div>
         <div class="message-meta">${editedHtml}<span class="message-time">${escHtml(msg.time)}</span></div>

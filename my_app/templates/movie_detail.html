@@ -441,6 +441,14 @@
                 </div>
 
                 <div class="video-section">
+                    {% if not has_access %}
+                    <div style="padding: 40px 20px; text-align: center; color: white;">
+                        <i class='bx bx-lock-alt' style="font-size: 4rem; color: #ffc107; margin-bottom: 15px;"></i>
+                        <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 10px;">PREMIUM KONTEKT</h3>
+                        <p style="color: var(--text-dim); margin-bottom: 20px;">Ushbu animeni ko'rish uchun sizda Premium obuna bo'lishi kerak.</p>
+                        <a href="{% url 'premium_page' %}" class="btn-back" style="background: var(--accent); color: white; border-color: var(--accent);">Obuna bo'lish</a>
+                    </div>
+                    {% else %}
                     {% with first_episode=movie.episodes.first %}
                         <div class="video-container" id="video-container">
                             <div class="player-shell">
@@ -503,6 +511,7 @@
                             </div>
                         </div>
                     {% endwith %}
+                    {% endif %}
 
                     {% if movie.telegram_link %}
                     <div class="telegram-download-wrapper">

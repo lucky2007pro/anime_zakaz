@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Movie, MovieEpisode, SiteSettings, MP3, ChatMessage, Category
+from .models import (
+    Category, CustomUser, VipUser, Movie, MovieEpisode, 
+    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt
+)
 
 
 class CustomUserAdmin(UserAdmin):
@@ -69,4 +72,6 @@ admin.site.register(SiteSettings, SiteSettingsAdmin)
 admin.site.register(MP3, MP3Admin)
 admin.site.register(ChatMessage, ChatMessageAdmin)
 admin.site.register(Category)
+admin.site.register(ProfileAvatar)
+admin.site.register(SubscriptionReceipt)
 # admin.site.register(VipUserTanlash, VipUserTanlashAdmin)

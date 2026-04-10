@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Premium Obuna | BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+.premium-container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: var(--bg-surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.premium-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--accent);
+    margin-bottom: 10px;
+}
+
+.premium-desc {
+    color: var(--text-dim);
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+.plan-cards {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.plan-card {
+    flex: 1;
+    background: var(--glass-bg);
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.plan-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-5px);
+}
+
+.plan-card.selected {
+    border-color: var(--accent);
+    background: rgba(255, 51, 102, 0.1);
+}
+
+.plan-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.plan-price {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent);
+}
+
+.upload-section {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.upload-section label {
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.upload-section input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px dashed var(--glass-border);
+    border-radius: 8px;
+    color: white;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #ff3366, #ff8a00);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 51, 102, 0.4);
+}
+
+.status-box {
+    margin-bottom: 30px;
+    padding: 20px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.status-active {
+    background: rgba(0, 255, 100, 0.1);
+    color: #00ff64;
+    border: 1px solid rgba(0, 255, 100, 0.3);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <div class="premium-container">
+        <h1 class="premium-title">👑 Premium Obuna</h1>
+        <p class="premium-desc">Eng sarasi faqat siz uchun! Yopiq animelar, maxsus znachoklar va eksklyuziv profil!</p>
+
+        {% if vip_data.vip_active %}
+            <div class="status-box status-active">
+                Sizning status: ayni paytda PREMIUM <br>
+                <span style="font-size:0.9rem; font-weight:normal; color:var(--text-light);">Yaroqlilik muddati: {{ vip_data.vip_expire|date:"d M Y, H:i" }} gacha</span>
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="plan-cards">
+                <!-- 1 oylik -->
+                <label class="plan-card" id="card_1_month">
+                    <input type="radio" name="plan" value="1_month" style="display:none;" required onclick="selectPlan('card_1_month')">
+                    <div class="plan-title">1 OY</div>
+                    <div class="plan-price">10 000 UZS</div>
+                </label>
+
+                <!-- 1 yillik -->
+                <label class="plan-card" id="card_1_year">
+                    <input type="radio" name="plan" value="1_year" style="display:none;" required onclick="selectPlan('card_1_year')">
+                    <div class="plan-title">1 YIL</div>
+                    <div class="plan-price">100 000 UZS</div>
+                </label>
+            </div>
+
+            <div class="upload-section">
+                <label for="receipt_image">Karta yoki hamyonga to'lov qilinganligini tasdiqlovchi chek (rasm):</label>
+                <div style="font-size:0.9rem; color:#aaa; margin-bottom:15px; border-left:3px solid var(--accent); padding-left:10px;">
+                    To'lov uchun karta raqami: <strong>8600 1234 5678 9012</strong> (Shu kartaga to'lov qilib, chekni yuklang)
+                </div>
+                <input type="file" name="receipt_image" id="receipt_image" accept="image/*" required>
+            </div>
+
+            <button type="submit" class="submit-btn">CHEKNI YUBORISH</button>
+        </form>
+    </div>
+</main>
+
+<script>
+    function selectPlan(cardId) {
+        document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById(cardId).classList.add('selected');
+    }
+</script>
+{% endblock %}
