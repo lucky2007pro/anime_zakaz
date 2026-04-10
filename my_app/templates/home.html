@@ -396,7 +396,15 @@
     <div class="slides-wrapper" id="slidesWrapper">
         {% for anime in hero_movies %}
         <div class="slide">
-             <div class="slide-bg" style="background-image: url('{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');"></div>
+             {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
+                 <video class="slide-bg" autoplay loop muted playsinline style="object-fit: cover;">
+                     <source src="{{ anime.hero_media.url }}">
+                 </video>
+             {% elif anime.hero_media %}
+                 <div class="slide-bg" style="background-image: url('{{ anime.hero_media.url }}'); border-top-right-radius: 4px;"></div>
+             {% else %}
+                 <div class="slide-bg" style="background-image: url('{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');"></div>
+             {% endif %}
              <div class="slide-overlay"></div>
 
             <div class="slide-content">

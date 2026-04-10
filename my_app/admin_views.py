@@ -130,6 +130,7 @@ def admin_movie_form(request, pk=None):
             home_featured_order = 0
         image = request.FILES.get('image')
         video_file = request.FILES.get('video_file')
+        hero_media = request.FILES.get('hero_media')
 
         if not movie:
             movie = Movie()
@@ -152,6 +153,8 @@ def admin_movie_form(request, pk=None):
             movie.image = image
         if video_file:
             movie.video_file = video_file
+        if hero_media:
+            movie.hero_media = hero_media
             
         try:
             movie.save()

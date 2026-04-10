@@ -539,6 +539,44 @@
     </div>
 </div>
 
+<!-- PROFESSIONAL FOOTER -->
+<footer style="background: rgba(10,10,15,0.95); border-top: 1px solid rgba(255,255,255,0.05); padding: 60px 5% 30px; margin-top: 60px; color: var(--text-dim); font-size: 0.9rem;">
+    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-bottom: 40px;">
+        <div>
+            <!-- LOGO in FOOTER -->
+            <a href="{% url 'home' %}" style="display:inline-flex; align-items:center; text-decoration:none; gap:10px; margin-bottom:15px;">
+                <img src="{% static 'images/anibest-logo.svg' %}" alt="BESTMEDIA" width="40" height="40" style="object-fit:contain;">
+                <span style="font-weight:900; font-size:1.4rem; color:var(--text-main); letter-spacing:1px;">BESTMEDIA</span>
+            </a>
+            <p style="line-height:1.7; max-width: 300px; margin-bottom: 20px;">Sifatli tarjima va qulay interfeys orqali sevimli animelaringizdan zavqlaning. Yangi va eng ommabop animelar faqat bizda.</p>
+        </div>
+
+        <div>
+            <h4 style="color: var(--text-main); font-weight:800; font-size: 1.1rem; margin-bottom: 20px;">Sahifalar</h4>
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
+                <li><a href="{% url 'home' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Bosh sahifa</a></li>
+                <li><a href="{% url 'anime_catalog' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Animelar katalogi</a></li>
+                <li><a href="{% url 'premium_page' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Premium sotib olish</a></li>
+                <li><a href="{% url 'chat' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Jonli Chat</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h4 style="color: var(--text-main); font-weight:800; font-size: 1.1rem; margin-bottom: 20px;">Biz bilan aloqa</h4>
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
+                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bxl-telegram' style="font-size:1.2rem; color:var(--accent);"></i> <a href="https://t.me/anibest_uz" target="_blank" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Telegram sahifamiz</a></li>
+                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bxl-instagram' style="font-size:1.2rem; color:#E1306C;"></i>  <a href="#" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Instagram sahifamiz</a></li>
+                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bx-envelope' style="font-size:1.2rem;"></i> admin@bestmedia.uz</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="max-width: 1280px; margin: 0 auto; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <p style="margin:0;">&copy; {% now "Y" %} BESTMEDIA. Barcha huquqlar himoyalangan.</p>
+        <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700;">ANI BEST JAMOASI TOMONIDAN YARATILGAN</p>
+    </div>
+</footer>
+
 {% if request.session.mp3_played == False and mp3_file and request.user.is_authenticated %}
 <audio preload="auto" autoplay>
     <source src="{{ mp3_file }}" type="audio/mpeg">

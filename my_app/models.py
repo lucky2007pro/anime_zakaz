@@ -89,6 +89,12 @@ class Movie(models.Model):
         default=0,
         help_text="Kichik raqam avval ko'rsatiladi"
     )
+    hero_media = models.FileField(
+        upload_to='movies/hero/',
+        blank=True,
+        null=True,
+        help_text="Bosh sahifa slideri uchun maxsus rasm yoki video (Ixtiyoriy)"
+    )
 
     views_count = models.PositiveIntegerField(default=0, help_text="Umumiy ko'rishlar soni")
     release_year = models.CharField(max_length=20, blank=True, null=True, help_text="Chiqarilgan yili, masalan: 2026")
