@@ -144,6 +144,7 @@ def movie_detail(request, id):
     is_favorited = FavoriteAnime.objects.filter(user=request.user, movie=movie).exists()
 
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    tier = vip_data.get_tier()
     
     # Old premium fallback + new tier logic
     is_staff_or_admin = request.user.is_staff or request.user.is_admin_user
@@ -152,12 +153,25 @@ def movie_detail(request, id):
     tier_labels = dict(Movie.TIER_CHOICES)
     required_tier_label = tier_labels.get(movie.minimum_tier, movie.minimum_tier)
 
+    # Qo'shimcha cheklovlar xususiyatlari (rasm/tariflardagi imkoniyatlarga qarab):
+    show_ads = (tier == 'basic') and not is_staff_or_admin
+    can_download = (tier in ['premium', 'vip']) or is_staff_or_admin
+    max_quality = '480p'
+    if tier == 'premium' or is_staff_or_admin:
+        max_quality = '1080p'
+    if tier == 'vip' or is_staff_or_admin:
+        max_quality = '4K'
+
     return render(request, 'movie_detail.html', {
         'movie': movie,
         'episodes': episodes,
         'has_access': has_access,
         'is_favorited': is_favorited,
-        'required_tier_label': required_tier_label
+        'required_tier_label': required_tier_label,
+        'show_ads': show_ads,
+        'can_download': can_download,
+        'max_quality': max_quality,
+        'user_tier': tier
     })
 
 

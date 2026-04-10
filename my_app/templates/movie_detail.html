@@ -427,6 +427,12 @@
                 </div>
 
                 <h2 class="movie-title">{{ movie.title }}</h2>
+                <div style="display:flex; gap: 10px; margin-top:5px; align-items: center;">
+                    <span style="padding:4px 10px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius:8px; font-weight:800; font-size:0.85rem; color:#fff;">Sifat: {{ max_quality }} gacha</span>
+                    {% if show_ads %}
+                    <span style="padding:4px 10px; background: rgba(255,50,50,0.2); border: 1px solid rgba(255,50,50,0.4); border-radius:8px; font-weight:800; font-size:0.85rem; color:#ff8888;">Reklamalar mavjud</span>
+                    {% endif %}
+                </div>
                 <p class="movie-summary">{{ movie.description|default:"Bu anime uchun izoh kiritilmagan." }}</p>
             </div>
         </section>
@@ -514,9 +520,16 @@
                     {% endif %}
 
                     {% if movie.telegram_link %}
+                    {% if can_download %}
                     <div class="telegram-download-wrapper">
                         <a href="{{ movie.telegram_link }}" target="_blank" class="telegram-download-btn">📥 Telegramdan yuklab olish</a>
                     </div>
+                    {% else %}
+                    <div style="padding: 15px; margin: 25px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; text-align: center;">
+                        <i class='bx bxs-lock-alt' style="color:#ffc107; font-size:1.5rem;"></i>
+                        <p style="margin: 5px 0 0 0; font-size:0.95rem; color: var(--text-dim);">Offline yuklab olish uchun <a href="{% url 'premium_page' %}" style="color:var(--accent); text-decoration:none; font-weight:700;">Premium</a> obuna oling.</p>
+                    </div>
+                    {% endif %}
                     {% endif %}
                 </div>
             </section>
