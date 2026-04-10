@@ -343,6 +343,31 @@
 
     .tag-jp { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 3px; color: var(--text-light); font-size: 0.65rem; font-weight: 800;}
 
+    /* ----- REKOMENDATSIYA SCROLL ----- */
+    .recommendation-section {
+        padding: 30px 0 0px 0;
+        overflow: hidden;
+        width: 100%;
+        position: relative;
+    }
+    .marquee-container {
+        display: flex;
+        width: max-content;
+        animation: scroll-left 40s linear infinite;
+        gap: 16px;
+    }
+    .marquee-container:hover {
+        animation-play-state: paused;
+    }
+    .marquee-item {
+        width: 220px;
+        flex-shrink: 0;
+    }
+    @keyframes scroll-left {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(calc(-50% - 8px)); }
+    }
+
     @media (max-width: 1024px) {
         .slide-title { font-size: 3rem; }
     }
@@ -432,6 +457,60 @@
         {% for anime in hero_movies %}
         <div class="dot" role="button" tabindex="0" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" onclick="goToSlide({{ forloop.counter0 }})"></div>
         {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if recommended_movies %}
+<div class="container recommendation-section">
+    <div class="section-header" style="margin-top:0;">
+        <div class="section-title">
+            <h3>Tavsiya <span>etiladiganlar</span></h3>
+        </div>
+    </div>
+
+    <div style="overflow: hidden; width: 100%; position: relative; padding-bottom: 20px;">
+        <div class="marquee-container">
+            {% for anime in recommended_movies %}
+            <div class="card-wrapper marquee-item">
+                <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer; height: 260px;">
+                    <div class="top-badge-group">
+                        <div class="top-badge" style="background: var(--accent); color: #000;"><i class='bx bx-trending-up'></i> TOP</div>
+                    </div>
+                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                </div>
+                <div class="card-info-bottom" style="margin-top:8px;">
+                     <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                         <h4 class="card-title">{{ anime.title }}</h4>
+                     </a>
+                      <div class="card-meta" style="margin-top:4px;">
+                           {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                           <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                      </div>
+                </div>
+            </div>
+            {% endfor %}
+            <!-- Dublikat skroll animatsiyasi silliq bo'lishi uchun -->
+            {% for anime in recommended_movies %}
+            <div class="card-wrapper marquee-item">
+                <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer; height: 260px;">
+                    <div class="top-badge-group">
+                        <div class="top-badge" style="background: var(--accent); color: #000;"><i class='bx bx-trending-up'></i> TOP</div>
+                    </div>
+                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                </div>
+                <div class="card-info-bottom" style="margin-top:8px;">
+                     <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                         <h4 class="card-title">{{ anime.title }}</h4>
+                     </a>
+                      <div class="card-meta" style="margin-top:4px;">
+                           {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                           <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                      </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endif %}

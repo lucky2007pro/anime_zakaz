@@ -94,6 +94,10 @@ def home(request):
         .order_by('home_featured_order', '-created_at')[:7]
     )
 
+    recommended_movies = list(
+        Movie.objects.select_related('category').prefetch_related('episodes')
+        .order_by('-views_count', '-created_at')[:10]
+    )
 
     categories = Category.objects.all()
 
@@ -114,6 +118,7 @@ def home(request):
     context = {
         'movies': movies,
         'hero_movies': hero_movies,
+        'recommended_movies': recommended_movies,
         'categories': categories,
         'mp3_file': mp3_to_play,
         'total_users': User.objects.count(),
