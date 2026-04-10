@@ -433,8 +433,12 @@
     <div class="nav-actions">
         <a href="{% url 'search' %}" class="action-icon"><i class='bx bx-search'></i></a>
         <a href="{% url 'chat' %}" class="action-icon" aria-label="Chat"><i class='bx bx-bell'></i></a>
-        <div class="action-icon profile-btn" onclick="toggleProfileMenu()">
-             <i class='bx bx-user'></i>
+        <div class="action-icon profile-btn" onclick="toggleProfileMenu()" style="overflow: hidden; padding: 0;">
+             {% if request.user.is_authenticated and request.user.avatar %}
+                 <img src="{{ request.user.avatar.image.url }}" alt="profile" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+             {% else %}
+                 <i class='bx bx-user' style="margin: auto;"></i>
+             {% endif %}
         </div>
         <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()">
             <span></span>
@@ -446,7 +450,10 @@
 
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="if(event.target===this) toggleMobileNav()">
     <div class="mobile-nav-container menu-section">
-        <h4 class="menu-title" style="color:var(--accent); font-weight:900; letter-spacing:2px; font-size:1rem;">ASOSIY MENYU</h4>
+        <h4 class="menu-title" style="color:var(--accent); font-weight:900; letter-spacing:2px; font-size:1rem; display: flex; justify-content: space-between; align-items: center;">
+            ASOSIY MENYU
+            <i class='bx bx-x' style="cursor: pointer; font-size: 1.5rem; color: #ff3366;" onclick="toggleMobileNav()"></i>
+        </h4>
         <a href="{% url 'home' %}" class="menu-item"><span class="icon-left"><i class='bx bx-home-alt'></i></span> Bosh sahifa <span class="arrow">›</span></a>
         <a href="{% url 'anime_catalog' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span> Katalog <span class="arrow">›</span></a>
         <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span> Chat <span class="arrow">›</span></a>
@@ -471,7 +478,13 @@
 
     {% if request.user.is_authenticated %}
     <div class="user-info-section">
-        <div class="avatar-large"><i class='bx bx-user'></i></div>
+        <div class="avatar-large" style="overflow: hidden;">
+            {% if request.user.avatar %}
+                 <img src="{{ request.user.avatar.image.url }}" alt="avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+            {% else %}
+                 <i class='bx bx-user'></i>
+            {% endif %}
+        </div>
         <div class="user-name-card">
             <div class="user-name">{{ request.user.username }}</div>
             <div class="user-handle">@{{ request.user.username|lower }}</div>
