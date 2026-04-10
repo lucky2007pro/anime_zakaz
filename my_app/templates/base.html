@@ -296,32 +296,48 @@
 
         .mobile-nav-overlay {
             display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15,15,19,0.98);
-            z-index: 10000;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 0;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            z-index: 10000; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
         }
         .mobile-nav-overlay.open { display: flex; opacity: 1; }
-        .mobile-nav-overlay a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.4rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            padding: 18px 40px;
-            width: 100%;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: color 0.2s, background 0.2s;
+
+        .mobile-nav-container {
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            width: 85%;
+            max-width: 350px;
+            padding: 25px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        .mobile-nav-overlay a:hover { color: var(--accent); background: rgba(0,243,255,0.05); }
+        .mobile-nav-overlay.open .mobile-nav-container {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .mobile-nav-container .menu-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .mobile-nav-container a.menu-item {
+            justify-content: flex-start;
+            padding: 15px 12px;
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+        .mobile-nav-container a.menu-item:hover {
+            background: rgba(0, 243, 255, 0.05);
+            border-color: rgba(0, 243, 255, 0.2);
+            transform: translateY(-2px);
+        }
 
         /* Generic Classes for Pages */
         main.main-content {
@@ -429,10 +445,13 @@
 </nav>
 
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="if(event.target===this) toggleMobileNav()">
-    <a href="{% url 'home' %}">Bosh sahifa</a>
-    <a href="{% url 'anime_catalog' %}">Katalog</a>
-    <a href="{% url 'chat' %}">Chat</a>
-    <button type="button" class="mobile-profile-btn" onclick="toggleMobileNav(); toggleProfileMenu();">Profil</button>
+    <div class="mobile-nav-container menu-section">
+        <h4 class="menu-title" style="color:var(--accent); font-weight:900; letter-spacing:2px; font-size:1rem;">ASOSIY MENYU</h4>
+        <a href="{% url 'home' %}" class="menu-item"><span class="icon-left"><i class='bx bx-home-alt'></i></span> Bosh sahifa <span class="arrow">›</span></a>
+        <a href="{% url 'anime_catalog' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span> Katalog <span class="arrow">›</span></a>
+        <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span> Chat <span class="arrow">›</span></a>
+        <a href="#" onclick="toggleMobileNav(); toggleProfileMenu(); return false;" class="menu-item"><span class="icon-left"><i class='bx bx-user'></i></span> Profil <span class="arrow">›</span></a>
+    </div>
 </div>
 
 {% block content %}
