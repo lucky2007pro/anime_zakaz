@@ -462,7 +462,7 @@
 <div class="profile-sidebar" id="profileSidebar">
     <div class="sidebar-header premium-btn-container">
         {% if request.user.is_authenticated %}
-        <a href="{% url 'profile' %}" class="premium-btn"><i class='bx bxs-bolt'></i> PROFILGA O'TING</a>
+        <a href="{% url 'premium_page' %}" class="premium-btn"><i class='bx bxs-bolt'></i> PREMIUM OBUNA</a>
         {% else %}
         <a href="{% url 'register' %}" class="premium-btn"><i class='bx bxs-bolt'></i> RO'YXATDAN O'TING</a>
         {% endif %}

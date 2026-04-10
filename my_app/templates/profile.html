@@ -129,11 +129,23 @@
             </p>
         </div>
 
-        <!-- YANi: Avatar tanlash qismi -->
+        <!-- Tahrirlash va Avatar tanlash qismi -->
         <div class="profile-info">
-            <h3 style="margin-bottom:15px; color:var(--accent);">Profil rasmini tanlash</h3>
-            <form method="POST" action="{% url 'profile' %}" style="display: flex; flex-direction:column; gap:15px; align-items:center;">
+            <h3 style="margin-bottom:15px; color:var(--accent);">Profilni tahrirlash</h3>
+            <form method="POST" action="{% url 'profile' %}" style="display: flex; flex-direction:column; gap:15px;">
                 {% csrf_token %}
+
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <label style="color:var(--text-dim); font-weight:600; font-size:0.9rem;">Ism:</label>
+                    <input type="text" name="first_name" value="{{ user.first_name }}" style="padding:12px; background:rgba(0,0,0,0.2); border:1px solid var(--glass-border); color:#fff; border-radius:8px; outline:none; font-family:'Outfit';" placeholder="Ismingiz">
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <label style="color:var(--text-dim); font-weight:600; font-size:0.9rem;">Familiya:</label>
+                    <input type="text" name="last_name" value="{{ user.last_name }}" style="padding:12px; background:rgba(0,0,0,0.2); border:1px solid var(--glass-border); color:#fff; border-radius:8px; outline:none; font-family:'Outfit';" placeholder="Familiyangiz">
+                </div>
+
+                <h4 style="color:var(--text-dim); margin-top:10px; text-align:center;">Profil rasmini tanlash</h4>
                 <div style="display:flex; flex-wrap:wrap; gap:15px; justify-content:center;">
                     {% for av in avatars %}
                         <label style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:5px;">
@@ -144,7 +156,8 @@
                         <p style="color:var(--text-dim);">Hozircha admin profillar rasmini yuklamagan.</p>
                     {% endfor %}
                 </div>
-                <button type="submit" class="btn-main" style="padding:10px 20px; border-radius:8px; background:var(--accent); color:white; border:none; font-weight:bold; cursor:pointer;">Saqlash</button>
+
+                <button type="submit" class="btn-main" style="padding:14px; margin-top:10px; border-radius:8px; background:var(--accent); color:black; border:none; font-weight:800; cursor:pointer; font-size:1rem; box-shadow: 0 8px 25px rgba(0, 243, 255, 0.3);">O'zgarishlarni Saqlash</button>
             </form>
         </div>
 

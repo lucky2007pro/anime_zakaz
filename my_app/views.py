@@ -156,15 +156,32 @@ def profile(request):
 
     if request.method == 'POST':
         avatar_id = request.POST.get('avatar_id')
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        
+        user = request.user
+        updated = False
+
         if avatar_id:
             try:
                 selected_avatar = ProfileAvatar.objects.get(id=avatar_id)
-                user = request.user
                 user.avatar = selected_avatar
-                user.save()
-                messages.success(request, "Profil rasmingiz yangilandi!")
+                updated = True
             except ProfileAvatar.DoesNotExist:
                 messages.error(request, "Maxsus profil rasmi topilmadi.")
+
+        if first_name != user.first_name:
+            user.first_name = first_name
+            updated = True
+        
+        if last_name != user.last_name:
+            user.last_name = last_name
+            updated = True
+
+        if updated:
+            user.save()
+            messages.success(request, "Profillingiz muvaffaqiyatli saqlandi!")
+
         return redirect('profile')
 
     context = {
@@ -229,14 +246,13 @@ def anime_catalog(request):
 @login_required
 def chat(request):
     tz = ZoneInfo('Asia/Tashkent')
-    messages_list = ChatMessage.objects.select_related('user', 'user__avatar', 'user__vip_data', 'reply_to').order_by('-created_at')[:40:-1]
     
     # fetch all messages up to limit
     messages_count = ChatMessage.objects.count()
     has_more = messages_count > 40
     
-    messages_list = ChatMessage.objects.select_related('user', 'reply_to', 'user__avatar', 'user__vip_data').order_by('-created_at')[:40]
-    messages_list = reversed(messages_list)
+    messages_list = list(ChatMessage.objects.select_related('user', 'reply_to', 'user__avatar', 'user__vip_data').order_by('-created_at')[:40])
+    messages_list.reverse()
 
     for msg in messages_list:
         msg.local_created_at = localtime(msg.created_at, tz)
@@ -387,7 +403,6 @@ def premium_page(request):
         if not plan or not receipt_image:
             messages.error(request, "Iltimos, obuna turini va to'lov chekini yuklang.")
         else:
-            # Tekshiramiz, ayni shu userda kutilayotgan so'rov bormi?
             if SubscriptionReceipt.objects.filter(user=request.user, is_approved=False, is_rejected=False).exists():
                 messages.warning(request, "Sizda allaqachon ko'rib chiqilayotgan so'rov bor. Iltimos kuting.")
             else:
