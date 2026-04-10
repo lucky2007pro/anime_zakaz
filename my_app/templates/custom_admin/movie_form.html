@@ -168,8 +168,8 @@
             <label for="movie-image">Poster/Rasm {% if not movie %}(Majburiy){% else %}(Ixtiyoriy - almashtirish uchun){% endif %}</label>
             <input id="movie-image" type="file" name="image" class="form-control" {% if not movie %}required{% endif %} accept="image/*">
             {% if movie and movie.image %}
-            <div style="margin-top: 10px;">
-                <img src="{{ movie.image.url }}" alt="{{ movie.title }} poster" style="height: 100px; border-radius: 4px; border: 1px solid var(--border-line);">
+            <div style="margin-top: 10px; width: 100%; aspect-ratio: 16/4; overflow: hidden; border-radius: 8px; border: 1px solid var(--border-line);">
+                <img src="{{ movie.image.url }}" alt="{{ movie.title }} poster" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
             </div>
             {% endif %}
         </div>
