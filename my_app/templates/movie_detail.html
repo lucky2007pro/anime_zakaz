@@ -234,45 +234,6 @@
     background: #000;
 }
 
-.seek-bar {
-    width: 100%;
-    margin-top: 10px;
-    appearance: none;
-    -webkit-appearance: none;
-    height: 8px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.12);
-    outline: none;
-    cursor: pointer;
-}
-
-.seek-bar::-webkit-slider-thumb {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 0 4px rgba(0, 243, 255, 0.18);
-    cursor: pointer;
-}
-
-.seek-bar::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border: none;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 0 4px rgba(0, 243, 255, 0.18);
-    cursor: pointer;
-}
-
-.seek-bar::-moz-range-track {
-    height: 8px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.12);
-}
-
 .bunny-player-wrapper {
     position: relative;
     width: 100%;
@@ -287,14 +248,6 @@
     height: 100%;
     border: none;
     display: block;
-}
-
-.time-display {
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 5px;
-    display: flex;
-    justify-content: space-between;
 }
 
 .episodes-box {
@@ -593,11 +546,6 @@
                                     <source src="{{ movie.video_file.url }}">
                                     Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                                 </video>
-                                <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
-                                <div class="time-display">
-                                    <span id="current-time">00:00</span>
-                                    <span id="duration-time">00:00</span>
-                                </div>
                             {% elif movie.video_url %}
                                 {% if "iframe" in movie.video_url or "mediadelivery.net" in movie.video_url %}
                                     <div class="bunny-player-wrapper">
@@ -608,22 +556,12 @@
                                         <source src="{{ movie.video_url }}" type="video/mp4">
                                         Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                                     </video>
-                                    <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
-                                    <div class="time-display">
-                                        <span id="current-time">00:00</span>
-                                        <span id="duration-time">00:00</span>
-                                    </div>
                                 {% endif %}
                             {% elif first_episode and first_episode.video_file %}
                                 <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
                                     <source src="{{ first_episode.video_file.url }}">
                                     Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                                 </video>
-                                <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
-                                <div class="time-display">
-                                    <span id="current-time">00:00</span>
-                                    <span id="duration-time">00:00</span>
-                                </div>
                             {% elif first_episode and first_episode.video_url %}
                                 {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
                                     <div class="bunny-player-wrapper">
@@ -634,11 +572,6 @@
                                         <source src="{{ first_episode.video_url }}" type="video/mp4">
                                         Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                                     </video>
-                                    <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
-                                    <div class="time-display">
-                                        <span id="current-time">00:00</span>
-                                        <span id="duration-time">00:00</span>
-                                    </div>
                                 {% endif %}
                             {% else %}
                                 <p style="text-align: center; color: var(--text-dim); padding: 30px 20px;">Bu qism uchun video manbasi yuklanmagan.</p>
@@ -747,12 +680,7 @@ const episodeBtns = document.querySelectorAll('.episode-btn');
 const videoContainer = document.getElementById('video-container');
 let videoPlayer = document.getElementById('video-player');
 let iframePlayer = document.getElementById('iframe-player');
-let seekBar = document.getElementById('seek-bar');
-let currentTimeEl = document.getElementById('current-time');
-let durationTimeEl = document.getElementById('duration-time');
 const episodeDescriptionEl = document.getElementById('episode-description');
-let pendingSeekRatio = null;
-let isSeeking = false;
 let currentSource = '';
 
 function buildNativePlayerMarkup(videoSrc){
@@ -762,11 +690,7 @@ function buildNativePlayerMarkup(videoSrc){
             <source src="${videoSrc}" type="video/mp4">
             Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
         </video>
-        <input id="seek-bar" class="seek-bar" type="range" min="0" max="1000" value="0" aria-label="Video seek bar">
-        <div class="time-display">
-            <span id="current-time">00:00</span>
-            <span id="duration-time">00:00</span>
-        </div>`;
+        `;
 }
 
 function appendPlayerQuery(videoSrc){
@@ -842,125 +766,20 @@ function updateEpisodeDescription(btn){
     episodeDescriptionEl.textContent = episodeDescription || 'Bu qism uchun izoh kiritilmagan.';
 }
 
-function formatTime(seconds){
-    if(!Number.isFinite(seconds) || seconds < 0){
-        return '00:00';
-    }
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-}
-
-function syncSeekBar(){
-    if(!videoPlayer || !seekBar || !Number.isFinite(videoPlayer.duration) || videoPlayer.duration <= 0){
-        return;
-    }
-    seekBar.value = Math.round((videoPlayer.currentTime / videoPlayer.duration) * Number(seekBar.max || 1000));
-}
-
-function bindNativePlayerControls(){
-    videoPlayer = document.getElementById('video-player');
-    seekBar = document.getElementById('seek-bar');
-    currentTimeEl = document.getElementById('current-time');
-    durationTimeEl = document.getElementById('duration-time');
-
-    if(!videoPlayer || !seekBar){
-        return;
-    }
-
-    const applyPendingSeek = () => {
-        if(pendingSeekRatio === null || !Number.isFinite(videoPlayer.duration) || videoPlayer.duration <= 0){
-            return;
-        }
-        videoPlayer.currentTime = Math.max(0, Math.min(1, pendingSeekRatio)) * videoPlayer.duration;
-        pendingSeekRatio = null;
-    };
-
-    const updateTimes = () => {
-        if(currentTimeEl){
-            currentTimeEl.textContent = formatTime(videoPlayer.currentTime);
-        }
-        if(durationTimeEl && Number.isFinite(videoPlayer.duration)){
-            durationTimeEl.textContent = formatTime(videoPlayer.duration);
-        }
-        if(!isSeeking){
-            syncSeekBar();
-        }
-    };
-
-    seekBar.addEventListener('input', () => {
-        isSeeking = true;
-        const max = Number(seekBar.max || 1000);
-        const ratio = max > 0 ? Number(seekBar.value) / max : 0;
-
-        if(Number.isFinite(videoPlayer.duration) && videoPlayer.duration > 0){
-            videoPlayer.currentTime = ratio * videoPlayer.duration;
-            pendingSeekRatio = null;
-            updateTimes();
-        } else {
-            pendingSeekRatio = ratio;
-        }
-    });
-
-    seekBar.addEventListener('change', () => {
-        isSeeking = false;
-        applyPendingSeek();
-        updateTimes();
-    });
-
-    videoPlayer.addEventListener('loadedmetadata', () => {
-        if(durationTimeEl){
-            durationTimeEl.textContent = formatTime(videoPlayer.duration);
-        }
-        applyPendingSeek();
-        updateTimes();
-    });
-
-    videoPlayer.addEventListener('durationchange', updateTimes);
-    videoPlayer.addEventListener('timeupdate', updateTimes);
-    videoPlayer.addEventListener('progress', syncSeekBar);
-
-    if(Number.isFinite(videoPlayer.duration) && videoPlayer.duration > 0){
-        durationTimeEl.textContent = formatTime(videoPlayer.duration);
-    }
-    syncSeekBar();
-    updateCurrentSource();
-}
 
 function loadNativeVideoSource(videoSrc){
-    if(!videoSrc){
-        return;
-    }
-
+    if(!videoSrc){ return; }
     if(!videoPlayer){
         videoContainer.innerHTML = `<div class="player-shell">${buildNativePlayerMarkup(videoSrc)}</div>`;
-        videoPlayer=document.getElementById('video-player');
-        seekBar=document.getElementById('seek-bar');
-        currentTimeEl=document.getElementById('current-time');
-        durationTimeEl=document.getElementById('duration-time');
-        iframePlayer=null;
-        bindNativePlayerControls();
+        videoPlayer = document.getElementById('video-player');
+        iframePlayer = null;
     }
-
-    pendingSeekRatio = null;
-    isSeeking = false;
-    if(seekBar){
-        seekBar.value = 0;
-    }
-    if(currentTimeEl){
-        currentTimeEl.textContent = '00:00';
-    }
-    if(durationTimeEl){
-        durationTimeEl.textContent = '00:00';
-    }
-
     videoPlayer.src = videoSrc;
     videoPlayer.load();
     videoPlayer.play();
     currentSource = videoSrc;
 }
 
-bindNativePlayerControls();
 updateCurrentSource();
 
 if(episodeBtns.length > 0) {
@@ -978,11 +797,9 @@ episodeBtns.forEach(btn=>{
                     const embedSrc = appendPlayerQuery(videoSrc);
                     if(iframePlayer){iframePlayer.src=embedSrc;}
             else{
-                        videoContainer.innerHTML=`<div class="player-shell"><button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button><div class="bunny-player-wrapper"><iframe id="iframe-player" src="${embedSrc}" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe></div></div>`;
-                iframePlayer=document.getElementById('iframe-player');videoPlayer=null;
-                seekBar=null;
-                currentTimeEl=null;
-                durationTimeEl=null;
+                videoContainer.innerHTML=`<div class="player-shell"><button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button><div class="bunny-player-wrapper"><iframe id="iframe-player" src="${embedSrc}" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe></div></div>`;
+                iframePlayer=document.getElementById('iframe-player');
+                videoPlayer=null;
             }
             currentSource = embedSrc;
         }else{
