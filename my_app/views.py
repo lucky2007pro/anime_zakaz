@@ -161,10 +161,14 @@ def movie_detail(request, id):
     
     # Old premium fallback + new tier logic
     is_staff_or_admin = request.user.is_staff or request.user.is_admin_user
-    has_access = is_staff_or_admin or (not movie.is_premium and movie.minimum_tier == 'basic') or vip_data.has_access(movie.minimum_tier) or (movie.is_premium and vip_data.vip_active())
+    real_minimum_tier = movie.minimum_tier
+    if movie.is_premium and real_minimum_tier == 'basic':
+        real_minimum_tier = 'premium'
+        
+    has_access = is_staff_or_admin or vip_data.has_access(real_minimum_tier)
 
     tier_labels = dict(Movie.TIER_CHOICES)
-    required_tier_label = tier_labels.get(movie.minimum_tier, movie.minimum_tier)
+    required_tier_label = tier_labels.get(real_minimum_tier, real_minimum_tier)
 
     # Qo'shimcha cheklovlar xususiyatlari (rasm/tariflardagi imkoniyatlarga qarab):
     show_ads = (tier == 'basic') and not is_staff_or_admin
@@ -522,7 +526,7 @@ def premium_page(request):
             messages.error(request, "Iltimos, obuna turini va to'lov chekini yuklang.")
         else:
             if SubscriptionReceipt.objects.filter(user=request.user, is_approved=False, is_rejected=False).exists():
-                messages.warning(request, "Sizda allaqachon ko'rib chiqilayotgan so'rov bor. Iltimos kuting.")
+                messages.warning(request, "Sizda allaqon ko'rib chiqilayotgan so'rov bor. Iltimos kuting.")
             else:
                 SubscriptionReceipt.objects.create(
                     user=request.user,
