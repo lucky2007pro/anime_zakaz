@@ -442,12 +442,6 @@
              {% endif %}
              <div class="slide-overlay"></div>
 
-             <div class="slider-controls" style="position: absolute; bottom: 15px; left: 16px; z-index: 30; display: flex; gap: 8px;">
-                {% for h_anime in hero_movies %}
-                <div class="dot dot-{{ forloop.counter0 }}" role="button" tabindex="0" aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}" onclick="goToSlide({{ forloop.counter0 }})" style="width: 25px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s;"></div>
-                {% endfor %}
-            </div>
-
             <div class="slide-content">
                 <div class="tags">
                     <span class="tag">YANGI</span>
@@ -461,9 +455,17 @@
                 </div>
                 <h1 class="slide-title">{{ anime.title }}</h1>
                 <p class="slide-desc">{{ anime.description|truncatechars:180 }}</p>
-                <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
-                    ▶ Hozir ko'rish
-                </a>
+
+                <div style="display: flex; align-items: center; gap: 20px; margin-top: 25px;">
+                    <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
+                        ▶ Hozir ko'rish
+                    </a>
+                    <div class="slider-controls" style="position: relative; bottom: unset; left: unset; display: flex; gap: 8px; z-index: 30;">
+                        {% for h_anime in hero_movies %}
+                        <div class="dot dot-{{ forloop.counter0 }}" role="button" tabindex="0" aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}" onclick="goToSlide({{ forloop.counter0 }})" style="width: 25px; height: 4px; border-radius: 2px; cursor: pointer; transition: all 0.3s; background: rgba(255,255,255,0.2);"></div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
         {% endfor %}
