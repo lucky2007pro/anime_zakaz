@@ -1,0 +1,62 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}Izohni tahrirlash{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-panel { max-width: 800px; margin: 0 auto; }
+    .glass-panel { padding: 40px; }
+    .form-group { margin-bottom: 25px; }
+    .form-group label { display: block; margin-bottom: 10px; font-weight: 600; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+    .form-control {
+        width: 100%; padding: 15px; background: #0a0a0f; border: 1px solid var(--border-line);
+        border-radius: 8px; color: white; font-size: 1rem; transition: 0.3s;
+    }
+    .form-control:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 15px rgba(0,243,255,0.2); }
+    
+    .comment-info {
+        background: rgba(255,255,255,0.05);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border-left: 3px solid var(--accent);
+    }
+    .info-label { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px; }
+    .info-value { font-weight: 600; color: white; }
+
+    .btn-save {
+        background: var(--accent); color: black; border: none; padding: 15px 40px;
+        border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase;
+        letter-spacing: 1px; transition: 0.3s; width: 100%;
+    }
+    .btn-save:hover { background: white; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-panel">
+    <div class="glass-panel">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="comment-info">
+                <div class="info-label">Foydalanuvchi:</div>
+                <div class="info-value">{{ comment.user.username }}</div>
+            </div>
+
+            <div class="comment-info">
+                <div class="info-label">Anime:</div>
+                <div class="info-value">{{ comment.movie.title }}</div>
+            </div>
+
+            <div class="form-group">
+                <label>Izoh matni</label>
+                <textarea name="text" class="form-control" rows="6" required>{{ comment.text }}</textarea>
+            </div>
+
+            <button type="submit" class="btn-save">Saqlash</button>
+            <a href="{% url 'admin_comments' %}" style="display:block; text-align:center; margin-top:20px; color:var(--text-dim); text-decoration:none;">Orqaga qaytish</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

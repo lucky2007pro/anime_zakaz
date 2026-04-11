@@ -57,6 +57,10 @@ urlpatterns = [
     path('control-panel/avatars/', admin_avatars, name='admin_avatars'),
     path('control-panel/avatars/add/', admin_avatar_form, name='admin_avatar_form'),
     path('control-panel/avatars/<int:pk>/delete/', admin_avatar_delete, name='admin_avatar_delete'),
+    
+    path('control-panel/comments/', admin_comments, name='admin_comments'),
+    path('control-panel/comments/<int:pk>/edit/', admin_comment_edit, name='admin_comment_edit'),
+    path('control-panel/comments/<int:pk>/delete/', admin_comment_delete, name='admin_comment_delete'),
 ]
 
 if settings.DEBUG:

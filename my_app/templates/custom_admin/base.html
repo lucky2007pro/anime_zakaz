@@ -172,6 +172,7 @@
             <li><a href="{% url 'admin_episodes' %}" class="{% if request.resolver_match.url_name == 'admin_episodes' or request.resolver_match.url_name == 'admin_episode_form' %}active{% endif %}"><i class='bx bx-list-ol'></i> Qismlar</a></li>
             <li><a href="{% url 'admin_subscriptions' %}" class="{% if request.resolver_match.url_name == 'admin_subscriptions' %}active{% endif %}"><i class='bx bx-credit-card-front'></i> Obunalar</a></li>
             <li><a href="{% url 'admin_chat' %}" class="{% if request.resolver_match.url_name == 'admin_chat' %}active{% endif %}"><i class='bx bx-message-dots'></i> Chat</a></li>
+            <li><a href="{% url 'admin_comments' %}" class="{% if request.resolver_match.url_name == 'admin_comments' or request.resolver_match.url_name == 'admin_comment_edit' %}active{% endif %}"><i class='bx bx-comment-dots'></i> Izohlar</a></li>
         </ul>
 
         <div class="sidebar-bottom">

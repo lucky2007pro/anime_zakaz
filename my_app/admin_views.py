@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
-from .models import CustomUser, Movie, MovieEpisode, Category, ChatMessage, SubscriptionReceipt, ProfileAvatar, VipUser
+from .models import CustomUser, Movie, MovieEpisode, Category, ChatMessage, SubscriptionReceipt, ProfileAvatar, VipUser, MovieComment
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
@@ -356,3 +356,35 @@ def admin_avatar_delete(request, pk):
     avatar.delete()
     messages.success(request, "Avatar o'chirildi!")
     return redirect('admin_avatars')
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_comments(request):
+    comments_qs = MovieComment.objects.select_related('movie', 'user').all().order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Animelarga izohlar',
+        'items': comments_qs,
+        'type': 'comment'
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_comment_edit(request, pk):
+    comment = get_object_or_404(MovieComment, pk=pk)
+    if request.method == 'POST':
+        new_text = request.POST.get('text')
+        if new_text:
+            comment.text = new_text
+            comment.save()
+            messages.success(request, "Izoh muvaffaqiyatli tahrirlandi!")
+            return redirect('admin_comments')
+    
+    return render(request, 'custom_admin/comment_form.html', {'comment': comment})
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_comment_delete(request, pk):
+    comment = get_object_or_404(MovieComment, pk=pk)
+    comment.delete()
+    messages.success(request, "Izoh o'chirildi!")
+    return redirect('admin_comments')
