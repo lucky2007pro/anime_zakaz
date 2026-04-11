@@ -348,11 +348,17 @@
     .video-container{padding:14px;}
 }
 @media(max-width:480px){
-    .movie-hero { min-height: 220px; }
-    .movie-hero-content { min-height: 220px; padding: 16px; }
-    .movie-title{font-size:1.55rem;}
-    .btn-back{padding:8px 14px;font-size:0.85rem;}
-    .movie-badge { font-size: 0.75rem; padding: 7px 10px; }
+    .movie-hero { min-height: 300px; }
+    .movie-hero-content {
+        min-height: 300px;
+        padding: 24px 16px 20px;
+        justify-content: space-between;
+        display: flex;
+        flex-direction: column;
+    }
+    .movie-title{font-size:1.4rem; line-height: 1.2; margin-top: 10px;}
+    .btn-back{padding:7px 12px; font-size:0.8rem;}
+    .movie-badge { font-size: 0.7rem; padding: 6px 10px; }
     .episode-btn{flex:1 1 46%;font-size:0.85rem;}
     .episodes-box, .movie-info { padding: 14px; }
 }

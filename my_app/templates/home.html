@@ -399,19 +399,22 @@
     }
     @media (max-width: 480px) {
         .slider-container {
-            aspect-ratio: 16 / 9;
-            min-height: 160px;
-            max-height: 56vw;
+            aspect-ratio: 4 / 3; /* Increased height ratio for mobile */
+            min-height: 280px;
+            max-height: 80vh;
             margin-top: 60px;
         }
         .slide {
-            padding: 16px 14px 48px;
+            padding: 20px 16px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
         }
-        .tags { gap: 6px; }
-        .slide-title { font-size: 1.55rem; }
-        .slide-desc { font-size: 0.85rem; margin-bottom: 16px; }
-        .btn-main { padding: 10px 16px; font-size: 0.85rem; }
-        .slider-controls { bottom: 15px; }
+        .tags { gap: 6px; margin-bottom: 10px; }
+        .slide-title { font-size: 1.4rem; line-height: 1.2; }
+        .slide-desc { font-size: 0.82rem; margin-bottom: 14px; -webkit-line-clamp: 3; }
+        .btn-main { padding: 10px 18px; font-size: 0.85rem; }
+        .slider-controls { bottom: 12px; }
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
         .anime-card { height: 140px; }
         .card-meta { font-size: 0.7rem; }
