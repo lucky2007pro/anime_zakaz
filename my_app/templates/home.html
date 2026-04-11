@@ -442,6 +442,12 @@
              {% endif %}
              <div class="slide-overlay"></div>
 
+             <div class="slider-controls" style="position: absolute; bottom: 20px; left: 16px; z-index: 30; display: flex; gap: 8px;">
+                {% for h_anime in hero_movies %}
+                <div class="dot dot-{{ forloop.counter0 }}" role="button" tabindex="0" aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}" onclick="goToSlide({{ forloop.counter0 }})" style="width: 25px; height: 4px; border-radius: 2px; cursor: pointer; transition: all 0.3s; display: inline-block;"></div>
+                {% endfor %}
+            </div>
+
             <div class="slide-content">
                 <div class="tags">
                     <span class="tag">YANGI</span>
@@ -460,11 +466,6 @@
                     <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
                         ▶ Hozir ko'rish
                     </a>
-                </div>
-                <div class="slider-controls" style="position: relative; bottom: unset; left: unset; display: flex; gap: 8px; z-index: 30; margin-top: 20px;">
-                    {% for h_anime in hero_movies %}
-                    <div class="dot dot-{{ forloop.counter0 }}" role="button" tabindex="0" aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}" onclick="goToSlide({{ forloop.counter0 }})" style="width: 25px; height: 4px; border-radius: 2px; cursor: pointer; transition: all 0.3s; display: inline-block;"></div>
-                    {% endfor %}
                 </div>
             </div>
         </div>
