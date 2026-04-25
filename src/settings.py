@@ -29,7 +29,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-bestmedia-vps-key-202
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Allowed hosts (environment variable dan o'qish yoki default qo'yish)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='bestmedia-official.uz,www.bestmedia-official.uz,5.189.136.95', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='bestmedia-official.uz,www.bestmedia-official.uz,5.189.136.95,www.anibest.uz,45.138.159.4', cast=Csv())
 
 # Ilovalar ro'yxati
 INSTALLED_APPS = [
