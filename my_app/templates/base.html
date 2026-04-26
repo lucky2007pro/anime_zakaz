@@ -3,18 +3,22 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>{% block title %}BESTMEDIA - O'zbekistondagi Eng Yaxshi Media Sayti{% endblock %}</title>
 
     <!-- ===== SEO META TAGS ===== -->
-    <meta name="description" content="Eng sara va yangi anime seriallarni yuqori sifatda o'zbek tilida bepul tomosha qiling.">
-    <meta name="keywords" content="anime, anime uzbek tilida, anime bepul, anime streaming, o'zbekcha anime, bestmedia, anime sayt">
+    <meta name="description"
+          content="Eng sara va yangi anime seriallarni yuqori sifatda o'zbek tilida bepul tomosha qiling.">
+    <meta name="keywords"
+          content="anime, anime uzbek tilida, anime bepul, anime streaming, o'zbekcha anime, bestmedia, anime sayt">
     <meta name="author" content="BESTMEDIA">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph -->
     <meta property="og:title" content="BESTMEDIA - O'zbekistondagi Eng Yaxshi Media Sayti">
-    <meta property="og:description" content="Eng sara va yangi anime seriallarni yuqori sifatda o'zbek tilida bepul tomosha qiling.">
+    <meta property="og:description"
+          content="Eng sara va yangi anime seriallarni yuqori sifatda o'zbek tilida bepul tomosha qiling.">
     <meta property="og:image" content="{% static 'images/default.svg' %}">
 
     <meta name="theme-color" content="#ff3366">
@@ -294,50 +298,6 @@
         .hamburger.active span:nth-child(2) { opacity: 0; }
         .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        .mobile-nav-overlay {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
-            z-index: 10000; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        .mobile-nav-overlay.open { display: flex; opacity: 1; }
-
-        .mobile-nav-container {
-            background: var(--bg-surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            width: 85%;
-            max-width: 350px;
-            padding: 25px 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .mobile-nav-overlay.open .mobile-nav-container {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .mobile-nav-container .menu-title {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-        }
-        .mobile-nav-container a.menu-item {
-            justify-content: flex-start;
-            padding: 15px 12px;
-            margin-bottom: 10px;
-            font-size: 1.05rem;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-        }
-        .mobile-nav-container a.menu-item:hover {
-            background: rgba(0, 243, 255, 0.05);
-            border-color: rgba(0, 243, 255, 0.2);
-            transform: translateY(-2px);
-        }
 
         /* Generic Classes for Pages */
         main.main-content {
@@ -376,6 +336,71 @@
             .nav-menu { gap: 10px; }
             .pill-nav-item { padding: 7px 14px; font-size: 0.78rem; }
         }
+
+/* =========================
+   MOBILE OVERLAY
+========================= */
+
+.mobile-nav-overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    z-index: 10000;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: all 0.35s ease;
+}
+
+.mobile-nav-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* =========================
+   SIDEBAR (GLASS)
+========================= */
+
+.mobile-nav-container {
+    position: absolute;
+    top: 0;
+    right: -100%;
+
+    width: 82%;
+    max-width: 340px;
+    height: 100%;
+
+    background: rgba(20, 20, 28, 0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+
+    box-shadow: -10px 0 35px rgba(0, 0, 0, 0.35);
+
+    padding: 22px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    /* 🔥 ROUNDED SIDE */
+    border-top-left-radius: 500px;
+    border-bottom-left-radius: 500px;
+
+    transition: right 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mobile-nav-overlay.active .mobile-nav-container {
+    right: 0;
+}
 
         @media (max-width: 768px) {
             .navbar { padding: 12px 4%; }
@@ -427,7 +452,8 @@
     <div class="nav-menu">
         <a href="{% url 'anime_catalog' %}" class="pill-nav-item"><i class='bx bx-play-circle'></i> KATALOG</a>
         <a href="{% url 'chat' %}" class="pill-nav-item"><i class='bx bx-message-dots'></i> CHAT</a>
-        <a href="javascript:void(0)" class="pill-nav-item" onclick="toggleProfileMenu()"><i class='bx bx-user'></i> PROFIL</a>
+        <a href="javascript:void(0)" class="pill-nav-item" onclick="toggleProfileMenu()"><i class='bx bx-user'></i>
+            PROFIL</a>
         <a href="{% url 'home' %}" class="pill-nav-item"><i class='bx bx-home-alt'></i> BOSH SAHIFA</a>
     </div>
 
@@ -435,11 +461,12 @@
         <a href="{% url 'search' %}" class="action-icon"><i class='bx bx-search'></i></a>
         <a href="{% url 'chat' %}" class="action-icon" aria-label="Chat"><i class='bx bx-bell'></i></a>
         <div class="action-icon profile-btn" onclick="toggleProfileMenu()" style="overflow: hidden; padding: 0;">
-             {% if request.user.is_authenticated and request.user.avatar %}
-                 <img src="{{ request.user.avatar.image.url }}" alt="profile" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
-             {% else %}
-                 <i class='bx bx-user' style="margin: auto;"></i>
-             {% endif %}
+            {% if request.user.is_authenticated and request.user.avatar %}
+            <img src="{{ request.user.avatar.image.url }}" alt="profile"
+                 style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+            {% else %}
+            <i class='bx bx-user' style="margin: auto;"></i>
+            {% endif %}
         </div>
         <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()">
             <span></span>
@@ -449,16 +476,39 @@
     </div>
 </nav>
 
-<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="if(event.target===this) toggleMobileNav()">
-    <div class="mobile-nav-container menu-section">
-        <h4 class="menu-title" style="color:var(--accent); font-weight:900; letter-spacing:2px; font-size:1rem; display: flex; justify-content: space-between; align-items: center;">
+<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeOnOverlay(event)">
+    <div class="mobile-nav-container" id="mobileNav">
+
+        <h4 class="menu-title">
             ASOSIY MENYU
-            <i class='bx bx-x' style="cursor: pointer; font-size: 1.5rem; color: #ff3366;" onclick="toggleMobileNav()"></i>
+            <i class='bx bx-x' onclick="toggleMobileNav()"></i>
         </h4>
-        <a href="{% url 'home' %}" class="menu-item"><span class="icon-left"><i class='bx bx-home-alt'></i></span> Bosh sahifa <span class="arrow">›</span></a>
-        <a href="{% url 'anime_catalog' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span> Katalog <span class="arrow">›</span></a>
-        <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span> Chat <span class="arrow">›</span></a>
-        <a href="#" onclick="toggleMobileNav(); toggleProfileMenu(); return false;" class="menu-item"><span class="icon-left"><i class='bx bx-user'></i></span> Profil <span class="arrow">›</span></a>
+
+        <a href="{% url 'home' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-home-alt'></i></span>
+            Bosh sahifa <span class="arrow">›</span>
+        </a>
+
+        <a href="{% url 'anime_catalog' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-play-circle'></i></span>
+            Katalog <span class="arrow">›</span>
+        </a>
+
+        <a href="{% url 'news' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-news'></i></span>
+            Yangiliklar <span class="arrow">›</span>
+        </a>
+
+        <a href="{% url 'reels' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-video'></i></span>
+            Reels <span class="arrow">›</span>
+        </a>
+
+        <a href="{% url 'aloqa' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-support'></i></span>
+            Aloqa <span class="arrow">›</span>
+        </a>
+
     </div>
 </div>
 
@@ -481,9 +531,10 @@
     <div class="user-info-section">
         <div class="avatar-large" style="overflow: hidden;">
             {% if request.user.avatar %}
-                 <img src="{{ request.user.avatar.image.url }}" alt="avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+            <img src="{{ request.user.avatar.image.url }}" alt="avatar"
+                 style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
             {% else %}
-                 <i class='bx bx-user'></i>
+            <i class='bx bx-user'></i>
             {% endif %}
         </div>
         <div class="user-name-card">
@@ -491,26 +542,41 @@
             <div class="user-handle">@{{ request.user.username|lower }}</div>
         </div>
         {% if request.user.vip_data and request.user.vip_data.vip_active %}
-        <p style="color:#fbbf24; font-weight: 800; font-size: 0.85rem; margin-top: 15px;"><i class='bx bxs-crown'></i> VIP PROFILE</p>
+        <p style="color:#fbbf24; font-weight: 800; font-size: 0.85rem; margin-top: 15px;"><i class='bx bxs-crown'></i>
+            VIP PROFILE</p>
         {% endif %}
     </div>
 
     <div class="menu-section">
         <h4 class="menu-title">MENING HISOBIM</h4>
-        <a href="{% url 'profile' %}" class="menu-item"><span class="icon-left" style="color:#00f3ff;"><i class='bx bx-user-circle'></i></span> Mening Hisobim <span class="value" style="color:var(--text-light); font-weight:800;">{% if request.user.vip_data and request.user.vip_data.vip_active %}VIP{% else %}Oddiy{% endif %}</span> <span class="arrow">›</span></a>
-        <a href="{% url 'premium_page' %}" class="menu-item"><span class="icon-left" style="color:#fbbf24;"><i class='bx bxs-crown'></i></span> Premium Obuna <span class="value" style="color:var(--text-light); font-weight:800;">{% if request.user.vip_data and request.user.vip_data.vip_active %}Faol{% else %}Yo'q{% endif %}</span> <span class="arrow">›</span></a>
-        <a href="{% url 'favorites_page' %}" class="menu-item"><span class="icon-left" style="color:#ff3366;"><i class='bx bxs-bookmark-star'></i></span> Saqlanganlar <span class="arrow">›</span></a>
-        <a href="{% url 'watch_history_page' %}" class="menu-item"><span class="icon-left" style="color:#a855f7;"><i class='bx bx-history'></i></span> Ko'rishlar tarixi <span class="arrow">›</span></a>
+        <a href="{% url 'profile' %}" class="menu-item"><span class="icon-left" style="color:#00f3ff;"><i
+                class='bx bx-user-circle'></i></span> Mening Hisobim <span class="value"
+                                                                           style="color:var(--text-light); font-weight:800;">{% if request.user.vip_data and request.user.vip_data.vip_active %}VIP{% else %}Oddiy{% endif %}</span>
+            <span class="arrow">›</span></a>
+        <a href="{% url 'premium_page' %}" class="menu-item"><span class="icon-left" style="color:#fbbf24;"><i
+                class='bx bxs-crown'></i></span> Premium Obuna <span class="value"
+                                                                     style="color:var(--text-light); font-weight:800;">{% if request.user.vip_data and request.user.vip_data.vip_active %}Faol{% else %}Yo'q{% endif %}</span>
+            <span class="arrow">›</span></a>
+        <a href="{% url 'favorites_page' %}" class="menu-item"><span class="icon-left" style="color:#ff3366;"><i
+                class='bx bxs-bookmark-star'></i></span> Saqlanganlar <span class="arrow">›</span></a>
+        <a href="{% url 'watch_history_page' %}" class="menu-item"><span class="icon-left" style="color:#a855f7;"><i
+                class='bx bx-history'></i></span> Ko'rishlar tarixi <span class="arrow">›</span></a>
     </div>
 
     <div class="menu-section">
         <h4 class="menu-title">ASOSIY</h4>
-        <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span> Umumiy chat <span class="arrow">›</span></a>
-        <a href="{% url 'anime_catalog' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span> Katalog <span class="arrow">›</span></a>
-        <a href="{% url 'home' %}" class="menu-item"><span class="icon-left"><i class='bx bx-home-alt'></i></span> Bosh sahifa <span class="arrow">›</span></a>
-        <a href="{% url 'news' %}" class="menu-item"><span class="icon-left"><i class='bx bx-news'></i></span>Yangiliklar<span class="arrow">›</span></a>
-        <a href="{% url 'reels' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span>Reels<span class="arrow">›</span></a>
-        <a href="{% url 'aloqa' %}" class="menu-item"><span class="icon-left"><i class='bx bx-support'></i></span>Aloqa<span class="arrow">›</span></a>
+        <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span>
+            Umumiy chat <span class="arrow">›</span></a>
+        <a href="{% url 'anime_catalog' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span>
+            Katalog <span class="arrow">›</span></a>
+        <a href="{% url 'home' %}" class="menu-item"><span class="icon-left"><i class='bx bx-home-alt'></i></span> Bosh
+            sahifa <span class="arrow">›</span></a>
+        <a href="{% url 'news' %}" class="menu-item"><span class="icon-left"><i class='bx bx-news'></i></span>Yangiliklar<span
+                class="arrow">›</span></a>
+        <a href="{% url 'reels' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span>Reels<span
+                class="arrow">›</span></a>
+        <a href="{% url 'aloqa' %}" class="menu-item"><span class="icon-left"><i
+                class='bx bx-support'></i></span>Aloqa<span class="arrow">›</span></a>
     </div>
 
     {% if request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
@@ -561,36 +627,55 @@
     <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-bottom: 40px;">
         <div>
             <!-- LOGO in FOOTER -->
-            <a href="{% url 'home' %}" style="display:inline-flex; align-items:center; text-decoration:none; gap:10px; margin-bottom:15px;">
-                <img src="{% static 'images/anibest-logo.svg' %}" alt="BESTMEDIA" width="40" height="40" style="object-fit:contain;">
+            <a href="{% url 'home' %}"
+               style="display:inline-flex; align-items:center; text-decoration:none; gap:10px; margin-bottom:15px;">
+                <img src="{% static 'images/anibest-logo.svg' %}" alt="BESTMEDIA" width="40" height="40"
+                     style="object-fit:contain;">
                 <span style="font-weight:900; font-size:1.4rem; color:var(--text-main); letter-spacing:1px;">BESTMEDIA</span>
             </a>
-            <p style="line-height:1.7; max-width: 300px; margin-bottom: 20px;">Sifatli tarjima va qulay interfeys orqali sevimli animelaringizdan zavqlaning. Yangi va eng ommabop animelar faqat bizda.</p>
+            <p style="line-height:1.7; max-width: 300px; margin-bottom: 20px;">Sifatli tarjima va qulay interfeys orqali
+                sevimli animelaringizdan zavqlaning. Yangi va eng ommabop animelar faqat bizda.</p>
         </div>
 
         <div>
             <h4 style="color: var(--text-main); font-weight:800; font-size: 1.1rem; margin-bottom: 20px;">Sahifalar</h4>
             <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                <li><a href="{% url 'home' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Bosh sahifa</a></li>
-                <li><a href="{% url 'anime_catalog' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Animelar katalogi</a></li>
-                <li><a href="{% url 'premium_page' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Premium sotib olish</a></li>
-                <li><a href="{% url 'chat' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Jonli Chat</a></li>
+                <li><a href="{% url 'home' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Bosh
+                    sahifa</a></li>
+                <li><a href="{% url 'anime_catalog' %}"
+                       style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Animelar katalogi</a></li>
+                <li><a href="{% url 'premium_page' %}"
+                       style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Premium sotib olish</a>
+                </li>
+                <li><a href="{% url 'chat' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Jonli
+                    Chat</a></li>
             </ul>
         </div>
 
         <div>
-            <h4 style="color: var(--text-main); font-weight:800; font-size: 1.1rem; margin-bottom: 20px;">Biz bilan aloqa</h4>
+            <h4 style="color: var(--text-main); font-weight:800; font-size: 1.1rem; margin-bottom: 20px;">Biz bilan
+                aloqa</h4>
             <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bxl-telegram' style="font-size:1.2rem; color:var(--accent);"></i> <a href="https://t.me/ani_best_uzb_anime" target="_blank" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Telegram kanalimiz</a></li>
-                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bxl-instagram' style="font-size:1.2rem; color:#E1306C;"></i>  <a href="#" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Instagram sahifamiz</a></li>
-                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bx-envelope' style="font-size:1.2rem;"></i> admin@bestmedia.uz</li>
+                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bxl-telegram'
+                                                                          style="font-size:1.2rem; color:var(--accent);"></i>
+                    <a href="https://t.me/ani_best_uzb_anime" target="_blank"
+                       style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Telegram kanalimiz</a></li>
+                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bxl-instagram'
+                                                                          style="font-size:1.2rem; color:#E1306C;"></i>
+                    <a href="#" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Instagram
+                        sahifamiz</a></li>
+                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bx-envelope'
+                                                                          style="font-size:1.2rem;"></i>
+                    admin@bestmedia.uz
+                </li>
             </ul>
         </div>
     </div>
 
     <div style="max-width: 1280px; margin: 0 auto; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
         <p style="margin:0;">&copy; {% now "Y" %} BESTMEDIA. Barcha huquqlar himoyalangan.</p>
-        <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700;">ANI BEST JAMOASI TOMONIDAN YARATILGAN</p>
+        <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700;">ANI BEST JAMOASI TOMONIDAN
+            YARATILGAN</p>
     </div>
 </footer>
 {% endblock footer %}
@@ -602,33 +687,55 @@
 {% endif %}
 
 <script>
+    /* ================= NAVBAR SCROLL ================= */
     window.addEventListener('scroll', () => {
         const nav = document.getElementById('navbar');
-        if (window.scrollY > 50) {
-            nav.classList.add('scrolled');
-        } else {
-            nav.classList.remove('scrolled');
-        }
+        if (!nav) return;
+
+        nav.classList.toggle('scrolled', window.scrollY > 50);
     });
 
+
+    /* ================= PROFILE SIDEBAR ================= */
     function toggleProfileMenu() {
         const sidebar = document.getElementById('profileSidebar');
         const overlay = document.getElementById('profileOverlay');
+
+        if (!sidebar || !overlay) return;
+
         sidebar.classList.toggle('active');
         overlay.classList.toggle('active');
+
+        document.body.style.overflow = sidebar.classList.contains('active')
+            ? 'hidden'
+            : '';
     }
 
+
+    /* ================= MOBILE SIDEBAR (RIGHT MENU) ================= */
     function toggleMobileNav() {
         const overlay = document.getElementById('mobileNavOverlay');
         const btn = document.getElementById('hamburgerBtn');
-        if (overlay && btn) {
-            overlay.classList.toggle('open');
-            btn.classList.toggle('active');
-            document.body.style.overflow = overlay.classList.contains('open') ? 'hidden' : '';
+
+        if (!overlay) return;
+
+        overlay.classList.toggle('active');
+
+        if (btn) btn.classList.toggle('active');
+
+        document.body.style.overflow = overlay.classList.contains('active')
+            ? 'hidden'
+            : '';
+    }
+
+    function closeOnOverlay(event) {
+        if (event.target.id === 'mobileNavOverlay') {
+            toggleMobileNav();
         }
     }
 
-    /* Favoritelarga qo'shish uchun umumiy funksiya */
+
+    /* ================= FAVORITE SYSTEM ================= */
     function toggleFavorite(e, movieId) {
         e.preventDefault();
         e.stopPropagation();
@@ -641,21 +748,49 @@
             }
         })
         .then(response => {
-            if(!response.ok) throw new Error("Avval tizimga kiring!");
+            if (!response.ok) throw new Error("Avval tizimga kiring!");
             return response.json();
         })
         .then(data => {
             const icon = document.getElementById(`fav-icon-${movieId}`);
-            if (data.is_favorited) {
-                icon.className = "bx bxs-star";
-            } else {
-                icon.className = "bx bx-star";
-            }
+
+            if (!icon) return;
+
+            icon.className = data.is_favorited
+                ? "bx bxs-star"
+                : "bx bx-star";
         })
         .catch(err => {
             alert(err.message);
         });
     }
+
+
+    /* ================= MOBILE SWIPE (LEFT / RIGHT) ================= */
+    let startX = 0;
+
+    document.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+    });
+
+    document.addEventListener('touchend', (e) => {
+        const diff = startX - e.changedTouches[0].clientX;
+        const overlay = document.getElementById('mobileNavOverlay');
+
+        if (!overlay) return;
+
+        // swipe LEFT → open
+        if (diff > 80) {
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // swipe RIGHT → close
+        if (diff < -80) {
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
 </script>
 
 </body>
