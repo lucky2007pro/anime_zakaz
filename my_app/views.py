@@ -538,3 +538,24 @@ def premium_page(request):
 
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     return render(request, 'premium.html', {'vip_data': vip_data})
+
+@login_required
+def aloqa(request):
+    context = {
+        "title": "Aloqa"
+    }
+    return render(request, "aloqa.html", context)
+
+@login_required
+def news(request):
+    context = {
+        "title": "Aloqa"
+    }
+    return render(request, "news.html", context)
+
+@login_required
+def reels(request):
+    context = {
+        "title": "Aloqa"
+    }
+    return render(request, "reels.html", context)
