@@ -508,6 +508,9 @@
         <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span> Umumiy chat <span class="arrow">›</span></a>
         <a href="{% url 'anime_catalog' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span> Katalog <span class="arrow">›</span></a>
         <a href="{% url 'home' %}" class="menu-item"><span class="icon-left"><i class='bx bx-home-alt'></i></span> Bosh sahifa <span class="arrow">›</span></a>
+        <a href="{% url 'news' %}" class="menu-item"><span class="icon-left"><i class='bx bx-news'></i></span>Yangiliklar<span class="arrow">›</span></a>
+        <a href="{% url 'reels' %}" class="menu-item"><span class="icon-left"><i class='bx bx-play-circle'></i></span>Reels<span class="arrow">›</span></a>
+        <a href="{% url 'aloqa' %}" class="menu-item"><span class="icon-left"><i class='bx bx-support'></i></span>Aloqa<span class="arrow">›</span></a>
     </div>
 
     {% if request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
