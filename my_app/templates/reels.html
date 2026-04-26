@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: radial-gradient(circle at top, #0b0f19, #000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+
+        .box {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            width: 90%;
+            max-width: 420px;
+        }
+
+        .box img {
+            width: 140px;
+            margin-bottom: 20px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            background: #00f3ff;
+            color: #000;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,243,255,0.4);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <!-- RASM (maintenance icon) -->
+    <img src="data:image/png;base64,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"
+     alt="maintenance"
+     style="width:140px; margin-bottom:20px; animation: float 2s ease-in-out infinite;">
+
+    <div class="title">Reels bo‘limi ta’mirlanmoqda</div>
+    <div class="subtitle">Tez orada qayta ishga tushadi 🚀</div>
+
+    <!-- BACK BUTTON -->
+    <a href="{% url 'home' %}" class="btn">
+        <i class='bx bx-home-alt'></i>
+        Bosh sahifa
+    </a>
+
+</div>
+
+</body>
+</html>
