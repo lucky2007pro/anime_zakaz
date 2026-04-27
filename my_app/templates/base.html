@@ -399,41 +399,7 @@
     right: 0;
 }
 
-/* =========================
-   LIGHT SWEEP BORDER (SMOOTH)
-========================= */
-.mobile-nav-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 70px 0 0 70px;
 
-    background: linear-gradient(
-        120deg,
-        transparent 0%,
-        rgba(0, 243, 255, 0.05) 20%,
-        rgba(0, 243, 255, 0.9) 50%,
-        rgba(255, 0, 200, 0.7) 55%,
-        rgba(0, 243, 255, 0.05) 80%,
-        transparent 100%
-    );
-
-    background-size: 300% 100%;
-
-    animation: lightSweep 12s linear infinite;
-
-    filter: blur(1px);
-    pointer-events: none;
-
-    /* border effect mask */
-    -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-
-    padding: 2px;
-}
 
 /* =========================
    VERY SMOOTH ANIMATION
