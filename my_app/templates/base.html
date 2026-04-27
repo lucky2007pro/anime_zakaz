@@ -337,7 +337,6 @@
 /* =========================
    MOBILE OVERLAY
 ========================= */
-
 .mobile-nav-overlay {
     position: fixed;
     inset: 0;
@@ -352,7 +351,7 @@
     visibility: hidden;
     pointer-events: none;
 
-    transition: all 0.35s ease;
+    transition: 0.35s ease;
 }
 
 .mobile-nav-overlay.active {
@@ -362,9 +361,8 @@
 }
 
 /* =========================
-   SIDEBAR (GLASS)
+   SIDEBAR
 ========================= */
-
 .mobile-nav-container {
     position: absolute;
     top: 0;
@@ -374,13 +372,12 @@
     max-width: 340px;
     height: 100%;
 
-    background: rgba(20, 20, 28, 0.35);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(20, 20, 28, 0.45);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
 
-    border-left: 1px solid rgba(255, 255, 255, 0.08);
-
-    box-shadow: -10px 0 35px rgba(0, 0, 0, 0.35);
+    border-top-left-radius: 70px;
+    border-bottom-left-radius: 70px;
 
     padding: 22px;
 
@@ -388,32 +385,96 @@
     flex-direction: column;
     gap: 12px;
 
-    /* 🔥 ROUNDED SIDE */
-    border-top-left-radius: 70px;
-    border-bottom-left-radius: 70px;
+    overflow: hidden;
+
+    box-shadow:
+        -10px 0 35px rgba(0, 0, 0, 0.45),
+        -2px 0 25px rgba(0, 212, 255, 0.25);
 
     transition: right 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* OPEN */
+.mobile-nav-overlay.active .mobile-nav-container {
+    right: 0;
+}
+
+/* =========================
+   LIGHT SWEEP BORDER (SMOOTH)
+========================= */
+.mobile-nav-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 70px 0 0 70px;
+
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(0, 243, 255, 0.05) 20%,
+        rgba(0, 243, 255, 0.9) 50%,
+        rgba(255, 0, 200, 0.7) 55%,
+        rgba(0, 243, 255, 0.05) 80%,
+        transparent 100%
+    );
+
+    background-size: 300% 100%;
+
+    animation: lightSweep 12s linear infinite;
+
+    filter: blur(1px);
+    pointer-events: none;
+
+    /* border effect mask */
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+
+    padding: 2px;
+}
+
+/* =========================
+   VERY SMOOTH ANIMATION
+========================= */
+@keyframes lightSweep {
+    0% {
+        background-position: -250% 0;
+    }
+    50% {
+        background-position: 0% 0;
+    }
+    100% {
+        background-position: 250% 0;
+    }
+}
+
+/* =========================
+   HEADER
+========================= */
 .menu-title {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
 
     font-size: 0.85rem;
     font-weight: 900;
     letter-spacing: 1px;
-    color: rgba(255,255,255,0.8);
 
-    margin-bottom: 18px;
     padding: 10px 12px;
+    margin-bottom: 18px;
 
-    background: rgba(255,255,255,0.03);
+    background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 14px;
 }
 
-/* 🔥 X icon kattaroq va qizil */
+.menu-title span {
+    color: #00f3ff;
+    animation: breathe 2.5s ease-in-out infinite;
+}
+
 .menu-title i {
     font-size: 1.6rem;
     color: #ff3b30;
@@ -422,10 +483,48 @@
 }
 
 .menu-title i:hover {
-    transform: scale(1.15);
+    transform: scale(1.2);
     color: #ff1f1f;
 }
 
+/* =========================
+   MENU ITEMS
+========================= */
+.menu-item,
+.pill-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 12px;
+    border-radius: 12px;
+
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    transition: 0.25s;
+}
+
+.menu-item:hover,
+.pill-nav-item:hover {
+    background: rgba(255,255,255,0.08);
+    transform: translateX(4px);
+}
+
+.icon-left {
+    font-size: 1.2rem;
+}
+
+.arrow {
+    margin-left: auto;
+    opacity: 0.6;
+}
+
+/* =========================
+   FOOTER
+========================= */
 .sidebar-version {
     margin-top: auto;
     text-align: center;
@@ -440,11 +539,9 @@
     border-top: 1px solid rgba(255,255,255,0.06);
 }
 
-.menu-title span {
-    color: #00f3ff;
-    animation: breathe 2s ease-in-out infinite;
-}
-
+/* =========================
+   ANIMATION TEXT GLOW
+========================= */
 @keyframes breathe {
     0%, 100% {
         opacity: 0.7;
@@ -454,10 +551,6 @@
         opacity: 1;
         text-shadow: 0 0 18px rgba(0,243,255,0.8);
     }
-}
-
-.mobile-nav-overlay.active .mobile-nav-container {
-    right: 0;
 }
 
         @media (max-width: 768px) {
@@ -547,9 +640,6 @@
             Bosh sahifa <span class="arrow">›</span>
         </a>
 
-        <a href="javascript:void(0)" class="pill-nav-item" onclick="toggleProfileMenu()"><i class='bx bx-user'></i>
-            PROFIL</a>
-
         <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span>
             Umumiy chat <span class="arrow">›</span></a>
 
@@ -571,6 +661,11 @@
         <a href="{% url 'aloqa' %}" class="menu-item">
             <span class="icon-left"><i class='bx bx-support'></i></span>
             Aloqa <span class="arrow">›</span>
+        </a>
+
+
+        <a href="javascript:void(0)" class="pill-nav-item" onclick="openProfileFromMobile()">
+            <i class='bx bx-user'></i> PROFIL
         </a>
 
         <div class="sidebar-version">
@@ -831,6 +926,27 @@
             alert(err.message);
         });
     }
+
+    function openProfileFromMobile() {
+    // mobile sidebar yopiladi
+    const mobileOverlay = document.getElementById('mobileNavOverlay');
+    const hamburger = document.getElementById('hamburgerBtn');
+
+    if (mobileOverlay) mobileOverlay.classList.remove('active');
+    if (hamburger) hamburger.classList.remove('active');
+
+    document.body.style.overflow = '';
+
+    // keyin profil ochiladi
+    const profileSidebar = document.getElementById('profileSidebar');
+    const profileOverlay = document.getElementById('profileOverlay');
+
+    if (profileSidebar && profileOverlay) {
+        profileSidebar.classList.add('active');
+        profileOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
 
 
     /* ================= MOBILE SWIPE (LEFT / RIGHT) ================= */
