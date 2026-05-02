@@ -522,7 +522,7 @@
 
 <div class="section-header">
     <div class="section-title">
-        <h3>Hikoyalar</h3>
+        <h3>Anime <span>Hikoyakar</span></h3>
     </div>
 </div>
 
@@ -727,7 +727,6 @@
                 modal.style.zIndex = '9999';
 
                 modal.innerHTML = `
-                    <!-- ORQAGA TUGMA -->
                     <div style="
                         position: absolute;
                         top: 15px;
@@ -748,29 +747,44 @@
                         </button>
                     </div>
 
-                    <img src="${img}" style="
-                        max-width: 90%;
-                        max-height: 90%;
-                        border-radius: 10px;
-                        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-                    ">
+                    <div style="text-align:center;">
+                        <img src="${img}" style="
+                            max-width: 90%;
+                            max-height: 80%;
+                            border-radius: 10px;
+                            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+                        ">
+
+                        <p style="
+                            margin-top: 12px;
+                            color: #fff;
+                            font-size: 14px;
+                            opacity: 0.8;
+                        ">
+                           Bu bulim tamirlanmoqda tez orada qushiladi
+                        </p>
+                    </div>
                 `;
 
                 document.body.appendChild(modal);
 
-                // rasm bosilsa yopiladi
+                // rasm yoki background bosilsa yopiladi
                 modal.addEventListener('click', (e) => {
                     if (e.target.id !== 'story-back-btn') {
                         modal.remove();
                     }
                 });
 
-                // orqaga tugma → home ga qaytadi
-                modal.querySelector('#story-back-btn').addEventListener('click', () => {
-                    window.location.href = "{% url 'home' %}";
-                });
+                // orqaga tugma
+                const backBtn = modal.querySelector('#story-back-btn');
+                if (backBtn) {
+                    backBtn.addEventListener('click', () => {
+                        window.location.href = "{% url 'home' %}";
+                    });
+                }
             });
         });
     });
 </script>
+
 {% endblock %}
