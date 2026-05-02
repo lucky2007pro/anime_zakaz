@@ -347,6 +347,51 @@
     .tag-jp { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 3px; color: var(--text-light); font-size: 0.65rem; font-weight: 800;}
 
     /* ----- REKOMENDATSIYA SCROLL ----- */
+
+.story-container {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 15px 5%;
+    scrollbar-width: none;
+}
+.story-container::-webkit-scrollbar {
+    display: none;
+}
+
+.story-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 70px;
+    cursor: pointer;
+}
+
+.story-ring {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.story-ring img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #0f0f13;
+}
+
+.story-item span {
+    font-size: 12px;
+    color: #aaa;
+}
+
     .recommendation-section {
         padding: 30px 0 0px 0;
         overflow: hidden;
@@ -474,6 +519,38 @@
 </div>
 {% endif %}
 
+
+<div class="section-header">
+    <div class="section-title">
+        <h3>Hikoyalar</h3>
+    </div>
+</div>
+
+<div class="story-container">
+
+    <div class="story-item" data-img="https://i.pinimg.com/736x/2e/c0/ef/2ec0ef00dcc78eff0aba30ce26ad7269.jpg">
+        <div class="story-ring">
+            <img src="https://i.pinimg.com/736x/1c/69/6c/1c696cfecf3bf7078a02c34351132989.jpg" alt="story">
+        </div>
+        <span>Story 1</span>
+    </div>
+
+    <div class="story-item" data-img="https://i.pinimg.com/736x/2e/c0/ef/2ec0ef00dcc78eff0aba30ce26ad7269.jpg">
+        <div class="story-ring">
+            <img src="https://i.pinimg.com/736x/85/f9/c3/85f9c3fc90ce8423c5bc7165e52250f2.jpg" alt="story">
+        </div>
+        <span>Story 2</span>
+    </div>
+
+    <div class="story-item" data-img="https://i.pinimg.com/736x/2e/c0/ef/2ec0ef00dcc78eff0aba30ce26ad7269.jpg">
+        <div class="story-ring">
+            <img src="https://i.pinimg.com/control1/1200x/a9/de/dc/a9dedcef16ff2509d4cbe81211bfaf9c.jpg" alt="story">
+        </div>
+        <span>Story 3</span>
+    </div>
+
+</div>
+
 {% if recommended_movies %}
 <div class="container recommendation-section">
     <div class="section-header" style="margin-top:0;">
@@ -596,31 +673,104 @@
     let currentSlide = 0;
 
     function goToSlide(index) {
-        if (totalSlides === 0) return;
+        if (!wrapper || totalSlides === 0) return;
+
         currentSlide = index;
         wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
 
         dots.forEach(dot => dot.setAttribute('aria-pressed', 'false'));
-        const activeDots = document.querySelectorAll('.dot-' + currentSlide);
-        activeDots.forEach(dot => dot.setAttribute('aria-pressed', 'true'));
+
+        document.querySelectorAll('.dot-' + currentSlide).forEach(dot => {
+            dot.setAttribute('aria-pressed', 'true');
+        });
     }
 
-    if(totalSlides > 1) {
+    if (wrapper && totalSlides > 1) {
         setInterval(() => {
-            let nextSlide = (currentSlide + 1) % totalSlides;
-            goToSlide(nextSlide);
+            currentSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(currentSlide);
         }, 5000);
     }
 
-    // Parallax Effect
     window.addEventListener('scroll', () => {
-        let scrollY = window.scrollY;
+        const scrollY = window.scrollY;
+
         if (scrollY < 800) {
-            const bgs = document.querySelectorAll('.slide-bg');
-            bgs.forEach(bg => {
-                 bg.style.transform = `translateY(${scrollY * 0.4}px) scale(${1 + scrollY * 0.0005})`;
+            document.querySelectorAll('.slide-bg').forEach(bg => {
+                bg.style.transform = `
+                    translateY(${scrollY * 0.4}px)
+                    scale(${1 + scrollY * 0.0005})
+                `;
             });
         }
+    });
+
+    /* =========================
+            STORY SYSTEM
+    ========================== */
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const storyItems = document.querySelectorAll('.story-item');
+
+        storyItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const img = item.getAttribute('data-img');
+                if (!img) return;
+
+                const modal = document.createElement('div');
+                modal.style.position = 'fixed';
+                modal.style.inset = '0';
+                modal.style.background = 'rgba(0,0,0,0.95)';
+                modal.style.display = 'flex';
+                modal.style.justifyContent = 'center';
+                modal.style.alignItems = 'center';
+                modal.style.zIndex = '9999';
+
+                modal.innerHTML = `
+                    <!-- ORQAGA TUGMA -->
+                    <div style="
+                        position: absolute;
+                        top: 15px;
+                        left: 15px;
+                        z-index: 10000;
+                    ">
+                        <button id="story-back-btn" style="
+                            padding: 10px 16px;
+                            border: none;
+                            border-radius: 8px;
+                            background: rgba(255,255,255,0.15);
+                            color: #fff;
+                            font-size: 14px;
+                            cursor: pointer;
+                            backdrop-filter: blur(6px);
+                        ">
+                            ⬅ Orqaga
+                        </button>
+                    </div>
+
+                    <img src="${img}" style="
+                        max-width: 90%;
+                        max-height: 90%;
+                        border-radius: 10px;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+                    ">
+                `;
+
+                document.body.appendChild(modal);
+
+                // rasm bosilsa yopiladi
+                modal.addEventListener('click', (e) => {
+                    if (e.target.id !== 'story-back-btn') {
+                        modal.remove();
+                    }
+                });
+
+                // orqaga tugma → home ga qaytadi
+                modal.querySelector('#story-back-btn').addEventListener('click', () => {
+                    window.location.href = "{% url 'home' %}";
+                });
+            });
+        });
     });
 </script>
 {% endblock %}
