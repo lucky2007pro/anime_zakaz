@@ -1,215 +1,272 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <title>Chat UI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telegram Chat UI</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
 
-            /* 📱 MOBILE BACKGROUND */
-            background-image: url("https://i.pinimg.com/736x/1e/13/bb/1e13bb5921f018295c582c1767923fa7.jpg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+/* BACKGROUND */
+body {
+    background: url("https://i.pinimg.com/736x/1e/13/bb/1e13bb5921f018295c582c1767923fa7.jpg") no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
+/* NAVBAR */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
 
-        /* 💻 PC BACKGROUND */
-        @media (min-width: 769px) {
-            body {
-                background-image: url("https://i.pinimg.com/736x/30/d6/e1/30d6e15166f47535cf99cf6f2a43089d.jpg");
-            }
-        }
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(12px);
 
-        /* CHAT */
-        #chat {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            position: relative;
-        }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-        /* MESSAGE */
-        .msg {
-            max-width: 70%;
-            padding: 10px 14px;
-            border-radius: 15px;
-            font-size: 14px;
-            word-wrap: break-word;
-        }
+    padding: 0 12px;
+    z-index: 1000;
+}
 
-        /* USER */
-        .user {
-            align-self: flex-end;
-            background: #3b82f6;
-            color: white;
-            border-top-right-radius: 0;
-        }
+/* TITLE */
+.title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+}
 
-        /* BOT */
-        .bot {
-            align-self: flex-start;
+/* BACK BUTTON */
+.back-btn {
+    text-decoration: none;
+    color: white;
+    font-size: 13px;
 
-            background: rgba(0, 0, 0, 0.55);
-            color: white;
+    padding: 6px 10px;
+    border-radius: 8px;
 
-            border-top-left-radius: 0;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+    transition: 0.2s;
+}
 
-            border: 1px solid rgba(255, 255, 255, 0.15);
+.back-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
+/* CHAT */
+.chat-container {
+    flex: 1;
+    margin-top: 50px;
+    margin-bottom: 90px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
 
-        /* BUTTON AREA */
-        #buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            padding: 12px;
+/* MESSAGE */
+.message {
+    max-width: 75%;
+    padding: 10px 14px;
+    margin: 5px 0;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+}
 
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(12px);
-        }
+/* USER */
+.user {
+    align-self: flex-end;
+    background: #0088cc;
+    color: white;
+    border-bottom-right-radius: 0;
+}
 
-        /* BUTTON */
-        button {
-            padding: 12px;
-            border-radius: 14px;
-            cursor: pointer;
-            font-weight: bold;
+/* BOT */
+.bot {
+    align-self: flex-start;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border-bottom-left-radius: 0;
+}
 
-            background: rgba(0, 0, 0, 0.55);
-            color: white;
+/* BUTTONS */
+.buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
 
-            border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(12px);
 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
-    </style>
+    padding: 10px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.buttons .row3 {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+/* BUTTON */
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+
+    background: rgba(0,0,0,0.7);
+    color: white;
+
+    font-size: 12px;
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+button:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+
+    .message {
+        font-size: 13px;
+        max-width: 85%;
+    }
+
+    .buttons {
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .buttons .row3 {
+        gap: 12px;
+    }
+
+    button {
+        padding: 22px 10px;
+        font-size: 16px;
+        border-radius: 16px;
+        min-height: 70px;
+    }
+
+    .back-btn {
+        padding: 12px 18px;
+        font-size: 16px;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<div id="chat"></div>
+<!-- NAVBAR -->
+<div class="navbar">
+    <a href="{% url 'home' %}" class="back-btn">ORQAGA</a>
+    <div class="title">bestmedia UI</div>
+</div>
 
-<div id="buttons">
-    <button onclick="sendMsg('ega')">EGA</button>
-    <button onclick="sendMsg('kanal')">KANAL</button>
-    <button onclick="sendMsg('guruh')">GURUH</button>
-    <button onclick="sendMsg('sayt haqida')">SAYT HAQIDA</button>
-    <button onclick="sendMsg('aloqa')">ALOQA</button>
+<!-- CHAT -->
+<div class="chat-container" id="chat"></div>
+
+<!-- BUTTONS -->
+<div class="buttons">
+
+    <button onclick="sendMsg('ega')">ega</button>
+    <button onclick="sendMsg('kanal')">kanal</button>
+
+    <div class="row3">
+        <button onclick="sendMsg('guruh')">guruh</button>
+        <button onclick="sendMsg('sayt')">sayt haqida</button>
+        <button onclick="sendMsg('aloqa')">aloqa</button>
+    </div>
+
 </div>
 
 <script>
 
-    function addMessage(text, type, linkBtn = null) {
-        const chat = document.getElementById("chat");
+function addMessage(text, type) {
+    const chat = document.getElementById("chat");
 
-        const wrapper = document.createElement("div");
-        wrapper.classList.add("msg", type);
+    const div = document.createElement("div");
+    div.classList.add("message", type);
+    div.innerHTML = text;
 
-        const textDiv = document.createElement("div");
-        textDiv.innerText = text;
+    chat.appendChild(div);
 
-        wrapper.appendChild(textDiv);
+    setTimeout(() => {
+        chat.scrollTo({
+            top: chat.scrollHeight,
+            behavior: "smooth"
+        });
+    }, 50);
+}
 
-        /* LINK BUTTON */
-        if (linkBtn) {
-            const btn = document.createElement("a");
-            btn.href = linkBtn.url;
-            btn.target = "_blank";
-            btn.innerText = linkBtn.text;
+function sendMsg(type) {
 
-            btn.style.display = "inline-block";
-            btn.style.marginTop = "8px";
-            btn.style.padding = "8px 12px";
-            btn.style.borderRadius = "10px";
-            btn.style.background = "#111";
-            btn.style.color = "white";
-            btn.style.textDecoration = "none";
-            btn.style.border = "1px solid rgba(255,255,255,0.3)";
+    if(type === "kanal") {
+        addMessage("kanal", "user");
 
-            wrapper.appendChild(btn);
-        }
-
-        chat.appendChild(wrapper);
-        chat.scrollTop = chat.scrollHeight;
-    }
-
-    async function sendMsg(type) {
-
-        addMessage(type, "user");
-
-        setTimeout(async () => {
-
-            if (type === "kanal") {
-                addMessage(
-                    "Anibest kanali kirish uchun tugma ustiga bosin 👇",
-                    "bot",
-                    {
-                        text: "📢 KANALGA O‘TISH",
-                        url: "https://t.me/ani_best_uzb_anime"
-                    }
-                );
-            }
-
-            else if (type === "ega") {
-                addMessage("👤 Bot egasi: islom", "bot");
-            }
-
-            else if (type === "guruh") {
-                addMessage("👥 Guruh: tez orada", "bot");
-            }
-
-            if (type === "aloqa") {
-                addMessage(
-                    "Biz bilan boglanish uchun pastdagi tugma ustiga bosin",
-                    "bot",
-                    {
-                        text: "📢 KANALGA O‘TISH",
-                        url: "https://t.me/ani_best_uzb_anime"
-                    }
-                );
-            }
-
-            /* 🔥 SAYT HAQIDA */
-            else if (type === "sayt haqida") {
-
-                const start = performance.now();
-
-                await fetch(window.location.href, { cache: "no-store" }).catch(()=>{});
-
-                const end = performance.now();
-
-                let ping = Math.round(end - start);
-                ping = ping + Math.floor(Math.random() * 20) - 10;
-
-                let sign = ping >= 0 ? "+" : "";
-
-                addMessage(
-    `🌐 SAYT INFO
-
-    📡 Ping: ${sign}${ping}ms
-    📅 Yasalgan kun: 4.04.2026
-    ⚙️ Versiya: 0.00.02`
-                , "bot");
-            }
-
+        setTimeout(() => {
+            addMessage("👉 https://t.me/ani_best_uzb_anime", "bot");
         }, 400);
     }
+
+    else if(type === "ega") {
+        addMessage("ega", "user");
+
+        setTimeout(() => {
+            addMessage("👤 Admin: Only_me_subaru tomonidan boshqariladi", "bot");
+        }, 400);
+    }
+
+    else if(type === "guruh") {
+        addMessage("guruh", "user");
+
+        setTimeout(() => {
+            addMessage("👥 Guruh: https://t.me/ani_best_chat", "bot");
+        }, 400);
+    }
+
+    else if(type === "sayt") {
+        addMessage("sayt haqida", "user");
+
+        setTimeout(() => {
+            addMessage("🌐 bu sayt UI tizimga moslashgan holda ishlanmoqda", "bot");
+        }, 400);
+    }
+
+    else if(type === "aloqa") {
+        addMessage("aloqa", "user");
+
+        setTimeout(() => {
+            addMessage("📩 Telegram: @Only_me_subaru", "bot");
+        }, 400);
+    }
+}
 
 </script>
 
