@@ -16,13 +16,17 @@
 }
 
 /* =========================
-   BACKGROUND
+   BODY (MOBILE FIX + FULL HEIGHT)
 ========================= */
+html, body {
+    height: 100%;
+}
+
 body {
     background: url("https://i.pinimg.com/736x/1e/13/bb/1e13bb5921f018295c582c1767923fa7.jpg")
     no-repeat center center / cover;
 
-    height: 100vh;
+    min-height: 100dvh; /* 🔥 mobile fix */
     display: flex;
     flex-direction: column;
 
@@ -71,7 +75,6 @@ body {
 
     background: rgba(255,255,255,0.08);
     backdrop-filter: blur(8px);
-
     transition: 0.2s;
 }
 
@@ -82,33 +85,34 @@ body {
 .toggle {
     font-size: 30px;
     cursor: pointer;
-    color: #bbb; /* OFF holat */
-
-    transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+    color: #bbb;
+    transition: 0.3s;
 }
 
-/* ON holat */
 .toggle.active {
-    color: #00e5ff;  /* ko‘k neon */
+    color: #00e5ff;
     text-shadow: 0 0 10px #00e5ff;
-
     transform: rotate(180deg) scale(1.15);
 }
 
-
-
 /* =========================
-   CHAT AREA
+   CHAT AREA (🔥 FIXED MOBILE ISSUE)
 ========================= */
 .chat-container {
     flex: 1;
     margin-top: 50px;
-    margin-bottom: 140px;
+
+    /* 🔥 CRITICAL FIX */
+    height: calc(100dvh - 50px - 140px);
+
     overflow-y: auto;
+    scroll-behavior: smooth;
 
     display: flex;
     flex-direction: column;
+
     padding: 10px;
+    padding-bottom: 200px; /* 🔥 bot panel ustiga chiqmasin */
 }
 
 /* MESSAGE */
@@ -122,7 +126,6 @@ body {
     line-height: 1.4;
 }
 
-/* USER MESSAGE */
 .user {
     align-self: flex-end;
     background: #0088cc;
@@ -130,7 +133,6 @@ body {
     border-bottom-right-radius: 0;
 }
 
-/* BOT MESSAGE */
 .bot {
     align-self: flex-start;
     background: rgba(0,0,0,0.6);
@@ -139,7 +141,7 @@ body {
 }
 
 /* =========================
-   BUTTONS
+   BUTTONS (BOTTOM FIX)
 ========================= */
 .buttons {
     position: fixed;
@@ -151,13 +153,16 @@ body {
     backdrop-filter: blur(12px);
 
     padding: 10px;
+    padding-bottom: env(safe-area-inset-bottom);
 
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+
+    z-index: 999;
 }
 
-/* 3 KATTA BUTTON QATOR */
+/* 3 BUTTON ROW */
 .buttons .row3 {
     grid-column: span 2;
     display: grid;
@@ -165,7 +170,6 @@ body {
     gap: 10px;
 }
 
-/* BUTTON */
 button {
     border: none;
     border-radius: 10px;
@@ -182,6 +186,7 @@ button {
 button:hover {
     background: rgba(255,255,255,0.15);
 }
+
 
 /* =========================
    TYPING ANIMATION (ROUND DOTS)
@@ -234,9 +239,65 @@ button:hover {
     }
 }
 
-/* =========================
-   MOBILE
-========================= */
+
+
+/* LINK BOX */
+.link-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* TITLE */
+.link-title {
+    font-size: 14px;
+    color: #ccc;
+}
+
+/* COPY LINK */
+.copy-link {
+    padding: 8px;
+    border-radius: 8px;
+
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+
+    font-size: 13px;
+    color: #00e5ff;
+    cursor: pointer;
+
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.2s;
+}
+
+.copy-link:hover {
+    background: rgba(0,229,255,0.15);
+}
+
+/* BUTTON (BLUR) */
+.link-btn {
+    text-decoration: none;
+    text-align: center;
+
+    padding: 10px;
+    border-radius: 10px;
+
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+
+    color: white;
+    font-weight: bold;
+
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: 0.3s;
+}
+
+.link-btn:hover {
+    background: rgba(0,229,255,0.2);
+    border-color: #00e5ff;
+    box-shadow: 0 0 10px #00e5ff;
+}
+
 @media (max-width: 600px) {
 
     .message {
@@ -244,37 +305,42 @@ button:hover {
         max-width: 85%;
     }
 
+    /* 🔥 FIX: buttonlar chatni bosib qo‘ymasligi uchun */
+    .chat-container {
+        padding-bottom: 200px;
+    }
+
     .buttons {
-        gap: 12px;
+        gap: 10px;
         padding: 12px;
     }
 
     .buttons .row3 {
-        gap: 12px;
+        gap: 10px;
     }
 
     button {
-        padding: 22px 10px;
-        font-size: 16px;
-        border-radius: 16px;
-        min-height: 70px;
+        padding: 18px 10px;
+        font-size: 15px;
+        border-radius: 14px;
+        min-height: 65px;
     }
 
     .back-btn {
-        padding: 12px 18px;
-        font-size: 16px;
+        padding: 10px 14px;
+        font-size: 14px;
     }
 }
 
 /* =========================
-   DESKTOP
+   DESKTOP FIXED VERSION
 ========================= */
 @media (min-width: 768px) {
 
     .buttons {
         max-width: 800px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 18px;
         gap: 15px;
     }
 
@@ -283,14 +349,15 @@ button:hover {
     }
 
     button {
-        padding: 18px;
-        font-size: 16px;
+        padding: 16px;
+        font-size: 15px;
         border-radius: 14px;
-        min-height: 65px;
+        min-height: 60px;
     }
 
+    /* 🔥 FIX: chat pastda yashirinib qolmasligi uchun */
     .chat-container {
-        margin-bottom: 160px;
+        padding-bottom: 180px;
     }
 }
 
@@ -319,13 +386,16 @@ button:hover {
 <body>
 
 <div class="navbar">
-    <a href="{% url 'home' %}" class="back-btn">ORQAGA</a>
+    <a href="{% url 'home' %}" class="back-btn">
+        <i class='bx bx-arrow-back'></i> ORQAGA
+    </a>
 
-    <div class="title">bestmedia UI</div>
+    <div class="title">Bestmedia UI</div>
 
     <i id="toggleBtn"
        class="bx bxs-toggle-left toggle"
-       onclick="togglePC()"></i>
+       onclick="togglePC()"
+       title="Rejimni almashtirish"></i>
 </div>
 
 <div id="popup" class="popup">
@@ -335,17 +405,34 @@ button:hover {
 <div class="chat-container" id="chat"></div>
 
 <div class="buttons">
-    <button onclick="sendMsg('ega')">ega</button>
-    <button onclick="sendMsg('kanal')">kanal</button>
+
+    <button onclick="sendMsg('ega')">
+        <i class='bx bx-user'></i><br>Ega
+    </button>
+
+    <button onclick="sendMsg('kanal')">
+        <i class='bx bxl-telegram'></i><br>Kanal
+    </button>
 
     <div class="row3">
-        <button onclick="sendMsg('guruh')">guruh</button>
-        <button onclick="sendMsg('sayt')">sayt haqida</button>
-        <button onclick="sendMsg('aloqa')">aloqa</button>
+
+        <button onclick="sendMsg('guruh')">
+            <i class='bx bx-group'></i><br>Guruh
+        </button>
+
+        <button onclick="sendMsg('sayt')">
+            <i class='bx bx-globe'></i><br>Sayt
+        </button>
+
+        <button onclick="sendMsg('aloqa')">
+            <i class='bx bx-message-dots'></i><br>Aloqa
+        </button>
+
     </div>
 </div>
 
 <audio id="msgSound"
+       preload="auto"
        src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3">
 </audio>
 
@@ -407,6 +494,10 @@ function togglePC() {
     const body = document.body;
     const icon = document.getElementById("toggleBtn");
     const popup = document.getElementById("popup");
+    const BOT_AVATAR = `
+        <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg"
+            class="bot-avatar">
+    `;
 
     pcMode = !pcMode;
 
@@ -488,16 +579,46 @@ function playSound() {
     sound.play();
 }
 
-/* =========================
-   SEND MESSAGE (WITH TYPING)
-========================= */
+ /* =========================
+    SEND MESSAGE (WITH TYPING)
+ ========================= */
 function sendMsg(type) {
 
     if (type === "kanal") {
         addMessage("kanal", "user");
 
         showTyping(() => {
-            addMessage("👉 https://t.me/ani_best_uzb_anime", "bot");
+            addMessage(`
+                <div class="link-box">
+
+                    <div style="display:flex; align-items:center; gap:10px;">
+
+                        <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg"
+                            style="
+                                    width: 40px;
+                                    height: 40px;
+                                    border-radius: 50%;
+                                    object-fit: cover;
+                                    border: 2px solid #00e5ff;
+                            ">
+
+                        <div class="link-title">
+                            📢 Ani Best kanal
+                        </div>
+
+                    </div>
+
+                    <div class="copy-link" data-link="https://t.me/ani_best_uzb_anime" onclick="copyLink(this)">
+                        https://t.me/ani_best_uzb_anime
+                    </div>
+
+                    <a href="https://t.me/ani_best_uzb_anime" target="_blank" class="link-btn">
+                        👉 Kanalga kirish
+                    </a>
+
+                </div>
+            `, "bot");
+
             playSound();
         });
     }
@@ -506,7 +627,32 @@ function sendMsg(type) {
         addMessage("ega", "user");
 
         showTyping(() => {
-            addMessage("👤 Admin: Only_me_subaru tomonidan boshqariladi", "bot");
+            addMessage(`
+                <div style="display:flex; align-items:center; gap:10px;">
+
+                    <img src="https://i.pinimg.com/736x/72/96/23/729623fbacd8ba543de82d132b026a7a.jpg"
+                        style="
+                            width:38px;
+                            height:38px;
+                            border-radius:50%;
+                            object-fit:cover;
+                            border:2px solid #00e5ff;
+                            flex-shrink:0;
+                        ">
+
+                    <div>
+                        <div style="font-size:14px; color:#00e5ff; font-weight:bold;">
+                            Ega
+                        </div>
+
+                        <div style="font-size:14px; color:white;">
+                            Only_me_subaru tomonidan boshqariladi
+                        </div>
+                    </div>
+
+                </div>
+            `, "bot");
+
             playSound();
         });
     }
@@ -515,7 +661,22 @@ function sendMsg(type) {
         addMessage("guruh", "user");
 
         showTyping(() => {
-            addMessage("👥 Guruh: https://t.me/ani_best_chat", "bot");
+            addMessage(`
+                <div class="link-box">
+
+                    <div class="link-title">👥 Ani Best guruh</div>
+
+                    <div class="copy-link" data-link="https://t.me/ani_best_chat" onclick="copyLink(this)">
+                        https://t.me/ani_best_chat
+                    </div>
+
+                    <a href="https://t.me/ani_best_chat" target="_blank" class="link-btn">
+                        👉 Guruhga kirish
+                    </a>
+
+                </div>
+            `, "bot");
+
             playSound();
         });
     }
@@ -533,10 +694,41 @@ function sendMsg(type) {
         addMessage("aloqa", "user");
 
         showTyping(() => {
-            addMessage("📩 Telegram: @Only_me_subaru", "bot");
+            addMessage(`
+                <div class="link-box">
+
+                    <div class="link-title">📩 Admin bilan aloqa</div>
+
+                    <div class="copy-link" data-link="https://t.me/Only_me_subaru" onclick="copyLink(this)">
+                        @Only_me_subaru
+                    </div>
+
+                    <a href="https://t.me/Only_me_subaru" target="_blank" class="link-btn">
+                        👉 Yozish
+                    </a>
+
+                </div>
+            `, "bot");
+
             playSound();
         });
     }
+}
+
+
+/* =========================
+   COPY LINK (FIXED)
+========================= */
+function copyLink(el) {
+    const text = el.getAttribute("data-link");
+
+    navigator.clipboard.writeText(text).then(() => {
+        el.innerText = "✅ Nusxa olindi!";
+
+        setTimeout(() => {
+            el.innerText = text;
+        }, 1500);
+    });
 }
 
 </script>
