@@ -64,6 +64,107 @@ body {
     font-size: 15px;
 }
 
+
+/* FON RASMLAR */
+.bg-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bg-title {
+    font-size: 14px;
+    color: #ccc;
+    margin-bottom: 5px;
+}
+
+.bg-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+/* DEFAULT */
+.bg-img {
+    width: 55px;
+    height: 55px;
+
+    border-radius: 50%;
+    object-fit: cover;
+
+    border: 2px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+
+    transition: 0.25s ease;
+    position: relative;
+}
+
+.bg-img:hover:not(.active-bg) {
+    transform: scale(1.12);
+}
+
+/* SAVE BUTTON */
+.bg-save {
+    margin-top: 5px;
+    padding: 10px;
+
+    text-align: center;
+    border-radius: 10px;
+
+    background: rgba(0,229,255,0.15);
+    color: #00e5ff;
+
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.bg-save:hover {
+    background: rgba(0,229,255,0.25);
+    box-shadow: 0 0 10px #00e5ff;
+}
+
+.bg-item {
+    position: relative;
+}
+
+/* ✅ ACTIVE (SELECTED EFFECT) */
+.active-bg {
+    border: 3px solid #00e5ff !important;
+    transform: scale(1.2);
+    box-shadow:
+        0 0 0 3px rgba(0,229,255,0.25),
+        0 0 15px #00e5ff;
+    z-index: 2;
+}
+
+/* 🔵 OUTER RING EFFECT */
+.active-bg::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,229,255,0.6);
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 0.2;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+}
+
+
 /* BACK BUTTON */
 .back-btn {
     text-decoration: none;
@@ -240,6 +341,53 @@ button:hover {
 }
 
 
+/* Uchish effect */
+.toast {
+    position: fixed;
+    top: 60px; /* 🔥 navbar (50px) + ozgina masofa */
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(10px);
+    color: white;
+
+    padding: 10px 18px;
+    border-radius: 12px;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: all 0.4s ease;
+    z-index: 9999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast.hide {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+}
+@keyframes toastIn {
+    0% {
+        transform: translateX(-50%) translateY(-30px);
+        opacity: 0;
+    }
+    60% {
+        transform: translateX(-50%) translateY(5px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
 
 /* LINK BOX */
 .link-box {
@@ -274,6 +422,45 @@ button:hover {
     background: rgba(0,229,255,0.15);
 }
 
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.settings-btn {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+
+    padding: 18px 10px;
+
+    text-align: center;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+
+    cursor: pointer;
+    transition: 0.2s;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+}
+
+.settings-btn:hover {
+    transform: scale(1.05);
+    background: rgba(0,229,255,0.15);
+    border-color: #00e5ff;
+    box-shadow: 0 0 10px #00e5ff;
+}
+
 /* BUTTON (BLUR) */
 .link-btn {
     text-decoration: none;
@@ -300,23 +487,61 @@ button:hover {
 
 @media (max-width: 600px) {
 
+    /* =========================
+       NAVBAR
+    ========================= */
+    .navbar {
+        height: 45px;
+    }
+
+    .title {
+        font-size: 13px;
+    }
+
+    .back-btn {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    /* =========================
+       CHAT AREA
+    ========================= */
+    .chat-container {
+        padding-bottom: 190px; /* button bosib ketmasin */
+        -webkit-overflow-scrolling: touch; /* smooth scroll */
+    }
+
+    /* =========================
+       MESSAGE
+    ========================= */
     .message {
         font-size: 13px;
         max-width: 85%;
+        animation: msgIn 0.25s ease;
     }
 
-    /* 🔥 FIX: buttonlar chatni bosib qo‘ymasligi uchun */
-    .chat-container {
-        padding-bottom: 200px;
+    @keyframes msgIn {
+        from {
+            transform: translateY(10px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
 
+    /* =========================
+       BUTTONS
+    ========================= */
     .buttons {
-        gap: 10px;
+        gap: 12px;
         padding: 12px;
+        padding-bottom: calc(env(safe-area-inset-bottom) + 10px);
     }
 
     .buttons .row3 {
-        gap: 10px;
+        gap: 12px;
     }
 
     button {
@@ -324,24 +549,51 @@ button:hover {
         font-size: 15px;
         border-radius: 14px;
         min-height: 65px;
+        transition: 0.15s;
     }
 
-    .back-btn {
-        padding: 10px 14px;
-        font-size: 14px;
+    /* tap effect */
+    button:active {
+        transform: scale(0.95);
+        background: rgba(0,229,255,0.2);
     }
+
+    button:focus {
+        outline: none;
+        box-shadow: 0 0 10px #00e5ff;
+    }
+
+    /* =========================
+       TOAST
+    ========================= */
+    .toast {
+        width: 85%;
+        text-align: center;
+        border-radius: 16px;
+        backdrop-filter: blur(20px);
+        font-size: 13px;
+    }
+
+    .toast.show {
+        animation: toastIn 0.5s ease;
+    }
+
 }
-
-/* =========================
-   DESKTOP FIXED VERSION
-========================= */
 @media (min-width: 768px) {
 
+    /* =========================
+       BUTTONS
+    ========================= */
     .buttons {
         max-width: 800px;
         margin: 0 auto;
         padding: 18px;
         gap: 15px;
+
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
 
     .buttons .row3 {
@@ -353,13 +605,147 @@ button:hover {
         font-size: 15px;
         border-radius: 14px;
         min-height: 60px;
+        transition: 0.25s ease;
     }
 
-    /* 🔥 FIX: chat pastda yashirinib qolmasligi uchun */
+    button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 0 15px rgba(0,229,255,0.4);
+    }
+
+    /* =========================
+       CHAT CONTAINER (FIXED)
+    ========================= */
     .chat-container {
-        padding-bottom: 180px;
+        max-width: 800px;
+        margin: 60px auto 0 auto;
+
+        /* ❌ DUDE: eski conflict lar olib tashlandi */
+        padding-top: 20px;
+        padding-bottom: 190px;
+
+        /* ❌ justify-content duplicate o‘chirildi */
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+
+        overflow-y: auto;
+
+        border-radius: 20px;
+
+        background: rgba(0,0,0,0.55);
+        backdrop-filter: blur(5px);
+
+        box-shadow: 0 0 30px rgba(0,0,0,0.6);
+    }
+
+    /* =========================
+       MESSAGE HOVER
+    ========================= */
+    .message {
+        transition: 0.25s ease;
+    }
+
+    .message:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 15px rgba(0,229,255,0.25);
+    }
+
+    /* =========================
+       NAVBAR
+    ========================= */
+    .navbar {
+        max-width: 800px;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+
+        border-radius: 0 0 15px 15px;
+
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(10px);
+
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
+
+    /* =========================
+       TOAST
+    ========================= */
+    .toast {
+        top: 80px;
+        padding: 12px 22px;
+        font-size: 14px;
+
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.1);
     }
 }
+
+
+/* =========================
+   BIG DESKTOP (1024px+)
+========================= */
+@media (min-width: 1024px) {
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        background-attachment: fixed;
+    }
+
+    .chat-container {
+        max-width: 850px;
+        padding-bottom: 280px; /* 🔥 ULTRA FIX (safe area) */
+
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(6px);
+
+        box-shadow:
+            0 10px 40px rgba(0,0,0,0.7),
+            0 0 0 1px rgba(255,255,255,0.05);
+    }
+
+    .message {
+        transition: 0.25s ease;
+    }
+
+    .message:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 15px rgba(0,229,255,0.3);
+    }
+
+    /* SCROLL STYLE */
+    .chat-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .chat-container::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+    }
+
+    .chat-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(0,229,255,0.5);
+    }
+
+    /* BUTTONS */
+    .buttons {
+        max-width: 850px;
+        margin: 0 auto;
+
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(10px);
+
+        box-shadow: 0 5px 25px rgba(0,0,0,0.6);
+    }
+
+    .navbar {
+        max-width: 850px;
+    }
+}
+
 
 /* =========================
    POPUP
@@ -385,6 +771,7 @@ button:hover {
 
 <body>
 
+<div id="toast" class="toast"></div>
 <div class="navbar">
     <a href="{% url 'home' %}" class="back-btn">
         <i class='bx bx-arrow-back'></i> ORQAGA
@@ -397,6 +784,8 @@ button:hover {
        onclick="togglePC()"
        title="Rejimni almashtirish"></i>
 </div>
+
+
 
 <div id="popup" class="popup">
     kompyuter holatga o‘tdingiz
@@ -420,8 +809,8 @@ button:hover {
             <i class='bx bx-group'></i><br>Guruh
         </button>
 
-        <button onclick="sendMsg('sayt')">
-            <i class='bx bx-globe'></i><br>Sayt
+        <button onclick="sendMsg('saytsozlamalari')">
+            <i class='bx bx-cog'></i><br>Sayt sozlamalari
         </button>
 
         <button onclick="sendMsg('aloqa')">
@@ -431,6 +820,7 @@ button:hover {
     </div>
 </div>
 
+
 <audio id="msgSound"
        preload="auto"
        src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3">
@@ -438,18 +828,34 @@ button:hover {
 
 <script>
 
+let settingsMenu = false;
+let selectedBg = null;
+let activeBg = null;
+let lastBgMsg = null;
+
+
 /* =========================
    PAGE OPEN AUTO MESSAGE
 ========================= */
 window.addEventListener("load", () => {
 
+    // 🔥 1. SAVE qilingan fonni qayta yuklash
+    const savedBg = localStorage.getItem("chat_bg");
+    if (savedBg) {
+        document.body.style.backgroundImage = `url('${savedBg}')`;
+    }
+
+    // 🔥 2. Auto welcome message
     setTimeout(() => {
         showTyping(() => {
             addMessage(
-`Assalomu alaykum 👋\n
-bu Bestmedia UI sizga yordam berish maqsadida yaratilgan,\n
-sizga qanday yordam bera olaman. 😊`,
+`Assalomu alaykum 👋
+
+bu Bestmedia UI sizga yordam berish maqsadida yaratilgan,
+sizga qanday yordam bera olaman 😊`,
             "bot");
+
+            playSound(); // 🔊 ovoz ham chiqadi
         });
     }, 600);
 
@@ -568,6 +974,8 @@ function addMessage(text, type) {
         top: chat.scrollHeight,
         behavior: "smooth"
     });
+
+    return div; // 🔥 MUHIM
 }
 
 /* =========================
@@ -713,8 +1121,166 @@ function sendMsg(type) {
             playSound();
         });
     }
+
+    else if (type === "saytsozlamalari") {
+
+        // 🔥 USER MESSAGE (so‘rov sifatida)
+        addMessage("Sayt sozlamalari", "user");
+
+        showTyping(() => {
+
+            settingsMenu = true;
+
+            addMessage(`
+                <div class="settings-grid">
+
+                    <div class="settings-btn" onclick="settingsAction('mute')">
+                        🔇 <br> Sukut qilish
+                    </div>
+
+                    <div class="settings-btn" onclick="settingsAction('bg')">
+                        🖼️ <br> Fon o‘zgartirish
+                    </div>
+
+                    <div class="settings-btn" onclick="settingsAction('rate')">
+                        ⭐ <br> Baholash
+                    </div>
+
+                    <div class="settings-btn" onclick="settingsAction('premium')">
+                        💎 <br> Premium
+                    </div>
+
+                </div>
+            `, "bot");
+
+            playSound();
+        });
+    }
 }
 
+
+
+
+function applyBg() {
+    if (!selectedBg) return;
+
+    document.body.style.backgroundImage = `url('${selectedBg}')`;
+    localStorage.setItem("chat_bg", selectedBg);
+
+    addMessage("🖼 Fon o‘rnatildi", "bot");
+}
+
+function muteToggle(type) {
+
+    if (type === "on") {
+        addMessage("sukut qilish", "user");
+
+        showTyping(() => {
+            addMessage("🔇 Bot sukut qilindi", "bot");
+            playSound();
+        });
+    }
+
+    else if (type === "off") {
+        addMessage("sukutdan chiqarish", "user");
+
+        showTyping(() => {
+            addMessage("🔊 Bot sukutdan chiqarildi", "bot");
+            playSound();
+        });
+    }
+}
+
+function settingsAction(type) {
+
+    // 🔇 MUTE MENU
+    if (type === "mute") {
+
+        addMessage("sukut qilish", "user");
+
+        showTyping(() => {
+            addMessage(`
+                <div class="link-box">
+                    <div class="copy-link" onclick="muteToggle('on')">|| Sukut qilish ||</div>
+                    <div class="copy-link" onclick="muteToggle('off')">|| Sukunatdan chiqarish ||</div>
+                </div>
+            `, "bot");
+
+            playSound();
+        });
+    }
+
+    // 🖼 BACKGROUND MENU
+    else if (type === "bg") {
+
+        addMessage("fon o‘zgartirish", "user");
+
+        showTyping(() => {
+
+            addMessage(`
+                <div class="bg-grid">
+
+                    <div class="bg-title">🖼 Rasm tanlang</div>
+
+                    <div class="bg-row">
+
+                        <img src="https://i.pinimg.com/736x/77/3c/eb/773cebfabe446b2ecd7d5cc65f765eb0.jpg"
+                             onclick="selectBg(this.src, this)" class="bg-img">
+
+                        <img src="https://i.pinimg.com/736x/1e/13/bb/1e13bb5921f018295c582c1767923fa7.jpg"
+                             onclick="selectBg(this.src, this)" class="bg-img">
+
+                        <img src="https://i.pinimg.com/736x/7b/4f/30/7b4f30ddddedd15537d3c742fa7c8d7c.jpg"
+                             onclick="selectBg(this.src, this)" class="bg-img">
+
+                        <img src="https://i.pinimg.com/736x/49/26/85/492685785b09d8ef14a4ca36c1b7fabc.jpg"
+                             onclick="selectBg(this.src, this)" class="bg-img">
+
+                    </div>
+
+                    <div class="bg-row">
+
+                        <img src="https://i.pinimg.com/736x/6c/e7/34/6ce73446be46060b4ae96dad04c45569.jpg"
+                             onclick="selectBg(this.src, this)" class="bg-img">
+
+                        <img src="https://i.pinimg.com/736x/9a/20/8d/9a208dc8e4d8e6e79358e61875da1bc3.jpg"
+                             onclick="selectBg(this.src, this)" class="bg-img">
+
+                        <img src="https://i.pinimg.com/1200x/aa/dd/3e/aadd3e9eba0d019d26c54573ca7d4021.jpg"
+                             onclick="selectBg(this.src, this)" class="bg-img">
+
+                        <img src="https://i.pinimg.com/control1/1200x/b6/d1/d9/b6d1d964a55045124cb27a1c6b898c2c.jpg"
+                             onclick="selectBg(this.src, this)" class="bg-img">
+
+                    </div>
+
+                </div>
+            `, "bot");
+
+            playSound();
+        });
+    }
+
+    // ⭐ RATING
+    else if (type === "rate") {
+        addMessage("baholash", "user");
+
+        showTyping(() => {
+            addMessage("⭐ Bu funksiya tez orada qo‘shiladi", "bot");
+            playSound();
+        });
+    }
+
+    // 💎 PREMIUM
+    else if (type === "premium") {
+        addMessage("premium", "user");
+
+        showTyping(() => {
+            addMessage("💎 Premium tizim tez orada qo‘shiladi", "bot");
+            playSound();
+        });
+    }
+}
 
 /* =========================
    COPY LINK (FIXED)
@@ -730,6 +1296,38 @@ function copyLink(el) {
         }, 1500);
     });
 }
+
+function selectBg(url, el) {
+
+    selectedBg = url;
+
+    document.querySelectorAll(".bg-img").forEach(img => {
+        img.classList.remove("active-bg");
+    });
+
+    if (el) el.classList.add("active-bg");
+
+    document.body.style.backgroundImage = `url('${url}')`;
+    localStorage.setItem("chat_bg", url);
+
+    showToast("🖼 Fon o‘rnatildi");
+}
+
+function showToast(text) {
+    const toast = document.getElementById("toast");
+
+    toast.innerText = text;
+    toast.classList.add("show");
+    toast.classList.remove("hide");
+
+    setTimeout(() => {
+        toast.classList.add("hide");
+        toast.classList.remove("show");
+    }, 2000);
+}
+
+
+
 
 </script>
 
