@@ -165,6 +165,8 @@ body {
 }
 
 
+
+
 /* BACK BUTTON */
 .back-btn {
     text-decoration: none;
@@ -389,6 +391,83 @@ button:hover {
 }
 
 
+/* INPUT PANEL */
+/* INPUT PANEL */
+.chat-input {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+
+    z-index: 1000;
+}
+
+/* 🔥 ORQAGA BUTTON (chapda) */
+.back-input-btn {
+    padding: 10px 12px;
+    border-radius: 10px;
+
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* INPUT */
+.chat-input input {
+    flex: 1;
+    padding: 12px;
+
+    border-radius: 10px;
+    border: none;
+    outline: none;
+
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+/* BUTTON */
+.chat-input button {
+    padding: 12px 18px;
+    border-radius: 10px;
+
+    border: none;
+    background: #00e5ff;
+    color: black;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* SEND BUTTON */
+.chat-input button:last-child {
+    padding: 12px 18px;
+    border-radius: 10px;
+
+    border: none;
+    background: #00e5ff;
+    color: black;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* HIDDEN CLASS */
+.hidden {
+    display: none;
+}
+
+
 /* LINK BOX */
 .link-box {
     display: flex;
@@ -507,7 +586,7 @@ button:hover {
        CHAT AREA
     ========================= */
     .chat-container {
-        padding-bottom: 190px; /* button bosib ketmasin */
+        padding-bottom: 200px; /* button bosib ketmasin */
         -webkit-overflow-scrolling: touch; /* smooth scroll */
     }
 
@@ -578,6 +657,27 @@ button:hover {
         animation: toastIn 0.5s ease;
     }
 
+    .chat-input button,
+    .back-input-btn {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+        min-width: 45px;
+        min-height: 38px;
+        border-radius: 8px;
+    }
+
+    /* ORQAGA button */
+    .back-input-btn {
+        font-size: 13px !important;
+        padding: 8px 10px !important;
+    }
+
+    /* YUBORISH button (oxirgi button) */
+    .chat-input button:last-child {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        min-width: 55px;
+    }
 }
 @media (min-width: 768px) {
 
@@ -679,6 +779,175 @@ button:hover {
 
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* =========================
+       INPUT BUTTONS (DESKTOP FIX)
+    ========================= */
+    .chat-input {
+        max-width: 800px;
+        margin: 0 auto;
+
+        left: 0;
+        right: 0;
+
+        padding: 12px 14px;
+        gap: 12px;
+
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(12px);
+
+        border-top: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px 16px 0 0;
+
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.4);
+    }
+
+    /* =========================
+       BACK BUTTON (⬅ ORQAGA)
+    ========================= */
+    .back-input-btn {
+        padding: 10px 14px;
+        min-width: 44px;
+
+        border-radius: 12px;
+
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.1);
+
+        color: white;
+        font-size: 16px;
+
+        cursor: pointer;
+
+        transition: 0.25s ease;
+    }
+
+    .back-input-btn:hover {
+        background: rgba(0,229,255,0.15);
+        border-color: #00e5ff;
+        transform: scale(1.05);
+        box-shadow: 0 0 12px rgba(0,229,255,0.3);
+    }
+
+    /* =========================
+       INPUT FIELD
+    ========================= */
+    .chat-input input {
+        flex: 1;
+
+        padding: 12px 14px;
+
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.08);
+
+        background: rgba(255,255,255,0.06);
+        color: white;
+
+        font-size: 14px;
+
+        outline: none;
+
+        transition: 0.2s;
+    }
+
+    .chat-input input:focus {
+        border-color: #00e5ff;
+        box-shadow: 0 0 10px rgba(0,229,255,0.25);
+    }
+
+    /* =========================
+       SEND BUTTON (YUBORISH)
+    ========================= */
+    .chat-input button {
+        padding: 10px 16px;
+
+        border-radius: 12px;
+
+        background: linear-gradient(135deg, #00e5ff, #00bcd4);
+        color: black;
+
+        font-weight: bold;
+        font-size: 14px;
+
+        border: none;
+
+        cursor: pointer;
+
+        transition: 0.25s ease;
+    }
+
+    .chat-input button:hover {
+        transform: scale(1.08);
+        box-shadow: 0 0 15px rgba(0,229,255,0.5);
+    }
+
+    /* CLICK EFFECT */
+    .chat-input button:active {
+        transform: scale(0.95);
+    }
+
+}
+
+.ADMIN_SHKOYAT_USTUN {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    padding: 15px;
+    border-radius: 15px;
+
+    /* Blur effekt */
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* Button style */
+.settings-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 12px 14px;
+    border-radius: 12px;
+
+    cursor: pointer;
+    transition: 0.25s ease;
+
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Hover effekt */
+.settings-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(5px);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Click effect */
+.settings-btn:active {
+    transform: scale(0.98);
+}
+
+/* ANIMATION */
+@keyframes menuIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -793,7 +1062,21 @@ button:hover {
 
 <div class="chat-container" id="chat"></div>
 
-<div class="buttons">
+<!-- 🔻 INPUT (default hidden) -->
+<div id="chatInputBox" class="chat-input hidden">
+
+    <!-- 🔥 ORQAGA -->
+    <button class="back-input-btn" onclick="closeChatInput()">
+        ⬅ ORQAGA
+    </button>
+
+    <input type="text" id="userInput" placeholder="Xabar yozing...">
+
+    <button onclick="sendUserMessage()">Yuborish</button>
+
+</div>
+
+<div class="buttons" id="mainButtons">
 
     <button onclick="sendMsg('ega')">
         <i class='bx bx-user'></i><br>Ega
@@ -805,8 +1088,9 @@ button:hover {
 
     <div class="row3">
 
-        <button onclick="sendMsg('guruh')">
-            <i class='bx bx-group'></i><br>Guruh
+        <!-- 🔥 YOZISH -->
+        <button onclick="openChatInput()">
+            <i class='bx bx-edit'></i><br>Yozish
         </button>
 
         <button onclick="sendMsg('saytsozlamalari')">
@@ -820,7 +1104,6 @@ button:hover {
     </div>
 </div>
 
-
 <audio id="msgSound"
        preload="auto"
        src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3">
@@ -832,6 +1115,12 @@ let settingsMenu = false;
 let selectedBg = null;
 let activeBg = null;
 let lastBgMsg = null;
+let adminState = {
+    active: false,
+    step: null, // "name" | "message"
+    name: "",
+    message: ""
+};
 
 
 /* =========================
@@ -975,6 +1264,8 @@ function addMessage(text, type) {
         behavior: "smooth"
     });
 
+    scrollToBottom(); // 🔥 FIX
+
     return div; // 🔥 MUHIM
 }
 
@@ -1101,22 +1392,22 @@ function sendMsg(type) {
     else if (type === "aloqa") {
         addMessage("aloqa", "user");
 
-        showTyping(() => {
-            addMessage(`
-                <div class="link-box">
+            showTyping(() => {
+                addMessage(`
+                    <div class="ADMIN_SHKOYAT_USTUN">
 
-                    <div class="link-title">📩 Admin bilan aloqa</div>
+                        <div class="settings-btn" onclick="sendMsg('aloqa2')">
+                            📩 Aloqa
+                        </div>
 
-                    <div class="copy-link" data-link="https://t.me/Only_me_subaru" onclick="copyLink(this)">
-                        @Only_me_subaru
-                    </div>
+                        <div class="settings-btn" onclick="sendAdmin('admin')">
+                            👨‍💻 Adminga xabar yuborish
+                        </div>
 
-                    <a href="https://t.me/Only_me_subaru" target="_blank" class="link-btn">
-                        👉 Yozish
-                    </a>
-
-                </div>
-            `, "bot");
+                        <div class="settings-btn" onclick="sendAdmin('shikoyat')">
+                            ⚠️ Shikoyat
+                        </div>
+                `, "bot");
 
             playSound();
         });
@@ -1149,6 +1440,29 @@ function sendMsg(type) {
                     <div class="settings-btn" onclick="settingsAction('premium')">
                         💎 <br> Premium
                     </div>
+
+                </div>
+            `, "bot");
+
+            playSound();
+        });
+    }
+        else if (type === "aloqa2") {
+        addMessage("aloqa2", "user");
+
+        showTyping(() => {
+            addMessage(`
+                <div class="link-box">
+
+                    <div class="link-title">📩 Admin bilan aloqa</div>
+
+                    <div class="copy-link" data-link="https://t.me/Only_me_subaru" onclick="copyLink(this)">
+                        @Only_me_subaru
+                    </div>
+
+                    <a href="https://t.me/Only_me_subaru" target="_blank" class="link-btn">
+                        👉 Yozish
+                    </a>
 
                 </div>
             `, "bot");
@@ -1326,6 +1640,223 @@ function showToast(text) {
     }, 2000);
 }
 
+// 🔥 INPUTNI OCHISH
+function openChatInput() {
+    document.getElementById("mainButtons").style.display = "none";
+    document.getElementById("chatInputBox").classList.remove("hidden");
+
+    addMessage("💬 Yozish rejimi yoqildi", "bot");
+}
+
+// 🔥 USER XABAR YUBORISH
+function sendUserMessage() {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim().toLowerCase();
+
+    if (!text) return;
+
+    addMessage(text, "user");
+    input.value = "";
+
+    // =========================
+    // SALOM
+    // =========================
+    if (text === "salom") {
+
+        showTyping(() => {
+            addMessage(
+                `👋 Valaykum assalom!
+
+Sizga qanday yordam bera olaman 😊
+
+Agar admin bilan bog‘lanmoqchi bo‘lsangiz, "yordam" deb yozing.`,
+                "bot"
+            );
+        });
+    }
+    // =========================
+    // SALOM / HOL SO‘RASH (RANDOM JAVOB)
+    // =========================
+    else if (
+        text.includes("qalaysiz") ||
+        text.includes("qalaysan") ||
+        text.includes("yaxshimisiz") ||
+        text.includes("yaxshimisan") ||
+        text.includes("yahshimisan")
+    ) {
+        const replies = [
+            "😊 Yaxshi rahmat! Siz-chi, qalaysiz?",
+            "👍 Zo‘rman, rahmat! O‘zingiz qanday?",
+            "😄 Juda yaxshi, sizga ham omad!",
+            "✨ Ajoyib, rahmat! Sizda nima gaplar?",
+            "🙂 Yaxshiman, rahmat so‘raganingiz uchun!"
+        ];
+
+        const randomReply = replies[Math.floor(Math.random() * replies.length)];
+
+        showTyping(() => {
+            addMessage(randomReply, "bot");
+        });
+    }
+    // =========================
+    // ANIME (RANDOM JAVOB)
+    // =========================
+    else if (text.includes("anime")) {
+        const replies = [
+            "🎬 Anime haqida nima kerak? Tavsiya, ma’lumot yoki qidiruv?",
+            "🍥 Anime dunyosi juda katta! Qaysi tur qiziq: action, romance yoki isekai?",
+            "🎥 Anime tavsiya berishimni xohlaysizmi?",
+            "😄 Anime yoqadimi? Sizga eng yaxshilarini topib beraman!"
+        ];
+
+        const randomReply = replies[Math.floor(Math.random() * replies.length)];
+
+        showTyping(() => {
+            addMessage(randomReply, "bot");
+        });
+    }
+    // =========================
+    // EMOJI JAVOB
+    // =========================
+    else if (text.match(/[\u{1F300}-\u{1FAFF}]/u)) {
+        const replies = [
+            "😊 Emojilarni ko‘rdim!",
+            "👍 Yaxshi kayfiyat ekan!",
+            "😄 Emoji yubordingiz!",
+            "✨ Chiroyli emoji!",
+            "🙂 Qiziq emoji 😄"
+        ];
+
+        const randomReply = replies[Math.floor(Math.random() * replies.length)];
+
+        showTyping(() => {
+            addMessage(randomReply, "bot");
+        });
+    }
+    // =========================
+    // OK / YAXSHI JAVOB
+    // =========================
+    else if (
+        text.includes("ok") ||
+        text.includes("yaxshi") ||
+        text.includes("xo'p") ||
+        text.includes("ha") ||
+
+        text.includes("hop")
+    ) {
+        const replies = [
+            "👌 Yaxshi! davom etamiz!",
+            "👍 Tushunarli!  davom etamiz!",
+            "🙂 Mayli, davom etamiz!",
+            "😄 Zo‘r!  davom etamiz!",
+            "✨ Ajoyib!  davom etamiz!"
+        ];
+
+        const randomReply = replies[Math.floor(Math.random() * replies.length)];
+
+        showTyping(() => {
+            addMessage(randomReply, "bot");
+        });
+    }
+
+    // =========================
+    // YORDAM
+    // =========================
+    // =========================
+    // YORDAM
+    // =========================
+    else if (text === "yordam") {
+
+        showTyping(() => {
+            addMessage(`
+                <div class="ADMIN_SHKOYAT_USTUN">
+
+                    <div class="settings-btn" onclick="sendMsg('aloqa2')">
+                        📩 Aloqa
+                    </div>
+
+                    <div class="settings-btn" onclick="sendAdmin('admin')">
+                        👨‍💻 Adminga xabar yuborish
+                    </div>
+
+                    <div class="settings-btn" onclick="sendAdmin('shikoyat')">
+                        ⚠️ Shikoyat
+                    </div>
+
+                </div>
+            `, "bot");
+        });
+    }
+
+
+    // =========================
+    // DEFAULT REPLY
+    // =========================
+    else {
+
+        showTyping(() => {
+            addMessage("🤖 Tushunmadim yozgan habarizni: " + text, "bot");
+        });
+    }
+}
+
+// 🔥 ENTER BOSILSA HAM YUBORADI
+document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("userInput");
+
+    input.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            sendUserMessage();
+        }
+    });
+});
+
+function closeChatInput() {
+    document.getElementById("chatInputBox").classList.add("hidden");
+    document.getElementById("mainButtons").style.display = "grid";
+
+    addMessage("⬅️ Asosiy menyuga qaytdingiz", "bot");
+}
+
+// =========================
+// MOBILE KEYBOARD FIX
+// =========================
+const input = document.getElementById("userInput");
+
+input.addEventListener("focus", () => {
+    setTimeout(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+    }, 300);
+});
+
+function sendAdmin(type) {
+
+    if (type === "admin") {
+        showTyping(() => {
+            addMessage(
+                "📩 Sizning so‘rovingiz qabul qilindi. Adminga yuboramiz.",
+                "bot"
+            );
+        });
+    }
+
+    else if (type === "shikoyat") {
+        showTyping(() => {
+            addMessage(
+                "⚠️ Shikoyatingiz qabul qilindi. Tez orada ko‘rib chiqamiz.",
+                "bot"
+            );
+        });
+    }
+}
+
+function scrollToBottom() {
+    const chat = document.getElementById("chat");
+
+    setTimeout(() => {
+        chat.scrollTop = chat.scrollHeight;
+    }, 50);
+}
 
 
 
@@ -1333,3 +1864,4 @@ function showToast(text) {
 
 </body>
 </html>
+
