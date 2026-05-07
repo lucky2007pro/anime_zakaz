@@ -4,7 +4,7 @@ from .views import (
     register, login, home, movie_detail, check_username,
     profile, make_vip, search, anime_catalog,
     chat, chat_messages_api, edit_message, delete_message, ban_user,
-    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page, news, reels, aloqa
+    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page, reels, aloqa, news_feed, news_detail, toggle_like
 )
 from .admin_views import *
 from django.conf import settings
@@ -24,7 +24,9 @@ urlpatterns = [
     path('search/', search, name='search'),
     path('profile/', profile, name='profile'),
     path('premium/', premium_page, name='premium_page'),
-    path('news/', news, name='news'),
+    path('news/', news_feed, name='news_feed'),
+    path('news/<int:pk>/', news_detail, name='news_detail'),
+    path('news/<int:pk>/like/', toggle_like, name='toggle_like'),
     path('reels/', reels, name='reels'),
     path('aloqa/', aloqa, name='aloqa'),
 
