@@ -306,10 +306,18 @@ class AnimeNews(models.Model):
     image = models.ImageField(upload_to='news/')
     description = models.TextField()
 
+    # 🎥 VIDEO (agar bo‘lsa oldingi qo‘shilgan)
+    video = models.FileField(upload_to='news/videos/', null=True, blank=True)
+
+    # 🔗 IXTIYORIY SILKA
+    link = models.URLField(null=True, blank=True)
+
     author = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='news_posts'
+        related_name='news_posts',
+        null=True,
+        blank=True
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
