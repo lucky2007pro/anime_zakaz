@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>{{ news.title }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    position: relative;
+    min-height: 100vh;
+    color: #fff;
+}
+
+/* 🔥 DARK OVERLAY (o‘qish uchun) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 0;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+
+    background: rgba(20,20,20,0.85);
+    backdrop-filter: blur(10px);
+
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.back {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+/* IMAGE (QIRQILMAYDI) */
+img {
+    width: 100%;
+    max-height: 350px;
+
+    object-fit: contain;   /* 🔥 QIRQILMAYDI */
+    background: #000;
+
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+/* CONTENT CARD (o‘qish uchun fon) */
+.content {
+    padding: 15px;
+
+    position: relative;
+    z-index: 2;
+
+    background: rgba(20,20,20,0.75);
+    margin: 15px;
+    border-radius: 12px;
+
+    backdrop-filter: blur(10px);
+}
+
+.title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* TEXT O‘QILADIGAN QILDIK */
+.desc {
+    font-size: 15px;
+    color: #eee;
+    line-height: 1.6;
+}
+
+/* LIKE */
+.actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+
+    background: rgba(20,20,20,0.75);
+    margin: 15px;
+    border-radius: 12px;
+
+    position: relative;
+    z-index: 2;
+}
+
+.btn {
+    cursor: pointer;
+    background: #222;
+    border: none;
+    padding: 10px 15px;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+
+    body {
+        font-size: 14px;
+    }
+
+    /* HEADER */
+    .header {
+        padding: 10px 12px;
+        font-size: 14px;
+        background: rgba(20,20,20,0.9);
+    }
+
+    /* 🖼 IMAGE — 9:16 SUPPORT + FULL VIEW */
+    img {
+        width: 100%;
+        aspect-ratio: 9 / 16;     /* 🔥 9:16 format */
+        object-fit: contain;      /* qirqilmaydi */
+        background: #000;
+
+        display: block;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* 📦 CONTENT CARD */
+    .content {
+        margin: 10px;
+        padding: 14px;
+
+        background: rgba(20,20,20,0.75);
+        backdrop-filter: blur(12px);
+
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* 📰 TITLE */
+    .title {
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1.4;
+        margin-bottom: 8px;
+    }
+
+    /* 📖 DESCRIPTION */
+    .desc {
+        font-size: 14px;
+        line-height: 1.7;
+        color: #eaeaea;
+        white-space: pre-line;
+    }
+
+    /* ❤️ ACTIONS */
+    .actions {
+        margin: 10px;
+        padding: 12px;
+
+        background: rgba(20,20,20,0.75);
+        border-radius: 14px;
+    }
+
+    .btn {
+        width: 100%;
+        font-size: 15px;
+        padding: 10px;
+        border-radius: 10px;
+    }
+        /* 🧠 TEXT OVERFLOW FIX */
+    .title,
+    .desc {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        max-width: 100%;
+    }
+
+    .content {
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    /* agar juda uzun so‘z bo‘lsa ham chiqib ketmaydi */
+    * {
+        max-width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <a class="back" href="javascript:history.back()">⬅ Orqaga</a>
+    <div>📰 News</div>
+</div>
+
+<!-- IMAGE (qirqilmaydi) -->
+<img src="{{ news.image.url }}" alt="news image">
+
+<!-- CONTENT -->
+<div class="content">
+    <div class="title">{{ news.title }}</div>
+    <div class="desc">
+        {{ news.description }}
+    </div>
+</div>
+
+<!-- ACTIONS -->
+<div class="actions">
+    <button class="btn" onclick="likeNews({{ news.id }})">
+        ❤️ <span id="like-count">{{ total_likes }}</span>
+    </button>
+</div>
+
+<script>
+function likeNews(id) {
+    fetch(`/news/${id}/like/`, {
+        method: "GET",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("like-count").innerText = data.total_likes;
+    });
+}
+
+/* background + scroll restore (TO‘G‘RI BIR MARTA) */
+window.onload = function () {
+
+    const bg = localStorage.getItem("bg");
+    if (bg) {
+        document.body.style.backgroundImage = `url(${bg})`;
+    }
+
+    const pos = localStorage.getItem("scrollPos");
+    if (pos) {
+        window.scrollTo(0, pos);
+    }
+};
+</script>
+
+</body>
+</html>
