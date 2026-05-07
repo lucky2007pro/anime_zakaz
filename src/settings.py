@@ -36,6 +36,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='bestmedia-official.uz,www.bestm
 # Ilovalar ro'yxati
 INSTALLED_APPS = [
     'jazzmin',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,10 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Sizning ilovangiz
     'my_app.apps.MyAppConfig',
 
-    # Media va Static uchun
     'cloudinary_storage',
     'cloudinary',
 ]
