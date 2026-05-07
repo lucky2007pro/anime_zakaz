@@ -1,130 +1,553 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
+<meta charset="UTF-8">
+<title>Anime News</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: radial-gradient(circle at top, #0b0f19, #000);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: Arial, sans-serif;
-            color: #fff;
-            padding: 15px;
-        }
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #fff;
 
-        .box {
-            text-align: center;
-            padding: 40px 30px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            width: 100%;
-            max-width: 420px;
-        }
+    background-image: url("https://i.pinimg.com/736x/1d/6a/08/1d6a08d9b18f16cc49cdaddfa878e8a0.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 
-        .box img {
-            width: 140px;
-            max-width: 60%;
-            margin-bottom: 20px;
-            animation: float 2s ease-in-out infinite;
-        }
+    background-attachment: fixed;
+}
 
-        @keyframes float {
-            0%,100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-        .title {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
+    padding: 12px 14px;
+    background: rgba(20,20,20,0.8);
+    backdrop-filter: blur(12px);
 
-        .subtitle {
-            font-size: 14px;
-            color: #aaa;
-            margin-bottom: 25px;
-        }
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 18px;
-            width: 100%;
-            background: #00f3ff;
-            color: #000;
-            font-weight: 700;
-            text-decoration: none;
-            border-radius: 10px;
-            transition: 0.3s;
-        }
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,243,255,0.4);
-        }
+/* CENTER TITLE */
+.nav-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
 
-        /* 📱 MOBILE OPTIMIZATION */
-        @media (max-width: 480px) {
-            .box {
-                padding: 25px 18px;
-                border-radius: 14px;
-            }
+/* BUTTONS */
+.nav-btn {
+    background: rgba(255,255,255,0.08);
+    border: none;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+}
 
-            .title {
-                font-size: 18px;
-            }
+/* SETTINGS PANEL */
+.settings-wrapper {
+    position: relative;
+}
 
-            .subtitle {
-                font-size: 13px;
-            }
+.settings-panel {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 40px;
 
-            .box img {
-                width: 110px;
-            }
+    background: #1c1c1c;
+    padding: 10px;
+    border-radius: 12px;
+    width: 180px;
 
-            .btn {
-                font-size: 14px;
-                padding: 11px 14px;
-            }
-        }
-    </style>
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.bg-list {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.settings-panel img {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+
+    border-radius: 50%;
+    cursor: pointer;
+
+    border: 2px solid rgba(255,255,255,0.15);
+    transition: 0.2s ease;
+}
+
+.settings-panel img:hover {
+    transform: scale(1.1);
+    border-color: #ff3b5c;
+}
+
+.reset-btn {
+    width: 100%;
+    padding: 6px;
+    border: none;
+    background: #ff3b5c;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* CARD */
+.card {
+    background: rgba(26, 26, 26, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+
+    margin: 10px;
+    border-radius: 16px;
+    overflow: hidden;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+}
+
+/* butun card bosiladigan bo‘lsin */
+.card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* boshqa buttonlar ustida ishlashi uchun */
+.actions {
+    position: relative;
+    z-index: 2;
+}
+
+/* hover effect (desktop) */
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+}
+
+.card img {
+    width: 100%;
+    aspect-ratio: 16 / 9;   /* bir xil format */
+    object-fit: contain;
+    background: #111;
+}
+
+/* CONTENT */
+.content {
+    padding: 10px;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.desc {
+    font-size: 14px;
+    color: #bbb;
+}
+
+/* BUTTONS */
+.actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-top: 1px solid #333;
+}
+
+.btn {
+    cursor: pointer;
+    font-size: 14px;
+    color: #fff;
+    background: none;
+    border: none;
+}
+
+.like {
+    color: #ff4d4d;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px;
+    padding: 10px;
+}
+
+.like-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.06);
+    border: none;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.like-icon {
+    font-size: 20px;
+    color: #aaa;
+    transition: 0.2s;
+}
+
+.like-btn.liked .like-icon {
+    color: #ff3b5c;
+    transform: scale(1.2);
+}
+
+@media (max-width: 600px) {
+
+        .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 12px 14px;
+        font-size: 16px;
+
+        background: rgba(28, 28, 28, 0.85);
+        backdrop-filter: blur(10px);
+
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* 🔙 BACK BUTTON */
+    .back-btn {
+        font-size: 13px;
+        color: #fff;
+        text-decoration: none;
+
+        background: rgba(255,255,255,0.08);
+        padding: 6px 10px;
+        border-radius: 8px;
+
+        transition: 0.2s;
+    }
+
+    .back-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* 🔥 TITLE CENTER EFFECT */
+    .header-title {
+        flex: 1;
+        text-align: center;
+        font-weight: 600;
+        font-size: 16px;
+        color: #fff;
+    }
+
+    /* 📦 CONTAINER */
+    .card-container {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 12px;
+
+        /* 🔥 chetlardan bo‘shliq */
+        padding: 12px 10px;
+
+        box-sizing: border-box;
+    }
+
+    /* 🧊 CARD */
+    .card {
+        border-radius: 14px;
+        overflow: hidden;
+        margin: 0;
+
+        /* yumshoq ko‘rinish */
+        border: 1px solid rgba(255, 255, 255, 0.05);
+
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    /* ✨ tap effect (mobile hover o‘rniga) */
+    .card:active {
+        transform: scale(0.98);
+    }
+
+    /* 🖼 IMAGE */
+    .card img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        background: #000;
+    }
+
+    /* 📰 TITLE */
+    .title {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    /* 📝 DESCRIPTION */
+    .desc {
+        font-size: 13px;
+        color: #bbb;
+        line-height: 1.4;
+
+        /* 3 qator limit */
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* ❤️ + BUTTONS */
+    .actions {
+        padding: 8px;
+    }
+
+    .btn {
+        font-size: 13px;
+    }
+}
+
+
+@media (min-width: 768px) {
+    .card-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .card {
+        border-radius: 14px;
+        overflow: hidden;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .card img {
+        width: 100%;
+        height: auto;
+        object-fit: contain; /* rasm qirqilmasin */
+    }
+
+    .title {
+        font-size: 19px;
+    }
+
+    .desc {
+        font-size: 14px;
+    }
+}
+
+
+
+/* 🖥 DESKTOP */
+@media (min-width: 1024px) {
+    .card-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="header">
 
-    <!-- RASM -->
-    <img src="data:image/png;base64,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"
-     alt="maintenance">
-
-    <div class="title">Reels bo‘limi ta’mirlanmoqda</div>
-    <div class="subtitle">Tez orada qayta ishga tushadi 🚀</div>
-
-    <a href="{% url 'home' %}" class="btn">
-        <i class='bx bx-home-alt'></i>
-        Bosh sahifa
+    <!-- LEFT: BACK -->
+    <a href="{% url 'home' %}" class="nav-btn">
+        ⬅ Orqaga
     </a>
 
+    <!-- CENTER TITLE -->
+    <div class="nav-title">
+        BESTMEDIA NEWS
+    </div>
+
+    <!-- RIGHT SETTINGS -->
+    <div class="settings-wrapper">
+        <button onclick="toggleSettings()" class="nav-btn">
+            ⚙ Sozlamalar
+        </button>
+
+        <!-- DROPDOWN -->
+        <div id="settingsPanel" class="settings-panel">
+
+            <h4>🎨 Background tanlash</h4>
+
+            <div class="bg-list">
+                <img src="https://i.pinimg.com/736x/5b/53/88/5b53888b7f316b71d14f25932d09a7a8.jpg"
+                     onclick="setBg(this.src)">
+
+                <img src="https://i.pinimg.com/736x/2f/3e/24/2f3e24af82da99275c2d8677985c5a26.jpg"
+                     onclick="setBg(this.src)">
+            </div>
+
+            <button onclick="resetBg()" class="reset-btn">Reset</button>
+
+        </div>
+    </div>
+
 </div>
+
+<div class="card-container">
+
+{% for news in news_list %}
+
+<div class="card">
+
+    <!-- 🔥 CARD FULL CLICK -->
+    <a href="{% url 'news_detail' news.id %}" class="card-link"></a>
+
+    <a href="{% url 'news_detail' news.id %}">
+        <img src="{{ news.image.url }}" alt="news image">
+    </a>
+
+    <div class="content">
+        <div class="title">{{ news.title }}</div>
+        <div class="desc">
+            {{ news.description|truncatechars:120 }}
+        </div>
+    </div>
+
+    <div class="actions">
+
+        <button class="like-btn {% if user in news.likes.all %}liked{% endif %}"
+                onclick="likeNews({{ news.id }})">
+
+            <i class="bx {% if user in news.likes.all %}bxs-heart{% else %}bx-heart{% endif %} like-icon"></i>
+
+            <span id="like-{{ news.id }}">{{ news.total_likes }}</span>
+        </button>
+
+        <!-- 📖 O‘QISH -->
+        <a href="{% url 'news_detail' news.id %}" class="btn">📖 O‘qish</a>
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<script>
+
+let settingsOpen = false;
+
+function likeNews(id) {
+
+    const btn = document.querySelector(`#like-${id}`).closest(".like-btn");
+
+    fetch(`/news/${id}/like/`, {
+        method: "GET",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        document.getElementById(`like-${id}`).innerText = data.total_likes;
+
+        if (data.liked) {
+            btn.classList.add("liked");
+            btn.querySelector("i").className = "bx bxs-heart like-icon";
+        } else {
+            btn.classList.remove("liked");
+            btn.querySelector("i").className = "bx bx-heart like-icon";
+        }
+
+    });
+}
+
+
+
+function setBg(url) {
+    document.body.style.backgroundImage = `url(${url})`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+
+    localStorage.setItem("bg", url);
+}
+
+function resetBg() {
+    document.body.style.backgroundImage = "none";
+    localStorage.removeItem("bg");
+}
+
+/* LOAD SAVED BG */
+window.onload = function () {
+    const bg = localStorage.getItem("bg");
+    if (bg) setBg(bg);
+}
+
+function toggleSettings() {
+    const panel = document.getElementById("settingsPanel");
+    settingsOpen = !settingsOpen;
+    panel.style.display = settingsOpen ? "block" : "none";
+}
+
+function closeSettings() {
+    const panel = document.getElementById("settingsPanel");
+    panel.style.display = "none";
+    settingsOpen = false;
+}
+
+/* scroll bo‘lsa */
+window.addEventListener("scroll", () => {
+    if (settingsOpen) closeSettings();
+});
+
+/* ekranga touch bo‘lsa */
+document.addEventListener("touchstart", (e) => {
+    const panel = document.getElementById("settingsPanel");
+    const button = document.querySelector(".settings-wrapper");
+
+    if (settingsOpen && !button.contains(e.target)) {
+        closeSettings();
+    }
+});
+
+window.addEventListener("scroll", function () {
+    localStorage.setItem("scrollPos", window.scrollY);
+});
+
+</script>
 
 </body>
 </html>
