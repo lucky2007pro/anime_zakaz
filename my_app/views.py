@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.db.models import F
 
 from .models import (
-    CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar
+    CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike
 )
 
 User = get_user_model()
@@ -546,12 +546,60 @@ def aloqa(request):
     }
     return render(request, "aloqa.html", context)
 
+# =======================
+# NEWS FEED (HOME PAGE)
+# =======================
+def news_feed(request):
+    news_list = AnimeNews.objects.all().order_by('-created_at')
+
+    return render(request, 'news.html', {
+        'news_list': news_list
+    })
+
+# =======================
+# NEWS DETAIL PAGE
+# =======================
+def news_detail(request, pk):
+    news = get_object_or_404(AnimeNews, pk=pk)
+
+    is_liked = False
+
+    if request.user.is_authenticated:
+        is_liked = NewsLike.objects.filter(
+            user=request.user,
+            news_id=pk
+        ).exists()
+
+    return render(request, 'news_detail.html', {
+        'news': news,
+        'is_liked': is_liked,
+        'total_likes': news.likes.count()   # agar ManyToMany ishlatsang
+    })
+
+
+# =======================
+# LIKE / UNLIKE (TOGGLE)
+# =======================
 @login_required
-def news(request):
-    context = {
-        "title": "Aloqa"
-    }
-    return render(request, "news.html", context)
+def toggle_like(request, pk):
+    news = get_object_or_404(AnimeNews, pk=pk)
+
+    like_obj, created = NewsLike.objects.get_or_create(
+        user=request.user,
+        news=news
+    )
+
+    if not created:
+        like_obj.delete()
+        liked = False
+    else:
+        liked = True
+
+    return JsonResponse({
+        "liked": liked,
+        "total_likes": NewsLike.objects.filter(news=news).count()
+    })
+
 
 @login_required
 def reels(request):
@@ -559,3 +607,7 @@ def reels(request):
         "title": "Aloqa"
     }
     return render(request, "reels.html", context)
+
+
+
+
