@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode, 
-    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt
+    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews
 )
 
 
@@ -64,6 +64,23 @@ class ChatMessageAdmin(admin.ModelAdmin):
         return obj.message[:50] + '...' if len(obj.message) > 50 else obj.message
     message_preview.short_description = 'Message'
 
+class AnimeNewsAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'created_at', 'total_likes_count')
+    search_fields = ('title', 'description', 'author__username')
+    list_filter = ('created_at',)
+    readonly_fields = ('created_at', 'updated_at')
+
+    def total_likes_count(self, obj):
+        return obj.total_likes()
+    total_likes_count.short_description = "Likes"
+
+class NewsLikeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'news', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'news__title')
+
+
+
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
@@ -75,3 +92,6 @@ admin.site.register(Category)
 admin.site.register(ProfileAvatar)
 admin.site.register(SubscriptionReceipt)
 # admin.site.register(VipUserTanlash, VipUserTanlashAdmin)
+
+admin.site.register(AnimeNews, AnimeNewsAdmin)
+admin.site.register(NewsLike, NewsLikeAdmin)
