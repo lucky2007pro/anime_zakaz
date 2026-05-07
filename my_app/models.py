@@ -295,3 +295,52 @@ class ActiveSession(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.session_key}"
+
+
+
+# =======================
+# ANIME NEWS
+# =======================
+class AnimeNews(models.Model):
+    title = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='news/')
+    description = models.TextField()
+
+    author = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='news_posts'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def total_likes(self):
+        return self.likes.count()
+
+    def __str__(self):
+        return self.title
+
+
+
+# =======================
+# NEWS LIKE SYSTEM
+# =======================
+class NewsLike(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    news = models.ForeignKey(
+        AnimeNews,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'news')
+        verbose_name = "News Like"
+        verbose_name_plural = "News Likes"
+
+    def __str__(self):
+        return f"{self.user.username} liked {self.news.title}"
+
+
