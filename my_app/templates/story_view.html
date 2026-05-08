@@ -138,27 +138,45 @@ body {
 
 @media (max-width: 600px) {
 
+    /* =========================
+       TITLE
+    ========================= */
     .title {
         flex: 1;
         text-align: center;
-        font-size: 14px;
+        font-size: 15px;
 
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
 
-        opacity: 1;
-
-        /* 🔥 ANIQ RANG */
         color: #00f3ff !important;
-
-        text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+        text-shadow: 0 2px 10px rgba(0,0,0,0.9);
         font-weight: 700;
+        opacity: 1;
     }
 
+    /* =========================
+       VIEWS
+    ========================= */
     .views {
-        font-size: 11px;
-        padding: 5px 8px;
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 10px;
+    }
+
+    /* =========================
+       TOP BAR
+    ========================= */
+    .top-bar {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .back-btn {
+        padding: 8px 12px;
+        font-size: 14px;
     }
 
     /* =========================
@@ -180,7 +198,7 @@ body {
     }
 
     /* =========================
-       BOTTOM FIXED BAR
+       BOTTOM BAR (KATTA & YUQORIGA)
     ========================= */
     .bottom-bar {
         position: fixed;
@@ -198,46 +216,22 @@ body {
         z-index: 50;
     }
 
-    /* Tomosha qilish button */
+    /* =========================
+       WATCH BUTTON (KATTA)
+    ========================= */
     .watch-btn button {
         background: #00f3ff;
         color: #000;
-        font-weight: 700;
 
-        padding: 10px 16px;
-        border-radius: 12px;
+        font-size: 16px;   /* 👈 kattaroq */
+        font-weight: 800;
 
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        padding: 12px 20px; /* 👈 kattaroq button */
+        border-radius: 14px;
+
+        box-shadow: 0 6px 25px rgba(0,0,0,0.4);
     }
 
-    /* Like */
-    .like-btn {
-        font-size: 14px;
-    }
-
-    /* admin link kichik */
-    .admin-link {
-        font-size: 12px;
-    }
-
-    /* PROGRESS BAR FIX */
-    .progress-bar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 6px;
-        background: rgba(255,255,255,0.2);
-        z-index: 100;
-        cursor: pointer;
-    }
-
-    .progress-fill {
-        height: 100%;
-        width: 0%;
-        background: #00f3ff;
-    }
-    
     /* =========================
        NAVBAR / ICONS (KATTA)
        (agar navbar bo‘lsa)
@@ -259,7 +253,19 @@ body {
     .bottom-nav button {
         font-size: 16px;
         padding: 10px 12px;
-    }    
+    }
+
+    /* =========================
+       PROGRESS BAR
+    ========================= */
+    .progress-bar {
+        height: 5px;
+    }
+
+    .progress-fill {
+        background: #00f3ff;
+    }
+
 }
 
 /* =========================
