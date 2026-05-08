@@ -1347,37 +1347,23 @@ window.addEventListener("resize", function () {
 /* =========================================================
    INITIAL SCROLL (MOBIL UCHUN ENG ISHONCHLI USUL)
    ========================================================= */
-function forceScrollToBottom() {
-    const box = document.getElementById("chatBox");
-    if (!box) return;
+function scrollToChatInput() {
+    const form = document.getElementById("chatForm");
+    if (!form) return;
 
-    // Vaqtincha silliq skrollni o'chiramiz
-    box.style.scrollBehavior = "auto";
-
-    // 1-usul: Butun qutini pastga tortish
-    box.scrollTop = box.scrollHeight;
-
-    // 2-usul: Eng oxirgi xabarni topib, aynan o'shanga sakrash
-    const messages = box.querySelectorAll('.message-wrapper');
-    if (messages.length > 0) {
-        messages[messages.length - 1].scrollIntoView(false);
-    }
-
-    // Brauzer ulgurishi uchun scrollBehavior ni biroz keyin tiklaymiz
-    setTimeout(() => {
-        box.style.scrollBehavior = "";
-    }, 10);
+    form.scrollIntoView({
+        behavior: "auto",
+        block: "end"
+    });
 }
 
-document.addEventListener("DOMContentLoaded", forceScrollToBottom);
+document.addEventListener("DOMContentLoaded", scrollToChatInput);
 
 window.addEventListener("load", function () {
-    forceScrollToBottom();
-
-    // Mobil tarmoq va eski telefonlar uchun qayta urinishlar
-    setTimeout(forceScrollToBottom, 150);
-    setTimeout(forceScrollToBottom, 400);
-    setTimeout(forceScrollToBottom, 800);
+    scrollToChatInput();
+    setTimeout(scrollToChatInput, 150);
+    setTimeout(scrollToChatInput, 400);
+    setTimeout(scrollToChatInput, 800);
 });
 
 /* =========================================================
