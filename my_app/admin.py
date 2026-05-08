@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode, 
-    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews
+    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews,
+    Story, StoryView
 )
 
 
@@ -79,7 +80,22 @@ class NewsLikeAdmin(admin.ModelAdmin):
     list_filter = ('created_at',)
     search_fields = ('user__username', 'news__title')
 
+class StoryViewInline(admin.TabularInline):
+    model = StoryView
+    extra = 0
+    readonly_fields = ('user', 'viewed_at')
+    can_delete = False
 
+class StoryAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_active', 'created_at', 'expires_at', 'total_views')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('title', 'description')
+    readonly_fields = ('created_at', 'expires_at')
+    inlines = [StoryViewInline]
+
+    def total_views(self, obj):
+        return obj.views.count()
+    total_views.short_description = "Ko‘rishlar"
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
@@ -95,3 +111,7 @@ admin.site.register(SubscriptionReceipt)
 
 admin.site.register(AnimeNews, AnimeNewsAdmin)
 admin.site.register(NewsLike, NewsLikeAdmin)
+
+admin.site.register(Story, StoryAdmin)
+admin.site.register(StoryView)
+
