@@ -11,6 +11,9 @@ from django.db.models import Max
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import F
+from .sitemaps import NewsSitemap
+from django.contrib.sitemaps.views import sitemap
+
 
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike
@@ -18,6 +21,10 @@ from .models import (
 
 User = get_user_model()
 
+
+sitemaps = {
+    'news': NewsSitemap,
+}
 
 # =======================
 # REGISTER
