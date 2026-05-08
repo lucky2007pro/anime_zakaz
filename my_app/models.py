@@ -63,7 +63,7 @@ class VipUser(models.Model):
         return tiers.index(current) >= tiers.index(required_tier)
 
     def __str__(self):
-        return f"{self.user.username} - VIP"if self.user.username else f"User-{self.user.id} - VIP"
+        return f"{self.user.username} - VIP" if self.user.username else f"User-{self.user.id} - VIP"
 
 
 # =======================
@@ -79,12 +79,12 @@ class Movie(models.Model):
     image = models.ImageField(upload_to='movies/')
     description = models.TextField(blank=True, null=True)
     is_premium = models.BooleanField(
-        default=False, 
+        default=False,
         help_text="Faqat premium obunachilar ko'ra oladi (Eski tizim)"
     )
     minimum_tier = models.CharField(
-        max_length=10, 
-        choices=TIER_CHOICES, 
+        max_length=10,
+        choices=TIER_CHOICES,
         default='basic',
         help_text="Qaysi tarifdan boshlab ko'rish mumkin"
     )
@@ -147,7 +147,8 @@ class MovieEpisode(models.Model):
     episode_number = models.PositiveIntegerField(default=1)
     title = models.CharField(max_length=200)
     video_url = models.URLField(blank=True, null=True, help_text="Bunny.net iframe yoki mp4 linkini yozing")
-    video_file = models.FileField(upload_to='videos/', blank=True, null=True, help_text="Yoki video faylni yuklang (mp4, mkv va b.)")
+    video_file = models.FileField(upload_to='videos/', blank=True, null=True,
+                                  help_text="Yoki video faylni yuklang (mp4, mkv va b.)")
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -243,12 +244,12 @@ class ProfileAvatar(models.Model):
 # =======================
 class SubscriptionReceipt(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='receipts')
-    plan = models.CharField(max_length=50) # masalan: '1_month', '1_year'
+    plan = models.CharField(max_length=50)  # masalan: '1_month', '1_year'
     image = models.ImageField(upload_to='receipts/%Y/%m/')
     is_approved = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return f"{self.user.username} - {self.plan} ({'Tasdiqlangan' if self.is_approved else 'Rad etish' if self.is_rejected else 'Kutilmoqda'})"
 
@@ -264,6 +265,7 @@ class FavoriteAnime(models.Model):
     class Meta:
         unique_together = ('user', 'movie')
 
+
 class WatchHistory(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='watch_history')
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='watched_by')
@@ -271,6 +273,7 @@ class WatchHistory(models.Model):
 
     class Meta:
         unique_together = ('user', 'movie')
+
 
 # =======================
 # MOVIE COMMENTS
@@ -287,6 +290,7 @@ class MovieComment(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.movie.title} - {self.text[:20]}"
 
+
 # =======================
 # ACTIVE SESSIONS (DEVICE LIMITS)
 # =======================
@@ -300,9 +304,6 @@ class ActiveSession(models.Model):
 
 
 
-# =======================
-# ANIME NEWS
-# =======================
 class AnimeNews(models.Model):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='news/')
@@ -332,7 +333,6 @@ class AnimeNews(models.Model):
         return self.title
 
 
-
 # =======================
 # NEWS LIKE SYSTEM
 # =======================
@@ -352,6 +352,7 @@ class NewsLike(models.Model):
 
     def __str__(self):
         return f"{self.user.username} liked {self.news.title}"
+
 
 # =======================
 # STORY
