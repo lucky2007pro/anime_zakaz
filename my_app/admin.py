@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode, 
-    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews,
-    Story, StoryView
+    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView
 )
 
 
@@ -96,7 +95,6 @@ class StoryAdmin(admin.ModelAdmin):
     def total_views(self, obj):
         return obj.views.count()
     total_views.short_description = "Ko‘rishlar"
-
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
