@@ -88,20 +88,6 @@ main.main-content {
     vertical-align: middle;
 }
 
-/* =====================================================
-   MESSAGES SCROLL AREA — butun bo'sh joyni egallaydi
-   ===================================================== */
-.chat-box {
-    flex: 1;
-    min-height: 0;
-    padding: 16px 18px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-}
 
 .chat-box::-webkit-scrollbar { width: 5px; }
 .chat-box::-webkit-scrollbar-thumb {
@@ -507,18 +493,20 @@ main.main-content {
 
 .chat-box {
     flex: 1;
-    min-height: 0;
-    padding: 16px 18px;
+    min-height: 0; /* MUHIM */
     overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 18px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
 
-    /* 👇 BACKGROUND IMAGE */
     background: url('https://i.pinimg.com/736x/b9/2c/e5/b92ce567394106d2e4747cc977db6fa6.jpg') center/cover no-repeat;
     position: relative;
+    z-index: 1;
 }
 
 /* qoramtir overlay (o‘qilishi uchun juda muhim) */
@@ -526,7 +514,8 @@ main.main-content {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.55); /* qoraytirish darajasi */
+    background: rgba(0,0,0,0.55);
+    pointer-events: none; /* MUHIM FIX */
     z-index: 0;
 }
 
@@ -1521,6 +1510,21 @@ chatBox.addEventListener("scroll", function () {
     } else {
         scrollBtn.classList.remove("show");
     }
+});
+
+function forceScrollBottom() {
+    const chatBox = document.getElementById("chatBox");
+    if (!chatBox) return;
+
+    requestAnimationFrame(() => {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+}
+
+window.addEventListener("load", () => {
+    setTimeout(forceScrollBottom, 100);
+    setTimeout(forceScrollBottom, 300);
+    setTimeout(forceScrollBottom, 600);
 });
 </script>
 {% endblock %}
