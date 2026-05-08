@@ -346,8 +346,6 @@
 
     .tag-jp { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 3px; color: var(--text-light); font-size: 0.65rem; font-weight: 800;}
 
-    /* ----- REKOMENDATSIYA SCROLL ----- */
-
     /* =========================
             STORY CONTAINER
     ========================= */
@@ -460,6 +458,7 @@
         0% { transform: translateX(0); }
         100% { transform: translateX(calc(-50% - 8px)); }
     }
+
     /* =========================
             MOBILE FIX
     ========================= */
@@ -477,7 +476,7 @@
         .story-item span {
             font-size: 11px;
         }
-    }    
+    }
 
     @media (max-width: 1024px) {
         .slide-title { font-size: 3rem; }
@@ -615,7 +614,6 @@
     {% endfor %}
 
 </div>
-
 
 {% if recommended_movies %}
 <div class="container recommendation-section">
@@ -771,86 +769,7 @@
         }
     });
 
-    /* =========================
-            STORY SYSTEM
-    ========================== */
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const storyItems = document.querySelectorAll('.story-item');
-
-        storyItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const img = item.getAttribute('data-img');
-                if (!img) return;
-
-                const modal = document.createElement('div');
-                modal.style.position = 'fixed';
-                modal.style.inset = '0';
-                modal.style.background = 'rgba(0,0,0,0.95)';
-                modal.style.display = 'flex';
-                modal.style.justifyContent = 'center';
-                modal.style.alignItems = 'center';
-                modal.style.zIndex = '9999';
-
-                modal.innerHTML = `
-                    <div style="
-                        position: absolute;
-                        top: 15px;
-                        left: 15px;
-                        z-index: 10000;
-                    ">
-                        <button id="story-back-btn" style="
-                            padding: 10px 16px;
-                            border: none;
-                            border-radius: 8px;
-                            background: rgba(255,255,255,0.15);
-                            color: #fff;
-                            font-size: 14px;
-                            cursor: pointer;
-                            backdrop-filter: blur(6px);
-                        ">
-                            ⬅ Orqaga
-                        </button>
-                    </div>
-
-                    <div style="text-align:center;">
-                        <img src="${img}" style="
-                            max-width: 90%;
-                            max-height: 80%;
-                            border-radius: 10px;
-                            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-                        ">
-
-                        <p style="
-                            margin-top: 12px;
-                            color: #fff;
-                            font-size: 14px;
-                            opacity: 0.8;
-                        ">
-                           Bu bulim tamirlanmoqda tez orada qushiladi
-                        </p>
-                    </div>
-                `;
-
-                document.body.appendChild(modal);
-
-                // rasm yoki background bosilsa yopiladi
-                modal.addEventListener('click', (e) => {
-                    if (e.target.id !== 'story-back-btn') {
-                        modal.remove();
-                    }
-                });
-
-                // orqaga tugma
-                const backBtn = modal.querySelector('#story-back-btn');
-                if (backBtn) {
-                    backBtn.addEventListener('click', () => {
-                        window.location.href = "{% url 'home' %}";
-                    });
-                }
-            });
-        });
-    });
 </script>
 
 {% endblock %}
