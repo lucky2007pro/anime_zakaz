@@ -10,6 +10,13 @@ from .admin_views import *
 from django.conf import settings
 from django.conf.urls.static import static
 
+from .sitemaps import NewsSitemap
+from django.contrib.sitemaps.views import sitemap
+
+sitemaps = {
+    'news': NewsSitemap,
+}
+
 urlpatterns = [
     path('', home, name='home'),
     path('login/', login, name='login'),
@@ -66,6 +73,12 @@ urlpatterns = [
     path('control-panel/comments/', admin_comments, name='admin_comments'),
     path('control-panel/comments/<int:pk>/edit/', admin_comment_edit, name='admin_comment_edit'),
     path('control-panel/comments/<int:pk>/delete/', admin_comment_delete, name='admin_comment_delete'),
+    path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'
+    ),    
 ]
 
 if settings.DEBUG:
