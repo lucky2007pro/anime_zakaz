@@ -115,22 +115,28 @@ body {
     to   { transform: translateX(100%); }
 }
 
+/* =========================
+   STORY DESCRIPTION
+========================= */
 .story-description {
     position: absolute;
-    bottom: 120px; /* 👈 bottom-bar ustiga chiqadi */
+    bottom: 110px;
+    left: 10px;
+    right: 10px;
 
-    left: 15px;
-    right: 15px;
+    font-size: 12px;
+    line-height: 1.5;
 
-    color: white;
-    font-size: 13px;
-    line-height: 1.4;
+    color: #fff;
 
-    background: rgba(0,0,0,0.35);
-    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.45);
+    padding: 8px 10px;
     border-radius: 10px;
 
     backdrop-filter: blur(6px);
+
+    white-space: pre-line; /* 👈 admin yozgan formatni saqlaydi */
+    word-break: break-word;
 
     z-index: 60;
 }
@@ -183,18 +189,26 @@ body {
        STORY DESCRIPTION
     ========================= */
     .story-description {
+        position: absolute;
         bottom: 110px;
         left: 10px;
         right: 10px;
 
         font-size: 12px;
-        line-height: 1.4;
+        line-height: 1.5;
 
-        background: rgba(0,0,0,0.45);
+        color: #fff;
+
+        background: rgba(0, 0, 0, 0.45);
         padding: 8px 10px;
         border-radius: 10px;
 
         backdrop-filter: blur(6px);
+
+        white-space: pre-line; /* 👈 admin yozgan formatni saqlaydi */
+        word-break: break-word;
+
+        z-index: 60;
     }
 
     /* =========================
@@ -473,7 +487,7 @@ body {
 
     {% if story.description %}
     <div class="story-description">
-        {{ story.description }}
+        {{ story.description|linebreaks }}
     </div>
     {% endif %}
 
