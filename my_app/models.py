@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 from zoneinfo import ZoneInfo
+from datetime import timedelta
+
 
 # =======================
 # CATEGORY
@@ -351,4 +353,48 @@ class NewsLike(models.Model):
     def __str__(self):
         return f"{self.user.username} liked {self.news.title}"
 
+# =======================
+# STORY
+# =======================
+class Story(models.Model):
+    title = models.CharField(max_length=200)
+
+    image = models.ImageField(upload_to='stories/', blank=True, null=True)
+    video = models.FileField(upload_to='stories/videos/', blank=True, null=True)
+
+    description = models.TextField(blank=True, null=True)  # izoh
+    link = models.URLField(blank=True, null=True)  # havola
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(blank=True, null=True)  # 24 soatlik story
+
+    is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        # avtomatik 24 soatlik story
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)
+
+    def is_expired(self):
+        return self.expires_at and timezone.now() > self.expires_at
+
+    def __str__(self):
+        return self.title
+
+
+# =======================
+# STORY VIEW (KO'RILGANLAR)
+# =======================
+class StoryView(models.Model):
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+    story = models.ForeignKey(Story, on_delete=models.CASCADE, related_name='views')
+
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'story')
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.story.title}"
 
