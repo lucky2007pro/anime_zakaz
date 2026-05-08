@@ -543,7 +543,7 @@ def premium_page(request):
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     return render(request, 'premium.html', {'vip_data': vip_data})
 
-@login_required
+
 def aloqa(request):
     context = {
         "title": "Aloqa"
