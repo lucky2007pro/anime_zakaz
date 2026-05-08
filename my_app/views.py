@@ -13,16 +13,12 @@ from django.utils import timezone
 from django.db.models import F
 from django.db import models
 
-
-
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
     Story, StoryView
 )
 
 User = get_user_model()
-
-
 
 
 # =======================
@@ -107,11 +103,32 @@ def home(request):
 
     categories = Category.objects.all()
 
+    # ================= STORY =================
+    stories = Story.objects.filter(
+        is_active=True
+    ).filter(
+        models.Q(expires_at__gt=timezone.now()) | models.Q(expires_at__isnull=True)
+    ).order_by('-created_at')
+
+    seen_stories = set()
+    if request.user.is_authenticated:
+        seen_stories = set(
+            StoryView.objects.filter(user=request.user)
+            .values_list('story_id', flat=True)
+        )
+
+    # ================= MP3 =================
     mp3_to_play = None
     fav_ids = []
+
     if request.user.is_authenticated:
         from .models import FavoriteAnime
-        fav_ids = list(FavoriteAnime.objects.filter(user=request.user).values_list('movie_id', flat=True))
+
+        fav_ids = list(
+            FavoriteAnime.objects.filter(user=request.user)
+            .values_list('movie_id', flat=True)
+        )
+
         try:
             mp3_obj = MP3.objects.latest('created_at')
             mp3_file = mp3_obj.file.url
@@ -121,11 +138,18 @@ def home(request):
         mp3_to_play = mp3_file if not request.session.get('mp3_played', False) else None
         request.session['mp3_played'] = True
 
+    # ================= CONTEXT =================
     context = {
         'movies': movies,
         'hero_movies': hero_movies,
         'recommended_movies': recommended_movies,
         'categories': categories,
+
+        # STORY
+        'stories': stories,
+        'seen_stories': seen_stories,
+
+        # OTHER
         'mp3_file': mp3_to_play,
         'total_users': User.objects.count(),
         'user_id': request.user.id if request.user.is_authenticated else None,
@@ -150,7 +174,7 @@ def movie_detail(request, id):
         return redirect('movie_detail', id=movie.id)
 
     episodes = movie.episodes.all().order_by('episode_number')
-    
+
     # Increment views remotely safely
     Movie.objects.filter(id=id).update(views_count=F('views_count') + 1)
     movie.refresh_from_db()
@@ -164,13 +188,13 @@ def movie_detail(request, id):
 
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     tier = vip_data.get_tier()
-    
+
     # Old premium fallback + new tier logic
     is_staff_or_admin = request.user.is_staff or request.user.is_admin_user
     real_minimum_tier = movie.minimum_tier
     if movie.is_premium and real_minimum_tier == 'basic':
         real_minimum_tier = 'premium'
-        
+
     has_access = is_staff_or_admin or vip_data.has_access(real_minimum_tier)
 
     tier_labels = dict(Movie.TIER_CHOICES)
@@ -274,7 +298,7 @@ def profile(request):
         avatar_id = request.POST.get('avatar_id')
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
-        
+
         user = request.user
         updated = False
 
@@ -289,7 +313,7 @@ def profile(request):
         if first_name != user.first_name:
             user.first_name = first_name
             updated = True
-        
+
         if last_name != user.last_name:
             user.last_name = last_name
             updated = True
@@ -374,12 +398,14 @@ def anime_catalog(request):
 @login_required
 def chat(request):
     tz = ZoneInfo('Asia/Tashkent')
-    
+
     # fetch all messages up to limit
     messages_count = ChatMessage.objects.count()
     has_more = messages_count > 40
-    
-    messages_list = list(ChatMessage.objects.select_related('user', 'reply_to', 'user__avatar', 'user__vip_data').order_by('-created_at')[:40])
+
+    messages_list = list(
+        ChatMessage.objects.select_related('user', 'reply_to', 'user__avatar', 'user__vip_data').order_by(
+            '-created_at')[:40])
     messages_list.reverse()
 
     for msg in messages_list:
@@ -429,7 +455,8 @@ def chat_messages_api(request):
     except ValueError:
         limit = 20
 
-    qs = ChatMessage.objects.select_related('user', 'user__avatar', 'user__vip_data', 'reply_to').order_by('-created_at')
+    qs = ChatMessage.objects.select_related('user', 'user__avatar', 'user__vip_data', 'reply_to').order_by(
+        '-created_at')
     if before_id and before_id.isdigit():
         qs = qs.filter(id__lt=before_id)
 
@@ -445,9 +472,9 @@ def chat_messages_api(request):
                 'username': msg.reply_to.user.username,
                 'message': msg.reply_to.message
             }
-            
+
         avatar_url = msg.user.avatar.image.url if getattr(msg.user, 'avatar', None) and msg.user.avatar.image else None
-            
+
         data.append({
             'id': msg.id,
             'message': msg.message,
@@ -546,11 +573,13 @@ def premium_page(request):
     return render(request, 'premium.html', {'vip_data': vip_data})
 
 
+
 def aloqa(request):
     context = {
         "title": "Aloqa"
     }
     return render(request, "aloqa.html", context)
+
 
 # =======================
 # NEWS FEED (HOME PAGE)
@@ -606,13 +635,14 @@ def toggle_like(request, pk):
         "total_likes": NewsLike.objects.filter(news=news).count()
     })
 
-
 @login_required
 def reels(request):
     context = {
         "title": "Aloqa"
     }
     return render(request, "reels.html", context)
+
+
 
 
 # =======================
@@ -683,6 +713,7 @@ def prev_story_view(request, story_id):
                 return redirect('home')
 
     return redirect('home')
+
 
 
 
