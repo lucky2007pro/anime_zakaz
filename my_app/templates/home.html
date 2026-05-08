@@ -348,49 +348,94 @@
 
     /* ----- REKOMENDATSIYA SCROLL ----- */
 
-.story-container {
-    display: flex;
-    gap: 14px;
-    overflow-x: auto;
-    padding: 15px 5%;
-    scrollbar-width: none;
-}
-.story-container::-webkit-scrollbar {
-    display: none;
-}
+    /* =========================
+            STORY CONTAINER
+    ========================= */
+    .story-container {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        padding: 15px 5%;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
 
-.story-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    min-width: 70px;
-    cursor: pointer;
-}
+    .story-container::-webkit-scrollbar {
+        display: none;
+    }
 
-.story-ring {
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    padding: 3px;
-    background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    /* =========================
+            STORY ITEM
+    ========================= */
+    .story-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        min-width: 70px;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
 
-.story-ring img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #0f0f13;
-}
+    /* =========================
+            STORY RING
+    ========================= */
+    .story-ring {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        padding: 3px;
 
-.story-item span {
-    font-size: 12px;
-    color: #aaa;
-}
+        /* default gradient (not seen) */
+        background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        transition: 0.3s ease;
+    }
+
+    /* ko‘rilgan story */
+    .story-ring.seen {
+        background: #444;
+    }
+
+    /* image inside */
+    .story-ring img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #0f0f13;
+    }
+
+    /* label */
+    .story-item span {
+        font-size: 12px;
+        color: #aaa;
+        max-width: 70px;
+        text-align: center;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* =========================
+            HOVER EFFECT
+    ========================= */
+    .story-item:hover .story-ring {
+        transform: scale(1.08);
+    }
+
+    /* =========================
+            ACTIVE CLICK EFFECT
+    ========================= */
+    .story-item:active .story-ring {
+        transform: scale(0.95);
+    }
 
     .recommendation-section {
         padding: 30px 0 0px 0;
@@ -415,6 +460,24 @@
         0% { transform: translateX(0); }
         100% { transform: translateX(calc(-50% - 8px)); }
     }
+    /* =========================
+            MOBILE FIX
+    ========================= */
+    @media (max-width: 600px) {
+        .story-container {
+            gap: 10px;
+            padding: 10px 4%;
+        }
+
+        .story-ring {
+            width: 58px;
+            height: 58px;
+        }
+
+        .story-item span {
+            font-size: 11px;
+        }
+    }    
 
     @media (max-width: 1024px) {
         .slide-title { font-size: 3rem; }
@@ -522,34 +585,37 @@
 
 <div class="section-header">
     <div class="section-title">
-        <h3>Anime <span>Hikoyakar</span></h3>
+        <h3>Anime <span>Hikoyalar</span></h3>
     </div>
 </div>
 
 <div class="story-container">
 
-    <div class="story-item" data-img="https://i.pinimg.com/736x/2e/c0/ef/2ec0ef00dcc78eff0aba30ce26ad7269.jpg">
-        <div class="story-ring">
-            <img src="https://i.pinimg.com/736x/1c/69/6c/1c696cfecf3bf7078a02c34351132989.jpg" alt="story">
-        </div>
-        <span>injiq vampir malika</span>
-    </div>
+    {% for story in stories %}
+    <a href="{% url 'story_view' story.id %}" class="story-item">
 
-    <div class="story-item" data-img="https://i.pinimg.com/736x/2e/c0/ef/2ec0ef00dcc78eff0aba30ce26ad7269.jpg">
-        <div class="story-ring">
-            <img src="https://i.pinimg.com/736x/85/f9/c3/85f9c3fc90ce8423c5bc7165e52250f2.jpg" alt="story">
-        </div>
-        <span>hojathonadagi hanako</span>
-    </div>
+        <div class="story-ring"
+             style="
+                {% if story.id in seen_stories %}
+                    background: #444;
+                {% endif %}
+             ">
 
-    <div class="story-item" data-img="https://i.pinimg.com/736x/2e/c0/ef/2ec0ef00dcc78eff0aba30ce26ad7269.jpg">
-        <div class="story-ring">
-            <img src="https://i.pinimg.com/control1/1200x/a9/de/dc/a9dedcef16ff2509d4cbe81211bfaf9c.jpg" alt="story">
+            {% if story.image %}
+                <img src="{{ story.image.url }}" alt="{{ story.title }}">
+            {% else %}
+                <img src="https://via.placeholder.com/150" alt="story">
+            {% endif %}
         </div>
-        <span>berserk</span>
-    </div>
+
+        <span>{{ story.title }}</span>
+    </a>
+    {% empty %}
+        <p style="color:#aaa; padding:10px;">Hozircha story yo‘q</p>
+    {% endfor %}
 
 </div>
+
 
 {% if recommended_movies %}
 <div class="container recommendation-section">
