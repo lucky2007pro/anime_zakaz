@@ -505,6 +505,37 @@ main.main-content {
     position: relative;
 }
 
+.chat-box {
+    flex: 1;
+    min-height: 0;
+    padding: 16px 18px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+
+    /* 👇 BACKGROUND IMAGE */
+    background: url('https://i.pinimg.com/736x/b9/2c/e5/b92ce567394106d2e4747cc977db6fa6.jpg') center/cover no-repeat;
+    position: relative;
+}
+
+/* qoramtir overlay (o‘qilishi uchun juda muhim) */
+.chat-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55); /* qoraytirish darajasi */
+    z-index: 0;
+}
+
+/* messagelar ustida chiqishi uchun */
+.chat-box > * {
+    position: relative;
+    z-index: 1;
+}
+
 .chat-form input[type="text"] {
     width: 100%;
     background: var(--bg-base, rgba(255,255,255,0.05));
@@ -644,6 +675,37 @@ main.main-content {
     border: 0;
 }
 
+.scroll-down-btn {
+    position: absolute;
+    right: 16px;
+    bottom: 80px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 1px solid var(--glass-border);
+    color: var(--text-light);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    z-index: 50;
+    transition: 0.2s;
+}
+
+.scroll-down-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: scale(1.1);
+}
+
+.scroll-down-btn.show {
+    display: flex;
+}
+
+
 /* Touch devices — actions always visible (telefonlarda hover yo'q) */
 @media (hover: none) {
     .msg-actions {
@@ -693,6 +755,37 @@ main.main-content {
     transform: translateX(40px);
 }
 
+@media (max-width: 600px) {
+
+    /* CHAT BOX FIX — scroll muammosi uchun */
+    .chat-box {
+        position: relative;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        background-attachment: scroll; /* mobile bug fix */
+    }
+
+    /* ❗ overlay mobil’da scrollni buzmasin */
+    .chat-box::before {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        pointer-events: none; /* 👈 ENG MUHIM FIX */
+        z-index: 0;
+    }
+
+    /* messages ustida qolishi */
+    .chat-box > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* container scroll emas, faqat chat scroll bo‘lsin */
+    main.main-content {
+        overflow: hidden;
+        height: 100vh;
+    }
+}
 
 @media (max-width: 768px) {
     main.main-content {
@@ -915,6 +1008,10 @@ main.main-content {
             </div>
         </div>
 
+        <button id="scrollDownBtn" class="scroll-down-btn">
+            <i class='bx bx-chevron-down'></i>
+        </button>
+
         <!-- ═══════════════════════════════════════
              INPUT PANEL — doim pastda qoladi
         ══════════════════════════════════════════ -->
@@ -948,11 +1045,7 @@ main.main-content {
             </button>
         </form>
 
-        <!-- Scroll-to-bottom floating button -->
-        <button id="scrollDownBtn" aria-label="Oxirgi xabarga o'tish">
-            <i class='bx bx-chevron-down'></i>
-            <span class="badge" id="unreadBadge"></span>
-        </button>
+
 
     </div><!-- .chat-container -->
 </main>
@@ -1422,5 +1515,26 @@ if (chatBox && hasMoreMessages) {
     const sentinel = document.getElementById("topSentinel");
     if (sentinel) observer.observe(sentinel);
 }
+
+const scrollBtn = document.getElementById("scrollDownBtn");
+const chatBox = document.getElementById("chatBox");
+
+// click → oxiriga tushish
+scrollBtn.addEventListener("click", function () {
+    chatBox.scrollTo({
+        top: chatBox.scrollHeight,
+        behavior: "smooth"
+    });
+});
+
+chatBox.addEventListener("scroll", function () {
+    const nearBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < 150;
+
+    if (!nearBottom) {
+        scrollBtn.classList.add("show");
+    } else {
+        scrollBtn.classList.remove("show");
+    }
+});
 </script>
 {% endblock %}
