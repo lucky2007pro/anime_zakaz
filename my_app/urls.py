@@ -4,18 +4,18 @@ from .views import (
     register, login, home, movie_detail, check_username,
     profile, make_vip, search, anime_catalog,
     chat, chat_messages_api, edit_message, delete_message, ban_user,
-    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page, reels, aloqa, news_feed, news_detail, toggle_like, next_story_view, prev_story_view, story_view, mark_story_seen
+    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,reels, aloqa, news_feed, news_detail, toggle_like,next_story_view, prev_story_view, story_view, mark_story_seen
 )
 from .admin_views import *
 from django.conf import settings
 from django.conf.urls.static import static
-
 from .sitemaps import NewsSitemap
 from django.contrib.sitemaps.views import sitemap
 
 sitemaps = {
     'news': NewsSitemap,
 }
+
 
 urlpatterns = [
     path('', home, name='home'),
@@ -42,7 +42,7 @@ urlpatterns = [
     path('ban_user/<int:user_id>/', ban_user, name='ban_user'),
     path('edit_message/<int:message_id>/', edit_message, name='edit_message'),
     path('delete_message/<int:message_id>/', delete_message, name='delete_message'),
-    path('make-vip/<int:user_id>/',make_vip, name='make_vip'),
+    path('make-vip/<int:user_id>/', make_vip, name='make_vip'),
 
     # Admin Panel
     path('control-panel/', admin_dashboard, name='admin_dashboard'),
@@ -63,13 +63,14 @@ urlpatterns = [
     path('control-panel/chat/', admin_chat, name='admin_chat'),
     path('control-panel/chat/edit/<int:pk>/', admin_message_edit, name='admin_message_edit'),
     path('control-panel/chat/delete/<int:pk>/', admin_message_delete, name='admin_message_delete'),
-    
+
     path('control-panel/subscriptions/', admin_subscriptions, name='admin_subscriptions'),
-    path('control-panel/subscriptions/<int:pk>/<str:action>/', admin_subscription_action, name='admin_subscription_action'),
+    path('control-panel/subscriptions/<int:pk>/<str:action>/', admin_subscription_action,
+         name='admin_subscription_action'),
     path('control-panel/avatars/', admin_avatars, name='admin_avatars'),
     path('control-panel/avatars/add/', admin_avatar_form, name='admin_avatar_form'),
     path('control-panel/avatars/<int:pk>/delete/', admin_avatar_delete, name='admin_avatar_delete'),
-    
+
     path('control-panel/comments/', admin_comments, name='admin_comments'),
     path('control-panel/comments/<int:pk>/edit/', admin_comment_edit, name='admin_comment_edit'),
     path('control-panel/comments/<int:pk>/delete/', admin_comment_delete, name='admin_comment_delete'),
@@ -86,7 +87,7 @@ urlpatterns = [
     # NEXT / PREV
     path('story/<int:story_id>/next/', next_story_view, name='next_story'),
     path('story/<int:story_id>/prev/', prev_story_view, name='prev_story'),
-    
+
 ]
 
 if settings.DEBUG:
