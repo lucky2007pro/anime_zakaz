@@ -11,11 +11,13 @@ from django.db.models import Max
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import F
+from django.db import models
 
 
 
 from .models import (
-    CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike
+    CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
+    Story, StoryView
 )
 
 User = get_user_model()
@@ -611,6 +613,76 @@ def reels(request):
         "title": "Aloqa"
     }
     return render(request, "reels.html", context)
+
+
+# =======================
+# STORY OCHISH (VIEW PAGE)
+# =======================
+def story_view(request, story_id):
+    story = get_object_or_404(Story, id=story_id, is_active=True)
+
+    if story.expires_at and story.expires_at < timezone.now():
+        return redirect('home')
+
+    if request.user.is_authenticated:
+        StoryView.objects.get_or_create(user=request.user, story=story)
+
+    return render(request, 'story_view.html', {
+        'story': story
+    })
+
+
+# =======================
+# AJAX: STORY SEEN
+# =======================
+@login_required
+def mark_story_seen(request, story_id):
+    story = get_object_or_404(Story, id=story_id)
+
+    obj, created = StoryView.objects.get_or_create(
+        user=request.user,
+        story=story
+    )
+
+    return JsonResponse({
+        'status': 'ok',
+        'created': created,
+        'views_count': story.views.count()
+    })
+
+def get_story_list():
+    return list(
+        Story.objects.filter(
+            is_active=True,
+            expires_at__gt=timezone.now()
+        ).order_by('created_at')
+    )
+
+
+def next_story_view(request, story_id):
+    stories = get_story_list()
+
+    for i, s in enumerate(stories):
+        if s.id == story_id:
+            if i + 1 < len(stories):
+                return redirect('story_view', story_id=stories[i + 1].id)
+            else:
+                return redirect('home')
+
+    return redirect('home')
+
+
+def prev_story_view(request, story_id):
+    stories = get_story_list()
+
+    for i, s in enumerate(stories):
+        if s.id == story_id:
+            if i - 1 >= 0:
+                return redirect('story_view', story_id=stories[i - 1].id)
+            else:
+                return redirect('home')
+
+    return redirect('home')
 
 
 
