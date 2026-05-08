@@ -4,7 +4,7 @@ from .views import (
     register, login, home, movie_detail, check_username,
     profile, make_vip, search, anime_catalog,
     chat, chat_messages_api, edit_message, delete_message, ban_user,
-    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page, reels, aloqa, news_feed, news_detail, toggle_like
+    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page, reels, aloqa, news_feed, news_detail, toggle_like, next_story_view, prev_story_view, story_view, mark_story_seen
 )
 from .admin_views import *
 from django.conf import settings
@@ -78,7 +78,15 @@ urlpatterns = [
         sitemap,
         {'sitemaps': sitemaps},
         name='django.contrib.sitemaps.views.sitemap'
-    ),    
+    ),
+    # STORY VIEW
+    path('story/<int:story_id>/', story_view, name='story_view'),
+    path('story/seen/<int:story_id>/', mark_story_seen, name='mark_story_seen'),
+
+    # NEXT / PREV
+    path('story/<int:story_id>/next/', next_story_view, name='next_story'),
+    path('story/<int:story_id>/prev/', prev_story_view, name='prev_story'),
+    
 ]
 
 if settings.DEBUG:
