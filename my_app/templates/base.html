@@ -427,6 +427,7 @@
         .logout-btn:hover { background: rgba(255, 59, 48, 0.1) !important; color: #ff3b30 !important; }
         .sidebar-footer { text-align: center; margin-top: 40px; color: var(--text-dim); font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; }
 
+
         /* ==================== MOBILE NAV OVERLAY ==================== */
         .mobile-nav-overlay {
             position: fixed;
@@ -733,14 +734,14 @@
         </div>
 
         <a href="{% url 'home' %}" class="mobile-menu-item">
-            <i class='bx bx-home-alt'></i>
+            <i class='bx bxs-home' style="color:#00f3ff;"></i>
             Bosh sahifa
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
         <hr class="mobile-hr">
 
         <a href="{% url 'anime_catalog' %}" class="mobile-menu-item">
-            <i class='bx bx-play-circle'></i>
+            <i class='bx bx-play-circle' ></i>
             Katalog
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
@@ -803,7 +804,7 @@
         </a>
 
         <div class="mobile-nav-footer">
-            VERSION 0.7 &nbsp;•&nbsp; ANI BEST
+            VERSION 1.8 &nbsp;•&nbsp; ANI BEST
         </div>
 
     </div>
@@ -940,7 +941,7 @@
     </div>
     {% endif %}
 
-    <div class="sidebar-footer">BESTMEDIA PLATFORM V1.0</div>
+    <div class="sidebar-footer">BESTMEDIA PLATFORM V1.8</div>
 </div>
 
 {% block footer %}
