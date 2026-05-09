@@ -20,11 +20,9 @@
     <meta property="og:description"
           content="Eng sara va yangi anime seriallarni yuqori sifatda o'zbek tilida bepul tomosha qiling.">
     <meta property="og:image" content="{% static 'images/default.svg' %}">
-
     <meta property="og:image" content="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    
     <meta name="theme-color" content="#ff3366">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -67,12 +65,20 @@
             min-height: 100vh;
         }
 
+        /* iOS scroll lock yordamchi class */
+        body.nav-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            /* top JS orqali o'rnatiladi */
+        }
+
         img, video, iframe {
             max-width: 100%;
             height: auto;
         }
 
-        /* ----- NAVBAR ----- */
+        /* ==================== NAVBAR ==================== */
         .navbar {
             position: fixed;
             top: 0;
@@ -85,6 +91,7 @@
             z-index: 1000;
             background: linear-gradient(to bottom, rgba(15, 15, 19, 0.9), transparent);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             transition: background 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -139,6 +146,7 @@
             font-size: 0.85rem;
             text-transform: uppercase;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .pill-nav-item i {
@@ -155,8 +163,6 @@
         .pill-nav-item:hover i {
             color: var(--accent);
         }
-
-
 
         .nav-actions {
             display: flex;
@@ -185,63 +191,206 @@
         }
 
         .profile-btn {
-           background: #1a1a24;
-           border: 1px solid var(--glass-border);
-           transition: all 0.3s ease;
-        }
-        .profile-btn:hover {
-             background: rgba(0, 243, 255, 0.15);
-             border-color: var(--accent);
-             transform: translateY(-2px);
-             box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            background: #1a1a24;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
         }
 
-        /* ----- PROFIL YON MENYUSI (SIDEBAR) ----- */
+        .profile-btn:hover {
+            background: rgba(0, 243, 255, 0.15);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        /* ==================== HAMBURGER ==================== */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            padding: 6px;
+            width: 38px;
+            height: 38px;
+            z-index: 10001;
+            position: relative;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.25s ease,
+                        width 0.3s ease;
+            transform-origin: center;
+        }
+
+        /* Hamburger → X animatsiyasi */
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* ==================== PROFIL YON MENYUSI (SIDEBAR) ==================== */
         .profile-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
-            z-index: 1999; opacity: 0; visibility: hidden; transition: 0.3s;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .profile-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
         .profile-sidebar {
-            position: fixed; top: 0; right: -350px;
-            width: 350px; height: 100vh;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 350px;
+            height: 100%;
+            height: 100dvh;
             background: var(--bg-surface);
             border-left: 1px solid var(--glass-border);
-            z-index: 2000; overflow-y: auto;
-            transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            padding: 20px; box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            z-index: 2000;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            /* RIGHT emas — TRANSFORM bilan harakat */
+            transform: translateX(110%);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
         }
 
         .profile-sidebar::-webkit-scrollbar { display: none; }
         .profile-sidebar { scrollbar-width: none; }
 
-        .profile-overlay.active { opacity: 1; visibility: visible; }
-        .profile-sidebar.active { right: 0; }
+        .profile-sidebar.active {
+            transform: translateX(0);
+        }
 
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .premium-btn-container { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 87, 34, 0.1); border: 1px solid rgba(255, 87, 34, 0.2); border-radius: 12px; padding: 12px 15px; margin-bottom: 30px; }
-        .premium-btn { color: white; border: none; background: transparent; font-weight: 900; font-size: 0.75rem; display: flex; align-items:center; gap:8px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .premium-btn-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 87, 34, 0.1);
+            border: 1px solid rgba(255, 87, 34, 0.2);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 30px;
+        }
+
+        .premium-btn {
+            color: white;
+            border: none;
+            background: transparent;
+            font-weight: 900;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .premium-btn i { color: #ff5722; font-size: 1.2rem; }
-        .close-btn { background: rgba(255,255,255,0.05); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
+
+        .close-btn {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1.1rem;
+        }
+
         .close-btn:hover { background: rgba(255,255,255,0.1); color: var(--accent); }
 
-        .user-info-section { text-align: center; margin-bottom: 30px; padding-bottom: 20px; }
+        .user-info-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
         .avatar-large {
-            width: 100px; height: 100px; background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 50%; margin: 0 auto 20px auto;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3rem; color: rgba(255,255,255,0.2); box-shadow: none;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin: 0 auto 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(255,255,255,0.2);
         }
+
         .user-name-card {
-             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-             border-radius: 12px; padding: 15px 25px; display:inline-block; border-bottom: 2px solid rgba(0,0,0,0.5);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px 25px;
+            display: inline-block;
+            border-bottom: 2px solid rgba(0,0,0,0.5);
         }
-        .user-name { font-size: 1.3rem; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
-        .user-handle { color: #ff5722; font-size: 0.95rem; font-weight: 800; background: none; padding: 0; }
+
+        .user-name {
+            font-size: 1.3rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-handle { color: #ff5722; font-size: 0.95rem; font-weight: 800; }
 
         .menu-section { margin-bottom: 25px; }
-        .menu-title { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 10px; padding-left: 0; }
+
+        .menu-title {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
 
         .menu-item {
             display: flex;
@@ -255,52 +404,237 @@
             font-size: 0.95rem;
             border-radius: 10px;
         }
+
         .menu-item:hover {
             color: var(--accent);
             transform: translateX(4px);
             background: rgba(255,255,255,0.04);
             border-bottom-color: rgba(0, 243, 255, 0.2);
         }
+
         .menu-item span.icon-left {
             font-size: 1.15rem;
             margin-right: 12px;
             color: var(--text-dim);
             transition: 0.25s;
         }
-        .menu-item:hover span.icon-left { color: var(--accent); }
 
+        .menu-item:hover span.icon-left { color: var(--accent); }
         .menu-item .arrow { margin-left: auto; color: var(--text-dim); font-size: 1.2rem; }
         .menu-item .value { margin-left: auto; color: var(--text-dim); font-size: 0.85rem; margin-right: 10px; }
-
         .ai-badge { background: linear-gradient(90deg, #00f3ff, #0051ff); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 900; margin-left: auto; margin-right: 10px; }
-
         .logout-btn { color: #ff3b30; margin-top: 10px; }
-        .logout-btn:hover { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
-
+        .logout-btn:hover { background: rgba(255, 59, 48, 0.1) !important; color: #ff3b30 !important; }
         .sidebar-footer { text-align: center; margin-top: 40px; color: var(--text-dim); font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; }
 
-        /* ===== HAMBURGER MENU ===== */
-        .hamburger {
-            display: none;
+
+        /* ==================== MOBILE NAV OVERLAY ==================== */
+        .mobile-nav-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .mobile-nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* ==================== MOBILE NAV SIDEBAR ==================== */
+        .mobile-nav-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 82%;
+            max-width: 320px;
+            height: 100%;
+            height: 100dvh;
+
+            background: rgba(16, 16, 22, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+
+            border-top-left-radius: 28px;
+            border-bottom-left-radius: 28px;
+
+            padding: 24px 20px;
+
+            display: flex;
             flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            background: transparent;
+            gap: 4px;
+
+            /* overflow-y SCROLL kerak, hidden emas! */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+
+            scrollbar-width: none;
+
+            box-shadow:
+                -8px 0 32px rgba(0, 0, 0, 0.5),
+                -1px 0 20px rgba(0, 212, 255, 0.15);
+
+            /* RIGHT emas — TRANSFORM bilan harakat (qotmaslik uchun) */
+            transform: translateX(110%);
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+
+        .mobile-nav-container::-webkit-scrollbar { display: none; }
+
+        .mobile-nav-overlay.active .mobile-nav-container {
+            transform: translateX(0);
+        }
+
+        /* ==================== MOBILE NAV HEADER ==================== */
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            flex-shrink: 0;
+        }
+
+        .mobile-nav-header .brand-name {
+            font-size: 0.85rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: var(--accent);
+            animation: breathe 2.5s ease-in-out infinite;
+        }
+
+        .mobile-close-btn {
+            background: rgba(255,59,48,0.12);
             border: none;
-            padding: 5px;
-            z-index: 10001;
-        }
-        .hamburger span {
-            display: block;
-            width: 25px;
-            height: 2px;
-            background: #fff;
-            border-radius: 2px;
-            transition: all 0.3s ease;
+            color: #ff3b30;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.4rem;
+            transition: 0.2s;
+            flex-shrink: 0;
         }
 
+        .mobile-close-btn:hover {
+            background: rgba(255,59,48,0.25);
+            transform: scale(1.1);
+        }
 
-        /* Generic Classes for Pages */
+        /* ==================== MOBILE MENU ITEMS ==================== */
+        .mobile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            border-radius: 13px;
+            color: #e8e8f0;
+            text-decoration: none;
+            font-size: 0.93rem;
+            font-weight: 700;
+            transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .mobile-menu-item i {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            flex-shrink: 0;
+            transition: color 0.2s ease;
+        }
+
+        .mobile-menu-item:hover,
+        .mobile-menu-item:active {
+            background: rgba(0, 243, 255, 0.08);
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .mobile-menu-item:hover i,
+        .mobile-menu-item:active i {
+            color: var(--accent);
+        }
+
+        .mobile-menu-item .m-arrow {
+            margin-left: auto;
+            opacity: 0.4;
+            font-size: 1rem;
+        }
+
+        .mobile-menu-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin: 8px 0;
+            flex-shrink: 0;
+        }
+
+        .mobile-section-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            padding: 4px 14px;
+            flex-shrink: 0;
+        }
+        .mobile-hr{
+            border: none;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            margin: 2px 0;
+        }
+
+        .mobile-profile-action {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 14px;
+            background: rgba(0, 243, 255, 0.07);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: 0.25s;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-profile-action:hover {
+            background: rgba(0, 243, 255, 0.14);
+        }
+
+        .mobile-nav-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.3);
+            flex-shrink: 0;
+        }
+
+        /* ==================== GENERIC PAGE ==================== */
         main.main-content {
             flex: 1;
             width: min(1400px, 100%);
@@ -308,256 +642,47 @@
             padding: 30px 5%;
         }
 
-        .mobile-profile-btn {
-            width: 100%;
-            border: none;
-            background: transparent;
-            color: #fff;
-            font-size: 1.4rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            padding: 18px 40px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            cursor: pointer;
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes breathe {
+            0%, 100% { opacity: 0.7; text-shadow: 0 0 5px rgba(0,243,255,0.3); }
+            50%       { opacity: 1;   text-shadow: 0 0 18px rgba(0,243,255,0.8); }
         }
-        .mobile-profile-btn:hover { color: var(--accent); background: rgba(0,243,255,0.05); }
 
-        /* Basic Auth/Form Styles refactored to fit BESTMEDIA */
+        /* ==================== AUTH ==================== */
         .auth-container { max-width: 400px; margin: 50px auto; background: var(--bg-surface); padding: 30px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .auth-container h2 { margin-bottom: 20px; text-align: center; font-weight: 800; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; color: var(--text-dim); font-weight: 600; font-size: 0.9rem; }
         .form-control { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: #fff; border-radius: 8px; outline: none; transition: 0.3s; font-family: 'Outfit'; }
         .form-control:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
-        .btn-submit { width: 100%; padding: 14px; background: var(--accent); color: black; border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.3s; font-family: 'Outfit'; box-shadow: 0 8px 25px rgba(0, 243, 255, 0.3);}
+        .btn-submit { width: 100%; padding: 14px; background: var(--accent); color: black; border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.3s; font-family: 'Outfit'; box-shadow: 0 8px 25px rgba(0, 243, 255, 0.3); }
         .btn-submit:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255, 255, 255, 0.5); }
 
+        /* ==================== RESPONSIVE ==================== */
         @media (max-width: 1024px) {
             .nav-menu { gap: 10px; }
             .pill-nav-item { padding: 7px 14px; font-size: 0.78rem; }
         }
 
-/* =========================
-   MOBILE OVERLAY
-========================= */
-.mobile-nav-overlay {
-    position: fixed;
-    inset: 0;
-
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-
-    z-index: 10000;
-
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-
-    transition: 0.35s ease;
-}
-
-.mobile-nav-overlay.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
-
-/* =========================
-   SIDEBAR
-========================= */
-.mobile-nav-container {
-    position: absolute;
-    top: 0;
-    right: -100%;
-
-    width: 82%;
-    max-width: 340px;
-    height: 100%;
-
-    background: rgba(20, 20, 28, 0.45);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-
-    border-top-left-radius: 70px;
-    border-bottom-left-radius: 70px;
-
-    padding: 22px;
-
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
-    overflow: hidden;
-
-    box-shadow:
-        -10px 0 35px rgba(0, 0, 0, 0.45),
-        -2px 0 25px rgba(0, 212, 255, 0.25);
-
-    transition: right 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* OPEN */
-.mobile-nav-overlay.active .mobile-nav-container {
-    right: 0;
-}
-
-
-
-/* =========================
-   VERY SMOOTH ANIMATION
-========================= */
-@keyframes lightSweep {
-    0% {
-        background-position: -250% 0;
-    }
-    50% {
-        background-position: 0% 0;
-    }
-    100% {
-        background-position: 250% 0;
-    }
-}
-
-/* =========================
-   HEADER
-========================= */
-.menu-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    font-size: 0.85rem;
-    font-weight: 900;
-    letter-spacing: 1px;
-
-    padding: 10px 12px;
-    margin-bottom: 18px;
-
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 14px;
-}
-
-.menu-title span {
-    color: #00f3ff;
-    animation: breathe 2.5s ease-in-out infinite;
-}
-
-.menu-title i {
-    font-size: 1.6rem;
-    color: #ff3b30;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.menu-title i:hover {
-    transform: scale(1.2);
-    color: #ff1f1f;
-}
-
-/* =========================
-   MENU ITEMS
-========================= */
-.menu-item,
-.pill-nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    padding: 10px 12px;
-    border-radius: 12px;
-
-    color: white;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 600;
-
-    transition: 0.25s;
-}
-
-.menu-item:hover,
-.pill-nav-item:hover {
-    background: rgba(255,255,255,0.08);
-    transform: translateX(4px);
-}
-
-.icon-left {
-    font-size: 1.2rem;
-}
-
-.arrow {
-    margin-left: auto;
-    opacity: 0.6;
-}
-
-/* =========================
-   FOOTER
-========================= */
-.sidebar-version {
-    margin-top: auto;
-    text-align: center;
-
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-
-    color: rgba(255,255,255,0.35);
-
-    padding-top: 12px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-}
-
-/* =========================
-   ANIMATION TEXT GLOW
-========================= */
-@keyframes breathe {
-    0%, 100% {
-        opacity: 0.7;
-        text-shadow: 0 0 5px rgba(0,243,255,0.3);
-    }
-    50% {
-        opacity: 1;
-        text-shadow: 0 0 18px rgba(0,243,255,0.8);
-    }
-}
-
         @media (max-width: 768px) {
             .navbar { padding: 12px 4%; }
             .nav-menu { display: none; }
             .hamburger { display: flex; }
-            .nav-brand-logo {
-                width: 38px;
-                height: 38px;
-                border-radius: 8px;
-            }
+            .nav-brand-logo { width: 38px; height: 38px; border-radius: 8px; }
             .nav-brand-text { font-size: 0.98rem; }
             .nav-actions .action-icon:not(.profile-btn) { display: none; }
             .nav-actions { gap: 8px; }
-            .action-icon, .profile-btn {
-                width: 38px;
-                height: 38px;
-                font-size: 1.1rem;
-            }
-            .profile-sidebar { width: 100%; right: -100%; border-left: none; }
-            .profile-sidebar.active { right: 0; }
+            .action-icon, .profile-btn { width: 38px; height: 38px; font-size: 1.1rem; }
+            .profile-sidebar { width: 100%; border-left: none; border-radius: 0; }
             main.main-content { margin-top: 72px; padding: 22px 4%; }
         }
+
         @media (max-width: 480px) {
             .navbar { padding: 10px 3.5%; }
-            .nav-brand-logo {
-                width: 34px;
-                height: 34px;
-                border-radius: 8px;
-            }
-            .nav-brand-text {
-                font-size: 0.88rem;
-                letter-spacing: 0.05em;
-            }
-            .profile-sidebar { padding: 16px; }
-            .mobile-nav-overlay a, .mobile-profile-btn { font-size: 1.15rem; }
+            .nav-brand-logo { width: 34px; height: 34px; border-radius: 8px; }
+            .nav-brand-text { font-size: 0.88rem; letter-spacing: 0.05em; }
             .hamburger span { width: 22px; }
+            .mobile-nav-container { max-width: 300px; }
         }
 
         {% block extra_css %}{% endblock %}
@@ -565,6 +690,7 @@
 </head>
 <body>
 
+<!-- ==================== NAVBAR ==================== -->
 <nav class="navbar" id="navbar">
     <a href="{% url 'home' %}" class="nav-brand" aria-label="BESTMEDIA bosh sahifa">
         <span class="nav-brand-text">ANI <span>BEST</span></span>
@@ -573,23 +699,22 @@
     <div class="nav-menu">
         <a href="{% url 'anime_catalog' %}" class="pill-nav-item"><i class='bx bx-play-circle'></i> KATALOG</a>
         <a href="{% url 'chat' %}" class="pill-nav-item"><i class='bx bx-message-dots'></i> CHAT</a>
-        <a href="javascript:void(0)" class="pill-nav-item" onclick="toggleProfileMenu()"><i class='bx bx-user'></i>
-            PROFIL</a>
+        <a href="javascript:void(0)" class="pill-nav-item" onclick="toggleProfileMenu()"><i class='bx bx-user'></i> PROFIL</a>
         <a href="{% url 'home' %}" class="pill-nav-item"><i class='bx bx-home-alt'></i> BOSH SAHIFA</a>
     </div>
 
     <div class="nav-actions">
-        <a href="{% url 'search' %}" class="action-icon"><i class='bx bx-search'></i></a>
+        <a href="{% url 'search' %}" class="action-icon" aria-label="Qidirish"><i class='bx bx-search'></i></a>
         <a href="{% url 'chat' %}" class="action-icon" aria-label="Chat"><i class='bx bx-bell'></i></a>
-        <div class="action-icon profile-btn" onclick="toggleProfileMenu()" style="overflow: hidden; padding: 0;">
+        <div class="action-icon profile-btn" onclick="toggleProfileMenu()" style="overflow: hidden; padding: 0;" role="button" aria-label="Profil">
             {% if request.user.is_authenticated and request.user.avatar %}
-            <img src="{{ request.user.avatar.image.url }}" alt="profile"
-                 style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                <img src="{{ request.user.avatar.image.url }}" alt="profile"
+                     style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
             {% else %}
-            <i class='bx bx-user' style="margin: auto;"></i>
+                <i class='bx bx-user' style="margin: auto;"></i>
             {% endif %}
         </div>
-        <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()">
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="Menyu" aria-expanded="false">
             <span></span>
             <span></span>
             <span></span>
@@ -597,76 +722,118 @@
     </div>
 </nav>
 
-<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeOnOverlay(event)">
-    <div class="mobile-nav-container" id="mobileNav">
+<!-- ==================== MOBILE NAV ==================== -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay">
+    <div class="mobile-nav-container" id="mobileNav" role="dialog" aria-modal="true" aria-label="Mobil menyu">
 
-        <h4 class="menu-title">
-            <span>BEST•MEIDA</span>
-            <i class='bx bx-x' onclick="toggleMobileNav()"></i>
-        </h4>
-
-        <a href="{% url 'home' %}" class="menu-item">
-            <span class="icon-left"><i class='bx bx-home-alt'></i></span>
-            Bosh sahifa <span class="arrow">›</span>
-        </a>
-
-        <a href="{% url 'chat' %}" class="menu-item"><span class="icon-left"><i class='bx bx-message-dots'></i></span>
-            Umumiy chat <span class="arrow">›</span></a>
-
-        <a href="{% url 'anime_catalog' %}" class="menu-item">
-            <span class="icon-left"><i class='bx bx-play-circle'></i></span>
-            Katalog <span class="arrow">›</span>
-        </a>
-
-        <a href="{% url 'news_feed' %}" class="menu-item">
-            <span class="icon-left"><i class='bx bx-news'></i></span>
-            Yangiliklar <span class="arrow">›</span>
-        </a>
-
-        <a href="{% url 'reels' %}" class="menu-item">
-            <span class="icon-left"><i class='bx bx-video'></i></span>
-            Reels <span class="arrow">›</span>
-        </a>
-
-        <a href="{% url 'aloqa' %}" class="menu-item">
-            <span class="icon-left"><i class='bx bx-support'></i></span>
-            Aloqa <span class="arrow">›</span>
-        </a>
-
-
-        <a href="javascript:void(0)" class="pill-nav-item" onclick="openProfileFromMobile()">
-            <i class='bx bx-user'></i> PROFIL
-        </a>
-
-        <div class="sidebar-version">
-            VERSION 0.2
+        <div class="mobile-nav-header">
+            <span class="brand-name">ANI•BEST</span>
+            <button class="mobile-close-btn" onclick="toggleMobileNav()" aria-label="Yopish">
+                <i class='bx bx-x'></i>
+            </button>
         </div>
+
+        <a href="{% url 'home' %}" class="mobile-menu-item">
+            <i class='bx bxs-home' style="color:#00f3ff;"></i>
+            Bosh sahifa
+            <i class='bx bx-chevron-right m-arrow'></i>
+        </a>
+        <hr class="mobile-hr">
+
+        <a href="{% url 'anime_catalog' %}" class="mobile-menu-item">
+            <i class='bx bx-play-circle' ></i>
+            Katalog
+            <i class='bx bx-chevron-right m-arrow'></i>
+        </a>
+        <hr class="mobile-hr">
+
+        <a href="{% url 'chat' %}" class="mobile-menu-item">
+            <i class='bx bx-message-dots'></i>
+            Umumiy chat
+            <i class='bx bx-chevron-right m-arrow'></i>
+        </a>
+        <hr class="mobile-hr">
+
+        <a href="{% url 'news_feed' %}" class="mobile-menu-item">
+            <i class='bx bx-news'></i>
+            Yangiliklar
+            <i class='bx bx-chevron-right m-arrow'></i>
+        </a>
+        <hr class="mobile-hr">
+
+        <a href="{% url 'reels' %}" class="mobile-menu-item">
+            <i class='bx bx-video'></i>
+            Reels
+            <i class='bx bx-chevron-right m-arrow'></i>
+        </a>
+        <hr class="mobile-hr">
+
+        <a href="{% url 'aloqa' %}" class="mobile-menu-item">
+            <i class='bx bx-support'></i>
+            Aloqa
+            <i class='bx bx-chevron-right m-arrow'></i>
+        </a>
+        <hr class="mobile-hr">
+
+        <!-- PROFILE -->
+        <a href="javascript:void(0)" class="mobile-profile-action" onclick="openProfileFromMobile()">
+            <i class='bx bx-grid-alt'></i>
+            Qo‘shimcha Bo‘limlar
+            <i class='bx bx-chevron-right m-arrow'></i>
+        </a>
+
+        <!-- MENING HISOBIM -->
+        <h4 class="menu-title">MENING HISOBIM</h4>
+
+        <a href="{% url 'profile' %}" class="menu-item">
+            <span class="icon-left" style="color:#00f3ff;">
+                <i class='bx bx-user-circle'></i>
+            </span>
+
+            Mening Hisobim
+
+            <span class="value" style="color:var(--text-light); font-weight:800;">
+                {% if request.user.vip_data and request.user.vip_data.vip_active %}
+                    VIP
+                {% else %}
+                    Oddiy
+                {% endif %}
+            </span>
+
+            <span class="arrow">›</span>
+        </a>
+
+        <div class="mobile-nav-footer">
+            VERSION 1.8 &nbsp;•&nbsp; ANI BEST
+        </div>
+
     </div>
 </div>
 
 {% block content %}
 {% endblock %}
 
+<!-- ==================== PROFIL SIDEBAR ==================== -->
 <div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this) toggleProfileMenu()"></div>
 
-<div class="profile-sidebar" id="profileSidebar">
-    <div class="sidebar-header premium-btn-container">
+<div class="profile-sidebar" id="profileSidebar" role="dialog" aria-modal="true" aria-label="Profil menyusi">
+    <div class="premium-btn-container">
         {% if request.user.is_authenticated %}
-        <a href="{% url 'premium_page' %}" class="premium-btn"><i class='bx bxs-bolt'></i> PREMIUM OBUNA</a>
+            <a href="{% url 'premium_page' %}" class="premium-btn"><i class='bx bxs-bolt'></i> PREMIUM OBUNA</a>
         {% else %}
-        <a href="{% url 'register' %}" class="premium-btn"><i class='bx bxs-bolt'></i> RO'YXATDAN O'TING</a>
+            <a href="{% url 'register' %}" class="premium-btn"><i class='bx bxs-bolt'></i> RO'YXATDAN O'TING</a>
         {% endif %}
-        <button class="close-btn" onclick="toggleProfileMenu()"><i class='bx bx-x'></i></button>
+        <button class="close-btn" onclick="toggleProfileMenu()" aria-label="Yopish"><i class='bx bx-x'></i></button>
     </div>
 
     {% if request.user.is_authenticated %}
     <div class="user-info-section">
         <div class="avatar-large" style="overflow: hidden;">
             {% if request.user.avatar %}
-            <img src="{{ request.user.avatar.image.url }}" alt="avatar"
-                 style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                <img src="{{ request.user.avatar.image.url }}" alt="avatar"
+                     style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
             {% else %}
-            <i class='bx bx-user'></i>
+                <i class='bx bx-user'></i>
             {% endif %}
         </div>
         <div class="user-name-card">
@@ -674,56 +841,62 @@
             <div class="user-handle">@{{ request.user.username|lower }}</div>
         </div>
         {% if request.user.vip_data and request.user.vip_data.vip_active %}
-        <p style="color:#fbbf24; font-weight: 800; font-size: 0.85rem; margin-top: 15px;"><i class='bx bxs-crown'></i>
-            VIP PROFILE</p>
+        <p style="color:#fbbf24; font-weight:800; font-size:0.85rem; margin-top:15px;">
+            <i class='bx bxs-crown'></i> VIP PROFILE
+        </p>
         {% endif %}
     </div>
 
     <div class="menu-section">
         <h4 class="menu-title">MENING HISOBIM</h4>
-        <a href="{% url 'profile' %}" class="menu-item"><span class="icon-left" style="color:#00f3ff;"><i
-                class='bx bx-user-circle'></i></span> Mening Hisobim <span class="value"
-                                                                           style="color:var(--text-light); font-weight:800;">{% if request.user.vip_data and request.user.vip_data.vip_active %}VIP{% else %}Oddiy{% endif %}</span>
-            <span class="arrow">›</span></a>
-        <a href="{% url 'premium_page' %}" class="menu-item"><span class="icon-left" style="color:#fbbf24;"><i
-                class='bx bxs-crown'></i></span> Premium Obuna <span class="value"
-                                                                     style="color:var(--text-light); font-weight:800;">{% if request.user.vip_data and request.user.vip_data.vip_active %}Faol{% else %}Yo'q{% endif %}</span>
-            <span class="arrow">›</span></a>
-        <a href="{% url 'favorites_page' %}" class="menu-item"><span class="icon-left" style="color:#ff3366;"><i
-                class='bx bxs-bookmark-star'></i></span> Saqlanganlar <span class="arrow">›</span></a>
-        <a href="{% url 'watch_history_page' %}" class="menu-item"><span class="icon-left" style="color:#a855f7;"><i
-                class='bx bx-history'></i></span> Ko'rishlar tarixi <span class="arrow">›</span></a>
+        <a href="{% url 'profile' %}" class="menu-item">
+            <span class="icon-left" style="color:#00f3ff;"><i class='bx bx-user-circle'></i></span>
+            Mening Hisobim
+            <span class="value" style="color:var(--text-light); font-weight:800;">
+                {% if request.user.vip_data and request.user.vip_data.vip_active %}VIP{% else %}Oddiy{% endif %}
+            </span>
+            <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'premium_page' %}" class="menu-item">
+            <span class="icon-left" style="color:#fbbf24;"><i class='bx bxs-crown'></i></span>
+            Premium Obuna
+            <span class="value" style="color:var(--text-light); font-weight:800;">
+                {% if request.user.vip_data and request.user.vip_data.vip_active %}Faol{% else %}Yo'q{% endif %}
+            </span>
+            <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'favorites_page' %}" class="menu-item">
+            <span class="icon-left" style="color:#ff3366;"><i class='bx bxs-bookmark-star'></i></span>
+            Saqlanganlar <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'watch_history_page' %}" class="menu-item">
+            <span class="icon-left" style="color:#a855f7;"><i class='bx bx-history'></i></span>
+            Ko'rishlar tarixi <span class="arrow">›</span>
+        </a>
     </div>
 
     <div class="menu-section">
         <h4 class="menu-title">ASOSIY</h4>
-
         <a href="{% url 'chat' %}" class="menu-item">
             <span class="icon-left"><i class='bx bx-message-dots'></i></span>
             Umumiy chat <span class="arrow">›</span>
         </a>
-
         <a href="{% url 'anime_catalog' %}" class="menu-item">
             <span class="icon-left"><i class='bx bx-play-circle'></i></span>
             Katalog <span class="arrow">›</span>
         </a>
-
         <a href="{% url 'home' %}" class="menu-item">
             <span class="icon-left"><i class='bx bx-home-alt'></i></span>
             Bosh sahifa <span class="arrow">›</span>
         </a>
-
-        <!-- ✅ TO‘G‘RI NEWS -->
         <a href="{% url 'news_feed' %}" class="menu-item">
             <span class="icon-left"><i class='bx bx-news'></i></span>
             Yangiliklar <span class="arrow">›</span>
         </a>
-
         <a href="{% url 'reels' %}" class="menu-item">
             <span class="icon-left"><i class='bx bx-play-circle'></i></span>
             Reels <span class="arrow">›</span>
         </a>
-
         <a href="{% url 'aloqa' %}" class="menu-item">
             <span class="icon-left"><i class='bx bx-support'></i></span>
             Aloqa <span class="arrow">›</span>
@@ -750,12 +923,12 @@
 
     {% else %}
     <div class="user-info-section" style="padding-top: 20px;">
-        <div class="avatar-large" style="background: #333; box-shadow: none;">?</div>
-        <h3 class="user-name">Mehmon</h3>
-        <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 10px;">Sayt imkoniyatlaridan to'liq foydalanish
-            uchun tizimga kiring.</p>
+        <div class="avatar-large" style="background: #333;">?</div>
+        <h3 class="user-name" style="margin-top: 10px;">Mehmon</h3>
+        <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 10px;">
+            Sayt imkoniyatlaridan to'liq foydalanish uchun tizimga kiring.
+        </p>
     </div>
-
     <div class="menu-section" style="margin-top: 30px;">
         <a href="{% url 'login' %}" class="menu-item"
            style="justify-content: center; background: var(--accent); color: black; font-weight: 800; border-radius: 12px; margin-bottom: 10px;">
@@ -768,65 +941,52 @@
     </div>
     {% endif %}
 
-    <div class="sidebar-footer">
-        BESTMEDIA PLATFORM V1.0
-    </div>
+    <div class="sidebar-footer">BESTMEDIA PLATFORM V1.8</div>
 </div>
 
 {% block footer %}
 <footer style="background: rgba(10,10,15,0.95); border-top: 1px solid rgba(255,255,255,0.05); padding: 60px 5% 30px; margin-top: 60px; color: var(--text-dim); font-size: 0.9rem;">
     <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-bottom: 40px;">
         <div>
-            <!-- LOGO in FOOTER -->
             <a href="{% url 'home' %}"
                style="display:inline-flex; align-items:center; text-decoration:none; gap:10px; margin-bottom:15px;">
-                <img src="{% static 'images/anibest-logo.svg' %}" alt="BESTMEDIA" width="40" height="40"
-                     style="object-fit:contain;">
-                <span style="font-weight:900; font-size:1.4rem; color:var(--text-main); letter-spacing:1px;">BESTMEDIA</span>
+                <img src="{% static 'images/anibest-logo.svg' %}" alt="BESTMEDIA" width="40" height="40" style="object-fit:contain;">
+                <span style="font-weight:900; font-size:1.4rem; color:#fff; letter-spacing:1px;">BESTMEDIA</span>
             </a>
-            <p style="line-height:1.7; max-width: 300px; margin-bottom: 20px;">Sifatli tarjima va qulay interfeys orqali
-                sevimli animelaringizdan zavqlaning. Yangi va eng ommabop animelar faqat bizda.</p>
+            <p style="line-height:1.7; max-width:300px; margin-bottom:20px;">
+                Sifatli tarjima va qulay interfeys orqali sevimli animelaringizdan zavqlaning.
+            </p>
         </div>
-
         <div>
-            <h4 style="color: var(--text-main); font-weight:800; font-size: 1.1rem; margin-bottom: 20px;">Sahifalar</h4>
+            <h4 style="color:#fff; font-weight:800; font-size:1.1rem; margin-bottom:20px;">Sahifalar</h4>
             <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                <li><a href="{% url 'home' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Bosh
-                    sahifa</a></li>
-                <li><a href="{% url 'anime_catalog' %}"
-                       style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Animelar katalogi</a></li>
-                <li><a href="{% url 'premium_page' %}"
-                       style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Premium sotib olish</a>
-                </li>
-                <li><a href="{% url 'chat' %}" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Jonli
-                    Chat</a></li>
+                <li><a href="{% url 'home' %}" style="color:var(--text-dim); text-decoration:none;">Bosh sahifa</a></li>
+                <li><a href="{% url 'anime_catalog' %}" style="color:var(--text-dim); text-decoration:none;">Animelar katalogi</a></li>
+                <li><a href="{% url 'premium_page' %}" style="color:var(--text-dim); text-decoration:none;">Premium sotib olish</a></li>
+                <li><a href="{% url 'chat' %}" style="color:var(--text-dim); text-decoration:none;">Jonli Chat</a></li>
             </ul>
         </div>
-
         <div>
-            <h4 style="color: var(--text-main); font-weight:800; font-size: 1.1rem; margin-bottom: 20px;">Biz bilan
-                aloqa</h4>
+            <h4 style="color:#fff; font-weight:800; font-size:1.1rem; margin-bottom:20px;">Biz bilan aloqa</h4>
             <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bxl-telegram'
-                                                                          style="font-size:1.2rem; color:var(--accent);"></i>
-                    <a href="https://t.me/ani_best_uzb_anime" target="_blank"
-                       style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Telegram kanalimiz</a></li>
-                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bxl-instagram'
-                                                                          style="font-size:1.2rem; color:#E1306C;"></i>
-                    <a href="#" style="color:var(--text-dim); text-decoration:none; transition:0.3s;">Instagram
-                        sahifamiz</a></li>
-                <li style="display:flex; align-items:center; gap:8px;"><i class='bx bx-envelope'
-                                                                          style="font-size:1.2rem;"></i>
+                <li style="display:flex; align-items:center; gap:8px;">
+                    <i class='bx bxl-telegram' style="font-size:1.2rem; color:var(--accent);"></i>
+                    <a href="https://t.me/ani_best_uzb_anime" target="_blank" style="color:var(--text-dim); text-decoration:none;">Telegram kanalimiz</a>
+                </li>
+                <li style="display:flex; align-items:center; gap:8px;">
+                    <i class='bx bxl-instagram' style="font-size:1.2rem; color:#E1306C;"></i>
+                    <a href="#" style="color:var(--text-dim); text-decoration:none;">Instagram sahifamiz</a>
+                </li>
+                <li style="display:flex; align-items:center; gap:8px;">
+                    <i class='bx bx-envelope' style="font-size:1.2rem;"></i>
                     admin@bestmedia.uz
                 </li>
             </ul>
         </div>
     </div>
-
-    <div style="max-width: 1280px; margin: 0 auto; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div style="max-width:1280px; margin:0 auto; padding-top:30px; border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
         <p style="margin:0;">&copy; {% now "Y" %} BESTMEDIA. Barcha huquqlar himoyalangan.</p>
-        <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700;">ANI BEST JAMOASI TOMONIDAN
-            YARATILGAN</p>
+        <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700;">ANI BEST JAMOASI TOMONIDAN YARATILGAN</p>
     </div>
 </footer>
 {% endblock footer %}
@@ -838,131 +998,179 @@
 {% endif %}
 
 <script>
-    /* ================= NAVBAR SCROLL ================= */
-    window.addEventListener('scroll', () => {
-        const nav = document.getElementById('navbar');
-        if (!nav) return;
-
-        nav.classList.toggle('scrolled', window.scrollY > 50);
-    });
+/* ================= SCROLL ================= */
+window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+}, { passive: true });
 
 
-    /* ================= PROFILE SIDEBAR ================= */
-    function toggleProfileMenu() {
-        const sidebar = document.getElementById('profileSidebar');
-        const overlay = document.getElementById('profileOverlay');
+/* ================= iOS BODY SCROLL LOCK ================= */
+let _scrollY = 0;
 
-        if (!sidebar || !overlay) return;
+function lockBodyScroll() {
+    _scrollY = window.scrollY;
+    document.body.style.top = `-${_scrollY}px`;
+    document.body.classList.add('nav-open');
+}
 
-        sidebar.classList.toggle('active');
-        overlay.classList.toggle('active');
-
-        document.body.style.overflow = sidebar.classList.contains('active')
-            ? 'hidden'
-            : '';
-    }
-
-
-    /* ================= MOBILE SIDEBAR (RIGHT MENU) ================= */
-    function toggleMobileNav() {
-        const overlay = document.getElementById('mobileNavOverlay');
-        const btn = document.getElementById('hamburgerBtn');
-
-        if (!overlay) return;
-
-        overlay.classList.toggle('active');
-
-        if (btn) btn.classList.toggle('active');
-
-        document.body.style.overflow = overlay.classList.contains('active')
-            ? 'hidden'
-            : '';
-    }
-
-    function closeOnOverlay(event) {
-        if (event.target.id === 'mobileNavOverlay') {
-            toggleMobileNav();
-        }
-    }
-
-
-    /* ================= FAVORITE SYSTEM ================= */
-    function toggleFavorite(e, movieId) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        fetch(`/toggle-favorite/${movieId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error("Avval tizimga kiring!");
-            return response.json();
-        })
-        .then(data => {
-            const icon = document.getElementById(`fav-icon-${movieId}`);
-
-            if (!icon) return;
-
-            icon.className = data.is_favorited
-                ? "bx bxs-star"
-                : "bx bx-star";
-        })
-        .catch(err => {
-            alert(err.message);
-        });
-    }
-
-    function openProfileFromMobile() {
-    // mobile sidebar yopiladi
-    const mobileOverlay = document.getElementById('mobileNavOverlay');
-    const hamburger = document.getElementById('hamburgerBtn');
-
-    if (mobileOverlay) mobileOverlay.classList.remove('active');
-    if (hamburger) hamburger.classList.remove('active');
-
-    document.body.style.overflow = '';
-
-    // keyin profil ochiladi
-    const profileSidebar = document.getElementById('profileSidebar');
-    const profileOverlay = document.getElementById('profileOverlay');
-
-    if (profileSidebar && profileOverlay) {
-        profileSidebar.classList.add('active');
-        profileOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
+function unlockBodyScroll() {
+    document.body.classList.remove('nav-open');
+    document.body.style.top = '';
+    window.scrollTo(0, _scrollY);
 }
 
 
-    /* ================= MOBILE SWIPE (LEFT / RIGHT) ================= */
+/* ================= MOBILE NAV ================= */
+function toggleMobileNav() {
+    const overlay = document.getElementById('mobileNavOverlay');
+    const btn = document.getElementById('hamburgerBtn');
+    if (!overlay) return;
+
+    const isOpen = overlay.classList.toggle('active');
+    if (btn) {
+        btn.classList.toggle('active', isOpen);
+        btn.setAttribute('aria-expanded', isOpen);
+    }
+
+    if (isOpen) {
+        lockBodyScroll();
+    } else {
+        unlockBodyScroll();
+    }
+}
+
+function closeMobileNav() {
+    const overlay = document.getElementById('mobileNavOverlay');
+    const btn = document.getElementById('hamburgerBtn');
+    if (!overlay || !overlay.classList.contains('active')) return;
+
+    overlay.classList.remove('active');
+    if (btn) {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-expanded', 'false');
+    }
+    unlockBodyScroll();
+}
+
+/* Overlay sirtiga bosish → yopiladi */
+document.getElementById('mobileNavOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeMobileNav();
+});
+
+/* ESC tugmasi */
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeMobileNav();
+        closeProfileMenu();
+    }
+});
+
+
+/* ================= PROFIL SIDEBAR ================= */
+function toggleProfileMenu() {
+    const sidebar = document.getElementById('profileSidebar');
+    const overlay = document.getElementById('profileOverlay');
+    if (!sidebar || !overlay) return;
+
+    const isOpen = sidebar.classList.toggle('active');
+    overlay.classList.toggle('active', isOpen);
+
+    if (isOpen) {
+        lockBodyScroll();
+    } else {
+        unlockBodyScroll();
+    }
+}
+
+function closeProfileMenu() {
+    const sidebar = document.getElementById('profileSidebar');
+    const overlay = document.getElementById('profileOverlay');
+    if (!sidebar || !sidebar.classList.contains('active')) return;
+
+    sidebar.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+    unlockBodyScroll();
+}
+
+function openProfileFromMobile() {
+    closeMobileNav();
+    /* Sidebar animatsiyasi tugaguncha kichik kechikish */
+    setTimeout(() => {
+        const sidebar = document.getElementById('profileSidebar');
+        const overlay = document.getElementById('profileOverlay');
+        if (sidebar && overlay) {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            lockBodyScroll();
+        }
+    }, 300);
+}
+
+
+/* ================= SWIPE (chapdan o'ngga yopish) ================= */
+(function() {
     let startX = 0;
+    let startY = 0;
+    let isSwipe = false;
 
-    document.addEventListener('touchstart', (e) => {
+    document.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
-    });
+        startY = e.touches[0].clientY;
+        isSwipe = false;
+    }, { passive: true });
 
-    document.addEventListener('touchend', (e) => {
-        const diff = startX - e.changedTouches[0].clientX;
+    document.addEventListener('touchmove', function(e) {
+        const dx = Math.abs(e.touches[0].clientX - startX);
+        const dy = Math.abs(e.touches[0].clientY - startY);
+        /* Gorizontal harakat aniq bo'lsa — swipe */
+        if (dx > dy && dx > 10) isSwipe = true;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+        if (!isSwipe) return;
+
+        const endX = e.changedTouches[0].clientX;
+        const diff = startX - endX;
         const overlay = document.getElementById('mobileNavOverlay');
-
         if (!overlay) return;
 
-        // swipe LEFT → open
-        if (diff > 80) {
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+        /* Chap tomonga ≥70px — ochiladi (faqat ekranning chap qirrasi: startX < 30) */
+        if (diff > 70 && startX < 30) {
+            if (!overlay.classList.contains('active')) toggleMobileNav();
         }
 
-        // swipe RIGHT → close
-        if (diff < -80) {
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
+        /* O'ng tomonga ≥70px — yopiladi */
+        if (diff < -70) {
+            if (overlay.classList.contains('active')) closeMobileNav();
         }
-    });
+    }, { passive: true });
+})();
+
+
+/* ================= FAVORITE ================= */
+function toggleFavorite(e, movieId) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    fetch(`/toggle-favorite/${movieId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Avval tizimga kiring!");
+        return response.json();
+    })
+    .then(data => {
+        const icon = document.getElementById(`fav-icon-${movieId}`);
+        if (!icon) return;
+        icon.className = data.is_favorited ? "bx bxs-star" : "bx bx-star";
+    })
+    .catch(err => alert(err.message));
+}
 </script>
 
 </body>
