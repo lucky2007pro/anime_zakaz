@@ -24,6 +24,8 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 /* ============================================================
@@ -97,7 +99,10 @@ body {
     backdrop-filter: blur(8px);
     flex-shrink: 0;
     font-size: 14px;
+    transition: background 0.2s;
 }
+
+.back-btn:hover { background: rgba(255,255,255,0.28); }
 
 .title {
     flex: 1;
@@ -125,6 +130,12 @@ body {
 /* ============================================================
    MEDIA
    ============================================================ */
+.story-media {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+
 .story-media img,
 .story-media video {
     width: 100%;
@@ -133,6 +144,187 @@ body {
     background: black;
     display: block;
 }
+
+/* ============================================================
+   LOADING OVERLAY
+   ============================================================ */
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(4px);
+}
+
+.loading-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.spinner {
+    width: 52px;
+    height: 52px;
+    border: 3px solid rgba(255,255,255,0.15);
+    border-top-color: #00f3ff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 14px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: rgba(255,255,255,0.75);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1;   }
+}
+
+/* ============================================================
+   MUTE BADGE
+   ============================================================ */
+.mute-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.6);
+    background: rgba(0,0,0,0.65);
+    color: white;
+    font-size: 28px;
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s, transform 0.15s;
+    backdrop-filter: blur(6px);
+}
+
+.mute-badge.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* ============================================================
+   PAUSE BADGE
+   ============================================================ */
+.pause-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.6);
+    background: rgba(0,0,0,0.55);
+    color: white;
+    font-size: 44px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s, transform 0.15s;
+    backdrop-filter: blur(8px);
+}
+
+.pause-badge.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* ============================================================
+   TAP ZONE RIPPLE (chap / o'ng tap effekti)
+   ============================================================ */
+.tap-ripple {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 80px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    z-index: 70;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.tap-ripple.left  { left: 20px; }
+.tap-ripple.right { right: 20px; }
+.tap-ripple.show  { opacity: 1; }
+
+/* ============================================================
+   FLYING ARROWS (desktop — hover qilganda)
+   ============================================================ */
+.fly-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 25;
+    pointer-events: none;
+    opacity: 0;
+    font-size: 22px;
+    color: white;
+    letter-spacing: -4px;
+    filter: drop-shadow(0 0 6px rgba(0,243,255,0.8));
+    transition: opacity 0.3s;
+}
+
+.fly-arrow.left  { left: 10px;  animation: flyLeft  1.4s ease-in-out infinite; }
+.fly-arrow.right { right: 10px; animation: flyRight 1.4s ease-in-out infinite; }
+
+.story-box:hover .fly-arrow { opacity: 1; }
+
+@keyframes flyLeft {
+    0%   { transform: translateY(-50%) translateX(0);     opacity: 0.3; }
+    50%  { transform: translateY(-50%) translateX(-14px); opacity: 1; }
+    100% { transform: translateY(-50%) translateX(0);     opacity: 0.3; }
+}
+
+@keyframes flyRight {
+    0%   { transform: translateY(-50%) translateX(0);    opacity: 0.3; }
+    50%  { transform: translateY(-50%) translateX(14px); opacity: 1; }
+    100% { transform: translateY(-50%) translateX(0);    opacity: 0.3; }
+}
+
+/* ============================================================
+   MOBILE ARROW BUTTONS
+   ============================================================ */
+.mobile-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    display: none;
+    background: rgba(255,255,255,0.13);
+    border: none;
+    color: white;
+    width: 44px; height: 80px;
+    border-radius: 12px;
+    font-size: 22px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, opacity 0.2s;
+    opacity: 0.7;
+}
+
+.mobile-arrow.left  { left: 6px;  }
+.mobile-arrow.right { right: 6px; }
+.mobile-arrow:active { background: rgba(0,243,255,0.25); opacity: 1; }
 
 /* ============================================================
    DESCRIPTION
@@ -188,7 +380,7 @@ body {
 }
 
 /* ============================================================
-   SWIPE OVERLAY — video ustida swipe ishlashi uchun
+   SWIPE OVERLAY
    ============================================================ */
 .swipe-overlay {
     position: absolute;
@@ -198,33 +390,6 @@ body {
     background: transparent;
     touch-action: pan-y;
 }
-
-/* ============================================================
-   DESKTOP ARROW HINTS (sichqoncha hover qilganda ko'rinadi)
-   ============================================================ */
-.swipe-hint {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 20;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 28px;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(6px);
-    border-radius: 50%;
-    width: 48px; height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-}
-
-.swipe-hint.left  { left: 10px; }
-.swipe-hint.right { right: 10px; }
-
-.story-box:hover .swipe-hint { opacity: 1; }
 
 /* ============================================================
    SWIPE ANIMATIONS
@@ -282,10 +447,11 @@ body {
 
     .story-media { transform: translateY(-45px); }
 
-    .navbar, .bottom-nav            { height: 70px; padding: 10px 0; }
-    .navbar i, .navbar svg,
-    .nav-icon, .bottom-nav i        { font-size: 26px !important; }
-    .navbar button, .bottom-nav button { font-size: 16px; padding: 10px 12px; }
+    /* Mobilsda arrow ko'rinadi */
+    .mobile-arrow { display: flex; }
+
+    /* Desktop fly arrow mobilsda yo'q */
+    .fly-arrow { display: none; }
 }
 
 /* ============================================================
@@ -337,22 +503,40 @@ body {
         <div class="views">👁 {{ story.views.count }}</div>
     </div>
 
-    <!-- SWIPE OVERLAY (butun ekranda swipe ishlashi uchun) -->
+    <!-- SWIPE OVERLAY -->
     <div class="swipe-overlay" id="swipeOverlay"></div>
 
-    <!-- DESKTOP ARROW HINTS -->
-    <div class="swipe-hint left">&#8592;</div>
-    <div class="swipe-hint right">&#8594;</div>
+    <!-- DESKTOP FLYING ARROWS -->
+    <div class="fly-arrow left">&#8592;&#8592;</div>
+    <div class="fly-arrow right">&#8594;&#8594;</div>
+
+    <!-- MOBILE ARROW BUTTONS -->
+    <button class="mobile-arrow left" id="arrowLeft" aria-label="Oldingisi">&#8592;</button>
+    <button class="mobile-arrow right" id="arrowRight" aria-label="Keyingisi">&#8594;</button>
 
     <!-- MEDIA -->
-    <div class="story-media">
+    <div class="story-media" id="storyMedia">
         {% if story.video %}
-            <video id="storyVideo" autoplay playsinline controls>
+            <video id="storyVideo" autoplay playsinline>
                 <source src="{{ story.video.url }}">
             </video>
         {% elif story.image %}
-            <img src="{{ story.image.url }}" alt="{{ story.title }}">
+            <img src="{{ story.image.url }}" alt="{{ story.title }}" id="storyImage">
         {% endif %}
+
+        <!-- LOADING OVERLAY -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <div class="loading-text">Yuklanmoqda…</div>
+        </div>
+
+        <!-- MUTE / PAUSE BADGES -->
+        <div class="mute-badge"  id="muteBadge">🔇</div>
+        <div class="pause-badge" id="pauseBadge">⏸</div>
+
+        <!-- TAP RIPPLE -->
+        <div class="tap-ripple left"  id="rippleLeft"></div>
+        <div class="tap-ripple right" id="rippleRight"></div>
     </div>
 
     <!-- DESCRIPTION -->
@@ -378,21 +562,61 @@ body {
 </div>
 
 <script>
-    const nextUrl = "{% url 'next_story' story.id %}";
-    const prevUrl = "{% url 'prev_story' story.id %}";
+    const nextUrl      = "{% url 'next_story' story.id %}";
+    const prevUrl      = "{% url 'prev_story' story.id %}";
 
-    const box          = document.getElementById("storyBox");
-    const video        = document.getElementById("storyVideo");
-    const progressBar  = document.getElementById("progressBar");
-    const progressFill = document.getElementById("progressFill");
-    const swipeOverlay = document.getElementById("swipeOverlay");
+    const box           = document.getElementById("storyBox");
+    const video         = document.getElementById("storyVideo");
+    const progressBar   = document.getElementById("progressBar");
+    const progressFill  = document.getElementById("progressFill");
+    const swipeOverlay  = document.getElementById("swipeOverlay");
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    const muteBadge     = document.getElementById("muteBadge");
+    const pauseBadge    = document.getElementById("pauseBadge");
+    const rippleLeft    = document.getElementById("rippleLeft");
+    const rippleRight   = document.getElementById("rippleRight");
+    const arrowLeft     = document.getElementById("arrowLeft");
+    const arrowRight    = document.getElementById("arrowRight");
+
+    // ============================================================
+    // MOBILE ARROW BUTTONS
+    // ============================================================
+    arrowLeft.addEventListener("click",  e => { e.stopPropagation(); goPrev(); });
+    arrowRight.addEventListener("click", e => { e.stopPropagation(); goNext(); });
+
+    // ============================================================
+    // LOADING OVERLAY — internet sekin bo'lsa
+    // ============================================================
+    function showLoading() { loadingOverlay.classList.add("visible"); }
+    function hideLoading() { loadingOverlay.classList.remove("visible"); }
+
+    // Sahifa birinchi ochilganda
+    window.addEventListener("load", hideLoading);
+
+    if (video) {
+        // Video buffer to'lganda
+        video.addEventListener("waiting",   showLoading);
+        video.addEventListener("stalled",   showLoading);
+        video.addEventListener("playing",   hideLoading);
+        video.addEventListener("canplay",   hideLoading);
+
+        // Sahifa yuklanishida video hali tayyor emas
+        if (video.readyState < 3) showLoading();
+    }
+
+    // Image loading
+    const storyImage = document.getElementById("storyImage");
+    if (storyImage) {
+        showLoading();
+        storyImage.addEventListener("load",  hideLoading);
+        storyImage.addEventListener("error", hideLoading);
+        if (storyImage.complete) hideLoading();
+    }
 
     // ============================================================
     // VIDEO — PROGRESS & AUTO-NEXT
     // ============================================================
     if (video) {
-        video.controls = true;
-
         video.addEventListener("timeupdate", () => {
             if (!isNaN(video.duration) && video.duration > 0) {
                 progressFill.style.width =
@@ -423,49 +647,174 @@ body {
     }, { passive: true });
 
     // ============================================================
-    // SWIPE NAVIGATION — butun ekranda ishlaydi
+    // MUTE TOGGLE
     // ============================================================
-    let startX = 0, startY = 0;
+    let muteTimeout = null;
 
-    function onTouchStart(e) {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
+    function toggleMute() {
+        if (!video) return;
+        video.muted = !video.muted;
+        muteBadge.textContent = video.muted ? "🔇" : "🔊";
+        muteBadge.classList.add("show");
+        clearTimeout(muteTimeout);
+        muteTimeout = setTimeout(() => muteBadge.classList.remove("show"), 900);
     }
 
-    function onTouchEnd(e) {
-        const diffX = startX - e.changedTouches[0].clientX;
-        const diffY = startY - e.changedTouches[0].clientY;
+    // ============================================================
+    // PAUSE / RESUME
+    // ============================================================
+    let pauseTimeout  = null;
+    let longPressTimer = null;
+    let longPressed    = false;
 
-        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
-            diffX > 0 ? goNext() : goPrev();
+    function showPauseBadge() {
+        pauseBadge.textContent = video && video.paused ? "⏸" : "▶";
+        pauseBadge.classList.add("show");
+        clearTimeout(pauseTimeout);
+        pauseTimeout = setTimeout(() => pauseBadge.classList.remove("show"), 800);
+    }
+
+    function pauseVideo() {
+        if (!video) return;
+        video.pause();
+        showPauseBadge();
+    }
+
+    function resumeVideo() {
+        if (!video) return;
+        video.play();
+        pauseBadge.classList.remove("show");
+    }
+
+    // ============================================================
+    // TAP ZONE LOGIC
+    // ============================================================
+    // Ekranning uchdan bir qismlari:
+    //   Left  1/3 → oldingisi
+    //   Right 1/3 → keyingisi
+    //   Middle    → mute toggle (tap) / pause (long press)
+
+    function flashRipple(side) {
+        const el = side === "left" ? rippleLeft : rippleRight;
+        el.classList.add("show");
+        setTimeout(() => el.classList.remove("show"), 250);
+    }
+
+    function handleTapZone(clientX) {
+        const w     = box.getBoundingClientRect().width;
+        const third = w / 3;
+
+        if (clientX < third) {
+            flashRipple("left");
+            goPrev();
+        } else if (clientX > third * 2) {
+            flashRipple("right");
+            goNext();
+        } else {
+            // Middle tap → mute
+            toggleMute();
         }
     }
 
-    // Video ustidagi shaffof qatlam — swipe ishlaydi, controls ham ishlaydi
+    // ============================================================
+    // SWIPE NAVIGATION
+    // ============================================================
+    let startX = 0, startY = 0;
+    let tapStartTime = 0;
+
+    function onTouchStart(e) {
+        startX       = e.touches[0].clientX;
+        startY       = e.touches[0].clientY;
+        tapStartTime = Date.now();
+        longPressed  = false;
+
+        // Long press = pause (hold uchun)
+        longPressTimer = setTimeout(() => {
+            longPressed = true;
+            pauseVideo();
+        }, 500);
+    }
+
+    function onTouchEnd(e) {
+        clearTimeout(longPressTimer);
+
+        // Long press qo'yib yuborildi → resume
+        if (longPressed) {
+            resumeVideo();
+            return;
+        }
+
+        const diffX   = startX - e.changedTouches[0].clientX;
+        const diffY   = startY - e.changedTouches[0].clientY;
+        const elapsed = Date.now() - tapStartTime;
+
+        // Swipe
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
+            diffX > 0 ? goNext() : goPrev();
+            return;
+        }
+
+        // Quick tap (not a scroll)
+        if (elapsed < 350 && Math.abs(diffX) < 15 && Math.abs(diffY) < 15) {
+            handleTapZone(startX);
+        }
+    }
+
     swipeOverlay.addEventListener("touchstart", onTouchStart, { passive: true });
     swipeOverlay.addEventListener("touchend",   onTouchEnd,   { passive: true });
 
-    // Boshqa elementlar (description, bottom-bar, va h.k.)
     document.addEventListener("touchstart", e => {
         if (e.target.closest(".progress-bar") ||
-            e.target.closest("video") ||
+            e.target.closest(".mobile-arrow")  ||
             e.target.closest(".swipe-overlay")) return;
         onTouchStart(e);
     }, { passive: true });
 
     document.addEventListener("touchend", e => {
         if (e.target.closest(".progress-bar") ||
-            e.target.closest("video") ||
+            e.target.closest(".mobile-arrow")  ||
             e.target.closest(".swipe-overlay")) return;
         onTouchEnd(e);
     }, { passive: true });
 
     // ============================================================
-    // KEYBOARD NAVIGATION — ← → klavishlari
+    // DESKTOP MOUSE — click zones (mute / pause)
+    // ============================================================
+    swipeOverlay.addEventListener("click", e => {
+        handleTapZone(e.clientX);
+    });
+
+    // Desktop long press (mouse down/up)
+    let mouseLongTimer = null;
+    let mouseLongPressed = false;
+
+    swipeOverlay.addEventListener("mousedown", () => {
+        mouseLongPressed = false;
+        mouseLongTimer = setTimeout(() => {
+            mouseLongPressed = true;
+            pauseVideo();
+        }, 500);
+    });
+
+    swipeOverlay.addEventListener("mouseup", () => {
+        clearTimeout(mouseLongTimer);
+        if (mouseLongPressed) resumeVideo();
+    });
+
+    // ============================================================
+    // KEYBOARD NAVIGATION — ← → M Space
     // ============================================================
     document.addEventListener("keydown", e => {
         if (e.key === "ArrowRight") goNext();
         if (e.key === "ArrowLeft")  goPrev();
+        if (e.key === "m" || e.key === "M") toggleMute();
+        if (e.key === " ") {
+            e.preventDefault();
+            if (video) {
+                if (video.paused) { resumeVideo(); }
+                else              { pauseVideo();  }
+            }
+        }
     });
 
     // ============================================================
