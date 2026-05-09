@@ -5,7 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0d0d1a">
-    <title>Chat | BESTMEDIA</title>
+    <title>BESTMEDIA Chat — Jonli muloqot | bestmedia-official.uz</title>
+
+    <!-- SEO -->
+    <meta name="description" content="BESTMEDIA rasmiy chat xonasi. Jonli muloqot, emoji va stikerlar bilan xabar almashing. bestmedia-official.uz/chat">
+    <meta name="keywords" content="BESTMEDIA chat, bestmedia uz chat, jonli chat, online chat uzbekistan">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://bestmedia-official.uz/chat">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="BESTMEDIA Chat">
+    <meta property="og:description" content="BESTMEDIA rasmiy jonli chat xonasi. Muloqot qiling!">
+    <meta property="og:url" content="https://bestmedia-official.uz/chat">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://i.pinimg.com/736x/16/aa/d7/16aad7f5390ff2e41f03b2f8f66d6db1.jpg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BESTMEDIA Chat">
+    <meta name="twitter:description" content="BESTMEDIA rasmiy jonli chat xonasi.">
+    <meta name="twitter:image" content="https://i.pinimg.com/736x/16/aa/d7/16aad7f5390ff2e41f03b2f8f66d6db1.jpg">
 
     <!-- Boxicons -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -480,7 +499,7 @@
         transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1);
         z-index: 35;
     }
-    .settings-panel.open { max-height: 290px; overflow-y: auto; }
+    .settings-panel.open { max-height: 420px; overflow-y: auto; }
     .settings-panel::-webkit-scrollbar { width: 4px; }
     .settings-panel::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
 
@@ -542,6 +561,72 @@
     }
     .bg-remove-btn i { font-size: 1rem; }
     .bg-remove-btn:hover { border-color: #ef4444; color: #ef4444; }
+
+    /* =====================================================
+       SOUND PICKER
+       ===================================================== */
+    .sound-picker { display: none; flex-direction: column; padding: 12px 16px 14px; gap: 10px; }
+    .sound-picker.open { display: flex; }
+    .sound-picker-label { font-size: 0.73rem; color: var(--text-dim); }
+    .sound-options-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .sound-option-btn {
+        display: flex; flex-direction: column;
+        align-items: center; gap: 5px;
+        background: rgba(255,255,255,0.05);
+        border: 2px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 10px 20px;
+        cursor: pointer;
+        color: var(--text-dim);
+        font-size: 0.76rem; font-family: inherit;
+        transition: background 0.2s, border-color 0.2s, color 0.2s;
+        min-width: 90px;
+    }
+    .sound-option-btn i { font-size: 1.4rem; }
+    .sound-option-btn.active {
+        background: rgba(0,243,255,0.1);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    /* =====================================================
+       DARK MODE PICKER
+       ===================================================== */
+    .dark-mode-picker { display: none; flex-direction: column; padding: 12px 16px 14px; gap: 10px; }
+    .dark-mode-picker.open { display: flex; }
+    .dark-mode-picker-label { font-size: 0.73rem; color: var(--text-dim); }
+    .dark-mode-row { display: flex; gap: 10px; }
+    .dark-mode-btn {
+        display: flex; flex-direction: column;
+        align-items: center; gap: 5px;
+        background: rgba(255,255,255,0.05);
+        border: 2px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 10px 24px;
+        cursor: pointer;
+        color: var(--text-dim);
+        font-size: 0.76rem; font-family: inherit;
+        transition: background 0.2s, border-color 0.2s, color 0.2s;
+        min-width: 90px;
+    }
+    .dark-mode-btn i { font-size: 1.4rem; }
+    .dark-mode-btn.on-btn.active {
+        background: rgba(0,243,255,0.1);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+    .dark-mode-btn.off-btn.active {
+        background: rgba(255,100,100,0.1);
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+
+    /* Dark mode overlay — fon rasmi ustiga qo'yiladi */
+    #chatBgLayer.dark-mode {
+        filter: brightness(0.22) blur(7px);
+        transition: filter 0.4s ease;
+    }
+    #chatBgLayer { transition: filter 0.4s ease; }
 
     /* =====================================================
        EMOJI + STICKER PANEL
@@ -1025,6 +1110,14 @@
                     <i class='bx bx-image-alt'></i>
                     <span>Fon</span>
                 </button>
+                <button type="button" class="settings-action-btn" id="soundSettingBtn" onclick="toggleSoundPicker()">
+                    <i class='bx bx-volume-full' id="soundNavIcon"></i>
+                    <span>Ovoz</span>
+                </button>
+                <button type="button" class="settings-action-btn" id="darkSettingBtn" onclick="toggleDarkModePicker()">
+                    <i class='bx bx-moon' id="darkNavIcon"></i>
+                    <span>Tungi</span>
+                </button>
             </div>
             <div class="bg-picker" id="bgPicker">
                 <div class="bg-picker-label">Fon rasmini tanlang:</div>
@@ -1050,6 +1143,36 @@
                         <span>Default</span>
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- SOUND PICKER -->
+        <div class="sound-picker" id="soundPicker">
+            <div class="sound-picker-label">Xabar ovozi:</div>
+            <div class="sound-options-row">
+                <button type="button" class="sound-option-btn" id="soundOnBtn" onclick="setSoundMode('on')">
+                    <i class='bx bx-volume-full'></i>
+                    <span>Ovoz yoqiq</span>
+                </button>
+                <button type="button" class="sound-option-btn" id="soundMuteBtn" onclick="setSoundMode('mute')">
+                    <i class='bx bx-volume-mute'></i>
+                    <span>Sukut qilish</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- DARK MODE PICKER -->
+        <div class="dark-mode-picker" id="darkModePicker">
+            <div class="dark-mode-picker-label">Tungi rejim (fon rasmi):</div>
+            <div class="dark-mode-row">
+                <button type="button" class="dark-mode-btn on-btn" id="darkModeOnBtn" onclick="setDarkMode(true)">
+                    <i class='bx bx-moon'></i>
+                    <span>Yoqish</span>
+                </button>
+                <button type="button" class="dark-mode-btn off-btn" id="darkModeOffBtn" onclick="setDarkMode(false)">
+                    <i class='bx bx-sun'></i>
+                    <span>O'chirish</span>
+                </button>
             </div>
         </div>
 
@@ -1548,6 +1671,7 @@ const chatForm = document.getElementById("chatForm");
 if (chatForm) {
     chatForm.addEventListener("submit", function(e) {
         if (messageInput && !messageInput.value.trim()) { e.preventDefault(); return; }
+        playMsgSound();
         sessionStorage.setItem("chatScrollToBottom", "1");
     });
 }
@@ -1652,7 +1776,98 @@ if (chatBox && hasMoreMessages) {
     const sen = document.getElementById("topSentinel");
     if (sen) obs.observe(sen);
 }
+
+/* =========================================================
+   SOUND — xabar yuborilganda ovoz
+   ========================================================= */
+function playMsgSound() {
+    const mode = localStorage.getItem("chat_sound_mode") || "on";
+    if (mode === "mute") return;
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(900, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(500, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.28, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.25);
+    } catch(e) {}
+}
+
+function setSoundMode(mode) {
+    localStorage.setItem("chat_sound_mode", mode);
+    document.getElementById("soundOnBtn") && document.getElementById("soundOnBtn").classList.toggle("active", mode === "on");
+    document.getElementById("soundMuteBtn") && document.getElementById("soundMuteBtn").classList.toggle("active", mode === "mute");
+    const icon = document.getElementById("soundNavIcon");
+    if (icon) icon.className = mode === "mute" ? "bx bx-volume-mute" : "bx bx-volume-full";
+    const btn = document.getElementById("soundSettingBtn");
+    if (btn) btn.classList.toggle("active", mode === "mute");
+}
+
+function toggleSoundPicker() {
+    const picker = document.getElementById("soundPicker");
+    const bgP = document.getElementById("bgPicker");
+    const dmP = document.getElementById("darkModePicker");
+    if (!picker) return;
+    const isOpen = picker.classList.toggle("open");
+    if (isOpen) {
+        if (bgP) bgP.classList.remove("open");
+        if (dmP) dmP.classList.remove("open");
+        document.getElementById("bgSettingBtn") && document.getElementById("bgSettingBtn").classList.remove("active");
+        document.getElementById("darkSettingBtn") && document.getElementById("darkSettingBtn").classList.remove("active");
+    }
+    document.getElementById("soundSettingBtn") && document.getElementById("soundSettingBtn").classList.toggle("active", isOpen);
+}
+
+/* =========================================================
+   DARK MODE — fon rasmi ustiga qorong'u blur
+   ========================================================= */
+function setDarkMode(enabled) {
+    const bg = document.getElementById("chatBgLayer");
+    if (!bg) return;
+    if (enabled) {
+        bg.classList.add("dark-mode");
+    } else {
+        bg.classList.remove("dark-mode");
+    }
+    localStorage.setItem("chat_dark_mode", enabled ? "1" : "0");
+    document.getElementById("darkModeOnBtn") && document.getElementById("darkModeOnBtn").classList.toggle("active", enabled);
+    document.getElementById("darkModeOffBtn") && document.getElementById("darkModeOffBtn").classList.toggle("active", !enabled);
+    const icon = document.getElementById("darkNavIcon");
+    if (icon) icon.className = enabled ? "bx bx-moon" : "bx bx-sun";
+}
+
+function toggleDarkModePicker() {
+    const picker = document.getElementById("darkModePicker");
+    const bgP = document.getElementById("bgPicker");
+    const sP = document.getElementById("soundPicker");
+    if (!picker) return;
+    const isOpen = picker.classList.toggle("open");
+    if (isOpen) {
+        if (bgP) bgP.classList.remove("open");
+        if (sP) sP.classList.remove("open");
+        document.getElementById("bgSettingBtn") && document.getElementById("bgSettingBtn").classList.remove("active");
+        document.getElementById("soundSettingBtn") && document.getElementById("soundSettingBtn").classList.remove("active");
+    }
+    document.getElementById("darkSettingBtn") && document.getElementById("darkSettingBtn").classList.toggle("active", isOpen);
+}
+
+/* =========================================================
+   INIT — localStorage dan sozlamalarni yuklash
+   ========================================================= */
+(function initSettings() {
+    const soundMode = localStorage.getItem("chat_sound_mode") || "on";
+    setSoundMode(soundMode);
+
+    const darkMode = localStorage.getItem("chat_dark_mode") === "1";
+    setDarkMode(darkMode);
+})();
 </script>
 
-</body>
+</body>y>
 </html>
