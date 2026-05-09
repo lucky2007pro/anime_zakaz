@@ -592,6 +592,12 @@
             padding: 4px 14px;
             flex-shrink: 0;
         }
+        .mobile-hr{
+            border: none;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            margin: 2px 0;
+        }
 
         .mobile-profile-action {
             display: flex;
@@ -731,38 +737,42 @@
             Bosh sahifa
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
+        <hr class="mobile-hr">
 
         <a href="{% url 'anime_catalog' %}" class="mobile-menu-item">
             <i class='bx bx-play-circle'></i>
             Katalog
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
+        <hr class="mobile-hr">
 
         <a href="{% url 'chat' %}" class="mobile-menu-item">
             <i class='bx bx-message-dots'></i>
             Umumiy chat
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
+        <hr class="mobile-hr">
 
         <a href="{% url 'news_feed' %}" class="mobile-menu-item">
             <i class='bx bx-news'></i>
             Yangiliklar
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
+        <hr class="mobile-hr">
 
         <a href="{% url 'reels' %}" class="mobile-menu-item">
             <i class='bx bx-video'></i>
             Reels
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
+        <hr class="mobile-hr">
 
         <a href="{% url 'aloqa' %}" class="mobile-menu-item">
             <i class='bx bx-support'></i>
             Aloqa
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
-
-        <div class="mobile-menu-divider"></div>
+        <hr class="mobile-hr">
 
         <!-- PROFILE -->
         <a href="javascript:void(0)" class="mobile-profile-action" onclick="openProfileFromMobile()">
