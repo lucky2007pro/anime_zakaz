@@ -6,47 +6,87 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+* {
+    box-sizing: border-box;
     margin: 0;
-    background: #000;
-    overflow: hidden;
-    font-family: Arial;
+    padding: 0;
 }
 
-/* container */
+body {
+    background: #000;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* ============================================================
+   BACKGROUND BLUR VIDEO (PC uchun)
+   ============================================================ */
+.bg-video {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.bg-video video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: blur(25px);
+    transform: scale(1.2);
+}
+
+/* ============================================================
+   STORY CONTAINER
+   ============================================================ */
 .story-box {
     position: relative;
     width: 100%;
     height: 100vh;
+    overflow: hidden;
 }
 
-/* MEDIA (smooth zoom feel) */
-.story-media img,
-.story-media video {
-    width: 100%;
-    height: 100vh;
-    object-fit: contain;
-    background: black;
-    transition: transform 0.4s ease;
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.progress-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: rgba(255,255,255,0.2);
+    z-index: 100;
+    cursor: pointer;
 }
 
-/* TOP BAR — FIXED + CLEAN */
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #00f3ff;
+    transition: width 0.1s linear;
+}
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
 .top-bar {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-
+    top: 10px; left: 10px; right: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-
     color: white;
     z-index: 10;
 }
 
-/* LEFT BUTTON */
 .back-btn {
     background: rgba(255,255,255,0.15);
     border: none;
@@ -56,37 +96,22 @@ body {
     cursor: pointer;
     backdrop-filter: blur(8px);
     flex-shrink: 0;
+    font-size: 14px;
 }
 
-/* CENTER TITLE (fix overflow + ugly center issue) */
 .title {
     flex: 1;
     text-align: center;
     font-size: 14px;
-
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
     opacity: 0.95;
-
-    color: #ffffff; /* 👈 rang */
-    text-shadow: 0 2px 8px rgba(0,0,0,0.8); /* 👈 fon ustida aniq ko‘rinsin */
-    font-weight: 600;
 }
 
-.bottom-bar {
-    position: absolute;
-    bottom: 15px;
-    left: 10px;
-    right: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: white;
-}
-
-/* RIGHT VIEWS */
 .views {
     flex-shrink: 0;
     font-size: 13px;
@@ -94,16 +119,118 @@ body {
     background: rgba(255,255,255,0.12);
     padding: 6px 10px;
     border-radius: 8px;
+    color: white;
 }
 
-/* SWIPE ANIMATION LAYER */
-.story-box.slide-left {
-    animation: slideLeft 0.25s ease;
+/* ============================================================
+   MEDIA
+   ============================================================ */
+.story-media img,
+.story-media video {
+    width: 100%;
+    height: 100vh;
+    object-fit: contain;
+    background: black;
+    display: block;
 }
 
-.story-box.slide-right {
-    animation: slideRight 0.25s ease;
+/* ============================================================
+   DESCRIPTION
+   ============================================================ */
+.story-description {
+    position: absolute;
+    bottom: 80px;
+    left: 15px; right: 15px;
+    color: white;
+    font-size: 13px;
+    line-height: 1.4;
+    background: rgba(0,0,0,0.35);
+    padding: 10px 12px;
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+    z-index: 60;
 }
+
+/* ============================================================
+   BOTTOM BAR
+   ============================================================ */
+.bottom-bar {
+    position: absolute;
+    bottom: 20px;
+    left: 10px; right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+}
+
+.watch-btn button {
+    background: #00f3ff;
+    color: #000;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 20px rgba(0,243,255,0.3);
+}
+
+.watch-btn button:hover  { transform: scale(1.05); }
+
+.watch-btn button:disabled {
+    background: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.5);
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ============================================================
+   SWIPE OVERLAY — video ustida swipe ishlashi uchun
+   ============================================================ */
+.swipe-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    bottom: 80px;
+    z-index: 5;
+    background: transparent;
+    touch-action: pan-y;
+}
+
+/* ============================================================
+   DESKTOP ARROW HINTS (sichqoncha hover qilganda ko'rinadi)
+   ============================================================ */
+.swipe-hint {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 28px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(6px);
+    border-radius: 50%;
+    width: 48px; height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.swipe-hint.left  { left: 10px; }
+.swipe-hint.right { right: 10px; }
+
+.story-box:hover .swipe-hint { opacity: 1; }
+
+/* ============================================================
+   SWIPE ANIMATIONS
+   ============================================================ */
+.story-box.slide-left  { animation: slideLeft  0.25s ease forwards; }
+.story-box.slide-right { animation: slideRight 0.25s ease forwards; }
 
 @keyframes slideLeft {
     from { transform: translateX(0); }
@@ -115,350 +242,107 @@ body {
     to   { transform: translateX(100%); }
 }
 
-.story-description {
-    position: absolute;
-    bottom: 120px; /* 👈 bottom-bar ustiga chiqadi */
-
-    left: 15px;
-    right: 15px;
-
-    color: white;
-    font-size: 13px;
-    line-height: 1.4;
-
-    background: rgba(0,0,0,0.35);
-    padding: 10px 12px;
-    border-radius: 10px;
-
-    backdrop-filter: blur(6px);
-
-    z-index: 60;
-}
-
-
+/* ============================================================
+   MOBILE  (max-width: 600px)
+   ============================================================ */
 @media (max-width: 600px) {
 
-    /* =========================
-       TITLE
-    ========================= */
     .title {
-        flex: 1;
-        text-align: center;
         font-size: 15px;
-
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
+        font-weight: 700;
         color: #00f3ff !important;
         text-shadow: 0 2px 10px rgba(0,0,0,0.9);
-        font-weight: 700;
         opacity: 1;
     }
 
-    /* =========================
-       VIEWS
-    ========================= */
-    .views {
-        font-size: 12px;
-        padding: 6px 10px;
-        border-radius: 10px;
-    }
+    .views        { font-size: 12px; border-radius: 10px; }
+    .back-btn     { padding: 8px 12px; font-size: 14px; }
 
-    /* =========================
-       TOP BAR
-    ========================= */
-    .top-bar {
-        top: 10px;
-        left: 10px;
-        right: 10px;
-    }
-
-    .back-btn {
-        padding: 8px 12px;
-        font-size: 14px;
-    }
-
-    /* =========================
-       STORY DESCRIPTION
-    ========================= */
     .story-description {
         bottom: 110px;
-        left: 10px;
-        right: 10px;
-
+        left: 10px; right: 10px;
         font-size: 12px;
-        line-height: 1.4;
-
         background: rgba(0,0,0,0.45);
         padding: 8px 10px;
-        border-radius: 10px;
-
-        backdrop-filter: blur(6px);
     }
 
-    /* =========================
-       BOTTOM BAR (KATTA & YUQORIGA)
-    ========================= */
     .bottom-bar {
         position: fixed;
-        bottom: 100px;  /* 👈 yuqoriga ko‘tarildi */
-
-        left: 0;
-        right: 0;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
+        bottom: 100px;
+        left: 0; right: 0;
         padding: 12px 0;
-
-        z-index: 50;
     }
 
-    /* =========================
-       WATCH BUTTON (KATTA)
-    ========================= */
     .watch-btn button {
-        background: #00f3ff;
-        color: #000;
-
-        font-size: 16px;   /* 👈 kattaroq */
-        font-weight: 800;
-
-        padding: 12px 20px; /* 👈 kattaroq button */
-        border-radius: 14px;
-
-        box-shadow: 0 6px 25px rgba(0,0,0,0.4);
-    }
-
-    /* =========================
-       NAVBAR / ICONS (KATTA)
-       (agar navbar bo‘lsa)
-    ========================= */
-    .navbar,
-    .bottom-nav {
-        height: 70px;
-        padding: 10px 0;
-    }
-
-    .navbar i,
-    .navbar svg,
-    .nav-icon,
-    .bottom-nav i {
-        font-size: 26px !important;  /* 👈 ICONLAR KATTA */
-    }
-
-    .navbar button,
-    .bottom-nav button {
         font-size: 16px;
-        padding: 10px 12px;
+        font-weight: 800;
+        padding: 12px 20px;
+        border-radius: 14px;
     }
 
-    .story-media {
-        transform: translateY(-45px); /* 👈 video + media yuqoriga chiqadi */
-    }
+    .story-media { transform: translateY(-45px); }
 
+    .navbar, .bottom-nav            { height: 70px; padding: 10px 0; }
+    .navbar i, .navbar svg,
+    .nav-icon, .bottom-nav i        { font-size: 26px !important; }
+    .navbar button, .bottom-nav button { font-size: 16px; padding: 10px 12px; }
 }
 
-/* =========================
-   PC / TABLET FIX (768px+)
-========================= */
+/* ============================================================
+   DESKTOP / TABLET  (min-width: 768px)
+   ============================================================ */
 @media (min-width: 768px) {
 
-    /* STORY CONTAINER */
-    .story-box {
-        max-width: 450px;
-        margin: auto;
-        overflow: hidden;
-        border-radius: 20px;
-        background: #000;
-    }
-
-    /* MEDIA */
-    .story-media video,
-    .story-media img {
-        width: 100%;
-        height: 100vh;
-        object-fit: contain;
-    }
-
-    /* TOP BAR */
-    .top-bar {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        right: 15px;
-
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        z-index: 50;
-    }
-
-    /* BACK BUTTON */
-    .back-btn {
-        padding: 8px 14px;
-        font-size: 14px;
-        border-radius: 12px;
-    }
-
-    /* TITLE */
-    .title {
-        flex: 1;
-        text-align: center;
-        font-size: 14px;
-
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
-        opacity: 0.95;
-
-        color: #ffffff; /* 👈 rang */
-        text-shadow: 0 2px 8px rgba(0,0,0,0.8); /* 👈 fon ustida aniq ko‘rinsin */
-        font-weight: 600;
-    }
-
-    /* VIEWS */
-    .views {
-        font-size: 13px;
-        padding: 7px 12px;
-    }
-
-    /* =========================
-       BOTTOM BAR
-    ========================= */
-    .bottom-bar {
-        position: absolute;
-        bottom: 50px; /* oldin 20px edi */
-        left: 15px;
-        right: 15px;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        z-index: 50;
-    }
-
-    /* WATCH BUTTON */
-    .watch-btn button {
-        padding: 12px 18px;
-
-        font-size: 14px;
-        font-weight: bold;
-
-        border: none;
-        border-radius: 12px;
-
-        background: #00f3ff;
-        color: #000;
-
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .watch-btn button:hover {
-        transform: scale(1.05);
-    }
-
-    /* =========================
-       PROGRESS BAR
-    ========================= */
-    .progress-bar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-
-        height: 5px;
-
-        background: rgba(255,255,255,0.2);
-
-        z-index: 100;
-        cursor: pointer;
-    }
-
-    .progress-fill {
-        height: 100%;
-        width: 0%;
-        background: #00f3ff;
-    }
-body {
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    height: 100vh;
-}
-
-    /* BACKGROUND VIDEO */
-    .bg-video {
-        position: fixed;
-        top: 0;
-        left: 0;
-
-        width: 100%;
-        height: 100%;
-
-        z-index: -1;
-        overflow: hidden;
-    }
-
-    .bg-video video {
-        width: 100%;
-        height: 100%;
-
-        object-fit: cover;
-
-        filter: blur(25px);
-        transform: scale(1.2);
-    }
-
-    /* STORY BOX */
     .story-box {
         width: 450px;
         height: 100vh;
-
-        position: relative;
-
         border-radius: 20px;
-        overflow: hidden;
-
-        box-shadow: 0 0 40px rgba(0,0,0,0.6);
         background: rgba(0,0,0,0.3);
+        box-shadow: 0 0 40px rgba(0,0,0,0.6);
     }
 
-}
+    .story-media video,
+    .story-media img { height: 100vh; object-fit: contain; }
 
+    .top-bar  { top: 15px; left: 15px; right: 15px; }
+    .back-btn { padding: 8px 14px; font-size: 14px; border-radius: 12px; }
+    .views    { font-size: 13px; padding: 7px 12px; }
+
+    .bottom-bar { bottom: 50px; left: 15px; right: 15px; }
+}
 
 </style>
 </head>
 <body>
 
+{% if story.video %}
+<div class="bg-video">
+    <video autoplay muted loop playsinline>
+        <source src="{{ story.video.url }}">
+    </video>
+</div>
+{% endif %}
+
 <div class="story-box" id="storyBox">
 
+    <!-- PROGRESS BAR -->
     <div class="progress-bar" id="progressBar">
         <div class="progress-fill" id="progressFill"></div>
     </div>
 
-
-    <!-- TOP -->
+    <!-- TOP BAR -->
     <div class="top-bar">
         <button class="back-btn" onclick="window.location.href='/'">⬅</button>
-
-        <div class="title">
-            {{ story.title }}
-        </div>
-
+        <div class="title">{{ story.title }}</div>
         <div class="views">👁 {{ story.views.count }}</div>
     </div>
+
+    <!-- SWIPE OVERLAY (butun ekranda swipe ishlashi uchun) -->
+    <div class="swipe-overlay" id="swipeOverlay"></div>
+
+    <!-- DESKTOP ARROW HINTS -->
+    <div class="swipe-hint left">&#8592;</div>
+    <div class="swipe-hint right">&#8594;</div>
 
     <!-- MEDIA -->
     <div class="story-media">
@@ -467,10 +351,11 @@ body {
                 <source src="{{ story.video.url }}">
             </video>
         {% elif story.image %}
-            <img src="{{ story.image.url }}">
+            <img src="{{ story.image.url }}" alt="{{ story.title }}">
         {% endif %}
     </div>
 
+    <!-- DESCRIPTION -->
     {% if story.description %}
     <div class="story-description">
         {{ story.description|linebreaks }}
@@ -479,163 +364,128 @@ body {
 
     <!-- BOTTOM BAR -->
     <div class="bottom-bar">
-
-        <!-- LINK BUTTON -->
         <div class="watch-btn">
             {% if story.link %}
-            <button onclick="window.open('{{ story.link }}', '_blank')">
-                ▶ Tomosha qilish
-            </button>
+                <button onclick="window.open('{{ story.link|urlencode }}', '_blank')">
+                    ▶ Tomosha qilish
+                </button>
             {% else %}
-            <button disabled>
-                ▶ Link yo‘q
-            </button>
+                <button disabled>▶ Link yo'q</button>
             {% endif %}
         </div>
-
-
     </div>
 
 </div>
 
 <script>
-const nextUrl = "{% url 'next_story' story.id %}";
-const prevUrl = "{% url 'prev_story' story.id %}";
+    const nextUrl = "{% url 'next_story' story.id %}";
+    const prevUrl = "{% url 'prev_story' story.id %}";
 
-const box = document.getElementById("storyBox");
-const video = document.getElementById("storyVideo");
-const progressBar = document.getElementById("progressBar");
-const progress = document.getElementById("progressFill");
+    const box          = document.getElementById("storyBox");
+    const video        = document.getElementById("storyVideo");
+    const progressBar  = document.getElementById("progressBar");
+    const progressFill = document.getElementById("progressFill");
+    const swipeOverlay = document.getElementById("swipeOverlay");
 
-// =====================
-// VIDEO PROGRESS
-// =====================
-if (video && progress) {
+    // ============================================================
+    // VIDEO — PROGRESS & AUTO-NEXT
+    // ============================================================
+    if (video) {
+        video.controls = true;
 
-    video.addEventListener("timeupdate", () => {
-
-        const percent =
-            (video.currentTime / video.duration) * 100;
-
-        progress.style.width = percent + "%";
-    });
-
-    video.addEventListener("ended", () => {
-
-        progress.style.width = "100%";
-
-        goNext();
-    });
-}
-
-// =====================
-// VIDEO SETTINGS
-// =====================
-if (video) {
-
-    video.controls = true;
-
-    video.addEventListener("ended", () => {
-        goNext();
-    });
-}
-
-// =====================
-// SWIPE LOGIC (MOBILE)
-// =====================
-let startX = 0;
-let startY = 0;
-
-document.addEventListener("touchstart", e => {
-
-    // progress bar ustida swipe ishlamasin
-    if (e.target.closest(".progress-bar")) return;
-
-    // video controller ustida ishlamasin
-    if (e.target.closest("video")) return;
-
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-});
-
-document.addEventListener("touchend", e => {
-
-    // progress bar ustida ishlamasin
-    if (e.target.closest(".progress-bar")) return;
-
-    // video controller ustida ishlamasin
-    if (e.target.closest("video")) return;
-
-    let endX = e.changedTouches[0].clientX;
-    let endY = e.changedTouches[0].clientY;
-
-    let diffX = startX - endX;
-    let diffY = startY - endY;
-
-    // faqat horizontal swipe
-    if (Math.abs(diffX) > Math.abs(diffY)) {
-
-        if (Math.abs(diffX) > 60) {
-
-            // chapga swipe → next
-            if (diffX > 0) {
-                goNext();
+        video.addEventListener("timeupdate", () => {
+            if (!isNaN(video.duration) && video.duration > 0) {
+                progressFill.style.width =
+                    (video.currentTime / video.duration * 100) + "%";
             }
+        });
 
-            // o‘ngga swipe → prev
-            else {
-                goPrev();
-            }
+        video.addEventListener("ended", () => {
+            progressFill.style.width = "100%";
+            goNext();
+        });
+    }
+
+    // ============================================================
+    // PROGRESS BAR — SEEK
+    // ============================================================
+    function seekTo(clientX) {
+        if (!video) return;
+        const rect    = progressBar.getBoundingClientRect();
+        const percent = (clientX - rect.left) / rect.width;
+        video.currentTime = Math.max(0, Math.min(1, percent)) * video.duration;
+    }
+
+    progressBar.addEventListener("click", e => seekTo(e.clientX));
+    progressBar.addEventListener("touchstart", e => {
+        e.stopPropagation();
+        seekTo(e.touches[0].clientX);
+    }, { passive: true });
+
+    // ============================================================
+    // SWIPE NAVIGATION — butun ekranda ishlaydi
+    // ============================================================
+    let startX = 0, startY = 0;
+
+    function onTouchStart(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }
+
+    function onTouchEnd(e) {
+        const diffX = startX - e.changedTouches[0].clientX;
+        const diffY = startY - e.changedTouches[0].clientY;
+
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
+            diffX > 0 ? goNext() : goPrev();
         }
     }
-});
 
-// =====================
-// PROGRESS BAR CONTROL
-// =====================
-function updateProgressPosition(clientX) {
+    // Video ustidagi shaffof qatlam — swipe ishlaydi, controls ham ishlaydi
+    swipeOverlay.addEventListener("touchstart", onTouchStart, { passive: true });
+    swipeOverlay.addEventListener("touchend",   onTouchEnd,   { passive: true });
 
-    if (!video) return;
+    // Boshqa elementlar (description, bottom-bar, va h.k.)
+    document.addEventListener("touchstart", e => {
+        if (e.target.closest(".progress-bar") ||
+            e.target.closest("video") ||
+            e.target.closest(".swipe-overlay")) return;
+        onTouchStart(e);
+    }, { passive: true });
 
-    const rect = progressBar.getBoundingClientRect();
+    document.addEventListener("touchend", e => {
+        if (e.target.closest(".progress-bar") ||
+            e.target.closest("video") ||
+            e.target.closest(".swipe-overlay")) return;
+        onTouchEnd(e);
+    }, { passive: true });
 
-    const x = clientX - rect.left;
+    // ============================================================
+    // KEYBOARD NAVIGATION — ← → klavishlari
+    // ============================================================
+    document.addEventListener("keydown", e => {
+        if (e.key === "ArrowRight") goNext();
+        if (e.key === "ArrowLeft")  goPrev();
+    });
 
-    const percent = x / rect.width;
+    // ============================================================
+    // ANIMATED NAVIGATION (bir marta ishlaydi)
+    // ============================================================
+    let navigating = false;
 
-    video.currentTime = percent * video.duration;
-}
+    function goNext() {
+        if (navigating) return;
+        navigating = true;
+        box.classList.add("slide-left");
+        setTimeout(() => { window.location.href = nextUrl; }, 220);
+    }
 
-// PC CLICK
-progressBar.addEventListener("click", (e) => {
-    updateProgressPosition(e.clientX);
-});
-
-// MOBILE TOUCH
-progressBar.addEventListener("touchstart", (e) => {
-    updateProgressPosition(e.touches[0].clientX);
-});
-
-// =====================
-// ANIMATED NAVIGATION
-// =====================
-function goNext() {
-
-    box.classList.add("slide-left");
-
-    setTimeout(() => {
-        window.location.href = nextUrl;
-    }, 200);
-}
-
-function goPrev() {
-
-    box.classList.add("slide-right");
-
-    setTimeout(() => {
-        window.location.href = prevUrl;
-    }, 200);
-}
+    function goPrev() {
+        if (navigating) return;
+        navigating = true;
+        box.classList.add("slide-right");
+        setTimeout(() => { window.location.href = prevUrl; }, 220);
+    }
 </script>
 
 </body>
