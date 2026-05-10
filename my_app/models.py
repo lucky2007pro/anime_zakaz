@@ -395,3 +395,79 @@ class StoryView(models.Model):
     def __str__(self):
         return f"{self.user.username} -> {self.story.title}"
 
+
+# qayta yoziladi bu joy 
+# =======================
+# REELS
+# =======================
+class Reel(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reels')
+    title = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    video_file = models.FileField(upload_to='reels/videos/', blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True)
+    thumbnail = models.ImageField(upload_to='reels/thumbnails/', blank=True, null=True)
+    views_count = models.PositiveIntegerField(default=0)
+    shares_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def total_likes(self):
+        return self.likes.count()
+
+    def total_comments(self):
+        return self.comments.count()
+
+    def get_video_src(self):
+        if self.video_file:
+            return self.video_file.url
+        return self.video_url or ''
+
+    def __str__(self):
+        return f"Reel #{self.id} - {self.user.username}"
+
+
+class ReelLike(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reel_likes')
+    reel = models.ForeignKey(Reel, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'reel')
+
+    def __str__(self):
+        return f"{self.user.username} liked Reel#{self.reel.id}"
+
+
+class ReelComment(models.Model):
+    reel = models.ForeignKey(Reel, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reel_comments')
+    text = models.TextField()
+    reply_to = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='replies'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.user.username}: {self.text[:30]}"
+
+
+class ReelShare(models.Model):
+    reel = models.ForeignKey(Reel, on_delete=models.CASCADE, related_name='shares')
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    shared_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Reel#{self.reel.id} shared"
+
+
+
