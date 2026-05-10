@@ -4,7 +4,9 @@ from .views import (
     register, login, home, movie_detail, check_username,
     profile, make_vip, search, anime_catalog,
     chat, chat_messages_api, edit_message, delete_message, ban_user,
-    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,reels, aloqa, news_feed, news_detail, toggle_like,next_story_view, prev_story_view, story_view, mark_story_seen
+    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,reels, aloqa, news_feed, news_detail, toggle_like,next_story_view, prev_story_view, story_view, mark_story_seen,
+    reels_feed, reel_detail, toggle_reel_like, add_reel_comment, reel_comments_api, reel_share
+    
 )
 from .admin_views import *
 from django.conf import settings
@@ -87,6 +89,15 @@ urlpatterns = [
     # NEXT / PREV
     path('story/<int:story_id>/next/', next_story_view, name='next_story'),
     path('story/<int:story_id>/prev/', prev_story_view, name='prev_story'),
+
+    # reels uchun bulim busa kere
+    path('reels/', reels_feed, name='reels'),
+    path('reels/<int:reel_id>/', reel_detail, name='reel_detail'),
+    path('reels/<int:reel_id>/like/', toggle_reel_like, name='toggle_reel_like'),
+    path('reels/<int:reel_id>/comment/', add_reel_comment, name='add_reel_comment'),
+    path('reels/<int:reel_id>/comments/', reel_comments_api, name='reel_comments_api'),
+    path('reels/<int:reel_id>/share/', reel_share, name='reel_share'),
+
 
 ]
 
