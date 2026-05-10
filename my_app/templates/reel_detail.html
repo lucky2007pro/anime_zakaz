@@ -1,0 +1,595 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reel #{{ reel.id }}{% endblock %}
+
+{% block content %}
+<style>
+  .reel-detail-page {
+    min-height: 100vh;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+
+  .reel-detail-inner {
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+  }
+
+  /* ===== VIDEO ===== */
+  .reel-detail-video-wrap {
+    position: relative;
+    width: 100%;
+    background: #111;
+    aspect-ratio: 9/16;
+    overflow: hidden;
+  }
+
+  .reel-detail-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  .play-pause-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* ===== INFO SECTION ===== */
+  .reel-detail-info {
+    background: #111;
+    padding: 16px 16px 6px;
+  }
+
+  .reel-user-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .reel-user-row img,
+  .reel-avatar-default {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #6c63ff;
+  }
+
+  .reel-avatar-default {
+    background: #6c63ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .reel-username {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .reel-date {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+  }
+
+  .reel-title-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 6px;
+  }
+
+  .reel-desc-text {
+    font-size: 14px;
+    color: #aaa;
+    line-height: 1.5;
+    margin: 0 0 12px;
+  }
+
+  /* ===== ACTIONS ROW ===== */
+  .reel-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px 16px;
+    background: #111;
+    border-bottom: 1px solid #1f1f1f;
+  }
+
+  .action-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 30px;
+    padding: 9px 16px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.15s;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .action-pill:hover {
+    background: #2a2a2a;
+    transform: scale(1.03);
+  }
+
+  .action-pill.liked {
+    background: rgba(255,48,96,0.15);
+    border-color: rgba(255,48,96,0.4);
+    color: #ff3060;
+  }
+
+  .action-pill svg { flex-shrink: 0; }
+
+  /* ===== COMMENTS SECTION ===== */
+  .comments-section {
+    background: #111;
+    padding: 16px;
+  }
+
+  .comments-section h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 16px;
+  }
+
+  .comment-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    animation: fadeInUp 0.2s ease;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity:0; transform: translateY(8px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+  .comment-avatar-sm {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .comment-avatar-default-sm {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #6c63ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .comment-body .comment-username {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .comment-body .comment-text {
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.45;
+    word-break: break-word;
+    margin: 2px 0 4px;
+  }
+
+  .comment-body .comment-meta {
+    font-size: 11px;
+    color: #555;
+    display: flex;
+    gap: 12px;
+  }
+
+  .comment-body .reply-ref {
+    font-size: 12px;
+    color: #6c63ff;
+    margin-bottom: 4px;
+  }
+
+  /* ===== COMMENT FORM ===== */
+  .comment-form-wrap {
+    position: sticky;
+    bottom: 0;
+    background: #0d0d0d;
+    border-top: 1px solid #1f1f1f;
+    padding: 12px 16px;
+  }
+
+  .reply-banner {
+    font-size: 12px;
+    color: #aaa;
+    padding: 4px 0 8px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reply-banner.active { display: flex; }
+
+  .reply-banner button {
+    background: none;
+    border: none;
+    color: #ff3060;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .comment-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .comment-input-row input {
+    flex: 1;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 24px;
+    padding: 10px 16px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .comment-input-row input:focus {
+    border-color: #6c63ff;
+  }
+
+  .comment-input-row input::placeholder { color: #555; }
+
+  .comment-input-row button[type="submit"] {
+    background: #6c63ff;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    flex-shrink: 0;
+  }
+
+  .comment-input-row button[type="submit"]:hover {
+    background: #5a52e0;
+    transform: scale(1.05);
+  }
+
+  .no-comments {
+    text-align: center;
+    color: #444;
+    padding: 24px 0;
+    font-size: 14px;
+  }
+
+  /* ===== SHARE TOAST ===== */
+  .share-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(12px);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 200;
+    pointer-events: none;
+  }
+
+  .share-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+
+<div class="reel-detail-page">
+  <div class="reel-detail-inner">
+
+    <!-- ===== VIDEO ===== -->
+    <div class="reel-detail-video-wrap">
+      {% if reel.video_file %}
+        <video class="reel-detail-video" id="reelVideo"
+               src="{{ reel.video_file.url }}"
+               loop playsinline autoplay></video>
+      {% elif reel.video_url %}
+        <video class="reel-detail-video" id="reelVideo"
+               src="{{ reel.video_url }}"
+               loop playsinline autoplay></video>
+      {% else %}
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:16px;">
+          Video mavjud emas
+        </div>
+      {% endif %}
+      <div class="play-pause-indicator" id="playIcon">⏸</div>
+    </div>
+
+    <!-- ===== INFO ===== -->
+    <div class="reel-detail-info">
+      <div class="reel-user-row">
+        {% if reel.user.avatar and reel.user.avatar.image %}
+          <img src="{{ reel.user.avatar.image.url }}" alt="{{ reel.user.username }}">
+        {% else %}
+          <div class="reel-avatar-default">{{ reel.user.username|first|upper }}</div>
+        {% endif %}
+        <div>
+          <div class="reel-username">@{{ reel.user.username }}</div>
+          <div class="reel-date">{{ reel.created_at|date:"d M Y, H:i" }}</div>
+        </div>
+      </div>
+
+      {% if reel.title %}
+        <p class="reel-title-text">{{ reel.title }}</p>
+      {% endif %}
+      {% if reel.description %}
+        <p class="reel-desc-text">{{ reel.description }}</p>
+      {% endif %}
+    </div>
+
+    <!-- ===== ACTIONS ===== -->
+    <div class="reel-actions-row">
+
+      <!-- LIKE -->
+      <button class="action-pill {% if is_liked %}liked{% endif %}" id="likeBtn" onclick="toggleLike()">
+        <svg width="18" height="18" viewBox="0 0 24 24"
+             fill="{% if is_liked %}#ff3060{% else %}none{% endif %}"
+             stroke="{% if is_liked %}#ff3060{% else %}currentColor{% endif %}"
+             stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span id="likeCount">{{ total_likes }}</span> Like
+      </button>
+
+      <!-- COMMENT (scroll down) -->
+      <button class="action-pill" onclick="document.getElementById('commentInputField').focus()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span id="commentCount">{{ total_comments }}</span> Izoh
+      </button>
+
+      <!-- SHARE -->
+      <button class="action-pill" onclick="shareReel()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        <span id="shareCount">{{ reel.shares_count }}</span> Ulash
+      </button>
+
+    </div>
+
+    <!-- ===== COMMENTS ===== -->
+    <div class="comments-section">
+      <h4>Izohlar (<span id="commentsCountTitle">{{ total_comments }}</span>)</h4>
+
+      <div id="commentsList">
+        <div class="no-comments">Yuklanmoqda...</div>
+      </div>
+    </div>
+
+  </div><!-- end inner -->
+</div>
+
+<!-- ===== STICKY COMMENT FORM ===== -->
+<div class="comment-form-wrap">
+  <div class="reply-banner" id="replyBanner">
+    <span id="replyBannerText"></span>
+    <button onclick="cancelReply()">✕</button>
+  </div>
+  <form class="comment-input-row" onsubmit="submitComment(event)">
+    {% csrf_token %}
+    <input type="text" id="commentInputField" placeholder="Izoh yozing..." autocomplete="off" required>
+    <input type="hidden" id="replyToId" value="">
+    <button type="submit">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </form>
+</div>
+
+<div class="share-toast" id="shareToast">Havola nusxalandi! ✓</div>
+
+<script>
+  const REEL_ID = {{ reel.id }};
+  const CSRF_TOKEN = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+
+  // ===== VIDEO TOGGLE =====
+  const video = document.getElementById('reelVideo');
+  const playIcon = document.getElementById('playIcon');
+
+  if (video) {
+    video.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        playIcon.textContent = '▶';
+      } else {
+        video.pause();
+        playIcon.textContent = '⏸';
+      }
+      playIcon.style.opacity = '1';
+      setTimeout(() => { playIcon.style.opacity = '0'; }, 800);
+    });
+  }
+
+  // ===== LOAD COMMENTS =====
+  function loadComments() {
+    fetch(`/reels/${REEL_ID}/comments/`)
+      .then(r => r.json())
+      .then(data => {
+        const list = document.getElementById('commentsList');
+        const countEls = document.querySelectorAll('#commentCount, #commentsCountTitle');
+        countEls.forEach(el => el.textContent = data.comments.length);
+
+        if (data.comments.length === 0) {
+          list.innerHTML = '<div class="no-comments">Hali izoh yo\'q. Birinchi bo\'ling!</div>';
+          return;
+        }
+
+        list.innerHTML = data.comments.map(c => `
+          <div class="comment-item" id="ci-${c.id}">
+            <div>
+              ${c.avatar
+                ? `<img class="comment-avatar-sm" src="${c.avatar}" alt="${c.user}">`
+                : `<div class="comment-avatar-default-sm">${c.user.charAt(0).toUpperCase()}</div>`}
+            </div>
+            <div class="comment-body">
+              ${c.reply_user ? `<div class="reply-ref">↩ @${c.reply_user}: ${escapeHtml(c.reply_text || '')}</div>` : ''}
+              <div class="comment-username">@${c.user}</div>
+              <div class="comment-text">${escapeHtml(c.text)}</div>
+              <div class="comment-meta">
+                <span>${c.time}</span>
+                <span style="color:#6c63ff;cursor:pointer;" onclick="setReply(${c.id}, '${c.user}')">Javob berish</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      });
+  }
+
+  loadComments();
+
+  // ===== SUBMIT COMMENT =====
+  function submitComment(e) {
+    e.preventDefault();
+    const input = document.getElementById('commentInputField');
+    const replyToId = document.getElementById('replyToId').value;
+    const text = input.value.trim();
+    if (!text) return;
+
+    const body = new FormData();
+    body.append('text', text);
+    if (replyToId) body.append('reply_to', replyToId);
+
+    fetch(`/reels/${REEL_ID}/comment/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF_TOKEN },
+      body
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        input.value = '';
+        cancelReply();
+        loadComments();
+
+        const countEls = document.querySelectorAll('#commentCount, #commentsCountTitle');
+        countEls.forEach(el => el.textContent = data.total_comments);
+      }
+    });
+  }
+
+  function setReply(commentId, username) {
+    document.getElementById('replyToId').value = commentId;
+    document.getElementById('replyBannerText').textContent = `@${username} ga javob berilmoqda`;
+    document.getElementById('replyBanner').classList.add('active');
+    document.getElementById('commentInputField').focus();
+    document.getElementById('commentInputField').placeholder = `@${username} ga javob yozing...`;
+  }
+
+  function cancelReply() {
+    document.getElementById('replyToId').value = '';
+    document.getElementById('replyBanner').classList.remove('active');
+    document.getElementById('commentInputField').placeholder = 'Izoh yozing...';
+  }
+
+  // ===== LIKE =====
+  let liked = {{ is_liked|yesno:"true,false" }};
+
+  function toggleLike() {
+    fetch(`/reels/${REEL_ID}/like/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF_TOKEN }
+    })
+    .then(r => r.json())
+    .then(data => {
+      liked = data.liked;
+      document.getElementById('likeCount').textContent = data.total_likes;
+      const btn = document.getElementById('likeBtn');
+      const svg = btn.querySelector('svg');
+      if (data.liked) {
+        btn.classList.add('liked');
+        svg.setAttribute('fill', '#ff3060');
+        svg.setAttribute('stroke', '#ff3060');
+      } else {
+        btn.classList.remove('liked');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+      }
+      btn.style.transform = 'scale(1.08)';
+      setTimeout(() => { btn.style.transform = ''; }, 180);
+    });
+  }
+
+  // ===== SHARE =====
+  function shareReel() {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: 'Reelni ko\'ring!', url });
+    } else {
+      navigator.clipboard.writeText(url).catch(() => {});
+      document.getElementById('shareToast').classList.add('show');
+      setTimeout(() => document.getElementById('shareToast').classList.remove('show'), 2500);
+    }
+
+    fetch(`/reels/${REEL_ID}/share/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF_TOKEN }
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('shareCount').textContent = data.total_shares;
+    });
+  }
+
+  function escapeHtml(text) {
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
+{% endblock %}
