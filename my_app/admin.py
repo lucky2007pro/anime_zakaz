@@ -85,15 +85,20 @@ class StoryViewInline(admin.TabularInline):
     readonly_fields = ('user', 'viewed_at')
     can_delete = False
 
+
 class StoryAdmin(admin.ModelAdmin):
     list_display = ('title', 'is_active', 'created_at', 'expires_at', 'total_views')
     list_filter = ('is_active', 'created_at')
     search_fields = ('title', 'description')
-    readonly_fields = ('created_at', 'expires_at')
+
+    # expires_at ni olib tashlang
+    readonly_fields = ('created_at',)
+
     inlines = [StoryViewInline]
 
     def total_views(self, obj):
         return obj.views.count()
+
     total_views.short_description = "Ko‘rishlar"
 
 admin.site.register(CustomUser, CustomUserAdmin)
