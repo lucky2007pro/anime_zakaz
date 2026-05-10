@@ -13,7 +13,7 @@
     padding: 18px 5% 40px;
     display: flex;
     flex-direction: column;
-    gap: 50px;
+    gap: 22px;
 }
 .movie-hero {
     position: relative; min-height: 290px; border-radius: 24px;
@@ -79,8 +79,6 @@
     width: 100%; display: block; aspect-ratio: 16/9;
     background: #000; outline: none; pointer-events: none;
 }
-
-
 
 /* -- TOP BAR -- */
 .bm-top-bar {
@@ -356,10 +354,6 @@
 .comment-time { color:var(--text-dim); font-size:.85rem; }
 .comment-text { color:rgba(255,255,255,.85); font-size:.95rem; line-height:1.5; }
 
-.comments-section{
-    margin-top: 30px;
-}
-
 /* =====================
    RESPONSIVE
 ===================== */
@@ -392,7 +386,7 @@
     .episodes-box,.movie-info { padding:14px; }
     .bm-vol-wrap { display:none; }
     .bm-quality-btn { display:none; }
-    .video-container { padding: 12px 0 0; }
+    .video-container { padding:0; }
     .bm-player { border-radius:0; }
     /* Even bigger progress on small screens */
     .bm-progress-wrap { height:7px; }
@@ -434,7 +428,12 @@
     <!-- PLAYER + SIDE -->
     <div class="movie-grid">
         <section class="player-panel">
-
+            <div class="panel-head">
+                <div>
+                    <div class="panel-title">Tomosha qilish</div>
+                    <div class="panel-subtitle">Video yoki URL manbasi avtomatik tanlanadi</div>
+                </div>
+            </div>
             <div class="video-section">
                 {% if not has_access %}
                 <div style="padding:40px 20px;text-align:center;color:white;">
@@ -607,8 +606,6 @@
 </main>
 
 <script>
-const MOVIE_DETAIL_URL = "{% url 'movie_detail' movie.id %}";
-
 /* =========================================================
    PLAYER HTML BUILDER — qo'shilgan: top bar, tap zones, controls
 ========================================================= */
@@ -628,77 +625,42 @@ function _svgFwd(){ return `<path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6
 function buildPlayerInner(title, quality){
     return `
 <div class="bm-top-bar" id="bm-top-bar">
-<a href="${MOVIE_DETAIL_URL}"
-   class="bm-back-link"
-   title="Orqaga">
-   ${_svgBack()}
-</a>
+  <a href="#" class="bm-back-link" title="Orqaga" onclick="history.back();return false;">${_svgBack()}</a>
   <span class="bm-title-bar">${title||''}</span>
+  <button class="bm-rotate-btn" id="bm-rotate" title="Yotiq ekran">${_svgRotate()}</button>
 </div>
-
 <div class="bm-tap-zone bm-tap-left">
   <div class="bm-tap-ripple" id="bm-ripple-left">
     <svg viewBox="0 0 24 24" fill="#ef4444" width="22" height="22">${_svgRewind()}</svg>
     <span>−10 son</span>
   </div>
 </div>
-
 <div class="bm-tap-zone bm-tap-right">
   <div class="bm-tap-ripple" id="bm-ripple-right">
     <svg viewBox="0 0 24 24" fill="#ef4444" width="22" height="22">${_svgFwd()}</svg>
     <span>+10 son</span>
   </div>
 </div>
-
-<div class="bm-big-play">
-  <div class="bm-big-play-icon">
-    <svg viewBox="0 0 24 24" fill="#fff" width="30" height="30">${_svgPlay()}</svg>
-  </div>
-</div>
-
-<div class="bm-spinner">
-  <div class="bm-spinner-ring"></div>
-</div>
-
+<div class="bm-big-play"><div class="bm-big-play-icon"><svg viewBox="0 0 24 24" fill="#fff" width="30" height="30">${_svgPlay()}</svg></div></div>
+<div class="bm-spinner"><div class="bm-spinner-ring"></div></div>
 <div class="bm-controls" id="bm-controls">
-
   <div class="bm-progress-wrap" id="bm-progress">
-    <div class="bm-progress-buf" id="bm-buf"></div>
+    <div class="bm-progress-buf"  id="bm-buf"></div>
     <div class="bm-progress-fill" id="bm-fill" style="width:0%"></div>
     <div class="bm-progress-thumb" id="bm-thumb" style="left:0%"></div>
   </div>
-
   <div class="bm-bottom-row">
-
-    <button class="bm-btn" id="bm-play-btn" aria-label="Play">
-      <svg id="bm-play-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgPlay()}</svg>
-    </button>
-
-    <button class="bm-btn" id="bm-back10" aria-label="-10s">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgRewind()}</svg>
-    </button>
-
-    <button class="bm-btn" id="bm-fwd10" aria-label="+10s">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgFwd()}</svg>
-    </button>
-
+    <button class="bm-btn" id="bm-play-btn" aria-label="Play"><svg id="bm-play-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgPlay()}</svg></button>
+    <button class="bm-btn" id="bm-back10" aria-label="-10s"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgRewind()}</svg></button>
+    <button class="bm-btn" id="bm-fwd10"  aria-label="+10s"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgFwd()}</svg></button>
     <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
-
     <div class="bm-spacer"></div>
-
     <div class="bm-vol-wrap">
-      <button class="bm-btn" id="bm-vol-btn" aria-label="Volume">
-        <svg id="bm-vol-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgVol()}</svg>
-      </button>
+      <button class="bm-btn" id="bm-vol-btn" aria-label="Volume"><svg id="bm-vol-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgVol()}</svg></button>
       <input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1">
     </div>
-
-
-
-    <button class="bm-btn" id="bm-fullscreen" aria-label="Fullscreen">
-      <svg id="bm-fs-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgExpand()}</svg>
-    </button>
-
+    <span class="bm-quality-btn">${quality||''}</span>
+    <button class="bm-btn" id="bm-fullscreen" aria-label="Fullscreen"><svg id="bm-fs-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgExpand()}</svg></button>
   </div>
 </div>`;
 }
@@ -863,12 +825,26 @@ function initBmPlayer(){
     });
 
     /* -- fullscreen -- */
+    function lockLandscape(){
+        if(screen.orientation&&screen.orientation.lock){
+            screen.orientation.lock('landscape-primary').catch(()=>{});
+        }
+    }
+    function unlockOrientation(){
+        if(screen.orientation&&screen.orientation.unlock) screen.orientation.unlock();
+    }
     function enterFs(){
         const fn=player.requestFullscreen||player.webkitRequestFullscreen;
-        if(fn) fn.call(player).catch(()=>{ if(video.webkitEnterFullscreen) video.webkitEnterFullscreen(); });
-        else if(video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+        if(fn){
+            fn.call(player)
+              .then(()=>lockLandscape())
+              .catch(()=>{ if(video.webkitEnterFullscreen) video.webkitEnterFullscreen(); });
+        } else if(video.webkitEnterFullscreen){
+            video.webkitEnterFullscreen();
+        }
     }
     function exitFs(){
+        unlockOrientation();
         const fn=document.exitFullscreen||document.webkitExitFullscreen;
         if(fn) fn.call(document);
     }
@@ -894,30 +870,30 @@ function initBmPlayer(){
     /* =====================================================
        CONTROLS VISIBILITY
        PC  : show on mousemove → hide 3s after last move
-       Mobile: show on touch  → hide 3s after last touch
+       Mobile: 1st tap = show, 2nd tap = hide (toggle, no auto-hide)
     ===================================================== */
     let hideTimer = null;
 
+    /* PC only: show with auto-hide */
     function showControls(ms){
         player.classList.add('show-controls');
         clearTimeout(hideTimer);
-        if(!video.paused){
+        if(!isTouch() && !video.paused){
             hideTimer = setTimeout(()=>player.classList.remove('show-controls'), ms||3000);
         }
     }
     function hideControls(){
-        if(!video.paused){
-            player.classList.remove('show-controls');
-        }
+        player.classList.remove('show-controls');
+        clearTimeout(hideTimer);
     }
 
     /* -- PC: mousemove / mouseleave -- */
     if(!isTouch()){
         player.addEventListener('mousemove', ()=>showControls(3000));
-        player.addEventListener('mouseleave', ()=>{ clearTimeout(hideTimer); hideControls(); });
+        player.addEventListener('mouseleave', ()=>{ clearTimeout(hideTimer); if(!video.paused) hideControls(); });
     }
 
-    /* -- PC: click = play/pause (only on desktop pointer) -- */
+    /* -- PC: click = play/pause -- */
     if(!isTouch()){
         player.addEventListener('click', e=>{
             if(e.target.closest('.bm-progress-wrap')||
@@ -931,18 +907,17 @@ function initBmPlayer(){
 
     /* =====================================================
        MOBILE TOUCH LOGIC
-       - 1 tap anywhere (not on buttons) → show controls
-       - 1 tap centre (controls visible)  → play/pause
-       - 2 taps left (<36%)              → −10s
-       - 2 taps right (>64%)             → +10s
-       - 2 taps centre                   → play/pause
+       1st tap  → show icons (no auto-hide)
+       2nd tap  → hide icons
+       Single tap centre (icons visible) → play/pause
+       Double tap left  (<36%) → −10s
+       Double tap right (>64%) → +10s
     ===================================================== */
     if(isTouch()){
         let lastTap=0;
         const DTAP=280;
 
         player.addEventListener('touchend', e=>{
-            /* ignore progress bar & buttons */
             if(e.target.closest('.bm-progress-wrap')||
                e.target.closest('.bm-btn')||
                e.target.closest('.bm-back-link')||
@@ -956,36 +931,40 @@ function initBmPlayer(){
 
             if(isDouble){
                 /* double tap */
+                lastTap=0;
                 if(xRel<0.36){
                     video.currentTime=Math.max(0,video.currentTime-10);
                     showRipple(rippleL);
+                    player.classList.add('show-controls');
                 } else if(xRel>0.64){
                     video.currentTime=Math.min(video.duration||Infinity,video.currentTime+10);
                     showRipple(rippleR);
+                    player.classList.add('show-controls');
                 } else {
                     togglePlay();
+                    player.classList.add('show-controls');
                 }
-                showControls(2000);
-                lastTap=0;
             } else {
-                /* single tap */
+                /* single tap — toggle show/hide */
                 const showing=player.classList.contains('show-controls');
                 if(showing){
-                    /* centre single tap while visible = play/pause */
+                    /* centre tap while visible = play/pause, then keep visible */
                     if(xRel>=0.36&&xRel<=0.64){
                         togglePlay();
+                    } else {
+                        /* tap outside centre = hide */
+                        hideControls();
                     }
-                    showControls(3000);
                 } else {
-                    showControls(3000);
+                    /* icons hidden → show them */
+                    player.classList.add('show-controls');
                 }
                 lastTap=now;
             }
         },{passive:true});
     }
 
-    /* -- Pause/play = always show/hide -- */
-    video.addEventListener('play',  ()=>showControls(2500));
+    /* -- Pause shows controls, play keeps state -- */
     video.addEventListener('pause', ()=>{ clearTimeout(hideTimer); player.classList.add('show-controls'); });
     video.addEventListener('ended', ()=>{ clearTimeout(hideTimer); player.classList.add('show-controls'); });
 
