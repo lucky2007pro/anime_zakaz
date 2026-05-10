@@ -607,6 +607,8 @@
 </main>
 
 <script>
+const MOVIE_DETAIL_URL = "{% url 'movie_detail' movie.id %}";
+
 /* =========================================================
    PLAYER HTML BUILDER — qo'shilgan: top bar, tap zones, controls
 ========================================================= */
@@ -626,42 +628,77 @@ function _svgFwd(){ return `<path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6
 function buildPlayerInner(title, quality){
     return `
 <div class="bm-top-bar" id="bm-top-bar">
-  <a href="/" class="bm-back-link" title="Orqaga">${_svgBack()}</a>
+<a href="${MOVIE_DETAIL_URL}"
+   class="bm-back-link"
+   title="Orqaga">
+   ${_svgBack()}
+</a>
   <span class="bm-title-bar">${title||''}</span>
-  <button class="bm-rotate-btn" id="bm-rotate" title="Yotiq ekran">${_svgRotate()}</button>
 </div>
+
 <div class="bm-tap-zone bm-tap-left">
   <div class="bm-tap-ripple" id="bm-ripple-left">
     <svg viewBox="0 0 24 24" fill="#ef4444" width="22" height="22">${_svgRewind()}</svg>
     <span>−10 son</span>
   </div>
 </div>
+
 <div class="bm-tap-zone bm-tap-right">
   <div class="bm-tap-ripple" id="bm-ripple-right">
     <svg viewBox="0 0 24 24" fill="#ef4444" width="22" height="22">${_svgFwd()}</svg>
     <span>+10 son</span>
   </div>
 </div>
-<div class="bm-big-play"><div class="bm-big-play-icon"><svg viewBox="0 0 24 24" fill="#fff" width="30" height="30">${_svgPlay()}</svg></div></div>
-<div class="bm-spinner"><div class="bm-spinner-ring"></div></div>
+
+<div class="bm-big-play">
+  <div class="bm-big-play-icon">
+    <svg viewBox="0 0 24 24" fill="#fff" width="30" height="30">${_svgPlay()}</svg>
+  </div>
+</div>
+
+<div class="bm-spinner">
+  <div class="bm-spinner-ring"></div>
+</div>
+
 <div class="bm-controls" id="bm-controls">
+
   <div class="bm-progress-wrap" id="bm-progress">
-    <div class="bm-progress-buf"  id="bm-buf"></div>
+    <div class="bm-progress-buf" id="bm-buf"></div>
     <div class="bm-progress-fill" id="bm-fill" style="width:0%"></div>
     <div class="bm-progress-thumb" id="bm-thumb" style="left:0%"></div>
   </div>
+
   <div class="bm-bottom-row">
-    <button class="bm-btn" id="bm-play-btn" aria-label="Play"><svg id="bm-play-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgPlay()}</svg></button>
-    <button class="bm-btn" id="bm-back10" aria-label="-10s"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgRewind()}</svg></button>
-    <button class="bm-btn" id="bm-fwd10"  aria-label="+10s"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgFwd()}</svg></button>
+
+    <button class="bm-btn" id="bm-play-btn" aria-label="Play">
+      <svg id="bm-play-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgPlay()}</svg>
+    </button>
+
+    <button class="bm-btn" id="bm-back10" aria-label="-10s">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgRewind()}</svg>
+    </button>
+
+    <button class="bm-btn" id="bm-fwd10" aria-label="+10s">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgFwd()}</svg>
+    </button>
+
     <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
+
     <div class="bm-spacer"></div>
+
     <div class="bm-vol-wrap">
-      <button class="bm-btn" id="bm-vol-btn" aria-label="Volume"><svg id="bm-vol-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgVol()}</svg></button>
+      <button class="bm-btn" id="bm-vol-btn" aria-label="Volume">
+        <svg id="bm-vol-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgVol()}</svg>
+      </button>
       <input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1">
     </div>
-    <span class="bm-quality-btn">${quality||''}</span>
-    <button class="bm-btn" id="bm-fullscreen" aria-label="Fullscreen"><svg id="bm-fs-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgExpand()}</svg></button>
+
+
+
+    <button class="bm-btn" id="bm-fullscreen" aria-label="Fullscreen">
+      <svg id="bm-fs-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgExpand()}</svg>
+    </button>
+
   </div>
 </div>`;
 }
