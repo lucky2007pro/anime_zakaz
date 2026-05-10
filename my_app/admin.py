@@ -101,6 +101,52 @@ class StoryAdmin(admin.ModelAdmin):
 
     total_views.short_description = "Ko‘rishlar"
 
+# qayta yoziladi bu joy hamm 
+@admin.register(Reel)
+class ReelAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'title', 'views_count', 'shares_count', 'total_likes', 'total_comments', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'title', 'description')
+    readonly_fields = ('views_count', 'shares_count', 'created_at')
+    ordering = ('-created_at',)
+
+    def total_likes(self, obj):
+        return obj.likes.count()
+    total_likes.short_description = 'Likelar'
+
+    def total_comments(self, obj):
+        return obj.comments.count()
+    total_comments.short_description = 'Izohlar'
+
+
+@admin.register(ReelLike)
+class ReelLikeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'reel', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username',)
+    ordering = ('-created_at',)
+
+
+@admin.register(ReelComment)
+class ReelCommentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'reel', 'text_short', 'reply_to', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'text')
+    ordering = ('-created_at',)
+
+    def text_short(self, obj):
+        return obj.text[:50]
+    text_short.short_description = 'Izoh'
+
+
+@admin.register(ReelShare)
+class ReelShareAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'reel', 'shared_at')
+    list_filter = ('shared_at',)
+    search_fields = ('user__username',)
+    ordering = ('-shared_at',)
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
 # admin.site.register(MovieEpisode)  # Alohida ko‘rish shart emas, inline orqali boshqariladi
