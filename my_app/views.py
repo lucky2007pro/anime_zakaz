@@ -15,7 +15,7 @@ from django.db import models
 
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
-    Story, StoryView
+    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare
 )
 
 User = get_user_model()
@@ -713,6 +713,151 @@ def prev_story_view(request, story_id):
                 return redirect('home')
 
     return redirect('home')
+
+
+# REELS — views.py ga qo'shing
+@login_required
+def reels_feed(request):
+    latest = Reel.objects.order_by('-created_at').first()
+    if latest:
+        return redirect('reel_detail', reel_id=latest.id)
+    return render(request, 'reels.html', {'reels': [], 'liked_ids': []})
+
+
+@login_required
+def toggle_reel_like(request, reel_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+
+    reel = get_object_or_404(Reel, id=reel_id)
+    like, created = ReelLike.objects.get_or_create(user=request.user, reel=reel)
+
+    if not created:
+        like.delete()
+        liked = False
+    else:
+        liked = True
+
+    return JsonResponse({
+        'liked': liked,
+        'total_likes': reel.likes.count(),
+    })
+
+
+@login_required
+def add_reel_comment(request, reel_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+
+    reel = get_object_or_404(Reel, id=reel_id)
+    text = request.POST.get('text', '').strip()
+    reply_to_id = request.POST.get('reply_to')
+
+    reply_obj = None
+    if reply_to_id:
+        try:
+            reply_obj = ReelComment.objects.get(id=int(reply_to_id))
+        except (ReelComment.DoesNotExist, ValueError):
+            reply_obj = None
+
+    if not text:
+        return JsonResponse({'error': "Izoh bo'sh bo'lmasin"}, status=400)
+
+    comment = ReelComment.objects.create(
+        reel=reel,
+        user=request.user,
+        text=text,
+        reply_to=reply_obj,
+    )
+
+    avatar_url = None
+    if getattr(request.user, 'avatar', None) and request.user.avatar.image:
+        avatar_url = request.user.avatar.image.url
+
+    return JsonResponse({
+        'status': 'ok',
+        'comment': {
+            'id': comment.id,
+            'user': request.user.username,
+            'text': comment.text,
+            'time': comment.created_at.strftime('%H:%M'),
+            'avatar': avatar_url,
+            'reply_to': reply_obj.id if reply_obj else None,
+            'reply_user': reply_obj.user.username if reply_obj else None,
+        },
+        'total_comments': reel.comments.count(),
+    })
+
+
+@login_required
+def reel_comments_api(request, reel_id):
+    comments = ReelComment.objects.select_related(
+        'user', 'user__avatar', 'reply_to', 'reply_to__user'
+    ).filter(reel_id=reel_id).order_by('created_at')
+
+    data = []
+    for c in comments:
+        avatar_url = None
+        if getattr(c.user, 'avatar', None) and c.user.avatar.image:
+            avatar_url = c.user.avatar.image.url
+
+        data.append({
+            'id': c.id,
+            'user': c.user.username,
+            'text': c.text,
+            'time': c.created_at.strftime('%H:%M'),
+            'avatar': avatar_url,
+            'reply_to': c.reply_to.id if c.reply_to else None,
+            'reply_user': c.reply_to.user.username if c.reply_to else None,
+            'reply_text': c.reply_to.text[:40] if c.reply_to else None,
+        })
+
+    return JsonResponse({'comments': data})
+
+
+@login_required
+def reel_share(request, reel_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+
+    reel = get_object_or_404(Reel, id=reel_id)
+    ReelShare.objects.create(reel=reel, user=request.user)
+    Reel.objects.filter(id=reel_id).update(shares_count=models.F('shares_count') + 1)
+    reel.refresh_from_db()
+
+    return JsonResponse({
+        'status': 'shared',
+        'total_shares': reel.shares_count,
+    })
+
+
+def reel_detail(request, reel_id):
+    reel = get_object_or_404(Reel, id=reel_id)
+    Reel.objects.filter(id=reel_id).update(views_count=models.F('views_count') + 1)
+
+    # Pastga scroll = eski reel (created_at kichikroq)
+    next_reel = Reel.objects.filter(
+        created_at__lt=reel.created_at
+    ).order_by('-created_at').first()
+
+    # Tepaga scroll = yangi reel (created_at kattaroq)
+    prev_reel = Reel.objects.filter(
+        created_at__gt=reel.created_at
+    ).order_by('created_at').first()
+
+    is_liked = False
+    if request.user.is_authenticated:
+        is_liked = ReelLike.objects.filter(user=request.user, reel=reel).exists()
+
+    return render(request, 'reel_detail.html', {
+        'reel': reel,
+        'is_liked': is_liked,
+        'total_likes': reel.likes.count(),
+        'total_comments': reel.comments.count(),
+        'next_reel': next_reel,
+        'prev_reel': prev_reel,
+    })
+
 
 
 
