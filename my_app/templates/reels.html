@@ -1,162 +1,155 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reels</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reels</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
 
-        body {
-            background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
-            color: white;
-            min-height: 100vh;
-            padding: 15px;
-        }
+/* ===== BACKGROUND ===== */
+body {
+    min-height: 100vh;
+    color: white;
 
-        /* TOP BAR */
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 700px;
-            margin: auto;
-            margin-bottom: 20px;
-        }
+    background: url("https://i.pinimg.com/736x/b1/1b/28/b11b28e99d63dc22d6d2ff2a05a860cd.jpg") no-repeat center center fixed;
+    background-size: cover;
+}
 
-        .back-btn {
-            background: #00d4ff;
-            color: #000;
-            padding: 10px 15px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
-        }
+/* dark overlay */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: -1;
+}
 
-        .back-btn:hover {
-            background: #00aacc;
-            transform: scale(1.05);
-        }
+/* ===== TOP BAR ===== */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 700px;
+    margin: auto;
+    padding: 15px;
+}
 
-        h1 {
-            font-size: 22px;
-            text-align: center;
-            flex: 1;
-        }
+.back-btn {
+    background: #00d4ff;
+    color: #000;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
 
-        /* BOX */
-        .reels-box {
-            max-width: 700px;
-            margin: auto;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
-            animation: fadeIn 0.6s ease-in-out;
-        }
+.back-btn:hover {
+    transform: scale(1.05);
+    background: #00aacc;
+}
 
-        .reels-box h2 {
-            margin-bottom: 15px;
-            color: #00d4ff;
-            text-align: center;
-        }
+h1 {
+    font-size: 22px;
+    text-align: center;
+    flex: 1;
+}
 
-        .reel-item {
-            margin: 12px 0;
-            padding: 14px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 10px;
-            transition: 0.3s;
-            animation: slideUp 0.5s ease;
-        }
+/* ===== BOX ===== */
+.reels-box {
+    max-width: 700px;
+    margin: auto;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+}
 
-        .reel-item:hover {
-            transform: translateY(-3px);
-            background: rgba(0,212,255,0.15);
-        }
+/* TITLE */
+.reels-box h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #00d4ff;
+}
 
-        .reel-item a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            font-size: 16px;
-        }
+/* ===== REEL ITEM ===== */
+.reel-item {
+    margin: 12px 0;
+    padding: 14px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
 
-        .reel-item a:hover {
-            color: #00d4ff;
-        }
+    animation: floatMove 3s ease-in-out infinite;
+    transition: 0.3s;
+}
 
-        .reel-item {
-            margin: 12px 0;
-            padding: 14px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 10px;
-            transition: 0.3s;
-            animation: floatMove 3s ease-in-out infinite;
-        }
+.reel-item:hover {
+    transform: scale(1.05);
+    background: rgba(0,212,255,0.18);
+    animation: none;
+}
 
-        /* Hover effekti */
-        .reel-item:hover {
-            transform: scale(1.05);
-            background: rgba(0,212,255,0.15);
-            animation: none; /* hoverda animatsiya to‘xtaydi */
-        }
+.reel-item a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+}
 
-        /* LINK */
-        .reel-item a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            font-size: 16px;
-        }
+/* ===== FLOAT ANIMATION ===== */
+@keyframes floatMove {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-6px); }
+    100% { transform: translateY(0); }
+}
 
-        /* FLOAT ANIMATION */
-        @keyframes floatMove {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-6px);
-            }
-            100% {
-                transform: translateY(0px);
-            }
-        }
+/* ===== ANIMATION BOX ===== */
+@keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.98);}
+    to {opacity: 1; transform: scale(1);}
+}
 
-        /* ANIMATIONS */
-        @keyframes fadeIn {
-            from {opacity: 0; transform: scale(0.98);}
-            to {opacity: 1; transform: scale(1);}
-        }
+.reels-box {
+    animation: fadeIn 0.6s ease-in-out;
+}
 
-        @keyframes slideUp {
-            from {opacity: 0; transform: translateY(10px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
+/* ===== MOBILE (600px) ===== */
+@media (max-width: 600px) {
 
-        /* MOBILE */
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 18px;
-            }
+    .top-bar {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
 
-            .back-btn {
-                padding: 8px 12px;
-                font-size: 14px;
-            }
+    h1 {
+        font-size: 18px;
+    }
 
-            .reel-item {
-                font-size: 14px;
-            }
-        }
-    </style>
+    .back-btn {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .reels-box {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .reel-item {
+        font-size: 14px;
+        padding: 12px;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -169,17 +162,17 @@
 <div class="reels-box">
     <h2>Mavjud reelslar</h2>
 
-  <div class="reel-item">
-      <a href="https://bestmedia-official.uz/reels/1" target="_blank">
-          🎬 Reels 1 - Ko‘rish
-      </a>
-  </div>
+    <div class="reel-item">
+        <a href="https://bestmedia-official.uz/reels/1" target="_blank">
+            🎬 Reels 1 - Ko‘rish
+        </a>
+    </div>
 
-  <div class="reel-item">
-      <a href="https://bestmedia-official.uz/reels/2" target="_blank">
-          🎬 Reels 2 - Ko‘rish
-      </a>
-  </div>
+    <div class="reel-item">
+        <a href="https://bestmedia-official.uz/reels/2" target="_blank">
+            🎬 Reels 2 - Ko‘rish
+        </a>
+    </div>
 
 </div>
 
