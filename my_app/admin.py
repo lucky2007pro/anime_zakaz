@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode, 
-    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView
+    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
+    Reel, ReelLike, ReelComment, ReelShare
 )
 
 
