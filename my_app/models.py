@@ -363,19 +363,15 @@ class Story(models.Model):
     image = models.ImageField(upload_to='stories/', blank=True, null=True)
     video = models.FileField(upload_to='stories/videos/', blank=True, null=True)
 
-    description = models.TextField(blank=True, null=True)  # izoh
-    link = models.URLField(blank=True, null=True)  # havola
+    description = models.TextField(blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField(blank=True, null=True)  # 24 soatlik story
+
+    # Admin panelda qo‘lda tanlanadi
+    expires_at = models.DateTimeField(blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
-
-    def save(self, *args, **kwargs):
-        # avtomatik 24 soatlik story
-        if not self.expires_at:
-            self.expires_at = timezone.now() + timedelta(hours=24)
-        super().save(*args, **kwargs)
 
     def is_expired(self):
         return self.expires_at and timezone.now() > self.expires_at
