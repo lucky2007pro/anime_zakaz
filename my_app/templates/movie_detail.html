@@ -77,8 +77,8 @@
 }
 
 .btn-back:hover {
-    background: rgba(0,243,255,0.16);
-    border-color: rgba(0,243,255,0.30);
+    background: rgba(220,38,38,0.16);
+    border-color: rgba(220,38,38,0.30);
     transform: translateY(-2px);
 }
 
@@ -111,9 +111,9 @@
 }
 
 .movie-badge.accent {
-    background: rgba(0,243,255,0.12);
-    border-color: rgba(0,243,255,0.22);
-    color: var(--accent);
+    background: rgba(220,38,38,0.15);
+    border-color: rgba(220,38,38,0.30);
+    color: #f87171;
 }
 
 .movie-badge.warn {
@@ -178,16 +178,291 @@
     position: relative;
 }
 
-.player-shell {
+/* =============================================
+   ZAMONAVIY QIZIL PLAYER
+============================================= */
+.bm-player {
     width: 100%;
-    background: #000;
-    border-radius: 18px;
+    border-radius: 16px;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    background: #000;
     position: relative;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 24px 48px rgba(0,0,0,0.7);
+    font-family: inherit;
+    user-select: none;
 }
 
+.bm-player video {
+    width: 100%;
+    display: block;
+    aspect-ratio: 16/9;
+    background: #000;
+    outline: none;
+}
+
+/* Controls overlay */
+.bm-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 14px 12px;
+    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 60%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+.bm-player:hover .bm-controls,
+.bm-player.paused .bm-controls,
+.bm-player.show-controls .bm-controls {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Progress bar */
+.bm-progress-wrap {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.18);
+    cursor: pointer;
+    position: relative;
+    transition: height 0.15s;
+}
+
+.bm-progress-wrap:hover {
+    height: 7px;
+}
+
+.bm-progress-buf {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: rgba(255,255,255,0.15);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.bm-progress-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+    border-radius: inherit;
+    pointer-events: none;
+    transition: width 0.1s linear;
+}
+
+.bm-progress-thumb {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 8px rgba(239,68,68,0.7);
+    pointer-events: none;
+    transition: transform 0.15s;
+}
+
+.bm-progress-wrap:hover .bm-progress-thumb {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Bottom row */
+.bm-bottom-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bm-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background 0.18s, color 0.18s;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+}
+
+.bm-btn:hover {
+    background: rgba(239,68,68,0.18);
+    color: #f87171;
+}
+
+.bm-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
+.bm-time {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.bm-vol-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bm-vol-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 70px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+    cursor: pointer;
+}
+
+.bm-vol-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #ef4444;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(239,68,68,0.6);
+}
+
+.bm-vol-slider::-moz-range-thumb {
+    width: 13px;
+    height: 13px;
+    border: none;
+    border-radius: 50%;
+    background: #ef4444;
+    cursor: pointer;
+}
+
+.bm-spacer { flex: 1; }
+
+.bm-quality-btn {
+    font-size: 0.72rem;
+    font-weight: 900;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.35);
+    color: #f87171;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: 0.18s;
+    white-space: nowrap;
+}
+
+.bm-quality-btn:hover {
+    background: rgba(239,68,68,0.28);
+}
+
+/* Big play button center */
+.bm-big-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.bm-player.paused .bm-big-play {
+    opacity: 1;
+}
+
+.bm-big-play-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(220,38,38,0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 6px rgba(239,68,68,0.2), 0 8px 32px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+}
+
+.bm-player:hover .bm-big-play-icon {
+    transform: scale(1.08);
+}
+
+.bm-big-play-icon svg {
+    width: 32px;
+    height: 32px;
+    fill: #fff;
+    margin-left: 4px;
+}
+
+/* Loading spinner */
+.bm-spinner {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.bm-player.loading .bm-spinner {
+    display: flex;
+}
+
+.bm-spinner-ring {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255,255,255,0.08);
+    border-top-color: #ef4444;
+    border-radius: 50%;
+    animation: bm-spin 0.8s linear infinite;
+}
+
+@keyframes bm-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Fullscreen adjustments */
+.bm-player:fullscreen video,
+.bm-player:-webkit-full-screen video {
+    height: 100vh;
+    aspect-ratio: unset;
+}
+
+/* iframe / bunny player wrapper */
+.bunny-player-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 24px 48px rgba(0,0,0,0.7);
+}
+
+.bunny-player-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+/* fullscreen btn for iframe */
 .fullscreen-btn {
     position: absolute;
     top: 12px;
@@ -209,47 +484,13 @@
 }
 
 .fullscreen-btn:hover {
-    background: rgba(0,243,255,0.16);
-    border-color: rgba(0,243,255,0.35);
-    transform: translateY(-1px);
+    background: rgba(220,38,38,0.25);
+    border-color: rgba(220,38,38,0.45);
 }
 
-.player-actions {
-    display: none;
-}
-
-.video-container video {
-    width: 100%;
-    height: auto;
-    display: block;
-    outline: none;
-    background: #000;
-}
-
-.video-container iframe {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border: 0;
-    display: block;
-    background: #000;
-}
-
-.bunny-player-wrapper {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #000;
-    border-radius: 18px;
-    overflow: hidden;
-}
-
-.bunny-player-wrapper iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-}
-
+/* =====================
+   EPISODES
+===================== */
 .episodes-box {
     width: 100%;
     padding: 18px;
@@ -282,11 +523,11 @@
 }
 
 .episode-btn:hover, .episode-btn[aria-pressed="true"] {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #000;
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(0, 243, 255, 0.22);
+    box-shadow: 0 10px 24px rgba(220,38,38,0.28);
 }
 
 .telegram-download-wrapper {
@@ -326,7 +567,7 @@
     margin-bottom: 10px;
     font-size: 1.15rem;
     font-weight: 900;
-    color: var(--accent);
+    color: #f87171;
 }
 
 .movie-info p {
@@ -334,67 +575,151 @@
     color: var(--text-dim);
 }
 
-@media(max-width:992px){
-    .movie-grid { grid-template-columns: 1fr; }
-    .episode-btn{flex:1 1 22%;}
-}
-@media(max-width:768px){
-    .movie-page { padding: 14px 4% 28px; gap: 16px; }
-    .movie-hero { min-height: 250px; border-radius: 20px; }
-    .movie-hero-content { min-height: 250px; padding: 20px; }
-    .movie-title{font-size:1.9rem;}
-    .movie-summary { font-size: 0.95rem; }
-    .episode-btn{flex:1 1 30%;font-size:0.9rem;}
-    .video-container{padding:14px;}
-}
-@media(max-width:480px){
-    .movie-hero { min-height: 300px; }
-    .movie-hero-content {
-        min-height: 300px;
-        padding: 45px 16px 20px;
-        justify-content: space-between;
-        display: flex;
-        flex-direction: column;
-    }
-    .movie-title{font-size:1.4rem; line-height: 1.2; margin-top: 10px;}
-    .btn-back{padding:7px 12px; font-size:0.8rem;}
-    .movie-badge { font-size: 0.7rem; padding: 6px 10px; }
-    .episode-btn{flex:1 1 46%;font-size:0.85rem;}
-    .episodes-box, .movie-info { padding: 14px; }
+/* =====================
+   RANDOM CARDS (izohdan keyin)
+===================== */
+.related-section {
+    background: rgba(17,17,24,0.88);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 18px 42px rgba(0,0,0,0.42);
 }
 
-/* ======================= COMMENTS STYLES ======================= */
+.related-section h3 {
+    font-size: 1.25rem;
+    font-weight: 900;
+    margin-bottom: 18px;
+}
+
+.related-section h3 span { color: #f87171; }
+
+.related-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.related-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.related-card-img {
+    width: 100%;
+    aspect-ratio: 2/3;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-surface);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.related-card-link:hover .related-card-img {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.7);
+}
+
+.related-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.related-card-link:hover .related-card-img img {
+    transform: scale(1.05);
+}
+
+.related-card-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13,13,18,0.88) 0%, transparent 45%);
+}
+
+.related-card-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    background: rgba(220,38,38,0.85);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 3px 7px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    backdrop-filter: blur(4px);
+}
+
+.related-card-info h4 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.3s;
+}
+
+.related-card-link:hover .related-card-info h4 {
+    color: #f87171;
+}
+
+.related-card-info p {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =====================
+   COMMENTS
+===================== */
 .comments-section {
     background: rgba(17,17,24,0.88);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 24px;
-    margin-top: 10px;
     box-shadow: 0 18px 42px rgba(0,0,0,0.42);
 }
+
 .comments-section h3 {
     font-size: 1.4rem;
     font-weight: 900;
     margin-bottom: 24px;
 }
+
 .comment-form {
     display: flex;
     gap: 16px;
     margin-bottom: 30px;
 }
+
 .comment-avatar {
     width: 44px;
     height: 44px;
     border-radius: 50%;
     object-fit: cover;
     background: #333;
+    flex-shrink: 0;
 }
+
 .comment-input-wrapper {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
+
 .comment-input {
     width: 100%;
     background: transparent;
@@ -407,17 +732,20 @@
     outline: none;
     transition: 0.3s;
 }
+
 .comment-input:focus {
-    border-bottom-color: var(--accent);
+    border-bottom-color: #ef4444;
 }
+
 .comment-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
 }
+
 .comment-btn {
-    background: var(--accent);
-    color: #000;
+    background: #dc2626;
+    color: #fff;
     border: none;
     padding: 8px 20px;
     border-radius: 50px;
@@ -425,39 +753,41 @@
     cursor: pointer;
     transition: 0.2s;
 }
+
 .comment-btn:disabled {
     background: rgba(255,255,255,0.1);
     color: rgba(255,255,255,0.3);
     cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
 }
+
 .comment-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,243,255,0.3);
+    box-shadow: 0 5px 15px rgba(220,38,38,0.4);
 }
+
 .comments-list {
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
+
 .comment-item {
     display: flex;
     gap: 16px;
 }
-.comment-body {
-    flex-grow: 1;
-}
+
+.comment-body { flex-grow: 1; }
+
 .comment-header {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 6px;
+    flex-wrap: wrap;
 }
-.comment-username {
-    font-weight: 800;
-    font-size: 0.95rem;
-}
+
+.comment-username { font-weight: 800; font-size: 0.95rem; }
+
 .vip-badge-sm {
     display: inline-flex;
     align-items: center;
@@ -470,6 +800,7 @@
     border-radius: 999px;
     font-weight: 800;
 }
+
 .admin-badge-sm {
     display: inline-flex;
     align-items: center;
@@ -482,14 +813,48 @@
     border-radius: 999px;
     font-weight: 800;
 }
-.comment-time {
-    color: var(--text-dim);
-    font-size: 0.85rem;
-}
+
+.comment-time { color: var(--text-dim); font-size: 0.85rem; }
+
 .comment-text {
     color: rgba(255,255,255,0.85);
     font-size: 0.95rem;
     line-height: 1.5;
+}
+
+/* =====================
+   RESPONSIVE
+===================== */
+@media(max-width:992px){
+    .movie-grid { grid-template-columns: 1fr; }
+    .episode-btn { flex: 1 1 22%; }
+}
+@media(max-width:768px){
+    .movie-page { padding: 14px 4% 28px; gap: 16px; }
+    .movie-hero { min-height: 250px; border-radius: 20px; }
+    .movie-hero-content { min-height: 250px; padding: 20px; }
+    .movie-title { font-size: 1.9rem; }
+    .movie-summary { font-size: 0.95rem; }
+    .episode-btn { flex: 1 1 30%; font-size: 0.9rem; }
+    .video-container { padding: 14px; }
+    .bm-vol-slider { width: 55px; }
+}
+@media(max-width:480px){
+    .movie-hero { min-height: 300px; }
+    .movie-hero-content {
+        min-height: 300px;
+        padding: 45px 16px 20px;
+        justify-content: space-between;
+        display: flex;
+        flex-direction: column;
+    }
+    .movie-title { font-size: 1.4rem; line-height: 1.2; margin-top: 10px; }
+    .btn-back { padding: 7px 12px; font-size: 0.8rem; }
+    .movie-badge { font-size: 0.7rem; padding: 6px 10px; }
+    .episode-btn { flex: 1 1 46%; font-size: 0.85rem; }
+    .episodes-box, .movie-info { padding: 14px; }
+    .bm-vol-wrap { display: none; }
+    .bm-quality-btn { display: none; }
 }
 </style>
 {% endblock %}
@@ -497,6 +862,8 @@
 {% block content %}
 <main class="main-content">
     <div class="movie-page">
+
+        <!-- HERO -->
         <section class="movie-hero">
             <div class="movie-hero-bg" style="background-image:url('{% if movie.image %}{{ movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');"></div>
             <div class="movie-hero-overlay"></div>
@@ -515,16 +882,17 @@
                 </div>
 
                 <h2 class="movie-title">{{ movie.title }}</h2>
-                <div style="display:flex; gap: 10px; margin-top:5px; align-items: center;">
+                <div style="display:flex; gap: 10px; margin-top:5px; align-items: center; flex-wrap:wrap;">
                     <span style="padding:4px 10px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius:8px; font-weight:800; font-size:0.85rem; color:#fff;">Sifat: {{ max_quality }} gacha</span>
                     {% if show_ads %}
-                    <span style="padding:4px 10px; background: rgba(255,50,50,0.2); border: 1px solid rgba(255,50,50,0.4); border-radius:8px; font-weight:800; font-size:0.85rem; color:#ff8888;">Reklamalar mavjud</span>
+                    <span style="padding:4px 10px; background: rgba(220,38,38,0.2); border: 1px solid rgba(220,38,38,0.4); border-radius:8px; font-weight:800; font-size:0.85rem; color:#f87171;">Reklamalar mavjud</span>
                     {% endif %}
                 </div>
                 <p class="movie-summary">{{ movie.description|default:"Bu anime uchun izoh kiritilmagan." }}</p>
             </div>
         </section>
 
+        <!-- PLAYER + SIDE PANEL -->
         <div class="movie-grid">
             <section class="player-panel">
                 <div class="panel-head">
@@ -540,50 +908,135 @@
                         <i class='bx bx-lock-alt' style="font-size: 4rem; color: #ffc107; margin-bottom: 15px;"></i>
                         <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 10px;">PREMIUM KONTEKT</h3>
                         <p style="color: var(--text-dim); margin-bottom: 20px;">Ushbu animeni ko'rish uchun sizda Premium obuna bo'lishi kerak.</p>
-                        <a href="{% url 'premium_page' %}" class="btn-back" style="background: var(--accent); color: white; border-color: var(--accent);">Obuna bo'lish</a>
+                        <a href="{% url 'premium_page' %}" class="btn-back" style="background: #dc2626; color: white; border-color: #dc2626;">Obuna bo'lish</a>
                     </div>
                     {% else %}
                     {% with first_episode=movie.episodes.first %}
-                        <div class="video-container" id="video-container">
-                            <div class="player-shell">
-                            <button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button>
-                            {% if movie.video_file %}
-                                <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
+                    <div class="video-container" id="video-container">
+                        {% if movie.video_file %}
+                            <!-- Native video with custom player -->
+                            <div class="bm-player paused" id="bm-player">
+                                <video id="video-player" playsinline webkit-playsinline preload="metadata">
                                     <source src="{{ movie.video_file.url }}">
-                                    Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
                                 </video>
-                            {% elif movie.video_url %}
-                                {% if "iframe" in movie.video_url or "mediadelivery.net" in movie.video_url %}
-                                    <div class="bunny-player-wrapper">
-                                        <iframe id="iframe-player" src="{{ movie.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
+                                <div class="bm-big-play">
+                                    <div class="bm-big-play-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                     </div>
-                                {% else %}
-                                    <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
-                                        <source src="{{ movie.video_url }}" type="video/mp4">
-                                        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
-                                    </video>
-                                {% endif %}
-                            {% elif first_episode and first_episode.video_file %}
-                                <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
-                                    <source src="{{ first_episode.video_file.url }}">
-                                    Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
-                                </video>
-                            {% elif first_episode and first_episode.video_url %}
-                                {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
-                                    <div class="bunny-player-wrapper">
-                                        <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
+                                </div>
+                                <div class="bm-spinner"><div class="bm-spinner-ring"></div></div>
+                                <div class="bm-controls" id="bm-controls">
+                                    <div class="bm-progress-wrap" id="bm-progress">
+                                        <div class="bm-progress-buf" id="bm-buf"></div>
+                                        <div class="bm-progress-fill" id="bm-fill" style="width:0%"></div>
+                                        <div class="bm-progress-thumb" id="bm-thumb" style="left:0%"></div>
                                     </div>
-                                {% else %}
-                                    <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
-                                        <source src="{{ first_episode.video_url }}" type="video/mp4">
-                                        Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
-                                    </video>
-                                {% endif %}
-                            {% else %}
-                                <p style="text-align: center; color: var(--text-dim); padding: 30px 20px;">Bu qism uchun video manbasi yuklanmagan.</p>
-                            {% endif %}
+                                    <div class="bm-bottom-row">
+                                        <button class="bm-btn" id="bm-play-btn" aria-label="Play">
+                                            <svg id="bm-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </button>
+                                        <button class="bm-btn" id="bm-back10" aria-label="-10s">
+                                            <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="8.5" y="15.5" font-size="5" fill="currentColor" font-weight="900">10</text></svg>
+                                        </button>
+                                        <button class="bm-btn" id="bm-fwd10" aria-label="+10s">
+                                            <svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="8.5" y="15.5" font-size="5" fill="currentColor" font-weight="900">10</text></svg>
+                                        </button>
+                                        <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
+                                        <div class="bm-spacer"></div>
+                                        <div class="bm-vol-wrap">
+                                            <button class="bm-btn" id="bm-vol-btn" aria-label="Volume">
+                                                <svg id="bm-vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                                            </button>
+                                            <input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1">
+                                        </div>
+                                        <span class="bm-quality-btn" id="bm-quality-label">{{ max_quality }}</span>
+                                        <button class="bm-btn" id="bm-fullscreen" aria-label="Fullscreen">
+                                            <svg id="bm-fs-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+
+                        {% elif movie.video_url %}
+                            {% if "iframe" in movie.video_url or "mediadelivery.net" in movie.video_url %}
+                                <div class="bunny-player-wrapper">
+                                    <button type="button" class="fullscreen-btn" id="fullscreen-toggle">⛶</button>
+                                    <iframe id="iframe-player" src="{{ movie.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
+                                </div>
+                            {% else %}
+                                <div class="bm-player paused" id="bm-player">
+                                    <video id="video-player" playsinline webkit-playsinline preload="metadata">
+                                        <source src="{{ movie.video_url }}" type="video/mp4">
+                                    </video>
+                                    <div class="bm-big-play"><div class="bm-big-play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+                                    <div class="bm-spinner"><div class="bm-spinner-ring"></div></div>
+                                    <div class="bm-controls" id="bm-controls">
+                                        <div class="bm-progress-wrap" id="bm-progress"><div class="bm-progress-buf" id="bm-buf"></div><div class="bm-progress-fill" id="bm-fill" style="width:0%"></div><div class="bm-progress-thumb" id="bm-thumb" style="left:0%"></div></div>
+                                        <div class="bm-bottom-row">
+                                            <button class="bm-btn" id="bm-play-btn"><svg id="bm-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+                                            <button class="bm-btn" id="bm-back10"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="8.5" y="15.5" font-size="5" fill="currentColor" font-weight="900">10</text></svg></button>
+                                            <button class="bm-btn" id="bm-fwd10"><svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="8.5" y="15.5" font-size="5" fill="currentColor" font-weight="900">10</text></svg></button>
+                                            <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
+                                            <div class="bm-spacer"></div>
+                                            <div class="bm-vol-wrap"><button class="bm-btn" id="bm-vol-btn"><svg id="bm-vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button><input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1"></div>
+                                            <button class="bm-btn" id="bm-fullscreen"><svg id="bm-fs-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        {% elif first_episode and first_episode.video_file %}
+                            <div class="bm-player paused" id="bm-player">
+                                <video id="video-player" playsinline webkit-playsinline preload="metadata">
+                                    <source src="{{ first_episode.video_file.url }}">
+                                </video>
+                                <div class="bm-big-play"><div class="bm-big-play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+                                <div class="bm-spinner"><div class="bm-spinner-ring"></div></div>
+                                <div class="bm-controls" id="bm-controls">
+                                    <div class="bm-progress-wrap" id="bm-progress"><div class="bm-progress-buf" id="bm-buf"></div><div class="bm-progress-fill" id="bm-fill" style="width:0%"></div><div class="bm-progress-thumb" id="bm-thumb" style="left:0%"></div></div>
+                                    <div class="bm-bottom-row">
+                                        <button class="bm-btn" id="bm-play-btn"><svg id="bm-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+                                        <button class="bm-btn" id="bm-back10"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="8.5" y="15.5" font-size="5" fill="currentColor" font-weight="900">10</text></svg></button>
+                                        <button class="bm-btn" id="bm-fwd10"><svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="8.5" y="15.5" font-size="5" fill="currentColor" font-weight="900">10</text></svg></button>
+                                        <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
+                                        <div class="bm-spacer"></div>
+                                        <div class="bm-vol-wrap"><button class="bm-btn" id="bm-vol-btn"><svg id="bm-vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button><input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1"></div>
+                                        <button class="bm-btn" id="bm-fullscreen"><svg id="bm-fs-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% elif first_episode and first_episode.video_url %}
+                            {% if "iframe" in first_episode.video_url or "mediadelivery.net" in first_episode.video_url %}
+                                <div class="bunny-player-wrapper">
+                                    <button type="button" class="fullscreen-btn" id="fullscreen-toggle">⛶</button>
+                                    <iframe id="iframe-player" src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
+                                </div>
+                            {% else %}
+                                <div class="bm-player paused" id="bm-player">
+                                    <video id="video-player" playsinline webkit-playsinline preload="metadata">
+                                        <source src="{{ first_episode.video_url }}" type="video/mp4">
+                                    </video>
+                                    <div class="bm-big-play"><div class="bm-big-play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+                                    <div class="bm-spinner"><div class="bm-spinner-ring"></div></div>
+                                    <div class="bm-controls" id="bm-controls">
+                                        <div class="bm-progress-wrap" id="bm-progress"><div class="bm-progress-buf" id="bm-buf"></div><div class="bm-progress-fill" id="bm-fill" style="width:0%"></div><div class="bm-progress-thumb" id="bm-thumb" style="left:0%"></div></div>
+                                        <div class="bm-bottom-row">
+                                            <button class="bm-btn" id="bm-play-btn"><svg id="bm-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+                                            <button class="bm-btn" id="bm-back10"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="8.5" y="15.5" font-size="5" fill="currentColor" font-weight="900">10</text></svg></button>
+                                            <button class="bm-btn" id="bm-fwd10"><svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="8.5" y="15.5" font-size="5" fill="currentColor" font-weight="900">10</text></svg></button>
+                                            <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
+                                            <div class="bm-spacer"></div>
+                                            <div class="bm-vol-wrap"><button class="bm-btn" id="bm-vol-btn"><svg id="bm-vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button><input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1"></div>
+                                            <button class="bm-btn" id="bm-fullscreen"><svg id="bm-fs-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <p style="text-align: center; color: var(--text-dim); padding: 30px 20px;">Bu qism uchun video manbasi yuklanmagan.</p>
+                        {% endif %}
+                    </div>
                     {% endwith %}
                     {% endif %}
 
@@ -595,7 +1048,7 @@
                     {% else %}
                     <div style="padding: 15px; margin: 25px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; text-align: center;">
                         <i class='bx bxs-lock-alt' style="color:#ffc107; font-size:1.5rem;"></i>
-                        <p style="margin: 5px 0 0 0; font-size:0.95rem; color: var(--text-dim);">Offline yuklab olish uchun <a href="{% url 'premium_page' %}" style="color:var(--accent); text-decoration:none; font-weight:700;">Premium</a> obuna oling.</p>
+                        <p style="margin: 5px 0 0 0; font-size:0.95rem; color: var(--text-dim);">Offline yuklab olish uchun <a href="{% url 'premium_page' %}" style="color:#f87171; text-decoration:none; font-weight:700;">Premium</a> obuna oling.</p>
                     </div>
                     {% endif %}
                     {% endif %}
@@ -629,7 +1082,7 @@
             </aside>
         </div>
 
-        <!-- YOUTUBE STYLE COMMENTS SECTION -->
+        <!-- COMMENTS -->
         <section class="comments-section" id="comments">
             <h3>Izohlar ({{ comments.count|default:"0" }})</h3>
 
@@ -647,7 +1100,7 @@
             {% else %}
             <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 30px;">
                 <p style="color: var(--text-dim); margin-bottom: 10px;">Izoh qoldirish uchun tizimga kiring.</p>
-                <a href="{% url 'login' %}" class="btn-back" style="background: var(--accent); color: #000; border: none;">Kirish</a>
+                <a href="{% url 'login' %}" class="btn-back" style="background: #dc2626; color: #fff; border: none;">Kirish</a>
             </div>
             {% endif %}
 
@@ -667,9 +1120,7 @@
                             {% endif %}
                             <span class="comment-time">{{ comment.local_created_at|date:"d M Y, H:i" }}</span>
                         </div>
-                        <div class="comment-text">
-                            {{ comment.text|linebreaksbr }}
-                        </div>
+                        <div class="comment-text">{{ comment.text|linebreaksbr }}</div>
                     </div>
                 </div>
                 {% empty %}
@@ -678,143 +1129,277 @@
             </div>
         </section>
 
+        <!-- IZOHDAN KEYIN: 2 TA RANDOM KARTA -->
+        {% if random_movies %}
+        <section class="related-section">
+            <h3>O'xshash <span>Animeler</span></h3>
+            <div class="related-cards">
+                {% for anime in random_movies %}
+                <a href="{% url 'movie_detail' anime.id %}" class="related-card-link">
+                    <div class="related-card-img">
+                        <div class="related-card-badge">
+                            <i class='bx bx-trending-up'></i> TOP
+                        </div>
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                    </div>
+                    <div class="related-card-info">
+                        <h4>{{ anime.title }}</h4>
+                        <p>
+                            {% if anime.category %}{{ anime.category.name }} · {% endif %}
+                            {{ anime.release_year|default:anime.created_at|date:"Y" }}
+                        </p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
     </div>
 </main>
 
 <script>
+/* =============================================
+   EPISODE SWITCHING
+============================================= */
 const episodeBtns = document.querySelectorAll('.episode-btn');
-const videoContainer = document.getElementById('video-container');
-let videoPlayer = document.getElementById('video-player');
-let iframePlayer = document.getElementById('iframe-player');
+const videoContainerEl = document.getElementById('video-container');
 const episodeDescriptionEl = document.getElementById('episode-description');
-let currentSource = '';
 
-function buildNativePlayerMarkup(videoSrc){
-    return `
-        <button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button>
-        <video id="video-player" controls playsinline webkit-playsinline preload="metadata">
-            <source src="${videoSrc}" type="video/mp4">
-            Sizning brauzeringiz videoni qo‘llab-quvvatlamaydi.
-        </video>
-        `;
-}
-
-function appendPlayerQuery(videoSrc){
-    if(!videoSrc){
-        return '';
-    }
-    const joiner = videoSrc.includes('?') ? '&' : '?';
-    return `${videoSrc}${joiner}autoplay=false&loop=false&muted=false&responsive=true`;
-}
-
-function requestPlayerFullscreen(){
-    const shell = document.querySelector('.player-shell');
-    const iframe = document.getElementById('iframe-player');
-    const video = document.getElementById('video-player');
-
-    const target = video || iframe || shell;
-    if(!target){
-        return;
-    }
-
-    const fullscreenFn = target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen;
-    try {
-        if(fullscreenFn){
-            const result = fullscreenFn.call(target);
-            if(result && typeof result.catch === 'function'){
-                result.catch(() => {
-                    if(video && typeof video.webkitEnterFullscreen === 'function'){
-                        video.webkitEnterFullscreen();
-                    }
-                });
-            }
-        } else if(video && typeof video.webkitEnterFullscreen === 'function'){
-            video.webkitEnterFullscreen();
-        }
-    } catch (error) {
-        if(video && typeof video.webkitEnterFullscreen === 'function'){
-            video.webkitEnterFullscreen();
-        }
-    }
-}
-
-document.addEventListener('click', (event) => {
-    if(event.target.closest('#fullscreen-toggle')){
-        requestPlayerFullscreen();
-    }
-});
-
-function updateCurrentSource(){
-    if(videoPlayer){
-        currentSource = videoPlayer.currentSrc || videoPlayer.src || '';
-        return;
-    }
-    if(iframePlayer){
-        currentSource = iframePlayer.src || '';
-        return;
-    }
-    currentSource = '';
-}
-
-function getEpisodeSource(btn){
-    return btn.dataset.videoSrc || '';
-}
-
-function getEpisodeDescription(btn){
-    return (btn.dataset.description || '').trim();
-}
+function getEpisodeSource(btn){ return btn.dataset.videoSrc || ''; }
+function getEpisodeDescription(btn){ return (btn.dataset.description || '').trim(); }
 
 function updateEpisodeDescription(btn){
-    if(!episodeDescriptionEl){
-        return;
-    }
-    const episodeDescription = btn ? getEpisodeDescription(btn) : '';
-    episodeDescriptionEl.textContent = episodeDescription || 'Bu qism uchun izoh kiritilmagan.';
+    if(!episodeDescriptionEl) return;
+    episodeDescriptionEl.textContent = btn ? (getEpisodeDescription(btn) || 'Bu qism uchun izoh kiritilmagan.') : 'Bu qism uchun izoh kiritilmagan.';
 }
 
-
-function loadNativeVideoSource(videoSrc){
-    if(!videoSrc){ return; }
-    if(!videoPlayer){
-        videoContainer.innerHTML = `<div class="player-shell">${buildNativePlayerMarkup(videoSrc)}</div>`;
-        videoPlayer = document.getElementById('video-player');
-        iframePlayer = null;
-    }
-    videoPlayer.src = videoSrc;
-    videoPlayer.load();
-    videoPlayer.play();
-    currentSource = videoSrc;
+function buildBmPlayer(videoSrc){
+    return `<div class="bm-player paused" id="bm-player">
+        <video id="video-player" playsinline webkit-playsinline preload="metadata">
+            <source src="${videoSrc}" type="video/mp4">
+        </video>
+        <div class="bm-big-play"><div class="bm-big-play-icon"><svg viewBox="0 0 24 24" fill="#fff" width="32" height="32"><path d="M8 5v14l11-7z"/></svg></div></div>
+        <div class="bm-spinner"><div class="bm-spinner-ring"></div></div>
+        <div class="bm-controls" id="bm-controls">
+            <div class="bm-progress-wrap" id="bm-progress"><div class="bm-progress-buf" id="bm-buf"></div><div class="bm-progress-fill" id="bm-fill" style="width:0%"></div><div class="bm-progress-thumb" id="bm-thumb" style="left:0%"></div></div>
+            <div class="bm-bottom-row">
+                <button class="bm-btn" id="bm-play-btn"><svg id="bm-play-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M8 5v14l11-7z"/></svg></button>
+                <button class="bm-btn" id="bm-back10"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+                <button class="bm-btn" id="bm-fwd10"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg></button>
+                <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
+                <div class="bm-spacer"></div>
+                <div class="bm-vol-wrap"><button class="bm-btn" id="bm-vol-btn"><svg id="bm-vol-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button><input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1"></div>
+                <button class="bm-btn" id="bm-fullscreen"><svg id="bm-fs-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+            </div>
+        </div>
+    </div>`;
 }
 
-updateCurrentSource();
+function buildIframePlayer(src){
+    const finalSrc = src.includes('?') ? src + '&autoplay=false' : src + '?autoplay=false';
+    return `<div class="bunny-player-wrapper"><button type="button" class="fullscreen-btn" id="fullscreen-toggle">⛶</button><iframe id="iframe-player" src="${finalSrc}" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe></div>`;
+}
 
-if(episodeBtns.length > 0) {
-    episodeBtns[0].setAttribute('aria-pressed', 'true');
+episodeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const src = getEpisodeSource(btn);
+        if(!src) return;
+
+        if(src.includes('iframe') || src.includes('mediadelivery.net')){
+            videoContainerEl.innerHTML = buildIframePlayer(src);
+            document.getElementById('fullscreen-toggle').addEventListener('click', () => {
+                const ifr = document.getElementById('iframe-player');
+                const fn = ifr.requestFullscreen || ifr.webkitRequestFullscreen;
+                if(fn) fn.call(ifr);
+            });
+        } else {
+            videoContainerEl.innerHTML = buildBmPlayer(src);
+            initBmPlayer();
+        }
+
+        episodeBtns.forEach(b => b.setAttribute('aria-pressed','false'));
+        btn.setAttribute('aria-pressed','true');
+        updateEpisodeDescription(btn);
+    });
+});
+
+if(episodeBtns.length > 0){
+    episodeBtns[0].setAttribute('aria-pressed','true');
     updateEpisodeDescription(episodeBtns[0]);
 } else {
     updateEpisodeDescription(null);
 }
 
-episodeBtns.forEach(btn=>{
-    btn.addEventListener('click',()=>{
-        const videoSrc = getEpisodeSource(btn);
-        if(!videoSrc) return;
-        if(videoSrc.includes('iframe') || videoSrc.includes('mediadelivery.net')){
-                    const embedSrc = appendPlayerQuery(videoSrc);
-                    if(iframePlayer){iframePlayer.src=embedSrc;}
-            else{
-                videoContainer.innerHTML=`<div class="player-shell"><button type="button" class="fullscreen-btn" id="fullscreen-toggle" aria-label="To'liq ekran">⛶</button><div class="bunny-player-wrapper"><iframe id="iframe-player" src="${embedSrc}" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen webkitallowfullscreen loading="lazy"></iframe></div></div>`;
-                iframePlayer=document.getElementById('iframe-player');
-                videoPlayer=null;
-            }
-            currentSource = embedSrc;
-        }else{
-            loadNativeVideoSource(videoSrc);
+/* =============================================
+   CUSTOM PLAYER LOGIC
+============================================= */
+function formatTime(s){
+    if(isNaN(s)) return '0:00';
+    const m = Math.floor(s/60);
+    const sec = Math.floor(s%60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function initBmPlayer(){
+    const player   = document.getElementById('bm-player');
+    const video    = document.getElementById('video-player');
+    const playBtn  = document.getElementById('bm-play-btn');
+    const playIcon = document.getElementById('bm-play-icon');
+    const back10   = document.getElementById('bm-back10');
+    const fwd10    = document.getElementById('bm-fwd10');
+    const timeEl   = document.getElementById('bm-time-display');
+    const progress = document.getElementById('bm-progress');
+    const fill     = document.getElementById('bm-fill');
+    const thumb    = document.getElementById('bm-thumb');
+    const buf      = document.getElementById('bm-buf');
+    const volBtn   = document.getElementById('bm-vol-btn');
+    const volIcon  = document.getElementById('bm-vol-icon');
+    const volSlider= document.getElementById('bm-volume');
+    const fsBtn    = document.getElementById('bm-fullscreen');
+    const fsIcon   = document.getElementById('bm-fs-icon');
+
+    if(!player || !video) return;
+
+    const PLAY_SVG  = '<path d="M8 5v14l11-7z"/>';
+    const PAUSE_SVG = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    const VOL_SVG   = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>';
+    const MUTE_SVG  = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+    const EXPAND_SVG= '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+    const COLLAPSE_SVG='<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+
+    function setPlayIcon(playing){
+        playIcon.innerHTML = playing ? PAUSE_SVG : PLAY_SVG;
+        player.classList.toggle('paused', !playing);
+    }
+
+    function updateProgress(){
+        if(!video.duration) return;
+        const pct = (video.currentTime / video.duration) * 100;
+        fill.style.width  = pct + '%';
+        thumb.style.left  = pct + '%';
+        timeEl.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
+        if(video.buffered.length){
+            buf.style.width = (video.buffered.end(video.buffered.length-1) / video.duration * 100) + '%';
         }
-        episodeBtns.forEach(b=>b.setAttribute('aria-pressed', 'false'));
-        btn.setAttribute('aria-pressed', 'true');
-        updateEpisodeDescription(btn);
+    }
+
+    function seekTo(e){
+        const rect = progress.getBoundingClientRect();
+        const ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+        video.currentTime = ratio * video.duration;
+        updateProgress();
+    }
+
+    /* Toggle play/pause */
+    function togglePlay(){
+        if(video.paused){ video.play(); } else { video.pause(); }
+    }
+
+    /* Video events */
+    video.addEventListener('play',    () => setPlayIcon(true));
+    video.addEventListener('pause',   () => setPlayIcon(false));
+    video.addEventListener('ended',   () => setPlayIcon(false));
+    video.addEventListener('timeupdate', updateProgress);
+    video.addEventListener('waiting', () => player.classList.add('loading'));
+    video.addEventListener('canplay', () => player.classList.remove('loading'));
+
+    /* Controls */
+    playBtn.addEventListener('click', togglePlay);
+
+    /* Click on video to toggle play */
+    video.addEventListener('click', togglePlay);
+
+    back10.addEventListener('click', () => { video.currentTime = Math.max(0, video.currentTime - 10); });
+    fwd10.addEventListener('click',  () => { video.currentTime = Math.min(video.duration, video.currentTime + 10); });
+
+    /* Progress seek */
+    let seeking = false;
+    progress.addEventListener('mousedown', e => { seeking = true; seekTo(e); });
+    window.addEventListener('mousemove', e => { if(seeking) seekTo(e); });
+    window.addEventListener('mouseup', () => { seeking = false; });
+    progress.addEventListener('touchstart', e => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = progress.getBoundingClientRect();
+        const ratio = Math.min(Math.max((touch.clientX - rect.left) / rect.width, 0), 1);
+        video.currentTime = ratio * video.duration;
+        updateProgress();
+    }, { passive: false });
+
+    /* Volume */
+    volSlider.addEventListener('input', () => {
+        video.volume = parseFloat(volSlider.value);
+        video.muted = video.volume === 0;
+        volIcon.innerHTML = video.muted ? MUTE_SVG : VOL_SVG;
     });
+
+    volBtn.addEventListener('click', () => {
+        video.muted = !video.muted;
+        volSlider.value = video.muted ? 0 : video.volume;
+        volIcon.innerHTML = video.muted ? MUTE_SVG : VOL_SVG;
+    });
+
+    /* Fullscreen */
+    fsBtn.addEventListener('click', () => {
+        const el = player;
+        const inFs = document.fullscreenElement || document.webkitFullscreenElement;
+        if(!inFs){
+            const fn = el.requestFullscreen || el.webkitRequestFullscreen;
+            if(fn) fn.call(el).catch(() => {
+                if(video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+            });
+        } else {
+            const fn = document.exitFullscreen || document.webkitExitFullscreen;
+            if(fn) fn.call(document);
+        }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        const inFs = !!document.fullscreenElement;
+        fsIcon.innerHTML = inFs ? COLLAPSE_SVG : EXPAND_SVG;
+    });
+    document.addEventListener('webkitfullscreenchange', () => {
+        const inFs = !!document.webkitFullscreenElement;
+        fsIcon.innerHTML = inFs ? COLLAPSE_SVG : EXPAND_SVG;
+    });
+
+    /* Keyboard shortcuts */
+    document.addEventListener('keydown', e => {
+        if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+        if(e.code === 'Space')  { e.preventDefault(); togglePlay(); }
+        if(e.code === 'ArrowLeft')  video.currentTime = Math.max(0, video.currentTime - 5);
+        if(e.code === 'ArrowRight') video.currentTime = Math.min(video.duration, video.currentTime + 5);
+        if(e.code === 'KeyM')  volBtn.click();
+        if(e.code === 'KeyF')  fsBtn.click();
+    });
+
+    /* Auto-hide controls */
+    let hideTimer;
+    function showControls(){
+        player.classList.add('show-controls');
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+            if(!video.paused) player.classList.remove('show-controls');
+        }, 2800);
+    }
+    player.addEventListener('mousemove', showControls);
+    player.addEventListener('touchstart', showControls, { passive: true });
+}
+
+/* Init player if exists on page load */
+initBmPlayer();
+
+/* Iframe fullscreen toggle */
+document.addEventListener('click', e => {
+    if(e.target.closest('#fullscreen-toggle')){
+        const ifr = document.getElementById('iframe-player');
+        const shell = document.querySelector('.bunny-player-wrapper');
+        const target = ifr || shell;
+        if(!target) return;
+        const fn = target.requestFullscreen || target.webkitRequestFullscreen;
+        try { if(fn) fn.call(target); } catch(err){}
+    }
 });
 </script>
 {% endblock %}
