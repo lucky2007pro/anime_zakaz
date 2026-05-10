@@ -167,7 +167,7 @@
         justify-content: space-between;
         align-items: flex-end;
         margin: 40px 0 30px 0;
-        padding: 0 5%;
+        padding: 0 5%;   /* 👈 shu qo‘shiladi */
     }
 
     .section-title h3 {
@@ -315,6 +315,7 @@
         color: #ff3366;
     }
 
+
     .card-info-bottom {
          display: flex;
          flex-direction: column;
@@ -388,17 +389,23 @@
         height: 85px;
         border-radius: 50%;
         padding: 3px;
+
+        /* default gradient (not seen) */
         background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc);
+
         display: flex;
         justify-content: center;
         align-items: center;
+
         transition: 0.3s ease;
     }
 
+    /* ko‘rilgan story */
     .story-ring.seen {
         background: #444;
     }
 
+    /* image inside */
     .story-ring img {
         width: 100%;
         height: 100%;
@@ -407,75 +414,51 @@
         border: 2px solid #0f0f13;
     }
 
+    /* label */
     .story-item span {
         font-size: 12px;
         color: #aaa;
         max-width: 70px;
         text-align: center;
+
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
+    /* =========================
+            HOVER EFFECT
+    ========================= */
     .story-item:hover .story-ring {
         transform: scale(1.08);
     }
 
+    /* =========================
+            ACTIVE CLICK EFFECT
+    ========================= */
     .story-item:active .story-ring {
         transform: scale(0.95);
     }
 
-    /* =========================
-       RECOMMENDATION SECTION
-    ========================= */
     .recommendation-section {
         padding: 30px 0 0px 0;
+        overflow: hidden;
         width: 100%;
         position: relative;
     }
-
-    /* Tashqi scroll wrapper — touch scroll ishlashi uchun */
-    .marquee-scroll-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        cursor: grab;
-        padding-bottom: 20px;
-        /* scrollbar yashirin */
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-    .marquee-scroll-wrapper::-webkit-scrollbar {
-        display: none;
-    }
-    .marquee-scroll-wrapper:active {
-        cursor: grabbing;
-    }
-
-    /* Animatsiya ichki container */
     .marquee-container {
         display: flex;
         width: max-content;
         animation: scroll-left 40s linear infinite;
         gap: 16px;
-        /* foydalanuvchi touch qilganda pointer events ishlashi kerak */
-        pointer-events: auto;
     }
-
-    /* Hover qilganda to'xtaydi (desktop) */
-    .marquee-scroll-wrapper:hover .marquee-container {
+    .marquee-container:hover {
         animation-play-state: paused;
     }
-
-    /* Touch paytida ham to'xtaydi */
-    .marquee-scroll-wrapper.is-touching .marquee-container {
-        animation-play-state: paused;
-    }
-
     .marquee-item {
         width: 220px;
         flex-shrink: 0;
     }
-
     @keyframes scroll-left {
         0% { transform: translateX(0); }
         100% { transform: translateX(calc(-50% - 8px)); }
@@ -503,7 +486,6 @@
     @media (max-width: 1024px) {
         .slide-title { font-size: 3rem; }
     }
-
     @media (max-width: 768px) {
         .slider-container {
             aspect-ratio: 16 / 9;
@@ -525,18 +507,12 @@
 
         .section-title h3 { font-size: 1.3rem; }
         .section-header { margin: 24px 0 14px; }
-
-        /* Yangi Qo'shilganlar — 2 ustun, katta kartochkalar */
-        .cards-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-        }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         .anime-card { height: 220px; }
     }
-
     @media (max-width: 480px) {
         .slider-container {
-            aspect-ratio: 4 / 3;
+            aspect-ratio: 4 / 3; /* Increased height ratio for mobile */
             min-height: 280px;
             max-height: 80vh;
             margin-top: 60px;
@@ -552,15 +528,8 @@
         .slide-desc { font-size: 0.82rem; margin-bottom: 14px; -webkit-line-clamp: 3; line-clamp: 3; }
         .btn-main { padding: 10px 18px; font-size: 0.85rem; }
         .slider-controls { bottom: 12px; }
-
-        /* Yangi Qo'shilganlar — mobilda 2 ustun, yetarli balandlik */
-        .cards-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-        }
-        .anime-card { height: 210px; }
-
-        .card-title { font-size: 0.9rem; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .anime-card { height: 140px; }
         .card-meta { font-size: 0.7rem; }
         .top-badge-episode, .top-badge-year { font-size: 0.62rem; padding: 3px 6px; }
         .top-badge { font-size: 0.62rem; padding: 3px 6px; }
@@ -625,25 +594,30 @@
 </div>
 
 <div class="story-container">
+
     {% for story in stories %}
     <a href="{% url 'story_view' story.id %}" class="story-item">
+
         <div class="story-ring"
              style="
                 {% if story.id in seen_stories %}
                     background: #444;
                 {% endif %}
              ">
+
             {% if story.image %}
                 <img src="{{ story.image.url }}" alt="{{ story.title }}">
             {% else %}
                 <img src="https://via.placeholder.com/150" alt="story">
             {% endif %}
         </div>
+
         <span>{{ story.title }}</span>
     </a>
     {% empty %}
-        <p style="color:#aaa; padding:10px;">Hozircha story yo'q</p>
+        <p style="color:#aaa; padding:10px;">Hozircha story yo‘q</p>
     {% endfor %}
+
 </div>
 
 {% if recommended_movies %}
@@ -654,9 +628,8 @@
         </div>
     </div>
 
-    <!-- marquee-scroll-wrapper: touch scroll ishlashi uchun overflow-x:auto -->
-    <div class="marquee-scroll-wrapper" id="marqueeScrollWrapper">
-        <div class="marquee-container" id="marqueeContainer">
+    <div style="overflow: hidden; width: 100%; position: relative; padding-bottom: 20px;">
+        <div class="marquee-container">
             {% for anime in recommended_movies %}
             <div class="card-wrapper marquee-item">
                 <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer; height: 260px;">
@@ -676,7 +649,7 @@
                 </div>
             </div>
             {% endfor %}
-            <!-- Dublikat: scroll animatsiyasi silliq bo'lishi uchun -->
+            <!-- Dublikat skroll animatsiyasi silliq bo'lishi uchun -->
             {% for anime in recommended_movies %}
             <div class="card-wrapper marquee-item">
                 <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer; height: 260px;">
@@ -762,9 +735,6 @@
 </div>
 
 <script>
-    /* =====================
-       HERO SLIDER
-    ===================== */
     const wrapper = document.getElementById('slidesWrapper');
     const dots = document.querySelectorAll('.dot');
     const slides = document.querySelectorAll('.slide');
@@ -773,9 +743,12 @@
 
     function goToSlide(index) {
         if (!wrapper || totalSlides === 0) return;
+
         currentSlide = index;
         wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+
         dots.forEach(dot => dot.setAttribute('aria-pressed', 'false'));
+
         document.querySelectorAll('.dot-' + currentSlide).forEach(dot => {
             dot.setAttribute('aria-pressed', 'true');
         });
@@ -790,6 +763,7 @@
 
     window.addEventListener('scroll', () => {
         const scrollY = window.scrollY;
+
         if (scrollY < 800) {
             document.querySelectorAll('.slide-bg').forEach(bg => {
                 bg.style.transform = `
@@ -800,73 +774,7 @@
         }
     });
 
-    /* =====================
-       MARQUEE TOUCH SCROLL
-       Foydalanuvchi touch qilganda animatsiya to'xtaydi,
-       scroll tugagandan so'ng davom etadi.
-    ===================== */
-    (function () {
-        const scrollWrapper = document.getElementById('marqueeScrollWrapper');
-        if (!scrollWrapper) return;
 
-        let touchStartX = 0;
-        let scrollStartX = 0;
-        let isTouching = false;
-        let resumeTimer = null;
-
-        function pauseMarquee() {
-            scrollWrapper.classList.add('is-touching');
-        }
-
-        function resumeMarquee() {
-            scrollWrapper.classList.remove('is-touching');
-        }
-
-        scrollWrapper.addEventListener('touchstart', function (e) {
-            isTouching = true;
-            touchStartX = e.touches[0].clientX;
-            scrollStartX = scrollWrapper.scrollLeft;
-            pauseMarquee();
-            clearTimeout(resumeTimer);
-        }, { passive: true });
-
-        scrollWrapper.addEventListener('touchmove', function (e) {
-            if (!isTouching) return;
-            const deltaX = touchStartX - e.touches[0].clientX;
-            scrollWrapper.scrollLeft = scrollStartX + deltaX;
-        }, { passive: true });
-
-        scrollWrapper.addEventListener('touchend', function () {
-            isTouching = false;
-            /* 2 soniya kutib animatsiyani qayta ishga tushuradi */
-            resumeTimer = setTimeout(resumeMarquee, 2000);
-        }, { passive: true });
-
-        /* Mouse drag support (desktop) */
-        let isMouseDown = false;
-        let mouseStartX = 0;
-        let mouseScrollX = 0;
-
-        scrollWrapper.addEventListener('mousedown', function (e) {
-            isMouseDown = true;
-            mouseStartX = e.clientX;
-            mouseScrollX = scrollWrapper.scrollLeft;
-            pauseMarquee();
-            clearTimeout(resumeTimer);
-            e.preventDefault();
-        });
-
-        window.addEventListener('mousemove', function (e) {
-            if (!isMouseDown) return;
-            const deltaX = mouseStartX - e.clientX;
-            scrollWrapper.scrollLeft = mouseScrollX + deltaX;
-        });
-
-        window.addEventListener('mouseup', function () {
-            if (!isMouseDown) return;
-            isMouseDown = false;
-            resumeTimer = setTimeout(resumeMarquee, 2000);
-        });
-    })();
 </script>
+
 {% endblock %}
