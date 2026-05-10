@@ -167,7 +167,7 @@
         justify-content: space-between;
         align-items: flex-end;
         margin: 40px 0 30px 0;
-        padding: 0 5%;   /* 👈 shu qo‘shiladi */
+        padding: 0 5%;
     }
 
     .section-title h3 {
@@ -389,23 +389,17 @@
         height: 85px;
         border-radius: 50%;
         padding: 3px;
-
-        /* default gradient (not seen) */
         background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc);
-
         display: flex;
         justify-content: center;
         align-items: center;
-
         transition: 0.3s ease;
     }
 
-    /* ko‘rilgan story */
     .story-ring.seen {
         background: #444;
     }
 
-    /* image inside */
     .story-ring img {
         width: 100%;
         height: 100%;
@@ -414,32 +408,58 @@
         border: 2px solid #0f0f13;
     }
 
-    /* label */
     .story-item span {
         font-size: 12px;
         color: #aaa;
         max-width: 70px;
         text-align: center;
-
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    /* =========================
-            HOVER EFFECT
-    ========================= */
     .story-item:hover .story-ring {
         transform: scale(1.08);
     }
 
-    /* =========================
-            ACTIVE CLICK EFFECT
-    ========================= */
     .story-item:active .story-ring {
         transform: scale(0.95);
     }
 
+    /* =========================
+        YOUTUBE KONTENT BO'LIMI
+    ========================= */
+    .youtube-section {
+        padding: 0 0 10px 0;
+    }
+
+    .youtube-player-wrapper {
+        padding: 0 5%;
+    }
+
+    .youtube-embed {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%; /* 16:9 nisbat */
+        border-radius: 14px;
+        overflow: hidden;
+        background: #000;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .youtube-embed iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 14px;
+    }
+
+    /* =========================
+            RECOMMENDATION
+    ========================= */
     .recommendation-section {
         padding: 30px 0 0px 0;
         overflow: hidden;
@@ -509,10 +529,13 @@
         .section-header { margin: 24px 0 14px; }
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         .anime-card { height: 220px; }
+
+        .youtube-player-wrapper { padding: 0 4%; }
+        .youtube-embed { border-radius: 10px; }
     }
     @media (max-width: 480px) {
         .slider-container {
-            aspect-ratio: 4 / 3; /* Increased height ratio for mobile */
+            aspect-ratio: 4 / 3;
             min-height: 280px;
             max-height: 80vh;
             margin-top: 60px;
@@ -533,6 +556,9 @@
         .card-meta { font-size: 0.7rem; }
         .top-badge-episode, .top-badge-year { font-size: 0.62rem; padding: 3px 6px; }
         .top-badge { font-size: 0.62rem; padding: 3px 6px; }
+
+        .youtube-player-wrapper { padding: 0 3%; }
+        .youtube-embed { border-radius: 8px; }
     }
 </style>
 {% endblock %}
@@ -615,10 +641,32 @@
         <span>{{ story.title }}</span>
     </a>
     {% empty %}
-        <p style="color:#aaa; padding:10px;">Hozircha story yo‘q</p>
+        <p style="color:#aaa; padding:10px;">Hozircha story yo'q</p>
     {% endfor %}
 
 </div>
+
+<!-- ===== YOUTUBE KONTENT BO'LIMI ===== -->
+<div class="youtube-section">
+    <div class="section-header">
+        <div class="section-title">
+            <h3>YouTube <span>Kontent</span></h3>
+        </div>
+    </div>
+
+    <div class="youtube-player-wrapper">
+        <div class="youtube-embed">
+            <iframe
+                src="https://www.youtube.com/embed/OfWIGJpOih8?rel=0&modestbranding=1"
+                title="YouTube Kontent"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+</div>
+<!-- ===== YOUTUBE KONTENT BO'LIMI TUGADI ===== -->
+
 
 {% if recommended_movies %}
 <div class="container recommendation-section">
@@ -773,8 +821,6 @@
             });
         }
     });
-
-
 </script>
 
 {% endblock %}
