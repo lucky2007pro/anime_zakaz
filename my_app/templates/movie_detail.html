@@ -627,7 +627,7 @@ function buildPlayerInner(title, quality){
 <div class="bm-top-bar" id="bm-top-bar">
   <a href="#" class="bm-back-link" title="Orqaga" onclick="history.back();return false;">${_svgBack()}</a>
   <span class="bm-title-bar">${title||''}</span>
-  <button class="bm-rotate-btn" id="bm-rotate" title="Yotiq ekran">${_svgRotate()}</button>
+
 </div>
 <div class="bm-tap-zone bm-tap-left">
   <div class="bm-tap-ripple" id="bm-ripple-left">
@@ -659,7 +659,6 @@ function buildPlayerInner(title, quality){
       <button class="bm-btn" id="bm-vol-btn" aria-label="Volume"><svg id="bm-vol-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgVol()}</svg></button>
       <input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1">
     </div>
-    <span class="bm-quality-btn">${quality||''}</span>
     <button class="bm-btn" id="bm-fullscreen" aria-label="Fullscreen"><svg id="bm-fs-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">${_svgExpand()}</svg></button>
   </div>
 </div>`;
@@ -917,6 +916,21 @@ function initBmPlayer(){
         let lastTap=0;
         const DTAP=280;
 
+        // 🔥 YANGI: progressive skip system
+        let leftSkip = 10;
+        let rightSkip = 10;
+        let resetTimer = null;
+
+        function resetSkipValues(){
+            leftSkip = 10;
+            rightSkip = 10;
+        }
+
+        function scheduleReset(){
+            clearTimeout(resetTimer);
+            resetTimer = setTimeout(resetSkipValues, 2000); // 2s ichida bosilmasa reset
+        }
+
         player.addEventListener('touchend', e=>{
             if(e.target.closest('.bm-progress-wrap')||
                e.target.closest('.bm-btn')||
@@ -932,23 +946,36 @@ function initBmPlayer(){
             if(isDouble){
                 /* double tap */
                 lastTap=0;
+
+                scheduleReset(); // har double tapda vaqt yangilanadi
+
                 if(xRel<0.36){
-                    video.currentTime=Math.max(0,video.currentTime-10);
+                    video.currentTime=Math.max(0,video.currentTime-leftSkip);
                     showRipple(rippleL);
                     player.classList.add('show-controls');
+
+                    // 🔥 oshirib borish
+                    leftSkip += 10;
+
                 } else if(xRel>0.64){
-                    video.currentTime=Math.min(video.duration||Infinity,video.currentTime+10);
+                    video.currentTime=Math.min(video.duration||Infinity,video.currentTime+rightSkip);
                     showRipple(rippleR);
                     player.classList.add('show-controls');
+
+                    // 🔥 oshirib borish
+                    rightSkip += 10;
+
                 } else {
                     togglePlay();
                     player.classList.add('show-controls');
                 }
+
             } else {
                 /* single tap — toggle show/hide */
                 const showing=player.classList.contains('show-controls');
+
                 if(showing){
-                    /* centre tap while visible = play/pause, then keep visible */
+                    /* centre tap while visible = play/pause */
                     if(xRel>=0.36&&xRel<=0.64){
                         togglePlay();
                     } else {
@@ -959,6 +986,7 @@ function initBmPlayer(){
                     /* icons hidden → show them */
                     player.classList.add('show-controls');
                 }
+
                 lastTap=now;
             }
         },{passive:true});
@@ -967,7 +995,6 @@ function initBmPlayer(){
     /* -- Pause shows controls, play keeps state -- */
     video.addEventListener('pause', ()=>{ clearTimeout(hideTimer); player.classList.add('show-controls'); });
     video.addEventListener('ended', ()=>{ clearTimeout(hideTimer); player.classList.add('show-controls'); });
-
     /* =====================================================
        KEYBOARD SHORTCUTS (desktop)
     ===================================================== */
