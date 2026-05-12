@@ -1,334 +1,1459 @@
 {% extends 'base.html' %}
+{% load static %}
+{% static 'images/default.svg' as default_movie_poster %}
 
-{% block title %}Premium Obuna | BESTMEDIA{% endblock %}
+{% block title %}{{ movie.title }} | BESTMEDIA{% endblock %}
 
 {% block extra_css %}
 <style>
-.premium-wrapper {
-    max-width: 1200px;
-    margin: 40px auto;
-    text-align: center;
-    padding: 0 5%;
-}
+*,*::before,*::after{box-sizing:border-box;}
 
-.premium-title {
-    font-size: 2.5rem;
-    font-weight: 900;
-    margin-bottom: 10px;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.premium-subtitle {
-    color: var(--text-dim);
-    font-size: 1.1rem;
-    margin-bottom: 40px;
-}
-
-.pricing-cards {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    flex-wrap: wrap;
-    margin-bottom: 40px;
-}
-
-.pricing-card {
-    flex: 1;
-    min-width: 300px;
-    max-width: 380px;
-    background: #111118;
-    border: 1px solid rgba(255,255,255,0.05);
-    padding: 40px 30px;
+.movie-page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 18px 5% 40px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-    transition: 0.3s;
+    gap: 22px;
 }
 
-.pricing-card.mid {
-    border-left: 2px solid #ff3366;
-    border-right: 2px solid #ff3366;
+/* ---- HERO ---- */
+.movie-hero {
     position: relative;
-    z-index: 10;
+    min-height: 290px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 22px 60px rgba(0,0,0,0.45);
+    background: rgba(17,17,24,0.88);
+}
+.movie-hero-bg {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.03);
+}
+.movie-hero-overlay {
+    position: absolute; inset: 0;
+    background:
+        linear-gradient(90deg,rgba(10,10,15,.94) 0%,rgba(10,10,15,.80) 45%,rgba(10,10,15,.40) 100%),
+        linear-gradient(0deg,rgba(10,10,15,.86) 0%,transparent 58%);
+}
+.movie-hero-content {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    min-height: 290px; padding: 28px; gap: 14px;
+}
+.hero-top {
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 16px; flex-wrap: wrap;
+}
+.btn-back {
+    text-decoration: none; color: white;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.10);
+    padding: 10px 16px; border-radius: 999px;
+    font-weight: 800; transition: .25s;
+    display: inline-flex; align-items: center; gap: 8px;
+    backdrop-filter: blur(10px);
+}
+.btn-back:hover {
+    background: rgba(220,38,38,.16);
+    border-color: rgba(220,38,38,.30);
+    transform: translateY(-2px);
+}
+.movie-title {
+    font-size: clamp(1.6rem,4vw,3.35rem);
+    line-height: 1.1; font-weight: 900;
+    max-width: 980px;
+    text-shadow: 0 10px 25px rgba(0,0,0,.55);
+}
+.movie-badges { display: flex; flex-wrap: wrap; gap: 10px; }
+.movie-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 999px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.10);
+    color: var(--text-light); font-size: .85rem; font-weight: 800;
+    backdrop-filter: blur(8px);
+}
+.movie-badge.accent { background:rgba(220,38,38,.15); border-color:rgba(220,38,38,.30); color:#f87171; }
+.movie-badge.warn   { background:rgba(255,193,7,.12);  border-color:rgba(255,193,7,.22);  color:#ffc107; }
+.movie-badge.soft   { color:#e5e7eb; }
+.movie-summary {
+    max-width: 760px; color: rgba(255,255,255,.78);
+    line-height: 1.7; font-size: 1rem;
 }
 
-.pricing-card.high {
-    border-left: 1px solid rgba(255,255,255,0.05);
+/* ---- GRID ---- */
+.movie-grid {
+    display: grid;
+    grid-template-columns: minmax(0,1.45fr) minmax(280px,0.75fr);
+    gap: 20px; align-items: start;
 }
-
-.plan-name {
-    font-size: 1.8rem;
-    font-weight: 900;
-    margin-bottom: 10px;
+.player-panel, .side-panel, .episodes-box, .movie-info {
+    background: rgba(17,17,24,.88);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: 0 18px 42px rgba(0,0,0,.42);
+    overflow: hidden;
 }
+.player-panel { margin-top: 0; }
+.side-panel   { margin-top: 0; }
+.episodes-box { border-radius: 0; box-shadow: none; border: none; border-bottom: 1px solid var(--glass-border); }
+.movie-info   { border-radius: 0; box-shadow: none; border: none; }
 
-.plan-price {
-    font-size: 3.5rem;
-    font-weight: 900;
-    color: #ff3366;
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 5px;
-}
-
-.plan-price span {
-    font-size: 1rem;
-    color: var(--text-dim);
-    font-weight: 600;
-}
-
-.plan-cyc {
-    font-size: 0.9rem;
-    color: var(--text-dim);
-    margin-bottom: 30px;
-}
-
-.plan-features {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 40px 0;
+/* ---- VIDEO SECTION ---- */
+.video-container {
     width: 100%;
-    flex: 1;
-}
-
-.plan-features li {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin-bottom: 18px;
-    color: white;
-}
-
-.plan-features li i {
-    color: #4ade80;
-    font-size: 1.2rem;
-}
-
-.plan-btn {
-    width: 100%;
+    position: relative;
     padding: 16px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 900;
-    text-align: center;
-    text-transform: uppercase;
+}
+
+/* =====================================================================
+   CUSTOM PLAYER — .bm-player
+===================================================================== */
+.bm-player {
+    width: 100%; border-radius: 14px; overflow: hidden;
+    background: #000; position: relative;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 48px rgba(0,0,0,.7);
+    user-select: none; -webkit-user-select: none;
     cursor: pointer;
-    transition: 0.3s;
-    border: none;
+    touch-action: manipulation;
+}
+.bm-player video {
+    width: 100%; display: block;
+    aspect-ratio: 16/9; background: #000;
+    outline: none; pointer-events: none;
+}
+
+/* -- TOP BAR -- */
+.bm-top-bar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 30;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: linear-gradient(to bottom, rgba(0,0,0,.85) 0%, transparent 100%);
+    opacity: 0; pointer-events: none;
+    transition: opacity .22s ease;
+}
+.bm-player.show-controls .bm-top-bar { opacity: 1; pointer-events: auto; }
+
+.bm-back-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,.5); backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,.12); color: #fff;
+    cursor: pointer; flex-shrink: 0; transition: .2s;
+    -webkit-appearance: none; appearance: none;
     text-decoration: none;
+}
+.bm-back-link:hover { background: rgba(220,38,38,.35); border-color: rgba(220,38,38,.5); }
+.bm-back-link svg { width: 18px; height: 18px; fill: currentColor; pointer-events: none; }
+
+.bm-title-bar {
+    flex: 1; font-size: .88rem; font-weight: 800; color: #fff;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    text-shadow: 0 1px 4px rgba(0,0,0,.8);
+}
+
+/* -- DOUBLE-TAP ZONES -- */
+.bm-tap-zone {
+    position: absolute; top: 0; bottom: 60px; width: 36%;
+    z-index: 20;
+    display: flex; align-items: center;
+    pointer-events: none;
+}
+.bm-tap-left  { left:  0; justify-content: flex-start; padding-left: 14px; }
+.bm-tap-right { right: 0; justify-content: flex-end;   padding-right: 14px; }
+.bm-tap-ripple {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    background: rgba(0,0,0,.55); backdrop-filter: blur(8px);
+    border-radius: 40px; padding: 9px 15px;
+    color: #fff; font-size: .75rem; font-weight: 800;
+    opacity: 0; transform: scale(.82);
+    transition: opacity .16s ease, transform .16s ease;
+    pointer-events: none; white-space: nowrap;
+}
+.bm-tap-ripple.active { opacity: 1; transform: scale(1); }
+.bm-tap-ripple svg { width: 22px; height: 22px; fill: #ef4444; }
+
+/* -- CONTROLS (bottom) -- */
+.bm-controls {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 0 12px 10px;
+    background: linear-gradient(to top, rgba(0,0,0,.94) 0%, rgba(0,0,0,.45) 65%, transparent 100%);
+    display: flex; flex-direction: column; gap: 5px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .22s ease; z-index: 25;
+}
+.bm-player.show-controls .bm-controls { opacity: 1; pointer-events: auto; }
+
+/* -- PROGRESS — o'rtacha hajm -- */
+.bm-progress-wrap {
+    width: 100%; height: 4px; border-radius: 3px;
+    background: rgba(255,255,255,.22); cursor: pointer;
+    position: relative; transition: height .14s;
+    padding: 5px 0; margin: -5px 0;
+    box-sizing: content-box;
+}
+.bm-progress-wrap:hover,
+.bm-progress-wrap:active { height: 6px; }
+.bm-progress-buf {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: rgba(255,255,255,.18); border-radius: inherit; pointer-events: none;
+}
+.bm-progress-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg,#b91c1c,#ef4444);
+    border-radius: inherit; pointer-events: none;
+    transition: width .07s linear;
+}
+.bm-progress-thumb {
+    position: absolute; top: 50%;
+    transform: translate(-50%,-50%) scale(0);
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,.7);
+    pointer-events: none; transition: transform .14s;
+}
+.bm-progress-wrap:hover .bm-progress-thumb,
+.bm-progress-wrap:active .bm-progress-thumb { transform: translate(-50%,-50%) scale(1); }
+
+/* -- BOTTOM ROW -- */
+.bm-bottom-row { display: flex; align-items: center; gap: 6px; }
+.bm-btn {
+    background: none; border: none; color: #fff; cursor: pointer;
+    padding: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 6px; transition: background .17s, color .17s; flex-shrink: 0;
+    min-width: 36px; min-height: 36px;
+}
+.bm-btn:hover  { background: rgba(239,68,68,.2); color: #f87171; }
+.bm-btn:active { background: rgba(239,68,68,.35); }
+.bm-btn svg { width: 22px; height: 22px; fill: currentColor; pointer-events: none; }
+.bm-time {
+    font-size: .77rem; color: rgba(255,255,255,.88); font-weight: 700;
+    letter-spacing: .03em; white-space: nowrap; flex-shrink: 0;
+}
+.bm-spacer { flex: 1; }
+.bm-vol-wrap { display: flex; align-items: center; gap: 5px; }
+.bm-vol-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 68px; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,.22); outline: none; cursor: pointer;
+}
+.bm-vol-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px; height: 13px; border-radius: 50%;
+    background: #ef4444; cursor: pointer;
+    box-shadow: 0 0 5px rgba(239,68,68,.6);
+}
+.bm-vol-slider::-moz-range-thumb {
+    width: 13px; height: 13px; border: none;
+    border-radius: 50%; background: #ef4444; cursor: pointer;
+}
+.bm-quality-btn {
+    font-size: .7rem; font-weight: 900; padding: 3px 8px; border-radius: 6px;
+    background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.35);
+    color: #f87171; cursor: default; letter-spacing: .04em; white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* -- SPEED BUTTON -- */
+.bm-speed-btn {
+    font-size: .72rem; font-weight: 900; padding: 4px 9px; border-radius: 6px;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+    color: #fff; cursor: pointer; letter-spacing: .04em; white-space: nowrap;
+    flex-shrink: 0; transition: background .18s, border-color .18s, color .18s;
+    min-height: 30px;
+}
+.bm-speed-btn:hover { background: rgba(239,68,68,.2); border-color: rgba(239,68,68,.4); color: #f87171; }
+
+/* -- BIG CENTER PLAY -- */
+.bm-big-play {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 15;
+}
+.bm-player.paused .bm-big-play { opacity: 1; }
+.bm-big-play-icon {
+    width: 70px; height: 70px; border-radius: 50%;
+    background: rgba(180,20,20,.82); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 6px rgba(239,68,68,.2), 0 8px 32px rgba(0,0,0,.55);
+    transition: transform .18s;
+}
+.bm-big-play-icon svg { width: 30px; height: 30px; fill: #fff; margin-left: 4px; pointer-events: none; }
+
+/* -- SPINNER -- */
+.bm-spinner {
+    position: absolute; inset: 0;
+    display: none; align-items: center; justify-content: center; z-index: 12;
+}
+.bm-player.loading .bm-spinner { display: flex; }
+.bm-spinner-ring {
+    width: 46px; height: 46px;
+    border: 3px solid rgba(255,255,255,.08);
+    border-top-color: #ef4444; border-radius: 50%;
+    animation: bm-spin .8s linear infinite;
+}
+@keyframes bm-spin { to { transform: rotate(360deg); } }
+
+/* -- FULLSCREEN -- */
+.bm-player:-webkit-full-screen { border-radius: 0 !important; }
+.bm-player:-webkit-full-screen video { height: 100vh !important; aspect-ratio: unset !important; object-fit: contain !important; }
+.bm-player:fullscreen { border-radius: 0 !important; }
+.bm-player:fullscreen video { height: 100vh !important; aspect-ratio: unset !important; object-fit: contain !important; }
+.bm-player:-moz-full-screen { border-radius: 0 !important; }
+.bm-player:-moz-full-screen video { height: 100vh !important; aspect-ratio: unset !important; object-fit: contain !important; }
+.bm-player:-ms-fullscreen { border-radius: 0 !important; }
+.bm-player:-ms-fullscreen video { height: 100vh !important; aspect-ratio: unset !important; object-fit: contain !important; }
+
+:-webkit-full-screen .bm-controls,
+:-webkit-full-screen .bm-top-bar { display: flex !important; }
+:fullscreen .bm-controls,
+:fullscreen .bm-top-bar { display: flex !important; }
+
+/* -- IFRAME / BUNNY -- */
+.bunny-player-wrapper {
+    position: relative; width: 100%; aspect-ratio: 16/9;
+    background: #000; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 48px rgba(0,0,0,.7);
+}
+.bunny-player-wrapper iframe { width: 100%; height: 100%; border: none; display: block; }
+.fullscreen-btn {
+    position: absolute; top: 12px; right: 12px; z-index: 5;
+    width: 42px; height: 42px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(10,10,15,.72);
+    color: #fff; font-size: 1.1rem; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px); transition: .25s ease;
+}
+.fullscreen-btn:hover { background: rgba(220,38,38,.25); border-color: rgba(220,38,38,.45); }
+
+/* =====================================================================
+   EPISODES
+===================================================================== */
+.episodes-box { width: 100%; padding: 18px; }
+.episodes-box h4 { margin-bottom: 14px; font-size: 1.1rem; font-weight: 900; }
+.episode-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+.episode-btn {
+    flex: 1 1 110px; min-width: 88px;
+    padding: 11px 12px;
+    background: rgba(255,255,255,.05); color: white;
+    border: 1px solid rgba(255,255,255,.08); border-radius: 12px;
+    cursor: pointer; font-weight: 800; text-align: center;
+    transition: all .25s ease; font-size: .9rem;
+    min-height: 44px;
+}
+.episode-btn:hover,
+.episode-btn[aria-pressed="true"] {
+    background: #dc2626; border-color: #dc2626; color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(220,38,38,.3);
+}
+.telegram-download-wrapper { width: 100%; display: flex; justify-content: center; margin: 20px 0; padding: 0 16px; }
+.telegram-download-btn {
+    background: linear-gradient(45deg,#0088cc,#00aced);
+    color: #fff; padding: 14px 32px; font-size: 1rem; font-weight: 800;
+    border-radius: 50px; text-decoration: none; transition: .3s ease;
+    box-shadow: 0 6px 20px rgba(0,136,204,.4);
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; max-width: 340px; justify-content: center;
+}
+.telegram-download-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,136,204,.6); }
+
+.movie-info { width: 100%; padding: 18px; line-height: 1.7; }
+.movie-info h4 { margin-bottom: 10px; font-size: 1.05rem; font-weight: 900; color: #f87171; }
+.movie-info p  { font-size: .95rem; color: var(--text-dim); }
+
+/* =====================================================================
+   RELATED CARDS — 1 qator, 10 ta, gorizontal scroll, chapga/unga strelkalar
+===================================================================== */
+.related-section {
+    background: rgba(17,17,24,.88);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px; padding: 22px;
+    box-shadow: 0 18px 42px rgba(0,0,0,.42);
+}
+.related-section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; gap: 12px;
+}
+.related-section-header h3 { font-size: 1.2rem; font-weight: 900; margin: 0; }
+.related-section-header h3 span { color: #f87171; }
+.related-nav-btns { display: flex; gap: 8px; flex-shrink: 0; }
+.related-nav-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+    color: #fff; cursor: pointer; font-size: 1rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: .2s; flex-shrink: 0;
+}
+.related-nav-btn:hover { background: rgba(220,38,38,.25); border-color: rgba(220,38,38,.4); }
+
+/* Scroll container */
+.related-scroll {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    cursor: grab;
+}
+.related-scroll:active { cursor: grabbing; }
+.related-scroll::-webkit-scrollbar { display: none; }
+
+/* 10 ta card, 1 qatorda */
+.related-card-link {
+    text-decoration: none; color: inherit;
+    display: flex; flex-direction: column; gap: 7px;
+    flex: 0 0 140px;
+    scroll-snap-align: start;
+    transition: transform .2s;
+}
+.related-card-link:hover { transform: translateY(-3px); }
+
+.related-card-img {
+    width: 100%; aspect-ratio: 2/3; border-radius: 10px; overflow: hidden;
+    position: relative; background: var(--bg-surface);
+    transition: box-shadow .3s;
+}
+.related-card-link:hover .related-card-img { box-shadow: 0 10px 24px rgba(0,0,0,.7); }
+.related-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; display: block; }
+.related-card-link:hover .related-card-img img { transform: scale(1.06); }
+.related-card-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top,rgba(13,13,18,.88) 0%,transparent 45%);
+    pointer-events: none;
+}
+.related-card-badge {
+    position: absolute; top: 6px; left: 6px; z-index: 2;
+    background: rgba(220,38,38,.85); color: #fff;
+    font-size: .6rem; font-weight: 900; padding: 2px 6px; border-radius: 4px;
+    display: flex; align-items: center; gap: 2px; backdrop-filter: blur(4px);
+}
+.related-card-info h4 {
+    font-size: .82rem; font-weight: 800; color: var(--text-light);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    transition: color .3s;
+}
+.related-card-link:hover .related-card-info h4 { color: #f87171; }
+.related-card-info p {
+    font-size: .7rem; color: var(--text-dim); margin-top: 1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-.btn-current {
-    background: #ff3366;
-    color: white;
-}
-
-.btn-monthly {
-    background: #ff3366;
-    color: white;
-}
-
-.btn-yearly {
-    background: transparent;
-}
-
-
-#payment-form-section {
-    display: none;
-    max-width: 600px;
-    margin: 0 auto;
-    background: var(--glass-bg);
+/* =====================================================================
+   COMMENTS — maksimal 5 ta, batafsil tugma
+===================================================================== */
+.comments-section {
+    background: rgba(17,17,24,.88);
     border: 1px solid var(--glass-border);
-    padding: 30px;
-    border-radius: 12px;
-    text-align: center;
+    border-radius: 20px; padding: 24px;
+    box-shadow: 0 18px 42px rgba(0,0,0,.42);
+    margin-top: 0;
+}
+.comments-section h3 { font-size: 1.3rem; font-weight: 900; margin-bottom: 24px; }
+.comment-form { display: flex; gap: 14px; margin-bottom: 28px; }
+.comment-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    object-fit: cover; background: #333; flex-shrink: 0;
+}
+.comment-input-wrapper { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+.comment-input {
+    width: 100%; background: transparent; border: none;
+    border-bottom: 1px solid rgba(255,255,255,.2); color: white;
+    font-size: 1rem; padding: 8px 0; resize: none; outline: none; transition: .3s;
+    font-family: inherit;
+}
+.comment-input:focus { border-bottom-color: #ef4444; }
+.comment-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.comment-btn {
+    background: #dc2626; color: #fff; border: none;
+    padding: 9px 22px; border-radius: 50px;
+    font-weight: 800; cursor: pointer; transition: .2s;
+    min-height: 40px;
+}
+.comment-btn:disabled { background: rgba(255,255,255,.1); color: rgba(255,255,255,.3); cursor: not-allowed; }
+.comment-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(220,38,38,.4); }
+.comments-list { display: flex; flex-direction: column; gap: 22px; }
+.comment-item { display: flex; gap: 14px; }
+.comment-body { flex-grow: 1; min-width: 0; }
+.comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.comment-username { font-weight: 800; font-size: .95rem; }
+.vip-badge-sm, .admin-badge-sm {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: .68rem; padding: 2px 6px; border-radius: 999px; font-weight: 800;
+}
+.vip-badge-sm   { background: rgba(244,63,94,.15);  color: #f43f5e; border: 1px solid rgba(244,63,94,.3); }
+.admin-badge-sm { background: rgba(74,222,128,.15); color: #4ade80; border: 1px solid rgba(74,222,128,.3); }
+.comment-time { color: var(--text-dim); font-size: .82rem; }
+.comment-text { color: rgba(255,255,255,.85); font-size: .95rem; line-height: 1.55; word-break: break-word; }
+
+/* Batafsil tugma */
+.comments-show-more {
+    display: flex; justify-content: center; margin-top: 20px;
+}
+.comments-show-more-btn {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+    color: #e5e7eb; padding: 10px 28px; border-radius: 50px;
+    font-weight: 800; font-size: .9rem; cursor: pointer;
+    transition: .2s; display: flex; align-items: center; gap: 8px;
+    min-height: 42px;
+}
+.comments-show-more-btn:hover { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.3); color: #f87171; }
+
+/* =====================================================================
+   RESPONSIVE
+===================================================================== */
+@media (max-width: 1024px) {
+    .movie-grid { grid-template-columns: 1fr; }
+    .side-panel { display: grid; grid-template-columns: 1fr 1fr; }
+    .episodes-box { border-right: 1px solid var(--glass-border); border-bottom: none; }
+    .movie-info   { border-left: none; }
+    .related-card-link { flex: 0 0 130px; }
 }
 
-#payment-form-section.active {
-    display: block;
-    animation: fadeIn 0.4s ease forwards;
+@media (max-width: 768px) {
+    .movie-page { padding: 12px 4% 24px; gap: 14px; }
+    .movie-hero { min-height: 240px; border-radius: 18px; }
+    .movie-hero-content { min-height: 240px; padding: 18px; gap: 10px; }
+    .movie-title { font-size: 1.55rem; }
+    .movie-summary { font-size: .92rem; }
+
+    .side-panel { grid-template-columns: 1fr; }
+    .episodes-box { border-right: none; border-bottom: 1px solid var(--glass-border); }
+
+    .episode-btn { flex: 1 1 30%; font-size: .85rem; }
+    .video-container { padding: 10px; }
+
+    .bm-progress-wrap { height: 4px; }
+    .bm-progress-wrap:hover,
+    .bm-progress-wrap:active { height: 7px; }
+    .bm-progress-thumb { width: 14px; height: 14px; }
+    .bm-vol-slider { width: 55px; }
+
+    .related-card-link { flex: 0 0 120px; }
+    .comments-section { padding: 18px; }
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+@media (max-width: 520px) {
+    .movie-hero { min-height: 280px; border-radius: 14px; }
+    .movie-hero-content { min-height: 280px; padding: 42px 16px 18px; justify-content: space-between; }
+    .movie-title { font-size: 1.3rem; line-height: 1.25; }
+    .btn-back { padding: 7px 12px; font-size: .78rem; }
+    .movie-badge { font-size: .68rem; padding: 6px 9px; }
+    .episode-btn { flex: 1 1 44%; font-size: .82rem; }
+    .episodes-box, .movie-info { padding: 14px; }
 
-.card-num {
-    font-size: 1.4rem;
-    color: #ff3366;
-    font-weight: 900;
-    letter-spacing: 2px;
-    margin: 15px 0;
-    padding: 15px;
-    background: rgba(0,0,0,0.3);
-    border-radius: 8px;
-}
+    .bm-vol-wrap  { display: none; }
+    .bm-quality-btn { display: none; }
 
-.file-input {
-    margin: 20px 0;
-    width: 100%;
-    padding: 10px;
-    background: rgba(0,0,0,0.3);
-    border-radius: 8px;
-    border: 1px solid var(--glass-border);
-    color: white;
-}
+    .video-container { padding: 0; }
+    .bm-player { border-radius: 0; }
+    .bm-progress-wrap { height: 4px; }
+    .bm-progress-wrap:hover,
+    .bm-progress-wrap:active { height: 8px; }
+    .bm-progress-thumb { width: 16px; height: 16px; }
 
-.btn-submit {
-    background: #ff3366;
-    color: white;
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 900;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 10px 20px rgba(255, 51, 102, 0.3);
-}
+    .comment-avatar { width: 34px; height: 34px; }
+    .comment-form { gap: 10px; }
 
-@media (max-width: 900px) {
-    .pricing-cards { flex-direction: column; align-items: center; gap: 20px; }
-    .pricing-card { max-width: 100%; width: 100%; border: 1px solid rgba(255,255,255,0.05) !important; border-radius: 16px; }
+    .related-card-link { flex: 0 0 110px; }
+    .related-nav-btns { display: none; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
+<script>const BM_MOVIE_TITLE = "{{ movie.title|escapejs }}";</script>
+
 <main class="main-content">
-    <a href="javascript:history.back()" style="display:inline-flex; align-items:center; gap:5px; margin-bottom: 20px; color: var(--accent); text-decoration: none; font-weight: 800; background: rgba(0,243,255,0.1); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(0,243,255,0.2); transition: 0.3s;" onmouseover="this.style.background='rgba(0,243,255,0.2)'" onmouseout="this.style.background='rgba(0,243,255,0.1)'"><i class='bx bx-arrow-back'></i> Orqaga</a>
-    <div class="premium-header">
-        <h1>Vip Abonement</h1>
-        <p>Premium animelarni cheklovlarsiz tomosha qiling.</p>
-    </div>
+<div class="movie-page">
 
-    <div class="premium-wrapper">
-        <h1 class="premium-title">Premium Obuna</h1>
-        <p class="premium-subtitle">Reklamalarsiz, eng yuqori sifatda va cheklovlarsiz tomosha qiling!</p>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div style="background: rgba(0, 243, 255, 0.1); color: var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 800; border: 1px solid var(--accent);">
-                    {{ message }}
-                </div>
-            {% endfor %}
+  <!-- ================= HERO ================= -->
+  <section class="movie-hero">
+    <div class="movie-hero-bg"
+         style="background-image:url('{% if movie.image %}{{ movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');"></div>
+    <div class="movie-hero-overlay"></div>
+    <div class="movie-hero-content">
+      <div class="hero-top">
+        <a href="{% url 'home' %}" class="btn-back">⬅ Orqaga</a>
+        <div class="movie-badges">
+          {% if movie.category %}<span class="movie-badge accent">{{ movie.category.name }}</span>{% endif %}
+          {% if movie.episodes.count %}<span class="movie-badge warn">{{ movie.episodes.count }} qism</span>{% endif %}
+          <span class="movie-badge soft">{{ movie.created_at|date:"Y" }}</span>
+        </div>
+      </div>
+      <h2 class="movie-title">{{ movie.title }}</h2>
+      <div style="display:flex;gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap;">
+        <span style="padding:4px 10px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);border-radius:8px;font-weight:800;font-size:.82rem;color:#fff;">
+          Sifat: {{ max_quality }} gacha
+        </span>
+        {% if show_ads %}
+        <span style="padding:4px 10px;background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.4);border-radius:8px;font-weight:800;font-size:.82rem;color:#f87171;">
+          Reklamalar mavjud
+        </span>
         {% endif %}
+      </div>
+      <p class="movie-summary">{{ movie.description|default:"Bu anime uchun izoh kiritilmagan." }}</p>
+    </div>
+  </section>
 
-        {% if vip_data and vip_data.vip_active %}
-            <div style="background: rgba(255, 193, 7, 0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 193, 7, 0.3); margin-bottom: 40px;">
-                <h3 style="color: #ffc107; font-weight: 900; font-size: 1.5rem;"><i class='bx bxs-crown'></i> Sizning hisobingizda Premium faol!</h3>
-                <p style="margin-top: 10px; font-size: 1.1rem; color: #fff;">Amal qilish muddati: <strong>{{ vip_data.vip_expire|date:"d.m.Y H:i" }}</strong> gacha.</p>
-            </div>
+  <!-- ================= PLAYER + SIDE ================= -->
+  <div class="movie-grid">
+
+    <!-- PLAYER -->
+    <section class="player-panel">
+      <div class="video-section">
+
+        {% if not has_access %}
+        <div style="padding:44px 24px;text-align:center;color:white;">
+          <i class='bx bx-lock-alt' style="font-size:3.5rem;color:#ffc107;margin-bottom:12px;display:block;"></i>
+          <h3 style="font-size:1.4rem;font-weight:900;margin-bottom:10px;">PREMIUM KONTEKT</h3>
+          <p style="color:var(--text-dim);margin-bottom:20px;">Ushbu animeni ko'rish uchun Premium obuna bo'lishi kerak.</p>
+          <a href="{% url 'premium_page' %}" class="btn-back"
+             style="background:#dc2626;color:white;border-color:#dc2626;display:inline-flex;">
+            Obuna bo'lish
+          </a>
+        </div>
+
         {% else %}
+        {% with first_episode=movie.episodes.first %}
+        <div class="video-container" id="video-container">
 
-        <div class="pricing-cards">
-            <!-- BEPUL -->
-            <div class="pricing-card">
-                <div class="plan-name">Bepul</div>
-                <div class="plan-price">0 <span>so'm</span></div>
-                <div class="plan-cyc">Doim bepul</div>
-
-                <ul class="plan-features">
-                    <li><i class='bx bx-check'></i> Asosiy animelarga kirish</li>
-                    <li><i class='bx bx-check'></i> SD sifat (480p)</li>
-                    <li><i class='bx bx-check'></i> Reklama bilan ko'rish</li>
-                    <li><i class='bx bx-check'></i> Bir qurilmada ko'rish</li>
-                    <li><i class='bx bx-check'></i> Asosiy qo'llab-quvvatlash</li>
-                </ul>
-
-                <button class="plan-btn btn-current">HOZIRGI REJANGIZ</button>
+          {% if movie.video_file %}
+            <div class="bm-player paused" id="bm-player">
+              <video id="video-player" playsinline webkit-playsinline preload="metadata">
+                <source src="{{ movie.video_file.url }}">
+              </video>
             </div>
 
-            <!-- OYLIK -->
-            <div class="pricing-card mid">
-                <div class="plan-name">Oylik</div>
-                <div class="plan-price">10,000 <span>so'm</span></div>
-                <div class="plan-cyc">Har oy</div>
+          {% elif movie.video_url %}
+            {% if "mediadelivery.net" in movie.video_url or "iframe" in movie.video_url %}
+              <div class="bunny-player-wrapper">
+                <button type="button" class="fullscreen-btn" id="fullscreen-toggle">⛶</button>
+                <iframe id="iframe-player"
+                  src="{{ movie.video_url }}?autoplay=false&loop=false&muted=false&responsive=true"
+                  allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen"
+                  allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
+              </div>
+            {% else %}
+              <div class="bm-player paused" id="bm-player">
+                <video id="video-player" playsinline webkit-playsinline preload="metadata">
+                  <source src="{{ movie.video_url }}" type="video/mp4">
+                </video>
+              </div>
+            {% endif %}
 
-                <ul class="plan-features">
-                    <li><i class='bx bx-check'></i> Barcha animelarga kirish</li>
-                    <li><i class='bx bx-check'></i> Full HD sifat (1080p)</li>
-                    <li><i class='bx bx-check'></i> Reklamasiz ko'rish</li>
-                    <li><i class='bx bx-check'></i> 3 qurilmada ko'rish</li>
-                    <li><i class='bx bx-check'></i> Offline yuklab olish</li>
-                    <li><i class='bx bx-check'></i> Eksklyuziv kontent</li>
-                    <li><i class='bx bx-check'></i> 24/7 qo'llab-quvvatlash</li>
-                </ul>
-
-                <button class="plan-btn btn-monthly" onclick="showPaymentForm('1_month', '10,000 so\'m')">7 KUN BEPUL SINAB KO'RING</button>
+          {% elif first_episode and first_episode.video_file %}
+            <div class="bm-player paused" id="bm-player">
+              <video id="video-player" playsinline webkit-playsinline preload="metadata">
+                <source src="{{ first_episode.video_file.url }}">
+              </video>
             </div>
 
-            <!-- YILLIK -->
-            <div class="pricing-card high">
-                <div class="plan-name">Yillik</div>
-                <div class="plan-price">50,000 <span>so'm</span></div>
-                <div class="plan-cyc">Yiliga (2 oy bepul!)</div>
+          {% elif first_episode and first_episode.video_url %}
+            {% if "mediadelivery.net" in first_episode.video_url or "iframe" in first_episode.video_url %}
+              <div class="bunny-player-wrapper">
+                <button type="button" class="fullscreen-btn" id="fullscreen-toggle">⛶</button>
+                <iframe id="iframe-player"
+                  src="{{ first_episode.video_url }}?autoplay=false&loop=false&muted=false&responsive=true"
+                  allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen"
+                  allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
+              </div>
+            {% else %}
+              <div class="bm-player paused" id="bm-player">
+                <video id="video-player" playsinline webkit-playsinline preload="metadata">
+                  <source src="{{ first_episode.video_url }}" type="video/mp4">
+                </video>
+              </div>
+            {% endif %}
 
-                <ul class="plan-features">
-                    <li><i class='bx bx-check'></i> Barcha animelarga kirish</li>
-                    <li><i class='bx bx-check'></i> 4K Ultra HD sifat</li>
-                    <li><i class='bx bx-check'></i> Reklamasiz ko'rish</li>
-                    <li><i class='bx bx-check'></i> 5 qurilmada ko'rish</li>
-                    <li><i class='bx bx-check'></i> Offline yuklab olish</li>
-                    <li><i class='bx bx-check'></i> Eksklyuziv kontent</li>
-                    <li><i class='bx bx-check'></i> Premium badgelari</li>
-                    <li><i class='bx bx-check'></i> Erta kirish yangi qismlarga</li>
-                    <li><i class='bx bx-check'></i> VIP qo'llab-quvvatlash</li>
-                </ul>
+          {% else %}
+            <p style="text-align:center;color:var(--text-dim);padding:30px 20px;">
+              Bu qism uchun video manbasi yuklanmagan.
+            </p>
+          {% endif %}
 
-                <button class="plan-btn btn-yearly" style="border: 2px solid #ff3366; color: #ff3366;" onclick="showPaymentForm('1_year', '50,000 so\'m')">YILLIK OBUNANI TANLASH</button>
-            </div>
         </div>
-
-        <div id="payment-form-section">
-            <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; color: var(--accent);">To'lovni Amalga Oshirish</h3>
-            <p style="color: var(--text-light); font-size: 1.1rem;">Tanlangan ta'rif: <strong id="selected-plan-text" style="color:#ff3366;"></strong></p>
-
-            <p style="margin-top: 20px; font-size: 0.95rem; color: var(--text-dim);">Quyidagi karta raqamiga to'lov qiling va chek skrinshotini yuklang:</p>
-
-            <div class="card-num" id="cardNumberToCopy">
-                https://t.me/ani_best_uzb_anime
-                <i class='bx bx-copy' style="cursor: pointer; margin-left: 10px; color: var(--text-dim);" onclick="copyCardInfo()" title="Nusxalash"></i>
-            </div>
-
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="hidden" name="plan" id="hidden-plan-input">
-
-                <label style="display: block; text-align: left; font-weight: 700; color: var(--text-light); margin-bottom: 5px;">To'lov cheki (skrinshot) *</label>
-                <input type="file" name="receipt_image" class="file-input" accept="image/*" required>
-
-                <button type="submit" class="btn-submit">Chekni yuborish va tasdiqlash</button>
-            </form>
-        </div>
-
+        {% endwith %}
         {% endif %}
+
+        {% if movie.telegram_link %}
+          {% if can_download %}
+          <div class="telegram-download-wrapper">
+            <a href="{{ movie.telegram_link }}" target="_blank" rel="noopener"
+               class="telegram-download-btn">
+              📥 Telegramdan yuklab olish
+            </a>
+          </div>
+          {% else %}
+          <div style="margin:16px 16px;padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;text-align:center;">
+            <i class='bx bxs-lock-alt' style="color:#ffc107;font-size:1.4rem;"></i>
+            <p style="margin:6px 0 0;font-size:.9rem;color:var(--text-dim);">
+              Offline yuklab olish uchun
+              <a href="{% url 'premium_page' %}" style="color:#f87171;text-decoration:none;font-weight:700;">Premium</a>
+              obuna oling.
+            </p>
+          </div>
+          {% endif %}
+        {% endif %}
+
+      </div><!-- /video-section -->
+    </section><!-- /player-panel -->
+
+    <!-- SIDEBAR -->
+    <aside class="side-panel">
+      {% if movie.episodes.all %}
+      <div class="episodes-box">
+        <h4>Qismlar</h4>
+        <div class="episode-buttons">
+          {% for episode in movie.episodes.all %}
+            {% if episode.video_file %}
+              <button class="episode-btn"
+                aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                data-video-src="{{ episode.video_file.url }}"
+                data-description="{{ episode.description|default:''|striptags|escape }}">
+                {{ forloop.counter }}-qism
+              </button>
+            {% elif episode.video_url %}
+              <button class="episode-btn"
+                aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                data-video-src="{{ episode.video_url }}"
+                data-description="{{ episode.description|default:''|striptags|escape }}">
+                {{ forloop.counter }}-qism
+              </button>
+            {% else %}
+              <button class="episode-btn"
+                aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                data-video-src=""
+                data-description="{{ episode.description|default:''|striptags|escape }}">
+                {{ forloop.counter }}-qism
+              </button>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="movie-info">
+        <h4>Qism haqida</h4>
+        {% with first_episode=movie.episodes.first %}
+        <p id="episode-description">
+          {{ first_episode.description|default:"Bu qism uchun izoh kiritilmagan." }}
+        </p>
+        {% endwith %}
+      </div>
+    </aside>
+
+  </div><!-- /movie-grid -->
+
+  <!-- ================= COMMENTS — max 5 ta, batafsil tugma ================= -->
+  <section class="comments-section" id="comments">
+    <h3>Izohlar ({{ comments.count|default:"0" }})</h3>
+
+    {% if request.user.is_authenticated %}
+    <form class="comment-form" method="POST" action="{% url 'movie_detail' movie.id %}#comments">
+      {% csrf_token %}
+      <img src="{% if request.user.avatar %}{{ request.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
+           alt="Avatar" class="comment-avatar">
+      <div class="comment-input-wrapper">
+        <textarea name="comment" class="comment-input" rows="1"
+                  placeholder="Fikr bildiring..." required
+                  oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
+        <div class="comment-actions">
+          <button type="submit" class="comment-btn">Izoh qoldirish</button>
+        </div>
+      </div>
+    </form>
+    {% else %}
+    <div style="text-align:center;padding:20px;background:rgba(255,255,255,.05);border-radius:12px;margin-bottom:28px;">
+      <p style="color:var(--text-dim);margin-bottom:12px;">Izoh qoldirish uchun tizimga kiring.</p>
+      <a href="{% url 'login' %}" class="btn-back"
+         style="background:#dc2626;color:#fff;border:none;display:inline-flex;">Kirish</a>
     </div>
+    {% endif %}
+
+    <div class="comments-list" id="comments-list">
+      {% for comment in comments %}
+      <div class="comment-item" data-comment-index="{{ forloop.counter0 }}" {% if forloop.counter > 5 %}style="display:none;"{% endif %}>
+        <img src="{% if comment.user.avatar %}{{ comment.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
+             alt="Avatar" class="comment-avatar">
+        <div class="comment-body">
+          <div class="comment-header">
+            <span class="comment-username">{{ comment.user.username }}</span>
+            {% if comment.user.is_superuser or comment.user.is_admin_user or comment.user.is_staff %}
+              <span class="admin-badge-sm">Admin</span>
+            {% elif comment.user.active_tier == 'vip' %}
+              <span class="vip-badge-sm" style="color:#f43f5e;border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.15);">VIP</span>
+            {% elif comment.user.active_tier == 'premium' %}
+              <span class="vip-badge-sm" style="color:#fbbf24;border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.15);">Premium</span>
+            {% endif %}
+            <span class="comment-time">{{ comment.local_created_at|date:"d M Y, H:i" }}</span>
+          </div>
+          <div class="comment-text">{{ comment.text|linebreaksbr }}</div>
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align:center;color:var(--text-dim);padding:20px 0;">
+        Hali izohlar yo'q. Birinchi bo'lib fikr bildiring!
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if comments.count > 5 %}
+    <div class="comments-show-more" id="comments-show-more">
+      <button class="comments-show-more-btn" id="comments-toggle-btn" onclick="toggleAllComments()">
+        <span>📋 Batafsil ({{ comments.count }} izoh)</span>
+      </button>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- ================= RELATED — 1 qator, 10 ta, gorizontal scroll ================= -->
+  {% if random_movies %}
+  <section class="related-section">
+    <div class="related-section-header">
+      <h3>O'xshash <span>Animeler</span></h3>
+      <div class="related-nav-btns">
+        <button class="related-nav-btn" id="related-prev" aria-label="Chapga">&#8592;</button>
+        <button class="related-nav-btn" id="related-next" aria-label="O'ngga">&#8594;</button>
+      </div>
+    </div>
+    <div class="related-scroll" id="related-scroll">
+      {% for anime in random_movies %}
+      <a href="{% url 'movie_detail' anime.id %}" class="related-card-link">
+        <div class="related-card-img">
+          <div class="related-card-badge"><i class='bx bx-trending-up'></i> TOP</div>
+          <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
+               alt="{{ anime.title }}" loading="lazy">
+        </div>
+        <div class="related-card-info">
+          <h4>{{ anime.title }}</h4>
+          <p>{% if anime.category %}{{ anime.category.name }} · {% endif %}{{ anime.release_year|default:anime.created_at|date:"Y" }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div><!-- /movie-page -->
 </main>
 
+<!-- ===============================================================
+     JAVASCRIPT
+=============================================================== -->
 <script>
-    function showPaymentForm(planVal, planText) {
-        document.getElementById('payment-form-section').classList.add('active');
-        document.getElementById('hidden-plan-input').value = planVal;
-        document.getElementById('selected-plan-text').innerText = planVal === '1_month' ? 'Oylik (' + planText + ')' : 'Yillik (' + planText + ')';
-        document.getElementById('payment-form-section').scrollIntoView({behavior: 'smooth'});
+/* ---------------------------------------------------------------
+   SVG helpers
+--------------------------------------------------------------- */
+const _T = (typeof BM_MOVIE_TITLE !== 'undefined') ? BM_MOVIE_TITLE : '';
+const _Q = '{{ max_quality|escapejs }}';
+
+function svgIcon(path){ return `<svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="${path}"/></svg>`; }
+
+const SVG = {
+  back:     'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z',
+  play:     'M8 5v14l11-7z',
+  pause:    'M6 19h4V5H6v14zm8-14v14h4V5h-4z',
+  rewind:   'M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z',
+  fwd:      'M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z',
+  vol:      'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z',
+  mute:     'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z',
+  expand:   'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z',
+  collapse: 'M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z',
+};
+
+function btn(id, title, svgKey){
+  return `<button class="bm-btn" id="${id}" aria-label="${title}">${svgIcon(SVG[svgKey])}</button>`;
+}
+
+/* ---------------------------------------------------------------
+   SPEED options
+--------------------------------------------------------------- */
+const SPEEDS = [0.1, 0.5, 1, 1.5, 2];
+
+/* ---------------------------------------------------------------
+   Build inner HTML for .bm-player
+--------------------------------------------------------------- */
+function buildInner(title, quality){
+  return `
+<div class="bm-top-bar" id="bm-top-bar">
+  <button type="button" class="bm-back-link" title="Kichik ekran" id="bm-exit-fs">${svgIcon(SVG.back)}</button>
+  <span class="bm-title-bar">${title || ''}</span>
+  ${quality ? `<span class="bm-quality-btn">${quality}</span>` : ''}
+</div>
+
+<div class="bm-tap-zone bm-tap-left">
+  <div class="bm-tap-ripple" id="bm-ripple-left">
+    ${svgIcon(SVG.rewind)}
+    <span id="bm-skip-left-label">−10 son</span>
+  </div>
+</div>
+<div class="bm-tap-zone bm-tap-right">
+  <div class="bm-tap-ripple" id="bm-ripple-right">
+    ${svgIcon(SVG.fwd)}
+    <span id="bm-skip-right-label">+10 son</span>
+  </div>
+</div>
+
+<div class="bm-big-play">
+  <div class="bm-big-play-icon">${svgIcon(SVG.play)}</div>
+</div>
+<div class="bm-spinner"><div class="bm-spinner-ring"></div></div>
+
+<div class="bm-controls" id="bm-controls">
+  <div class="bm-progress-wrap" id="bm-progress">
+    <div class="bm-progress-buf"  id="bm-buf"></div>
+    <div class="bm-progress-fill" id="bm-fill" style="width:0%"></div>
+    <div class="bm-progress-thumb" id="bm-thumb" style="left:0%"></div>
+  </div>
+  <div class="bm-bottom-row">
+    ${btn('bm-play-btn','Ijro etish','play')}
+    ${btn('bm-back10','-10s','rewind')}
+    ${btn('bm-fwd10','+10s','fwd')}
+    <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
+    <div class="bm-spacer"></div>
+    <button class="bm-speed-btn" id="bm-speed-btn" title="Tezlik">1x</button>
+    <div class="bm-vol-wrap">
+      ${btn('bm-vol-btn','Ovoz','vol')}
+      <input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1">
+    </div>
+    ${btn('bm-fullscreen','Katta ekran','expand')}
+  </div>
+</div>`;
+}
+
+/* ---------------------------------------------------------------
+   Inject controls
+--------------------------------------------------------------- */
+(function injectAll(){
+  document.querySelectorAll('.bm-player').forEach(function(p){
+    const vid = p.querySelector('video');
+    if(!vid || p.querySelector('.bm-controls')) return;
+    vid.insertAdjacentHTML('afterend', buildInner(_T, _Q));
+  });
+})();
+
+/* ---------------------------------------------------------------
+   EPISODE SWITCHING
+--------------------------------------------------------------- */
+const episodeBtns      = document.querySelectorAll('.episode-btn');
+const videoContainerEl = document.getElementById('video-container');
+const episodeDescEl    = document.getElementById('episode-description');
+
+function setEpDesc(btn){
+  if(!episodeDescEl) return;
+  const d = btn ? ((btn.dataset.description || '').trim() || 'Bu qism uchun izoh kiritilmagan.') : 'Bu qism uchun izoh kiritilmagan.';
+  episodeDescEl.textContent = d;
+}
+
+function buildBmHTML(src){
+  return `<div class="bm-player paused" id="bm-player">
+    <video id="video-player" playsinline webkit-playsinline preload="metadata">
+      <source src="${src}" type="video/mp4">
+    </video>
+    ${buildInner(_T, _Q)}
+  </div>`;
+}
+
+function buildIframeHTML(src){
+  const url = src.includes('?') ? src + '&autoplay=false' : src + '?autoplay=false';
+  return `<div class="bunny-player-wrapper">
+    <button type="button" class="fullscreen-btn" id="fullscreen-toggle">⛶</button>
+    <iframe id="iframe-player" src="${url}"
+      allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen"
+      allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
+  </div>`;
+}
+
+function isIframeSrc(src){
+  return src.includes('mediadelivery.net') || src.includes('iframe');
+}
+
+episodeBtns.forEach(function(b){
+  b.addEventListener('click', function(){
+    const src = b.dataset.videoSrc || '';
+    if(!src){ return; }
+
+    if(isIframeSrc(src)){
+      videoContainerEl.innerHTML = buildIframeHTML(src);
+    } else {
+      videoContainerEl.innerHTML = buildBmHTML(src);
+      initBmPlayer();
     }
 
-    function copyCardInfo() {
-        const text = "https://t.me/ani_best_uzb_anime";
-        navigator.clipboard.writeText(text).then(() => {
-            alert("Karta raqami nusxalandi: " + text);
-        });
+    episodeBtns.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+    b.setAttribute('aria-pressed','true');
+    setEpDesc(b);
+
+    if(window.innerWidth <= 1024){
+      videoContainerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  });
+});
+if(episodeBtns.length){ setEpDesc(episodeBtns[0]); }
+
+/* ---------------------------------------------------------------
+   UTILITY
+--------------------------------------------------------------- */
+function fmtTime(s){
+  if(!isFinite(s) || isNaN(s)) return '0:00';
+  const m   = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function showRipple(el, label){
+  if(!el) return;
+  if(label){
+    const span = el.querySelector('span');
+    if(span) span.textContent = label;
+  }
+  el.classList.add('active');
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.classList.remove('active'); }, 800);
+}
+
+function isTouch(){
+  return window.matchMedia('(pointer:coarse)').matches;
+}
+
+/* ---------------------------------------------------------------
+   FULLSCREEN HELPERS
+--------------------------------------------------------------- */
+function reqFS(el){
+  if(el.requestFullscreen)              return el.requestFullscreen();
+  if(el.webkitRequestFullscreen)        return el.webkitRequestFullscreen();
+  if(el.mozRequestFullScreen)           return el.mozRequestFullScreen();
+  if(el.msRequestFullscreen)            return el.msRequestFullscreen();
+  return Promise.reject(new Error('FS not supported'));
+}
+
+function exitFS(){
+  if(document.exitFullscreen)           return document.exitFullscreen();
+  if(document.webkitExitFullscreen)     return document.webkitExitFullscreen();
+  if(document.mozCancelFullScreen)      return document.mozCancelFullScreen();
+  if(document.msExitFullscreen)         return document.msExitFullscreen();
+}
+
+function getFSElement(){
+  return document.fullscreenElement
+      || document.webkitFullscreenElement
+      || document.mozFullScreenElement
+      || document.msFullscreenElement
+      || null;
+}
+
+function lockLandscape(){
+  if(screen.orientation && screen.orientation.lock){
+    screen.orientation.lock('landscape-primary').catch(function(){});
+  }
+}
+function unlockOrientation(){
+  try {
+    if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+  } catch(e){}
+}
+
+/* ---------------------------------------------------------------
+   MAIN PLAYER INIT
+--------------------------------------------------------------- */
+function initBmPlayer(){
+  const player  = document.getElementById('bm-player');
+  const video   = document.getElementById('video-player');
+  if(!player || !video) return;
+
+  const $id = function(id){ return document.getElementById(id); };
+
+  const playBtn   = $id('bm-play-btn');
+  const back10    = $id('bm-back10');
+  const fwd10     = $id('bm-fwd10');
+  const timeEl    = $id('bm-time-display');
+  const progress  = $id('bm-progress');
+  const fill      = $id('bm-fill');
+  const thumb     = $id('bm-thumb');
+  const buf       = $id('bm-buf');
+  const volBtn    = $id('bm-vol-btn');
+  const volSlider = $id('bm-volume');
+  const fsBtn     = $id('bm-fullscreen');
+  const exitFsBtn = $id('bm-exit-fs');
+  const rippleL   = $id('bm-ripple-left');
+  const rippleR   = $id('bm-ripple-right');
+  const speedBtn  = $id('bm-speed-btn');
+
+  /* ---- Speed control ---- */
+  var currentSpeedIdx = 2; // default 1x (index 2 in [0.1,0.5,1,1.5,2])
+  if(speedBtn){
+    speedBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      currentSpeedIdx = (currentSpeedIdx + 1) % SPEEDS.length;
+      const spd = SPEEDS[currentSpeedIdx];
+      video.playbackRate = spd;
+      speedBtn.textContent = spd + 'x';
+    });
+  }
+
+  /* ---- Helpers ---- */
+  function setPlayState(playing){
+    if(playBtn) playBtn.innerHTML = svgIcon(playing ? SVG.pause : SVG.play);
+    player.classList.toggle('paused', !playing);
+  }
+
+  function togglePlay(){
+    video.paused ? video.play().catch(function(){}) : video.pause();
+  }
+
+  function updateProgress(){
+    if(!video.duration) return;
+    const pct = (video.currentTime / video.duration) * 100;
+    if(fill)  fill.style.width  = pct + '%';
+    if(thumb) thumb.style.left  = pct + '%';
+    if(timeEl) timeEl.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+    if(buf && video.buffered.length)
+      buf.style.width = (video.buffered.end(video.buffered.length - 1) / video.duration * 100) + '%';
+  }
+
+  function seekRatio(r){
+    if(!video.duration) return;
+    video.currentTime = Math.min(Math.max(r, 0), 1) * video.duration;
+    updateProgress();
+  }
+
+  /* ---- Video events ---- */
+  video.addEventListener('play',           function(){ setPlayState(true); });
+  video.addEventListener('pause',          function(){ setPlayState(false); });
+  video.addEventListener('ended',          function(){ setPlayState(false); });
+  video.addEventListener('timeupdate',     updateProgress);
+  video.addEventListener('waiting',        function(){ player.classList.add('loading'); });
+  video.addEventListener('canplay',        function(){ player.classList.remove('loading'); });
+  video.addEventListener('loadedmetadata', updateProgress);
+
+  /* ---- Play / skip buttons ---- */
+  if(playBtn) playBtn.addEventListener('click', function(e){ e.stopPropagation(); togglePlay(); });
+  if(back10)  back10.addEventListener('click',  function(e){ e.stopPropagation(); video.currentTime = Math.max(0, video.currentTime - 10); showRipple(rippleL, '−10 son'); });
+  if(fwd10)   fwd10.addEventListener('click',   function(e){ e.stopPropagation(); video.currentTime = Math.min(video.duration || Infinity, video.currentTime + 10); showRipple(rippleR, '+10 son'); });
+
+  /* ---- Progress: mouse ---- */
+  var seeking = false;
+  function seekFromMouse(e){
+    var r = progress.getBoundingClientRect();
+    seekRatio((e.clientX - r.left) / r.width);
+  }
+  if(progress){
+    progress.addEventListener('mousedown', function(e){ e.stopPropagation(); seeking = true; seekFromMouse(e); });
+    window.addEventListener('mousemove',   function(e){ if(seeking) seekFromMouse(e); });
+    window.addEventListener('mouseup',     function(){ seeking = false; });
+
+    progress.addEventListener('touchstart', function(e){
+      e.stopPropagation();
+      var r = progress.getBoundingClientRect();
+      seekRatio((e.touches[0].clientX - r.left) / r.width);
+    }, { passive: true });
+    progress.addEventListener('touchmove', function(e){
+      e.stopPropagation();
+      var r = progress.getBoundingClientRect();
+      seekRatio((e.touches[0].clientX - r.left) / r.width);
+    }, { passive: true });
+  }
+
+  /* ---- Volume ---- */
+  if(volSlider) volSlider.addEventListener('input', function(){
+    video.volume = parseFloat(volSlider.value);
+    video.muted  = video.volume === 0;
+    if(volBtn) volBtn.innerHTML = svgIcon(video.muted ? SVG.mute : SVG.vol);
+  });
+  if(volBtn) volBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    video.muted = !video.muted;
+    if(volSlider) volSlider.value = video.muted ? 0 : video.volume;
+    volBtn.innerHTML = svgIcon(video.muted ? SVG.mute : SVG.vol);
+  });
+
+  /* ---- Fullscreen ---- */
+  function enterFullscreen(){
+    if(video.webkitEnterFullscreen && !document.fullscreenEnabled && !document.webkitFullscreenEnabled){
+      try { video.webkitEnterFullscreen(); } catch(e){}
+      return;
+    }
+    reqFS(player)
+      .then(function(){ lockLandscape(); })
+      .catch(function(){
+        if(video.webkitEnterFullscreen){
+          try { video.webkitEnterFullscreen(); } catch(e){}
+        }
+      });
+  }
+
+  function exitFullscreen(){
+    unlockOrientation();
+    try { exitFS(); } catch(e){}
+  }
+
+  if(fsBtn) fsBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(getFSElement()){ exitFullscreen(); }
+    else { enterFullscreen(); }
+  });
+
+  if(exitFsBtn) exitFsBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault();
+    if(getFSElement()){ exitFullscreen(); }
+  });
+
+  function onFsChange(){
+    var inFs = !!getFSElement();
+    if(fsBtn) fsBtn.innerHTML = svgIcon(inFs ? SVG.collapse : SVG.expand);
+    if(!inFs) unlockOrientation();
+  }
+  document.addEventListener('fullscreenchange',       onFsChange);
+  document.addEventListener('webkitfullscreenchange', onFsChange);
+  document.addEventListener('mozfullscreenchange',    onFsChange);
+  document.addEventListener('MSFullscreenChange',     onFsChange);
+
+  video.addEventListener('webkitbeginfullscreen', function(){
+    if(fsBtn) fsBtn.innerHTML = svgIcon(SVG.collapse);
+  });
+  video.addEventListener('webkitendfullscreen', function(){
+    if(fsBtn) fsBtn.innerHTML = svgIcon(SVG.expand);
+    unlockOrientation();
+  });
+
+  /* ================================================================
+     CONTROLS VISIBILITY — 1 marta touch: ko'rsat, yana 1 marta: yashir
+  ================================================================ */
+  var hideTimer = null;
+
+  function showControls(ms){
+    player.classList.add('show-controls');
+    clearTimeout(hideTimer);
+    if(!isTouch() && !video.paused){
+      hideTimer = setTimeout(function(){ player.classList.remove('show-controls'); }, ms || 3000);
+    }
+  }
+  function hideControls(){
+    player.classList.remove('show-controls');
+    clearTimeout(hideTimer);
+  }
+
+  /* -- PC: mouse -- */
+  if(!isTouch()){
+    player.addEventListener('mousemove',  function(){ showControls(3000); });
+    player.addEventListener('mouseleave', function(){ clearTimeout(hideTimer); if(!video.paused) hideControls(); });
+    player.addEventListener('click', function(e){
+      if(e.target.closest('.bm-progress-wrap') ||
+         e.target.closest('.bm-btn') ||
+         e.target.closest('.bm-back-link') ||
+         e.target.closest('#bm-exit-fs') ||
+         e.target.closest('.bm-speed-btn')) return;
+      togglePlay();
+      showControls(2500);
+    });
+  }
+
+  /* ================================================================
+     MOBILE TOUCH LOGIC
+     - 1 marta tap: iconlar yo'q bo'lsa ko'rsat, bor bo'lsa yashir
+     - Markazga tap (controls ko'rinib tursa): play/pause
+     - Chap/ung zona: 2 marta tap — +10, +20, +30 qo'shib ketadi
+  ================================================================ */
+  if(isTouch()){
+    var lastTap    = 0;
+    var DTAP       = 300; // ms, double-tap oraliq
+    var leftSkip   = 10;
+    var rightSkip  = 10;
+    var resetTimer = null;
+
+    function resetSkip(){ leftSkip = 10; rightSkip = 10; }
+    function scheduleReset(){
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(resetSkip, 1800);
+    }
+
+    player.addEventListener('touchend', function(e){
+      // controls yoki tugmalar bosilsa — player logicasiga kiritma
+      if(e.target.closest('.bm-progress-wrap') ||
+         e.target.closest('.bm-btn') ||
+         e.target.closest('.bm-back-link') ||
+         e.target.closest('#bm-exit-fs') ||
+         e.target.closest('.bm-speed-btn')) return;
+
+      var now  = Date.now();
+      var t    = e.changedTouches[0];
+      var rect = player.getBoundingClientRect();
+      var xRel = (t.clientX - rect.left) / rect.width;
+      var isDbl = (now - lastTap) < DTAP;
+
+      if(isDbl){
+        // ===== DOUBLE TAP =====
+        lastTap = 0;
+        scheduleReset();
+
+        if(xRel < 0.36){
+          // Chap zona — orqaga
+          video.currentTime = Math.max(0, video.currentTime - leftSkip);
+          showRipple(rippleL, '−' + leftSkip + ' son');
+          player.classList.add('show-controls');
+          leftSkip += 10;
+        } else if(xRel > 0.64){
+          // O'ng zona — oldinga
+          video.currentTime = Math.min(video.duration || Infinity, video.currentTime + rightSkip);
+          showRipple(rippleR, '+' + rightSkip + ' son');
+          player.classList.add('show-controls');
+          rightSkip += 10;
+        } else {
+          // Markaz — play/pause
+          togglePlay();
+          player.classList.add('show-controls');
+        }
+      } else {
+        // ===== SINGLE TAP =====
+        var showing = player.classList.contains('show-controls');
+        if(showing){
+          // Markazga bosish → play/pause, yon tomonga → yashir
+          if(xRel >= 0.36 && xRel <= 0.64){
+            togglePlay();
+          } else {
+            hideControls();
+          }
+        } else {
+          // Iconlar yo'q — ko'rsat (qayerga bosmasin)
+          player.classList.add('show-controls');
+        }
+        lastTap = now;
+      }
+    }, { passive: true });
+  }
+
+  video.addEventListener('pause', function(){ clearTimeout(hideTimer); player.classList.add('show-controls'); });
+  video.addEventListener('ended', function(){ clearTimeout(hideTimer); player.classList.add('show-controls'); });
+
+  /* ================================================================
+     KEYBOARD SHORTCUTS (desktop only)
+  ================================================================ */
+  document.addEventListener('keydown', function(e){
+    if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+    switch(e.code){
+      case 'Space':
+        e.preventDefault(); togglePlay(); showControls(2000); break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        video.currentTime = Math.max(0, video.currentTime - 5);
+        showRipple(rippleL,'−5 son'); showControls(1500); break;
+      case 'ArrowRight':
+        e.preventDefault();
+        video.currentTime = Math.min(video.duration || Infinity, video.currentTime + 5);
+        showRipple(rippleR,'+5 son'); showControls(1500); break;
+      case 'ArrowUp':
+        e.preventDefault();
+        video.volume = Math.min(1, (video.volume || 0) + .1);
+        if(volSlider) volSlider.value = video.volume;
+        if(volBtn) volBtn.innerHTML = svgIcon(video.muted ? SVG.mute : SVG.vol);
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        video.volume = Math.max(0, (video.volume || 0) - .1);
+        if(volSlider) volSlider.value = video.volume;
+        if(volBtn) volBtn.innerHTML = svgIcon(video.muted ? SVG.mute : SVG.vol);
+        break;
+      case 'KeyM': if(volBtn)  volBtn.click();  break;
+      case 'KeyF': if(fsBtn)   fsBtn.click();   break;
+      case 'KeyL': if(fwd10)   fwd10.click();   break;
+      case 'KeyJ': if(back10)  back10.click();  break;
+      case 'Escape':
+        if(getFSElement()) exitFullscreen(); break;
+    }
+  });
+}
+
+/* Init on page load */
+initBmPlayer();
+
+/* ---------------------------------------------------------------
+   Iframe fullscreen button
+--------------------------------------------------------------- */
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#fullscreen-toggle')) return;
+  var wrapper = document.querySelector('.bunny-player-wrapper');
+  var ifr     = document.getElementById('iframe-player');
+  if(wrapper){
+    reqFS(wrapper).catch(function(){
+      if(ifr) reqFS(ifr).catch(function(){});
+    });
+  } else if(ifr){
+    reqFS(ifr).catch(function(){});
+  }
+});
+
+/* ---------------------------------------------------------------
+   RELATED CARDS — strelka tugmalar + qo'l bilan surish
+--------------------------------------------------------------- */
+(function(){
+  var scroll = document.getElementById('related-scroll');
+  var prevBtn = document.getElementById('related-prev');
+  var nextBtn = document.getElementById('related-next');
+  if(!scroll) return;
+
+  var CARD_W = 154; // card width + gap taxminan
+
+  if(prevBtn) prevBtn.addEventListener('click', function(){
+    scroll.scrollBy({ left: -CARD_W * 3, behavior: 'smooth' });
+  });
+  if(nextBtn) nextBtn.addEventListener('click', function(){
+    scroll.scrollBy({ left: CARD_W * 3, behavior: 'smooth' });
+  });
+
+  /* Mouse drag to scroll (PC) */
+  var isDragging = false, startX = 0, scrollLeft = 0;
+  scroll.addEventListener('mousedown', function(e){
+    isDragging = true;
+    startX = e.pageX - scroll.offsetLeft;
+    scrollLeft = scroll.scrollLeft;
+    scroll.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mouseup', function(){
+    isDragging = false;
+    if(scroll) scroll.style.cursor = 'grab';
+  });
+  scroll.addEventListener('mousemove', function(e){
+    if(!isDragging) return;
+    e.preventDefault();
+    var x = e.pageX - scroll.offsetLeft;
+    scroll.scrollLeft = scrollLeft - (x - startX);
+  });
+  /* Linkka click bo'lsa — drag bo'lsa link ishlamasin */
+  scroll.addEventListener('click', function(e){
+    if(Math.abs(scroll.scrollLeft - scrollLeft) > 5){
+      e.preventDefault();
+    }
+  });
+})();
+
+/* ---------------------------------------------------------------
+   COMMENTS — 5 tadan batafsil toggle
+--------------------------------------------------------------- */
+var _commentsExpanded = false;
+function toggleAllComments(){
+  _commentsExpanded = !_commentsExpanded;
+  var items = document.querySelectorAll('#comments-list .comment-item');
+  items.forEach(function(item){
+    var idx = parseInt(item.getAttribute('data-comment-index'), 10);
+    if(idx >= 5){
+      item.style.display = _commentsExpanded ? 'flex' : 'none';
+    }
+  });
+  var btn = document.getElementById('comments-toggle-btn');
+  if(btn){
+    btn.querySelector('span').textContent = _commentsExpanded
+      ? '▲ Yopish'
+      : '📋 Batafsil (' + items.length + ' izoh)';
+  }
+}
 </script>
 {% endblock %}
