@@ -860,6 +860,8 @@ def reel_detail(request, reel_id):
 
 
 
+# push habarlae sozlasj
+
 
 
 
