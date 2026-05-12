@@ -621,15 +621,103 @@
     .story-top-space {
         margin-top: 75px;
     }
-    /* ----- MOBILE ----- */
-    @media (max-width: 600px) {
-        .story-container { gap: 10px; padding: 10px 4%; }
-        .story-ring { width: 80px; height: 80px; }
-        .story-item span { font-size: 11px; }
+
+    .hero-buttons{
+        margin-top: 25px;
+        display: flex;
+        justify-content: flex-start;
     }
+
+
+    .btn-main{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        padding: 14px 28px;
+        border-radius: 14px;
+
+        background: linear-gradient(135deg, #ff003c, #ff4d6d);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+
+        box-shadow: 0 8px 25px rgba(255, 0, 60, 0.35);
+
+        transition: all 0.3s ease;
+    }
+
+    .btn-main:hover{
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 12px 30px rgba(255, 0, 60, 0.5);
+    }
+
+    .btn-main:active{
+        transform: scale(0.96);
+    }
+
+    /* ----- MOBILE ----- */
+@media (max-width: 600px) {
+
+    /* STORY */
+    .story-container {
+        gap: 10px;
+        padding: 10px 4%;
+    }
+
+    .story-ring {
+        width: 80px;
+        height: 80px;
+    }
+
+    .story-item span {
+        font-size: 11px;
+    }
+
     .story-top-space {
         margin-top: 55px;
     }
+
+    /* HERO SLIDE CONTENT */
+    .slide-content {
+        text-align: left !important;
+        width: 100%;
+    }
+
+    /* TITLE */
+    .slide-title {
+        text-align: left !important;
+        font-size: 1.5rem;
+    }
+
+    /* TAGS */
+    .tags {
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+    }
+
+    /* META ROW */
+    .slide-meta-row {
+        justify-content: flex-start !important;
+        text-align: left;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    /* BUTTON WRAPPER */
+    .hero-buttons {
+        display: flex;
+        justify-content: flex-start !important;
+        width: 100%;
+    }
+
+    /* BUTTON */
+    .btn-main {
+        margin-left: 0 !important;
+    }
+}
     @media (max-width: 1024px) {
         .slide-title { font-size: 2.8rem; }
     }
@@ -655,6 +743,15 @@
         .anime-card { height: 240px; }
         .action-btn { padding: 14px 22px; font-size: 0.9rem; }
     }
+    .hero-buttons{
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .btn-main{
+        margin-left: 0;
+    }
+
 
     @media (max-width: 480px) {
         .slider-wrapper-outer { padding: 0; }
@@ -716,20 +813,30 @@
 <div class="slider-wrapper-outer" style="margin-top: 20px;">
     <div class="slider-container" id="heroSlider">
         <div class="slides-wrapper" id="slidesWrapper">
+
             {% for anime in hero_movies %}
             <div class="slide">
+
                 {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
                     <video class="slide-bg-video" autoplay loop muted playsinline>
                         <source src="{{ anime.hero_media.url }}">
                     </video>
+
                 {% elif anime.hero_media %}
-                    <div class="slide-bg" style="background-image: url('{{ anime.hero_media.url }}');"></div>
+                    <div class="slide-bg"
+                         style="background-image: url('{{ anime.hero_media.url }}');">
+                    </div>
+
                 {% else %}
-                    <div class="slide-bg" style="background-image: url('{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');"></div>
+                    <div class="slide-bg"
+                         style="background-image: url('{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');">
+                    </div>
                 {% endif %}
 
+                <!-- Overlay -->
                 <div class="slide-overlay"></div>
 
+                <!-- Dots -->
                 <div class="slider-controls">
                     {% for h_anime in hero_movies %}
                     <div class="dot dot-{{ forloop.counter0 }}"
@@ -741,42 +848,79 @@
                     {% endfor %}
                 </div>
 
+                <!-- Content -->
                 <div class="slide-content">
+
+                    <!-- Tags -->
                     <div class="tags">
                         <span class="tag">YANGI</span>
-                        <span class="tag tag-muted">{{ anime.created_at|date:"Y" }}</span>
+
+                        <span class="tag tag-muted">
+                            {{ anime.created_at|date:"Y" }}
+                        </span>
+
                         {% if anime.episodes.count > 0 %}
-                        <span class="tag">{{ anime.episodes.count }} qism</span>
+                        <span class="tag">
+                            {{ anime.episodes.count }} qism
+                        </span>
                         {% endif %}
+
                         {% if anime.category %}
-                        <span class="tag tag-muted">{{ anime.category.name }}</span>
+                        <span class="tag tag-muted">
+                            {{ anime.category.name }}
+                        </span>
                         {% endif %}
                     </div>
 
-                    <h1 class="slide-title">{{ anime.title }}</h1>
+                    <!-- Title -->
+                    <h1 class="slide-title">
+                        {{ anime.title }}
+                    </h1>
 
+                    <!-- Meta -->
                     <div class="slide-meta-row">
+
                         {% if anime.release_year %}
                         <div class="slide-meta-item">
                             <i class='bx bx-calendar'></i>
                             <span>{{ anime.release_year }}</span>
                         </div>
                         {% endif %}
+
                         {% if anime.views_count %}
                         <div class="slide-meta-item">
                             <i class='bx bx-show'></i>
                             <span>{{ anime.views_count }}</span>
                         </div>
                         {% endif %}
+
                         {% if anime.rating %}
                         <div class="slide-rating">
-                            <i class='bx bxs-star'></i> {{ anime.rating }}
+                            <i class='bx bxs-star'></i>
+                            {{ anime.rating }}
                         </div>
                         {% endif %}
+
                     </div>
+
+                    <!-- Description -->
+                    {% if anime.description %}
+                    <p class="slide-description">
+                        {{ anime.description|truncatechars:180 }}
+                    </p>
+                    {% endif %}
+
+                    <!-- Button -->
+                    <div class="hero-buttons">
+                        <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
+                            ▶ Hozir ko'rish
+                        </a>
+                    </div>
+
                 </div>
             </div>
             {% endfor %}
+
         </div>
     </div>
 </div>
