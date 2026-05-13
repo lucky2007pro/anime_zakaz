@@ -45,14 +45,20 @@
 
     .slide-bg {
         position: absolute;
-        top: -10%;
-        left: -10%;
-        width: 120%;
-        height: 120%;
-        background-size: cover;
-        background-position: center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         z-index: 1;
-        transition: transform 0.1s linear;
+        overflow: hidden;
+    }
+
+    .slide-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
     }
 
     .slide-bg-video {
@@ -316,7 +322,6 @@
 
     .card-wrapper:hover .anime-card img { transform: scale(1.06); }
 
-    /* Card inside overlay */
     .card-inner-overlay {
         position: absolute;
         inset: 0;
@@ -417,7 +422,6 @@
         gap: 2px;
     }
 
-    /* VIP / Premium badge top-right */
     .tier-badge {
         position: absolute;
         top: 8px;
@@ -515,26 +519,28 @@
         position: relative;
     }
 
-    .marquee-container {
-        display: flex;
-        width: max-content;
-        animation: scroll-left 40s linear infinite;
-        gap: 16px;
+    #marqueeOuter {
+        overflow: hidden;
+        width: 100%;
+        position: relative;
+        padding-bottom: 20px;
         cursor: grab;
         user-select: none;
     }
+    #marqueeOuter.grabbing {
+        cursor: grabbing;
+    }
 
-    .marquee-container.paused { animation-play-state: paused; }
-    .marquee-container.dragging { cursor: grabbing; }
+    .marquee-container {
+        display: flex;
+        width: max-content;
+        gap: 16px;
+    }
 
     .marquee-item {
         width: 220px;
         flex-shrink: 0;
-    }
-
-    @keyframes scroll-left {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(calc(-50% - 8px)); }
+        pointer-events: auto;
     }
 
     /* ----- CONTACT / CHAT BUTTONS ----- */
@@ -618,140 +624,112 @@
         position: relative;
         z-index: 1;
     }
+
     .story-top-space {
         margin-top: 75px;
     }
 
-    .hero-buttons{
+    .hero-buttons {
         margin-top: 25px;
         display: flex;
         justify-content: flex-start;
+        width: 100%;
     }
 
-
-    .btn-main{
+    .btn-main {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-
         padding: 14px 28px;
         border-radius: 14px;
-
         background: linear-gradient(135deg, #ff003c, #ff4d6d);
         color: #fff;
         font-size: 16px;
         font-weight: 600;
         text-decoration: none;
-
         box-shadow: 0 8px 25px rgba(255, 0, 60, 0.35);
-
         transition: all 0.3s ease;
+        margin-left: 0;
     }
 
-    .btn-main:hover{
+    .btn-main:hover {
         transform: translateY(-3px) scale(1.03);
         box-shadow: 0 12px 30px rgba(255, 0, 60, 0.5);
     }
 
-    .btn-main:active{
+    .btn-main:active {
         transform: scale(0.96);
     }
 
     /* ----- MOBILE ----- */
-@media (max-width: 600px) {
-
-    /* ================= STORY ================= */
-    .story-container {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        padding: 10px 4%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    @media (max-width: 600px) {
+        .story-container {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            padding: 10px 4%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .story-ring {
+            width: 80px !important;
+            height: 80px !important;
+        }
+        .story-item span {
+            font-size: 11px !important;
+        }
+        .story-top-space {
+            margin-top: 55px !important;
+        }
+        .slide-content {
+            width: 100% !important;
+            text-align: left !important;
+            align-items: flex-start !important;
+        }
+        .slide-title {
+            font-size: 1.5rem !important;
+            text-align: left !important;
+            line-height: 1.2;
+        }
+        .tags {
+            display: flex;
+            justify-content: flex-start !important;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .slide-meta-row {
+            display: flex;
+            justify-content: flex-start !important;
+            flex-wrap: wrap;
+            gap: 10px;
+            text-align: left;
+        }
+        .hero-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start !important;
+        }
+        .btn-main {
+            margin-left: 0 !important;
+            width: auto;
+        }
+        .slider-container {
+            aspect-ratio: 16 / 9;
+            min-height: 220px;
+            border-radius: 10px;
+        }
+        .slide {
+            padding: 20px 14px 50px;
+        }
     }
 
-    .story-ring {
-        width: 80px !important;
-        height: 80px !important;
-    }
-
-    .story-item span {
-        font-size: 11px !important;
-    }
-
-    .story-top-space {
-        margin-top: 55px !important;
-    }
-
-    /* ================= HERO CONTENT ================= */
-    .slide-content {
-        width: 100% !important;
-        text-align: left !important;
-        align-items: flex-start !important;
-    }
-
-    /* TITLE */
-    .slide-title {
-        font-size: 1.5rem !important;
-        text-align: left !important;
-        line-height: 1.2;
-    }
-
-    /* TAGS */
-    .tags {
-        display: flex;
-        justify-content: flex-start !important;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    /* META ROW */
-    .slide-meta-row {
-        display: flex;
-        justify-content: flex-start !important;
-        flex-wrap: wrap;
-        gap: 10px;
-        text-align: left;
-    }
-
-    /* BUTTON AREA */
-    .hero-buttons {
-        width: 100%;
-        display: flex;
-        justify-content: flex-start !important;
-    }
-
-    .btn-main {
-        margin-left: 0 !important;
-        width: auto;
-    }
-
-    /* ================= SLIDER FIX ================= */
-    .slider-container {
-        aspect-ratio: 16 / 9;
-        min-height: 220px;
-        border-radius: 10px;
-    }
-
-    .slide {
-        padding: 20px 14px 50px;
-    }
-
-    /* DESCRIPTION */
-    .slide-description {
-        font-size: 0.85rem;
-        line-height: 1.4;
-    }
-}
     @media (max-width: 1024px) {
         .slide-title { font-size: 2.8rem; }
     }
 
     @media (max-width: 768px) {
-        .slider-wrapper-outer {
-            padding: 0 3%;
-        }
+        .slider-wrapper-outer { padding: 0 3%; }
         .slider-container {
             aspect-ratio: 16 / 9;
             min-height: 200px;
@@ -769,15 +747,6 @@
         .anime-card { height: 240px; }
         .action-btn { padding: 14px 22px; font-size: 0.9rem; }
     }
-    .hero-buttons{
-        justify-content: flex-start;
-        width: 100%;
-    }
-
-    .btn-main{
-        margin-left: 0;
-    }
-
 
     @media (max-width: 480px) {
         .slider-wrapper-outer { padding: 0; }
@@ -809,7 +778,7 @@
 
 {% block content %}
 
-<!-- ANIME HIKOYALAR (YUQORIDA) -->
+<!-- ANIME HIKOYALAR -->
 <div class="story-top-space">
     <div class="section-header">
         <div class="section-title">
@@ -817,291 +786,276 @@
         </div>
     </div>
 
-<div class="story-container">
-    {% for story in stories %}
-    <a href="{% url 'story_view' story.id %}" class="story-item">
-        <div class="story-ring {% if story.id in seen_stories %}seen{% endif %}">
-            {% if story.image %}
-                <img src="{{ story.image.url }}" alt="{{ story.title }}">
-            {% else %}
-                <img src="https://via.placeholder.com/150" alt="story">
-            {% endif %}
-        </div>
-        <span>{{ story.title }}</span>
-    </a>
-    {% empty %}
-        <p style="color:#aaa; padding:10px;">Hozircha story yo'q</p>
-    {% endfor %}
-</div>
-
-<!-- HERO SLIDER (PASTDA, 16:9) -->
-{% if hero_movies %}
-<div class="slider-wrapper-outer" style="margin-top: 20px;">
-    <div class="slider-container" id="heroSlider">
-        <div class="slides-wrapper" id="slidesWrapper">
-
-            {% for anime in hero_movies %}
-            <div class="slide">
-
-                {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
-                    <video class="slide-bg-video" autoplay loop muted playsinline>
-                        <source src="{{ anime.hero_media.url }}">
-                    </video>
-
-                {% elif anime.hero_media %}
-                    <div class="slide-bg"
-                         style="background-image: url('{{ anime.hero_media.url }}');">
-                    </div>
-
+    <div class="story-container">
+        {% for story in stories %}
+        <a href="{% url 'story_view' story.id %}" class="story-item">
+            <div class="story-ring {% if story.id in seen_stories %}seen{% endif %}">
+                {% if story.image %}
+                    <img src="{{ story.image.url }}" alt="{{ story.title }}">
                 {% else %}
-                    <div class="slide-bg"
-                         style="background-image: url('{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}');">
-                    </div>
+                    <img src="https://via.placeholder.com/150" alt="story">
                 {% endif %}
-
-                <!-- Overlay -->
-                <div class="slide-overlay"></div>
-
-                <!-- Dots -->
-                <div class="slider-controls">
-                    {% for h_anime in hero_movies %}
-                    <div class="dot dot-{{ forloop.counter0 }}"
-                         role="button"
-                         tabindex="0"
-                         aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}"
-                         onclick="goToSlide({{ forloop.counter0 }})">
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Content -->
-                <div class="slide-content">
-
-                    <!-- Tags -->
-                    <div class="tags">
-                        <span class="tag">YANGI</span>
-
-                        <span class="tag tag-muted">
-                            {{ anime.created_at|date:"Y" }}
-                        </span>
-
-                        {% if anime.episodes.count > 0 %}
-                        <span class="tag">
-                            {{ anime.episodes.count }} qism
-                        </span>
-                        {% endif %}
-
-                        {% if anime.category %}
-                        <span class="tag tag-muted">
-                            {{ anime.category.name }}
-                        </span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Title -->
-                    <h1 class="slide-title">
-                        {{ anime.title }}
-                    </h1>
-
-                    <!-- Meta -->
-                    <div class="slide-meta-row">
-
-                        {% if anime.release_year %}
-                        <div class="slide-meta-item">
-                            <i class='bx bx-calendar'></i>
-                            <span>{{ anime.release_year }}</span>
-                        </div>
-                        {% endif %}
-
-                        {% if anime.views_count %}
-                        <div class="slide-meta-item">
-                            <i class='bx bx-show'></i>
-                            <span>{{ anime.views_count }}</span>
-                        </div>
-                        {% endif %}
-
-                        {% if anime.rating %}
-                        <div class="slide-rating">
-                            <i class='bx bxs-star'></i>
-                            {{ anime.rating }}
-                        </div>
-                        {% endif %}
-
-                    </div>
-
-                    <!-- Description -->
-                    {% if anime.description %}
-                    <p class="slide-description">
-                        {{ anime.description|truncatechars:180 }}
-                    </p>
-                    {% endif %}
-
-                    <!-- Button -->
-                    <div class="hero-buttons">
-                        <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
-                            ▶ Hozir ko'rish
-                        </a>
-                    </div>
-
-                </div>
             </div>
-            {% endfor %}
-
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<!-- TAVSIYA ETILADIGANLAR (MARQUEE, TOUCH SUPPORT) -->
-{% if recommended_movies %}
-<div class="container recommendation-section">
-    <div class="section-header" style="margin-top:0; padding: 0;">
-        <div class="section-title">
-            <h3>Tavsiya <span>etiladiganlar</span></h3>
-        </div>
-    </div>
-
-    <div style="overflow: hidden; width: 100%; position: relative; padding-bottom: 20px;" id="marqueeOuter">
-        <div class="marquee-container" id="marqueeContainer">
-            {% for anime in recommended_movies %}
-            <div class="card-wrapper marquee-item">
-                <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer; height: 260px;">
-                    <div class="top-badge-group">
-                        <div class="top-badge" style="background: var(--accent); color: #000;"><i class='bx bx-trending-up'></i> TOP</div>
-                    </div>
-                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
-                </div>
-                <div class="card-info-bottom">
-                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
-                        <h4 class="card-title">{{ anime.title }}</h4>
-                    </a>
-                    <div class="card-meta" style="margin-top:4px;">
-                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                        <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-            <!-- Duplicate for seamless loop -->
-            {% for anime in recommended_movies %}
-            <div class="card-wrapper marquee-item">
-                <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer; height: 260px;">
-                    <div class="top-badge-group">
-                        <div class="top-badge" style="background: var(--accent); color: #000;"><i class='bx bx-trending-up'></i> TOP</div>
-                    </div>
-                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
-                </div>
-                <div class="card-info-bottom">
-                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
-                        <h4 class="card-title">{{ anime.title }}</h4>
-                    </a>
-                    <div class="card-meta" style="margin-top:4px;">
-                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                        <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<!-- ALOQA VA CHAT TUGMALAR -->
-<div class="action-buttons-section">
-    <div class="action-buttons-inner">
-        <a href="https://bestmedia-official.uz/aloqa/" class="action-btn action-btn-contact" target="_blank" rel="noopener">
-            <i class='bx bx-phone-call'></i>
-            <span>Aloqa</span>
+            <span>{{ story.title }}</span>
         </a>
-        <a href="https://bestmedia-official.uz/chat/" class="action-btn action-btn-chat" target="_blank" rel="noopener">
-            <i class='bx bx-message-rounded-dots'></i>
-            <span>BestMedia Chat</span>
-        </a>
-    </div>
-</div>
-
-<!-- YANGI QO'SHILGANLAR -->
-<div class="container" id="new-releases">
-    <div class="section-header" style="padding:0;">
-        <div class="section-title">
-            <h3>Yangi <span>Qo'shilganlar</span></h3>
-        </div>
-        <a href="{% url 'anime_catalog' %}" class="view-all">Barchasini ko'rish →</a>
-    </div>
-
-    <div class="cards-grid">
-        {% for anime in movies %}
-        <div class="card-wrapper">
-            <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
-                <!-- TOP BADGES -->
-                <div class="top-badge-group">
-                    {% if anime.release_year %}
-                    <div class="top-badge-year">{{ anime.release_year }}</div>
-                    {% endif %}
-                    {% if anime.episodes.count > 0 %}
-                    <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
-                    {% else %}
-                    <div class="top-badge-episode">Film</div>
-                    {% endif %}
-                </div>
-
-                <!-- TIER BADGE (VIP / PREMIUM) -->
-                {% if anime.minimum_tier == 'vip' %}
-                <div class="tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
-                {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
-                <div class="tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
-                {% endif %}
-
-                <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
-
-                <!-- HOVER INNER OVERLAY -->
-                <div class="card-inner-overlay">
-                    <div class="card-inner-title">{{ anime.title }}</div>
-                    {% if anime.description %}
-                    <div class="card-inner-desc">{{ anime.description|truncatechars:80 }}</div>
-                    {% endif %}
-                    <div class="card-inner-meta">
-                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                        <div class="card-inner-views"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</div>
-                    </div>
-                </div>
-
-                <!-- FAV BADGE -->
-                <div class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})">
-                    {% if anime.id in fav_ids %}
-                        <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
-                    {% else %}
-                        <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="card-info-bottom">
-                <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
-                    <h4 class="card-title">{{ anime.title }}</h4>
-                </a>
-                <div class="card-meta" style="margin-top:4px;">
-                    {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                    <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
-                </div>
-                <div class="card-meta" style="justify-content:space-between; margin-top:5px;">
-                    <span style="display:flex; align-items:center; gap:4px; font-size:0.78rem; color:var(--text-dim);"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</span>
-                    {% if anime.minimum_tier == 'vip' %}
-                    <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#fbbf24; font-weight:900;"><i class='bx bxs-crown'></i> VIP</span>
-                    {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
-                    <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#f43f5e; font-weight:800;"><i class='bx bxs-diamond'></i> Premium</span>
-                    {% else %}
-                    <span style="font-size:0.78rem; color:#4ade80; font-weight:800;">Bepul</span>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
         {% empty %}
-        <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">Hozircha animelar kiritilmadi.</div>
+            <p style="color:#aaa; padding:10px;">Hozircha story yo'q</p>
         {% endfor %}
     </div>
-</div>
+
+    <!-- HERO SLIDER -->
+    {% if hero_movies %}
+    <div class="slider-wrapper-outer" style="margin-top: 20px;">
+        <div class="slider-container" id="heroSlider">
+            <div class="slides-wrapper" id="slidesWrapper">
+
+                {% for anime in hero_movies %}
+                {% if anime.id %}
+                <div class="slide">
+
+                    {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
+                        <video class="slide-bg-video" autoplay loop muted playsinline>
+                            <source src="{{ anime.hero_media.url }}">
+                        </video>
+                    {% elif anime.hero_media %}
+                        <div class="slide-bg">
+                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}">
+                        </div>
+                    {% else %}
+                        <div class="slide-bg">
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}">
+                        </div>
+                    {% endif %}
+
+                    <div class="slide-overlay"></div>
+
+                    <div class="slider-controls">
+                        {% for h_anime in hero_movies %}
+                        {% if h_anime.id %}
+                        <div class="dot dot-{{ forloop.counter0 }}"
+                             role="button"
+                             tabindex="0"
+                             aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}"
+                             onclick="goToSlide({{ forloop.counter0 }})">
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="slide-content">
+                        <div class="tags">
+                            <span class="tag">YANGI</span>
+                            <span class="tag tag-muted">{{ anime.created_at|date:"Y" }}</span>
+                            {% if anime.episodes.count > 0 %}
+                            <span class="tag">{{ anime.episodes.count }} qism</span>
+                            {% endif %}
+                            {% if anime.category %}
+                            <span class="tag tag-muted">{{ anime.category.name }}</span>
+                            {% endif %}
+                        </div>
+
+                        <h1 class="slide-title">{{ anime.title }}</h1>
+
+                        <div class="slide-meta-row">
+                            {% if anime.release_year %}
+                            <div class="slide-meta-item">
+                                <i class='bx bx-calendar'></i>
+                                <span>{{ anime.release_year }}</span>
+                            </div>
+                            {% endif %}
+                            {% if anime.views_count %}
+                            <div class="slide-meta-item">
+                                <i class='bx bx-show'></i>
+                                <span>{{ anime.views_count }}</span>
+                            </div>
+                            {% endif %}
+                            {% if anime.rating %}
+                            <div class="slide-rating">
+                                <i class='bx bxs-star'></i>
+                                {{ anime.rating }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="hero-buttons">
+                            <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
+                                ▶ Hozir ko'rish
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- TAVSIYA ETILADIGANLAR -->
+    {% if recommended_movies %}
+    <div class="container recommendation-section">
+        <div class="section-header" style="margin-top:0; padding: 0;">
+            <div class="section-title">
+                <h3>Tavsiya <span>etiladiganlar</span></h3>
+            </div>
+        </div>
+
+        <div id="marqueeOuter">
+            <div class="marquee-container" id="marqueeContainer">
+                {% for anime in recommended_movies %}
+                {% if anime.id %}
+                <div class="card-wrapper marquee-item">
+                    <div class="anime-card" style="cursor:pointer; height: 260px;"
+                         data-href="{% url 'movie_detail' anime.id %}">
+                        <div class="top-badge-group">
+                            <div class="top-badge" style="background: var(--accent); color: #000;">
+                                <i class='bx bx-trending-up'></i> TOP
+                            </div>
+                        </div>
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                    </div>
+                    <div class="card-info-bottom">
+                        <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
+                            <h4 class="card-title">{{ anime.title }}</h4>
+                        </a>
+                        <div class="card-meta" style="margin-top:4px;">
+                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                            <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                <!-- Duplicate for seamless loop -->
+                {% for anime in recommended_movies %}
+                {% if anime.id %}
+                <div class="card-wrapper marquee-item">
+                    <div class="anime-card" style="cursor:pointer; height: 260px;"
+                         data-href="{% url 'movie_detail' anime.id %}">
+                        <div class="top-badge-group">
+                            <div class="top-badge" style="background: var(--accent); color: #000;">
+                                <i class='bx bx-trending-up'></i> TOP
+                            </div>
+                        </div>
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                    </div>
+                    <div class="card-info-bottom">
+                        <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
+                            <h4 class="card-title">{{ anime.title }}</h4>
+                        </a>
+                        <div class="card-meta" style="margin-top:4px;">
+                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                            <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ALOQA VA CHAT TUGMALAR -->
+    <div class="action-buttons-section">
+        <div class="action-buttons-inner">
+            <a href="https://bestmedia-official.uz/aloqa/" class="action-btn action-btn-contact" target="_blank" rel="noopener">
+                <i class='bx bx-phone-call'></i>
+                <span>Aloqa</span>
+            </a>
+            <a href="https://bestmedia-official.uz/chat/" class="action-btn action-btn-chat" target="_blank" rel="noopener">
+                <i class='bx bx-message-rounded-dots'></i>
+                <span>BestMedia Chat</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- YANGI QO'SHILGANLAR -->
+    <div class="container" id="new-releases">
+        <div class="section-header" style="padding:0;">
+            <div class="section-title">
+                <h3>Yangi <span>Qo'shilganlar</span></h3>
+            </div>
+            <a href="{% url 'anime_catalog' %}" class="view-all">Barchasini ko'rish →</a>
+        </div>
+
+        <div class="cards-grid">
+            {% for anime in movies %}
+            {% if anime.id %}
+            <div class="card-wrapper">
+                <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
+                    <div class="top-badge-group">
+                        {% if anime.release_year %}
+                        <div class="top-badge-year">{{ anime.release_year }}</div>
+                        {% endif %}
+                        {% if anime.episodes.count > 0 %}
+                        <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
+                        {% else %}
+                        <div class="top-badge-episode">Film</div>
+                        {% endif %}
+                    </div>
+
+                    {% if anime.minimum_tier == 'vip' %}
+                    <div class="tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
+                    {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
+                    <div class="tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
+                    {% endif %}
+
+                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+
+                    <div class="card-inner-overlay">
+                        <div class="card-inner-title">{{ anime.title }}</div>
+                        {% if anime.description %}
+                        <div class="card-inner-desc">{{ anime.description|truncatechars:80 }}</div>
+                        {% endif %}
+                        <div class="card-inner-meta">
+                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                            <div class="card-inner-views"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</div>
+                        </div>
+                    </div>
+
+                    <div class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})">
+                        {% if anime.id in fav_ids %}
+                            <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
+                        {% else %}
+                            <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-info-bottom">
+                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                        <h4 class="card-title">{{ anime.title }}</h4>
+                    </a>
+                    <div class="card-meta" style="margin-top:4px;">
+                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                        <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                    </div>
+                    <div class="card-meta" style="justify-content:space-between; margin-top:5px;">
+                        <span style="display:flex; align-items:center; gap:4px; font-size:0.78rem; color:var(--text-dim);">
+                            <i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}
+                        </span>
+                        {% if anime.minimum_tier == 'vip' %}
+                        <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#fbbf24; font-weight:900;"><i class='bx bxs-crown'></i> VIP</span>
+                        {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
+                        <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#f43f5e; font-weight:800;"><i class='bx bxs-diamond'></i> Premium</span>
+                        {% else %}
+                        <span style="font-size:0.78rem; color:#4ade80; font-weight:800;">Bepul</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">
+                Hozircha animelar kiritilmadi.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div><!-- /story-top-space -->
 
 <script>
     /* ===========================
@@ -1137,7 +1091,6 @@
 
     resetAutoPlay();
 
-    /* Touch / drag on hero slider */
     if (wrapper) {
         let heroStartX = 0;
         let heroDragging = false;
@@ -1167,7 +1120,6 @@
             resetAutoPlay();
         });
 
-        /* Mouse drag */
         wrapper.addEventListener('mousedown', e => {
             heroStartX = e.clientX;
             heroDragging = true;
@@ -1198,73 +1150,120 @@
     window.addEventListener('scroll', () => {
         const scrollY = window.scrollY;
         if (scrollY < 800) {
-            document.querySelectorAll('.slide-bg').forEach(bg => {
-                bg.style.transform = `translateY(${scrollY * 0.4}px) scale(${1 + scrollY * 0.0005})`;
+            document.querySelectorAll('.slide-bg img').forEach(bg => {
+                bg.style.transform = `translateY(${scrollY * 0.18}px)`;
             });
         }
     });
 
     /* ===========================
-       MARQUEE TOUCH DRAG
+       MARQUEE — JS RAF + DRAG
     =========================== */
-    const marquee = document.getElementById('marqueeContainer');
-    if (marquee) {
-        let mStartX = 0;
-        let mScrollLeft = 0;
-        let mDragging = false;
-        let mAnimOffset = 0;
+    (function () {
+        const outer = document.getElementById('marqueeOuter');
+        const container = document.getElementById('marqueeContainer');
+        if (!outer || !container) return;
 
-        /* Get current translate X from animation */
-        function getMarqueeTranslate() {
-            const style = window.getComputedStyle(marquee);
-            const matrix = new DOMMatrix(style.transform);
-            return matrix.m41;
+        const SPEED = 0.5;
+
+        let offset = 0;
+        let rafId = null;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartOffset = 0;
+        let dragMoved = 0;
+        const DRAG_THRESHOLD = 5;
+
+        function getHalf() {
+            return container.scrollWidth / 2;
         }
 
-        function startMarqueeDrag(clientX) {
-            mDragging = true;
-            mStartX = clientX;
-            mAnimOffset = getMarqueeTranslate();
-            marquee.classList.add('paused', 'dragging');
-            marquee.style.transform = `translateX(${mAnimOffset}px)`;
+        function applyTransform() {
+            container.style.transform = `translateX(${offset}px)`;
         }
 
-        function moveMarqueeDrag(clientX) {
-            if (!mDragging) return;
-            const delta = clientX - mStartX;
-            marquee.style.transform = `translateX(${mAnimOffset + delta}px)`;
-        }
-
-        function endMarqueeDrag(clientX) {
-            if (!mDragging) return;
-            mDragging = false;
-            marquee.classList.remove('dragging');
-            const delta = clientX - mStartX;
-            mAnimOffset = mAnimOffset + delta;
-
-            const half = marquee.scrollWidth / 2;
-            if (Math.abs(mAnimOffset) >= half) {
-                mAnimOffset = mAnimOffset + half;
+        function animate() {
+            if (!isDragging) {
+                offset -= SPEED;
+                const half = getHalf();
+                if (Math.abs(offset) >= half) {
+                    offset += half;
+                }
+                applyTransform();
             }
-            /* Resume animation from current position via CSS custom property */
-            marquee.style.transform = '';
-            marquee.classList.remove('paused');
+            rafId = requestAnimationFrame(animate);
         }
 
-        /* Touch */
-        marquee.addEventListener('touchstart', e => startMarqueeDrag(e.touches[0].clientX), { passive: true });
-        marquee.addEventListener('touchmove', e => moveMarqueeDrag(e.touches[0].clientX), { passive: true });
-        marquee.addEventListener('touchend', e => endMarqueeDrag(e.changedTouches[0].clientX));
+        rafId = requestAnimationFrame(animate);
 
-        /* Mouse */
-        marquee.addEventListener('mousedown', e => startMarqueeDrag(e.clientX));
-        window.addEventListener('mousemove', e => moveMarqueeDrag(e.clientX));
-        window.addEventListener('mouseup', e => endMarqueeDrag(e.clientX));
+        /* Mouse drag */
+        outer.addEventListener('mousedown', e => {
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragStartOffset = offset;
+            dragMoved = 0;
+            outer.classList.add('grabbing');
+        });
 
-        /* Hover pause */
-        marquee.addEventListener('mouseenter', () => { if (!mDragging) marquee.classList.add('paused'); });
-        marquee.addEventListener('mouseleave', () => { if (!mDragging) marquee.classList.remove('paused'); });
-    }
+        window.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            const delta = e.clientX - dragStartX;
+            dragMoved = delta;
+            offset = dragStartOffset + delta;
+            applyTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            outer.classList.remove('grabbing');
+        });
+
+        /* Touch drag */
+        outer.addEventListener('touchstart', e => {
+            isDragging = true;
+            dragStartX = e.touches[0].clientX;
+            dragStartOffset = offset;
+            dragMoved = 0;
+        }, { passive: true });
+
+        outer.addEventListener('touchmove', e => {
+            if (!isDragging) return;
+            const delta = e.touches[0].clientX - dragStartX;
+            dragMoved = delta;
+            offset = dragStartOffset + delta;
+            applyTransform();
+        }, { passive: true });
+
+        outer.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+        });
+
+        /* Card click — drag bo'lmasa navigatsiya */
+        container.addEventListener('click', e => {
+            if (Math.abs(dragMoved) > DRAG_THRESHOLD) {
+                e.preventDefault();
+                e.stopPropagation();
+                dragMoved = 0;
+                return;
+            }
+            const card = e.target.closest('[data-href]');
+            if (card) {
+                window.location.href = card.dataset.href;
+            }
+        });
+
+        /* Link drag paytida o'tkazib yuborish */
+        container.querySelectorAll('a.marquee-link').forEach(link => {
+            link.addEventListener('click', e => {
+                if (Math.abs(dragMoved) > DRAG_THRESHOLD) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+    })();
 </script>
 
 {% endblock %}
