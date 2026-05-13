@@ -757,7 +757,7 @@
     <h3>Izohlar ({{ comments.count|default:"0" }})</h3>
 
     {% if request.user.is_authenticated %}
-    <form class="comment-form" method="POST" action="{% url 'movie_detail' movie.id %}#comments">
+    <form class="comment-form" method="POST" action="#comments">
       {% csrf_token %}
       <img src="{% if request.user.avatar %}{{ request.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
            alt="Avatar" class="comment-avatar">
