@@ -181,17 +181,10 @@ def movie_detail(request, id):
 
     # Add to watch history
     from .models import WatchHistory, FavoriteAnime
-    WatchHistory.objects.update_or_create(
-        user=request.user,
-        movie=movie,
-        defaults={'last_watched': timezone.now()}
-    )
+    WatchHistory.objects.update_or_create(user=request.user, movie=movie, defaults={'last_watched': timezone.now()})
 
     # Check if favorited
-    is_favorited = FavoriteAnime.objects.filter(
-        user=request.user,
-        movie=movie
-    ).exists()
+    is_favorited = FavoriteAnime.objects.filter(user=request.user, movie=movie).exists()
 
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     tier = vip_data.get_tier()
@@ -207,10 +200,9 @@ def movie_detail(request, id):
     tier_labels = dict(Movie.TIER_CHOICES)
     required_tier_label = tier_labels.get(real_minimum_tier, real_minimum_tier)
 
-    # Qo'shimcha cheklovlar
+    # Qo'shimcha cheklovlar xususiyatlari
     show_ads = (tier == 'basic') and not is_staff_or_admin
     can_download = (tier in ['premium', 'vip']) or is_staff_or_admin
-
     max_quality = '480p'
     if tier == 'premium' or is_staff_or_admin:
         max_quality = '1080p'
@@ -222,15 +214,12 @@ def movie_detail(request, id):
     for c in comments:
         c.local_created_at = localtime(c.created_at, tz)
 
-    # =========================
-    # 🔥 RANDOM MOVIES (YANGI QO'SHILDI)
-    # =========================
-    if movie.category:
-        random_movies = Movie.objects.filter(
-            category=movie.category
-        ).exclude(id=movie.id).order_by('?')[:10]
-    else:
-        random_movies = Movie.objects.exclude(id=movie.id).order_by('?')[:10]
+    # Izohdan keyin ko'rsatiladigan 2 ta random anime
+    import random
+    random_pool = list(
+        Movie.objects.exclude(id=movie.id).order_by('?')[:10]
+    )
+    random_movies = random.sample(random_pool, min(2, len(random_pool)))
 
     return render(request, 'movie_detail.html', {
         'movie': movie,
@@ -243,7 +232,7 @@ def movie_detail(request, id):
         'max_quality': max_quality,
         'user_tier': tier,
         'comments': comments,
-        'random_movies': random_movies,  # ✅ FIX
+        'random_movies': random_movies,
     })
 
 
@@ -657,7 +646,7 @@ def toggle_like(request, pk):
 @login_required
 def reels(request):
     context = {
-        "title": "Aloqa"
+        "title": "reels"
     }
     return render(request, "reels.html", context)
 
@@ -732,6 +721,8 @@ def prev_story_view(request, story_id):
                 return redirect('home')
 
     return redirect('home')
+
+
 
 
 # REELS — views.py ga qo'shing
@@ -876,11 +867,3 @@ def reel_detail(request, reel_id):
         'next_reel': next_reel,
         'prev_reel': prev_reel,
     })
-
-
-
-# push habarlae sozlasj
-
-
-
-
