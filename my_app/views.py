@@ -181,10 +181,17 @@ def movie_detail(request, id):
 
     # Add to watch history
     from .models import WatchHistory, FavoriteAnime
-    WatchHistory.objects.update_or_create(user=request.user, movie=movie, defaults={'last_watched': timezone.now()})
+    WatchHistory.objects.update_or_create(
+        user=request.user,
+        movie=movie,
+        defaults={'last_watched': timezone.now()}
+    )
 
     # Check if favorited
-    is_favorited = FavoriteAnime.objects.filter(user=request.user, movie=movie).exists()
+    is_favorited = FavoriteAnime.objects.filter(
+        user=request.user,
+        movie=movie
+    ).exists()
 
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     tier = vip_data.get_tier()
@@ -200,9 +207,10 @@ def movie_detail(request, id):
     tier_labels = dict(Movie.TIER_CHOICES)
     required_tier_label = tier_labels.get(real_minimum_tier, real_minimum_tier)
 
-    # Qo'shimcha cheklovlar xususiyatlari (rasm/tariflardagi imkoniyatlarga qarab):
+    # Qo'shimcha cheklovlar
     show_ads = (tier == 'basic') and not is_staff_or_admin
     can_download = (tier in ['premium', 'vip']) or is_staff_or_admin
+
     max_quality = '480p'
     if tier == 'premium' or is_staff_or_admin:
         max_quality = '1080p'
@@ -214,6 +222,16 @@ def movie_detail(request, id):
     for c in comments:
         c.local_created_at = localtime(c.created_at, tz)
 
+    # =========================
+    # 🔥 RANDOM MOVIES (YANGI QO'SHILDI)
+    # =========================
+    if movie.category:
+        random_movies = Movie.objects.filter(
+            category=movie.category
+        ).exclude(id=movie.id).order_by('?')[:10]
+    else:
+        random_movies = Movie.objects.exclude(id=movie.id).order_by('?')[:10]
+
     return render(request, 'movie_detail.html', {
         'movie': movie,
         'episodes': episodes,
@@ -224,7 +242,8 @@ def movie_detail(request, id):
         'can_download': can_download,
         'max_quality': max_quality,
         'user_tier': tier,
-        'comments': comments
+        'comments': comments,
+        'random_movies': random_movies,  # ✅ FIX
     })
 
 
