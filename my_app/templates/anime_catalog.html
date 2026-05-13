@@ -7,275 +7,435 @@
 
 {% block extra_css %}
 <style>
+/* ============================================================
+   CATALOG PAGE — BESTMEDIA
+   Dark cinema aesthetic · Tight grid · Smooth interactions
+   ============================================================ */
+
+.catalog-wrap {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 5% 60px;
+}
+
+/* ── HEADER ── */
 .catalog-header {
-    max-width: 1400px;
-    margin: 0 auto 18px;
-    padding: 0 5%;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     gap: 16px;
+    padding: 36px 0 32px;   /* ← header pastida joy */
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 32px;    /* ← header va cardlar orasida joy */
+}
+
+.catalog-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .catalog-title {
-    font-size: 2rem;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
     font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--text-light, #f0f0f0);
 }
 
 .catalog-title span {
-    color: var(--accent);
+    color: var(--accent, #ff3366);
 }
 
 .catalog-sub {
-    margin-top: 6px;
-    color: var(--text-dim);
-    font-size: 0.95rem;
+    color: var(--text-dim, rgba(240,240,240,0.45));
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.catalog-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
 }
 
 .catalog-search-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     text-decoration: none;
-    color: var(--text-light);
+    color: var(--text-light, #f0f0f0);
     font-weight: 700;
-    border: 1px solid var(--glass-border);
-    background: rgba(255,255,255,0.03);
-    border-radius: 10px;
-    padding: 10px 14px;
-    transition: 0.2s;
+    font-size: 0.88rem;
+    letter-spacing: 0.02em;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: 11px 18px;
+    transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.15s;
+    white-space: nowrap;
 }
 
 .catalog-search-link:hover {
-    color: var(--accent);
-    border-color: var(--accent);
+    color: var(--accent, #ff3366);
+    border-color: var(--accent, #ff3366);
+    background: rgba(255, 51, 102, 0.07);
+    transform: translateY(-1px);
 }
 
-.catalog-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 5% 20px;
+.catalog-search-link svg {
+    width: 16px; height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
 }
 
+/* ── GRID ── */
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 22px 18px;
 }
 
+/* ── CARD ── */
 .card-wrapper {
     text-decoration: none;
     color: inherit;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
+    cursor: pointer;
+    outline: none;
 }
 
 .anime-card {
     width: 100%;
-    height: 280px;
-    border-radius: 12px;
+    aspect-ratio: 2/3;
+    border-radius: 14px;
     overflow: hidden;
     position: relative;
-    background: var(--bg-surface);
-    border: 1px solid rgba(255,255,255,0.07);
-    transition: transform 0.24s ease, box-shadow 0.24s ease;
+    background: var(--bg-surface, #111);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.2s;
+    will-change: transform;
 }
 
-.card-wrapper:hover .anime-card {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 30px rgba(0,0,0,0.48);
+.card-wrapper:hover .anime-card,
+.card-wrapper:focus-visible .anime-card {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,51,102,0.18);
+    border-color: rgba(255,255,255,0.12);
 }
 
 .anime-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
 }
 
+.card-wrapper:hover .anime-card img {
+    transform: scale(1.04);
+}
+
+/* bottom gradient overlay */
+.anime-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 40%,
+        rgba(0,0,0,0.72) 100%
+    );
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 1;
+}
+
+/* ── TOP BADGES ── */
 .top-badge-group {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 9px;
+    left: 9px;
     display: flex;
     gap: 4px;
-    z-index: 10;
+    z-index: 5;
+    flex-wrap: wrap;
 }
 
-.top-badge-episode {
-    background: rgba(0,0,0,0.8);
-    border: 1px solid rgba(0,0,0,0.12);
-    padding: 4px 8px;
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
     border-radius: 6px;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     font-weight: 800;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+}
+
+.badge-year {
+    background: #eab308;
+    color: #000;
+}
+
+.badge-ep {
+    background: rgba(0,0,0,0.75);
     color: #FFC107;
+    border: 1px solid rgba(255,193,7,0.25);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
-.top-badge-year {
-    background: #eab308;
-    border: 1px solid rgba(0,0,0,0.12);
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: #000;
-}
-
-.top-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #eab308;
-    border: 1px solid rgba(0,0,0,0.12);
-    color: #000;
-    font-size: 0.75rem;
-    font-weight: 800;
-    padding: 4px 8px;
-    border-radius: 6px;
-    z-index: 10;
-}
-
+/* ── FAVORITE BADGE ── */
 .fav-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 9px;
+    right: 9px;
     background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(4px);
-    width: 32px;
-    height: 32px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    width: 34px; height: 34px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: #fff;
-    font-size: 1.1rem;
-    z-index: 10;
-    transition: 0.3s;
-}
-.fav-badge:hover {
-    background: rgba(255,255,255,0.2);
-    color: #ff3366;
-}
-.fav-badge i.bxs-star {
-    color: #ff3366;
+    font-size: 1.05rem;
+    z-index: 5;
+    transition: background 0.2s, transform 0.15s;
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
 }
 
+.fav-badge:hover {
+    background: rgba(255,255,255,0.18);
+    transform: scale(1.12);
+}
+
+.fav-badge i.bxs-star { color: #ff3366; }
+
+/* ── TIER BADGE (bottom right of card) ── */
+.tier-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+}
+
+.tier-free {
+    background: rgba(74, 222, 128, 0.18);
+    color: #4ade80;
+    border: 1px solid rgba(74,222,128,0.25);
+}
+
+.tier-premium {
+    background: rgba(251, 191, 36, 0.18);
+    color: #fbbf24;
+    border: 1px solid rgba(251,191,36,0.25);
+}
+
+.tier-vip {
+    background: rgba(244, 63, 94, 0.18);
+    color: #f43f5e;
+    border: 1px solid rgba(244,63,94,0.25);
+}
+
+/* ── CARD INFO (below image) ── */
+.card-info {
+    padding: 11px 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
 
 .card-title {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     font-weight: 800;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--text-light, #f0f0f0);
+    line-height: 1.3;
+    transition: color 0.2s;
 }
 
-.card-meta {
+.card-wrapper:hover .card-title { color: #fff; }
+
+.card-meta-row {
     display: flex;
-    gap: 8px;
+    justify-content: space-between;
     align-items: center;
-    color: var(--text-dim);
-    font-size: 0.76rem;
+    gap: 6px;
+}
+
+.tag-category {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.65);
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 0.66rem;
     font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
 }
 
-.tag-meta {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.67rem;
+.card-year {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-dim, rgba(240,240,240,0.45));
+    white-space: nowrap;
+    margin-left: auto;
 }
 
+.card-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.card-views {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--text-dim, rgba(240,240,240,0.45));
+    font-weight: 600;
+}
+
+.card-views i {
+    font-size: 0.9rem;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-dim, rgba(240,240,240,0.45));
+    padding: 60px 0;
+    font-size: 1rem;
+}
+
+/* ── PAGINATION ── */
 .pagination-wrap {
-    margin-top: 26px;
+    margin-top: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
 .page-btn {
     min-width: 44px;
     height: 44px;
-    border-radius: 10px;
-    border: 1px solid var(--glass-border);
+    border-radius: 11px;
+    border: 1px solid rgba(255,255,255,0.1);
     display: inline-flex;
     justify-content: center;
     align-items: center;
     text-decoration: none;
-    color: var(--text-light);
+    color: var(--text-light, #f0f0f0);
     font-weight: 800;
+    font-size: 0.88rem;
     background: rgba(255,255,255,0.03);
-    transition: 0.2s;
+    transition: border-color 0.18s, color 0.18s, background 0.18s, transform 0.15s;
 }
 
 .page-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--accent, #ff3366);
+    color: var(--accent, #ff3366);
+    background: rgba(255,51,102,0.07);
+    transform: translateY(-1px);
 }
 
 .page-btn.active {
-    background: #ff3366;
-    border-color: #ff3366;
+    background: var(--accent, #ff3366);
+    border-color: var(--accent, #ff3366);
     color: #fff;
-}
-
-.page-btn.disabled {
-    opacity: 0.5;
+    box-shadow: 0 4px 14px rgba(255,51,102,0.35);
     pointer-events: none;
 }
 
+.page-btn.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+    .catalog-wrap { padding: 0 4% 48px; }
+}
+
 @media (max-width: 768px) {
-    .catalog-header,
-    .catalog-container {
-        padding: 0 4%;
-    }
+    .catalog-wrap { padding: 0 4% 40px; }
 
     .catalog-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 14px;
+        padding: 24px 0 24px;
+        margin-bottom: 24px;
     }
+
+    .catalog-actions { width: 100%; }
+    .catalog-search-link { flex: 1; justify-content: center; }
 
     .cards-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px 12px;
     }
 
-    .anime-card {
-        height: 200px;
-    }
-
-    .card-title {
-        font-size: 0.9rem;
-    }
-
-    .card-meta {
-        font-size: 0.68rem;
-    }
-
-    .tag-meta {
-        font-size: 0.62rem;
-        padding: 2px 4px;
-    }
-
-    .top-badge-episode,
-    .top-badge-year {
-        font-size: 0.65rem;
-        padding: 3px 6px;
-    }
-
-    .top-badge {
-        font-size: 0.65rem;
-        padding: 3px 6px;
-    }
+    .card-title { font-size: 0.85rem; }
+    .card-meta-row { gap: 4px; }
+    .tag-category { font-size: 0.62rem; max-width: 80px; }
+    .card-year { font-size: 0.7rem; }
+    .card-views { font-size: 0.7rem; }
 }
 
 @media (max-width: 480px) {
-    .catalog-title {
-        font-size: 1.4rem;
+    .catalog-title { font-size: 1.35rem; }
+
+    .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px 10px;
     }
 
-    .anime-card {
-        height: 160px;
+    .card-info { padding-top: 8px; gap: 4px; }
+    .card-title { font-size: 0.82rem; }
+
+    .badge { font-size: 0.62rem; padding: 2px 6px; }
+    .tier-badge { font-size: 0.62rem; padding: 2px 6px; }
+
+    .fav-badge { width: 30px; height: 30px; font-size: 0.95rem; }
+}
+
+@media (min-width: 1200px) {
+    .cards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 26px 20px;
     }
 }
 </style>
@@ -283,89 +443,141 @@
 
 {% block content %}
 <main class="main-content">
+<div class="catalog-wrap">
+
+    <!-- HEADER -->
     <div class="catalog-header">
-        <div>
+        <div class="catalog-heading">
             <h1 class="catalog-title">Barcha <span>Animelar</span></h1>
-            <p class="catalog-sub">Jami: {{ page_obj.paginator.count }} ta</p>
+            <p class="catalog-sub">Jami {{ page_obj.paginator.count }} ta anime topildi</p>
         </div>
-        <a href="{% url 'search' %}" class="catalog-search-link">Qidiruvga o'tish</a>
+
+        <div class="catalog-actions">
+            <a href="{% url 'search' %}" class="catalog-search-link">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="7"/>
+                    <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+                </svg>
+                Qidirish
+            </a>
+        </div>
     </div>
 
-    <div class="catalog-container">
-        <div class="cards-grid">
-            {% for anime in movies %}
-            <div class="card-wrapper">
-                <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
-                    <div class="top-badge-group">
-                        {% if anime.release_year %}
-                        <div class="top-badge-year">{{ anime.release_year }}</div>
-                        {% endif %}
-                        {% if anime.episodes.count > 0 %}
-                        <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
-                        {% else %}
-                        <div class="top-badge-episode">Film</div>
-                        {% endif %}
-                    </div>
+    <!-- GRID -->
+    <div class="cards-grid">
+        {% for anime in movies %}
+        <div class="card-wrapper"
+             onclick="window.location.href='{% url 'movie_detail' anime.id %}'"
+             role="link"
+             tabindex="0"
+             onkeydown="if(event.key==='Enter')window.location.href='{% url 'movie_detail' anime.id %}'">
 
-                    <div class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})">
-                        {% if anime.id in fav_ids %}
-                            <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
-                        {% else %}
-                            <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
-                        {% endif %}
-                    </div>
+            <div class="anime-card">
 
-                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                <!-- TOP BADGES -->
+                <div class="top-badge-group">
+                    {% if anime.release_year %}
+                    <span class="badge badge-year">{{ anime.release_year }}</span>
+                    {% endif %}
+                    {% if anime.episodes.count > 0 %}
+                    <span class="badge badge-ep">{{ anime.episodes.count }} qism</span>
+                    {% else %}
+                    <span class="badge badge-ep">Film</span>
+                    {% endif %}
                 </div>
 
-                <div style="margin-top:8px;">
-                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
-                        <div class="card-title">{{ anime.title }}</div>
-                    </a>
-                    <div class="card-meta" style="margin-top:4px;">
-                        {% if anime.category %}<span class="tag-meta">{{ anime.category.name }}</span>{% endif %}
-                        <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
-                    </div>
-                    <div class="card-meta" style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="display:flex; align-items:center; gap:4px; font-size:0.8rem; color:var(--text-dim);"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</span>
-                        {% if anime.minimum_tier == 'vip' %}
-                        <span style="display:flex; align-items:center; gap:3px; font-size:0.8rem; color:#f43f5e; font-weight:800;"><i class='bx bxs-diamond'></i> VIP</span>
-                        {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
-                        <span style="display:flex; align-items:center; gap:3px; font-size:0.8rem; color:#fbbf24; font-weight:800;"><i class='bx bxs-crown'></i> Premium</span>
-                        {% else %}
-                        <span style="font-size:0.8rem; color:#4ade80; font-weight:800;">Bepul</span>
-                        {% endif %}
-                    </div>
+                <!-- FAVORITE -->
+                <div class="fav-badge"
+                     onclick="event.stopPropagation(); toggleFavorite(event, {{ anime.id }})"
+                     title="Saqlash">
+                    {% if anime.id in fav_ids %}
+                        <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
+                    {% else %}
+                        <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
+                    {% endif %}
+                </div>
+
+                <!-- POSTER -->
+                <img
+                    src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
+                    alt="{{ anime.title }}"
+                    loading="lazy"
+                    decoding="async"
+                >
+
+                <!-- TIER BADGE (bottom-right, over gradient) -->
+                {% if anime.minimum_tier == 'vip' %}
+                <span class="tier-badge tier-vip">
+                    <i class='bx bxs-diamond'></i> VIP
+                </span>
+                {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
+                <span class="tier-badge tier-premium">
+                    <i class='bx bxs-crown'></i> Premium
+                </span>
+                {% else %}
+                <span class="tier-badge tier-free">Bepul</span>
+                {% endif %}
+
+            </div>
+
+            <!-- CARD INFO -->
+            <div class="card-info">
+                <div class="card-title">{{ anime.title }}</div>
+
+                <div class="card-meta-row">
+                    {% if anime.category %}
+                    <span class="tag-category">{{ anime.category.name }}</span>
+                    {% endif %}
+                    <span class="card-year">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                </div>
+
+                <div class="card-stats-row">
+                    <span class="card-views">
+                        <i class='bx bx-show'></i>
+                        {{ anime.views_count|default:"0" }}
+                    </span>
                 </div>
             </div>
-            {% empty %}
-            <div style="grid-column:1/-1; text-align:center; color:var(--text-dim); padding: 24px 0;">Hozircha animelar yo'q.</div>
-            {% endfor %}
+
         </div>
+        {% empty %}
+        <div class="empty-state">Hozircha animelar yo'q.</div>
+        {% endfor %}
+    </div>
 
-        {% if page_obj.has_other_pages %}
-        <div class="pagination-wrap">
-            {% if page_obj.has_previous %}
-                <a class="page-btn" href="?page={{ page_obj.previous_page_number }}" aria-label="Oldingi">&#10094;</a>
-            {% else %}
-                <span class="page-btn disabled">&#10094;</span>
+    <!-- PAGINATION -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrap">
+        {% if page_obj.has_previous %}
+            <a class="page-btn" href="?page={{ page_obj.previous_page_number }}" aria-label="Oldingi">
+                <i class='bx bx-chevron-left' style="font-size:1.2rem;"></i>
+            </a>
+        {% else %}
+            <span class="page-btn disabled">
+                <i class='bx bx-chevron-left' style="font-size:1.2rem;"></i>
+            </span>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+                <span class="page-btn active">{{ num }}</span>
+            {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                <a class="page-btn" href="?page={{ num }}">{{ num }}</a>
             {% endif %}
+        {% endfor %}
 
-            {% for num in page_obj.paginator.page_range %}
-                {% if num == page_obj.number %}
-                    <span class="page-btn active">{{ num }}</span>
-                {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-                    <a class="page-btn" href="?page={{ num }}">{{ num }}</a>
-                {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-                <a class="page-btn" href="?page={{ page_obj.next_page_number }}" aria-label="Keyingi">&#10095;</a>
-            {% else %}
-                <span class="page-btn disabled">&#10095;</span>
-            {% endif %}
-        </div>
+        {% if page_obj.has_next %}
+            <a class="page-btn" href="?page={{ page_obj.next_page_number }}" aria-label="Keyingi">
+                <i class='bx bx-chevron-right' style="font-size:1.2rem;"></i>
+            </a>
+        {% else %}
+            <span class="page-btn disabled">
+                <i class='bx bx-chevron-right' style="font-size:1.2rem;"></i>
+            </span>
         {% endif %}
     </div>
+    {% endif %}
+
+</div>
 </main>
 {% endblock %}
