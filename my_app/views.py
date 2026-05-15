@@ -12,6 +12,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import F
 from django.db import models
+from django.views.decorators.http import require_POST
 
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
