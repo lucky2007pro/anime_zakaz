@@ -471,3 +471,13 @@ class ReelShare(models.Model):
 
 
 
+class UserPremiumSettings(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='premium_settings')
+    bottom_nav_enabled = models.BooleanField(default=False)
+    premium_design_enabled = models.BooleanField(default=False)
+    selected_bg_image = models.URLField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username} - Premium Settings"
+
