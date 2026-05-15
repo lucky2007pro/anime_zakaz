@@ -251,12 +251,6 @@
     width: 13px; height: 13px; border: none;
     border-radius: 50%; background: #ef4444; cursor: pointer;
 }
-.bm-quality-btn {
-    font-size: .7rem; font-weight: 900; padding: 3px 8px; border-radius: 6px;
-    background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.35);
-    color: #f87171; cursor: default; letter-spacing: .04em; white-space: nowrap;
-    flex-shrink: 0;
-}
 
 /* -- SPEED BUTTON -- */
 .bm-speed-btn {
@@ -264,9 +258,86 @@
     background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
     color: #fff; cursor: pointer; letter-spacing: .04em; white-space: nowrap;
     flex-shrink: 0; transition: background .18s, border-color .18s, color .18s;
-    min-height: 30px;
+    min-height: 30px; position: relative;
 }
 .bm-speed-btn:hover { background: rgba(239,68,68,.2); border-color: rgba(239,68,68,.4); color: #f87171; }
+
+/* -- SPEED MENU -- */
+.bm-speed-menu {
+    position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,15,.96); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px; overflow: hidden;
+    display: none; flex-direction: column;
+    min-width: 90px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.7);
+    backdrop-filter: blur(12px);
+    z-index: 50;
+}
+.bm-speed-menu.open { display: flex; }
+.bm-speed-menu-item {
+    padding: 9px 18px; font-size: .82rem; font-weight: 800;
+    color: rgba(255,255,255,.75); cursor: pointer; text-align: center;
+    transition: background .15s, color .15s;
+    border: none; background: none; white-space: nowrap;
+}
+.bm-speed-menu-item:hover { background: rgba(239,68,68,.18); color: #f87171; }
+.bm-speed-menu-item.active { color: #ef4444; background: rgba(239,68,68,.12); }
+
+/* -- LOCK BUTTON (top-left on controls) -- */
+.bm-lock-btn {
+    position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.18);
+    color: #fff; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: background .2s, border-color .2s, opacity .2s;
+    z-index: 40;
+    flex-shrink: 0;
+}
+.bm-lock-btn svg { width: 22px; height: 22px; fill: currentColor; pointer-events: none; }
+.bm-lock-btn:hover { background: rgba(239,68,68,.3); border-color: rgba(239,68,68,.5); }
+/* Show lock btn only when controls visible */
+.bm-player.show-controls .bm-lock-btn { display: inline-flex; }
+/* When locked — always show lock btn, hide other controls */
+.bm-player.locked .bm-lock-btn { display: inline-flex; opacity: 1; }
+.bm-player.locked .bm-top-bar { opacity: 0 !important; pointer-events: none !important; }
+.bm-player.locked .bm-controls { opacity: 0 !important; pointer-events: none !important; }
+.bm-player.locked .bm-tap-zone { pointer-events: none; }
+.bm-player.locked .bm-big-play { display: none; }
+/* Lock btn always visible when locked */
+.bm-player.locked .bm-lock-btn { display: inline-flex !important; }
+
+/* -- FAST FORWARD HOLD BUTTON -- */
+.bm-ffwd-btn {
+    background: none; border: none; color: #fff; cursor: pointer;
+    padding: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 6px; transition: background .17s, color .17s; flex-shrink: 0;
+    min-width: 36px; min-height: 36px;
+    /* Always works regardless of lock */
+}
+.bm-ffwd-btn:hover  { background: rgba(239,68,68,.2); color: #f87171; }
+.bm-ffwd-btn:active { background: rgba(239,68,68,.35); }
+.bm-ffwd-btn svg { width: 22px; height: 22px; fill: currentColor; pointer-events: none; }
+/* ffwd always visible in controls row but also outside when locked */
+.bm-ffwd-overlay {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.18);
+    color: #fff; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+    z-index: 40;
+    transition: background .2s;
+}
+.bm-ffwd-overlay svg { width: 22px; height: 22px; fill: currentColor; pointer-events: none; }
+.bm-ffwd-overlay:hover { background: rgba(239,68,68,.3); }
+/* Show ffwd overlay when locked */
+.bm-player.locked .bm-ffwd-overlay { display: inline-flex; }
 
 /* -- BIG CENTER PLAY -- */
 .bm-big-play {
@@ -550,7 +621,6 @@
     .episodes-box, .movie-info { padding: 14px; }
 
     .bm-vol-wrap  { display: none; }
-    .bm-quality-btn { display: none; }
 
     .video-container { padding: 0; }
     .bm-player { border-radius: 0; }
@@ -853,41 +923,55 @@
    SVG helpers
 --------------------------------------------------------------- */
 const _T = (typeof BM_MOVIE_TITLE !== 'undefined') ? BM_MOVIE_TITLE : '';
-const _Q = '{{ max_quality|escapejs }}';
 
 function svgIcon(path){ return `<svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="${path}"/></svg>`; }
 
 const SVG = {
-  back:     'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z',
-  play:     'M8 5v14l11-7z',
-  pause:    'M6 19h4V5H6v14zm8-14v14h4V5h-4z',
-  rewind:   'M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z',
-  fwd:      'M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z',
-  vol:      'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z',
-  mute:     'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z',
-  expand:   'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z',
-  collapse: 'M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z',
+  back:       'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z',
+  play:       'M8 5v14l11-7z',
+  pause:      'M6 19h4V5H6v14zm8-14v14h4V5h-4z',
+  rewind:     'M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z',
+  fwd:        'M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z',
+  vol:        'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z',
+  mute:       'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z',
+  expand:     'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z',
+  collapse:   'M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z',
+  lock:       'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z',
+  unlock:     'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z',
+  ffwd:       'M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z',
 };
+
+/* Speed options */
+const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
 function btn(id, title, svgKey){
   return `<button class="bm-btn" id="${id}" aria-label="${title}">${svgIcon(SVG[svgKey])}</button>`;
 }
 
 /* ---------------------------------------------------------------
-   SPEED options
---------------------------------------------------------------- */
-const SPEEDS = [0.1, 0.5, 1, 1.5, 2];
-
-/* ---------------------------------------------------------------
    Build inner HTML for .bm-player
 --------------------------------------------------------------- */
-function buildInner(title, quality){
+function buildInner(title){
+  /* Speed menu items */
+  const speedItems = SPEEDS.map(function(s){
+    return `<button class="bm-speed-menu-item${s===1?' active':''}" data-speed="${s}">${s}x</button>`;
+  }).join('');
+
   return `
 <div class="bm-top-bar" id="bm-top-bar">
   <button type="button" class="bm-back-link" title="Kichik ekran" id="bm-exit-fs">${svgIcon(SVG.back)}</button>
   <span class="bm-title-bar">${title || ''}</span>
-  ${quality ? `<span class="bm-quality-btn">${quality}</span>` : ''}
 </div>
+
+<!-- Lock button — always rendered, shown via CSS -->
+<button type="button" class="bm-lock-btn" id="bm-lock-btn" title="Ekranni qulflash">
+  ${svgIcon(SVG.lock)}
+</button>
+
+<!-- Fast-forward overlay (visible when locked) -->
+<button type="button" class="bm-ffwd-overlay" id="bm-ffwd-overlay" title="Tez oldinga (bosib turing)">
+  ${svgIcon(SVG.ffwd)}
+</button>
 
 <div class="bm-tap-zone bm-tap-left">
   <div class="bm-tap-ripple" id="bm-ripple-left">
@@ -917,9 +1001,17 @@ function buildInner(title, quality){
     ${btn('bm-play-btn','Ijro etish','play')}
     ${btn('bm-back10','-10s','rewind')}
     ${btn('bm-fwd10','+10s','fwd')}
+    <!-- Fast-forward hold button (in controls row) -->
+    <button class="bm-ffwd-btn" id="bm-ffwd-btn" title="Tez oldinga (bosib turing)">${svgIcon(SVG.ffwd)}</button>
     <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
     <div class="bm-spacer"></div>
-    <button class="bm-speed-btn" id="bm-speed-btn" title="Tezlik">1x</button>
+    <!-- Speed button with popup menu -->
+    <div style="position:relative;flex-shrink:0;">
+      <button class="bm-speed-btn" id="bm-speed-btn" title="Tezlik">1x</button>
+      <div class="bm-speed-menu" id="bm-speed-menu">
+        ${speedItems}
+      </div>
+    </div>
     <div class="bm-vol-wrap">
       ${btn('bm-vol-btn','Ovoz','vol')}
       <input type="range" class="bm-vol-slider" id="bm-volume" min="0" max="1" step="0.05" value="1">
@@ -936,7 +1028,7 @@ function buildInner(title, quality){
   document.querySelectorAll('.bm-player').forEach(function(p){
     const vid = p.querySelector('video');
     if(!vid || p.querySelector('.bm-controls')) return;
-    vid.insertAdjacentHTML('afterend', buildInner(_T, _Q));
+    vid.insertAdjacentHTML('afterend', buildInner(_T));
   });
 })();
 
@@ -958,7 +1050,7 @@ function buildBmHTML(src){
     <video id="video-player" playsinline webkit-playsinline preload="metadata">
       <source src="${src}" type="video/mp4">
     </video>
-    ${buildInner(_T, _Q)}
+    ${buildInner(_T)}
   </div>`;
 }
 
@@ -1071,41 +1163,151 @@ function initBmPlayer(){
 
   const $id = function(id){ return document.getElementById(id); };
 
-  const playBtn   = $id('bm-play-btn');
-  const back10    = $id('bm-back10');
-  const fwd10     = $id('bm-fwd10');
-  const timeEl    = $id('bm-time-display');
-  const progress  = $id('bm-progress');
-  const fill      = $id('bm-fill');
-  const thumb     = $id('bm-thumb');
-  const buf       = $id('bm-buf');
-  const volBtn    = $id('bm-vol-btn');
-  const volSlider = $id('bm-volume');
-  const fsBtn     = $id('bm-fullscreen');
-  const exitFsBtn = $id('bm-exit-fs');
-  const rippleL   = $id('bm-ripple-left');
-  const rippleR   = $id('bm-ripple-right');
-  const speedBtn  = $id('bm-speed-btn');
+  const playBtn    = $id('bm-play-btn');
+  const back10     = $id('bm-back10');
+  const fwd10      = $id('bm-fwd10');
+  const ffwdBtn    = $id('bm-ffwd-btn');
+  const ffwdOverlay= $id('bm-ffwd-overlay');
+  const timeEl     = $id('bm-time-display');
+  const progress   = $id('bm-progress');
+  const fill       = $id('bm-fill');
+  const thumb      = $id('bm-thumb');
+  const buf        = $id('bm-buf');
+  const volBtn     = $id('bm-vol-btn');
+  const volSlider  = $id('bm-volume');
+  const fsBtn      = $id('bm-fullscreen');
+  const exitFsBtn  = $id('bm-exit-fs');
+  const rippleL    = $id('bm-ripple-left');
+  const rippleR    = $id('bm-ripple-right');
+  const speedBtn   = $id('bm-speed-btn');
+  const speedMenu  = $id('bm-speed-menu');
+  const lockBtn    = $id('bm-lock-btn');
 
-  /* ---- Speed control ---- */
-  var currentSpeedIdx = 2; // default 1x (index 2 in [0.1,0.5,1,1.5,2])
+  /* ================================================================
+     SPEED MENU
+  ================================================================ */
+  var currentSpeed = 1;
+  var speedMenuOpen = false;
+
+  function openSpeedMenu(){
+    if(!speedMenu) return;
+    speedMenu.classList.add('open');
+    speedMenuOpen = true;
+  }
+  function closeSpeedMenu(){
+    if(!speedMenu) return;
+    speedMenu.classList.remove('open');
+    speedMenuOpen = false;
+  }
+  function toggleSpeedMenu(e){
+    e.stopPropagation();
+    speedMenuOpen ? closeSpeedMenu() : openSpeedMenu();
+  }
+
   if(speedBtn){
-    speedBtn.addEventListener('click', function(e){
-      e.stopPropagation();
-      currentSpeedIdx = (currentSpeedIdx + 1) % SPEEDS.length;
-      const spd = SPEEDS[currentSpeedIdx];
-      video.playbackRate = spd;
-      speedBtn.textContent = spd + 'x';
+    speedBtn.addEventListener('click', toggleSpeedMenu);
+  }
+
+  /* Speed menu item clicks */
+  if(speedMenu){
+    speedMenu.querySelectorAll('.bm-speed-menu-item').forEach(function(item){
+      item.addEventListener('click', function(e){
+        e.stopPropagation();
+        var spd = parseFloat(item.dataset.speed);
+        currentSpeed = spd;
+        video.playbackRate = spd;
+        if(speedBtn) speedBtn.textContent = spd + 'x';
+        speedMenu.querySelectorAll('.bm-speed-menu-item').forEach(function(i){
+          i.classList.toggle('active', parseFloat(i.dataset.speed) === spd);
+        });
+        closeSpeedMenu();
+      });
     });
   }
 
-  /* ---- Helpers ---- */
+  /* Close speed menu on outside click */
+  document.addEventListener('click', function(e){
+    if(speedMenuOpen && speedMenu && !speedMenu.contains(e.target) && e.target !== speedBtn){
+      closeSpeedMenu();
+    }
+  });
+
+  /* ================================================================
+     LOCK / UNLOCK
+  ================================================================ */
+  var isLocked = false;
+
+  function setLocked(locked){
+    isLocked = locked;
+    player.classList.toggle('locked', locked);
+    if(lockBtn) lockBtn.innerHTML = svgIcon(locked ? SVG.unlock : SVG.lock);
+  }
+
+  if(lockBtn){
+    lockBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      setLocked(!isLocked);
+      /* When unlocking, show controls briefly */
+      if(!isLocked){ showControls(3000); }
+    });
+  }
+
+  /* ================================================================
+     FAST-FORWARD HOLD (bm-ffwd-btn and bm-ffwd-overlay)
+     Hold → video time increments continuously like a counter 1,2,3...
+     Works in both locked and unlocked state
+  ================================================================ */
+  var ffwdInterval   = null;
+  var ffwdCounter    = 0;
+  var ffwdStep       = 1;      /* seconds per tick */
+  var ffwdTickMs     = 100;    /* ms between ticks */
+
+  function startFfwd(){
+    if(ffwdInterval) return;
+    ffwdCounter = 0;
+    ffwdInterval = setInterval(function(){
+      ffwdCounter++;
+      video.currentTime = Math.min(video.duration || Infinity, video.currentTime + ffwdStep);
+      updateProgress();
+      /* Show ripple as counter */
+      if(rippleR){
+        var span = rippleR.querySelector('span');
+        if(span) span.textContent = '+' + ffwdCounter + ' son';
+        rippleR.classList.add('active');
+      }
+    }, ffwdTickMs);
+  }
+
+  function stopFfwd(){
+    if(ffwdInterval){ clearInterval(ffwdInterval); ffwdInterval = null; }
+    if(rippleR){ rippleR.classList.remove('active'); }
+    ffwdCounter = 0;
+  }
+
+  function addFfwdListeners(el){
+    if(!el) return;
+    /* Mouse */
+    el.addEventListener('mousedown',  function(e){ e.stopPropagation(); startFfwd(); });
+    window.addEventListener('mouseup', stopFfwd);
+    /* Touch */
+    el.addEventListener('touchstart', function(e){ e.stopPropagation(); startFfwd(); }, { passive: true });
+    el.addEventListener('touchend',   function(e){ e.stopPropagation(); stopFfwd(); }, { passive: true });
+    el.addEventListener('touchcancel',function(){ stopFfwd(); }, { passive: true });
+  }
+
+  addFfwdListeners(ffwdBtn);
+  addFfwdListeners(ffwdOverlay);
+
+  /* ================================================================
+     HELPERS
+  ================================================================ */
   function setPlayState(playing){
     if(playBtn) playBtn.innerHTML = svgIcon(playing ? SVG.pause : SVG.play);
     player.classList.toggle('paused', !playing);
   }
 
   function togglePlay(){
+    if(isLocked) return; /* play/pause blocked when locked */
     video.paused ? video.play().catch(function(){}) : video.pause();
   }
 
@@ -1120,7 +1322,7 @@ function initBmPlayer(){
   }
 
   function seekRatio(r){
-    if(!video.duration) return;
+    if(!video.duration || isLocked) return;
     video.currentTime = Math.min(Math.max(r, 0), 1) * video.duration;
     updateProgress();
   }
@@ -1136,8 +1338,18 @@ function initBmPlayer(){
 
   /* ---- Play / skip buttons ---- */
   if(playBtn) playBtn.addEventListener('click', function(e){ e.stopPropagation(); togglePlay(); });
-  if(back10)  back10.addEventListener('click',  function(e){ e.stopPropagation(); video.currentTime = Math.max(0, video.currentTime - 10); showRipple(rippleL, '−10 son'); });
-  if(fwd10)   fwd10.addEventListener('click',   function(e){ e.stopPropagation(); video.currentTime = Math.min(video.duration || Infinity, video.currentTime + 10); showRipple(rippleR, '+10 son'); });
+  if(back10)  back10.addEventListener('click',  function(e){
+    e.stopPropagation();
+    if(isLocked) return;
+    video.currentTime = Math.max(0, video.currentTime - 10);
+    showRipple(rippleL, '−10 son');
+  });
+  if(fwd10)   fwd10.addEventListener('click',   function(e){
+    e.stopPropagation();
+    if(isLocked) return;
+    video.currentTime = Math.min(video.duration || Infinity, video.currentTime + 10);
+    showRipple(rippleR, '+10 son');
+  });
 
   /* ---- Progress: mouse ---- */
   var seeking = false;
@@ -1226,11 +1438,12 @@ function initBmPlayer(){
   });
 
   /* ================================================================
-     CONTROLS VISIBILITY — 1 marta touch: ko'rsat, yana 1 marta: yashir
+     CONTROLS VISIBILITY
   ================================================================ */
   var hideTimer = null;
 
   function showControls(ms){
+    if(isLocked){ return; } /* when locked controls stay hidden */
     player.classList.add('show-controls');
     clearTimeout(hideTimer);
     if(!isTouch() && !video.paused){
@@ -1247,11 +1460,15 @@ function initBmPlayer(){
     player.addEventListener('mousemove',  function(){ showControls(3000); });
     player.addEventListener('mouseleave', function(){ clearTimeout(hideTimer); if(!video.paused) hideControls(); });
     player.addEventListener('click', function(e){
+      if(isLocked) return; /* block all clicks when locked except lock btn */
       if(e.target.closest('.bm-progress-wrap') ||
          e.target.closest('.bm-btn') ||
          e.target.closest('.bm-back-link') ||
          e.target.closest('#bm-exit-fs') ||
-         e.target.closest('.bm-speed-btn')) return;
+         e.target.closest('.bm-speed-btn') ||
+         e.target.closest('.bm-speed-menu') ||
+         e.target.closest('.bm-ffwd-btn') ||
+         e.target.closest('#bm-lock-btn')) return;
       togglePlay();
       showControls(2500);
     });
@@ -1259,13 +1476,10 @@ function initBmPlayer(){
 
   /* ================================================================
      MOBILE TOUCH LOGIC
-     - 1 marta tap: iconlar yo'q bo'lsa ko'rsat, bor bo'lsa yashir
-     - Markazga tap (controls ko'rinib tursa): play/pause
-     - Chap/ung zona: 2 marta tap — +10, +20, +30 qo'shib ketadi
   ================================================================ */
   if(isTouch()){
     var lastTap    = 0;
-    var DTAP       = 300; // ms, double-tap oraliq
+    var DTAP       = 300;
     var leftSkip   = 10;
     var rightSkip  = 10;
     var resetTimer = null;
@@ -1277,12 +1491,20 @@ function initBmPlayer(){
     }
 
     player.addEventListener('touchend', function(e){
-      // controls yoki tugmalar bosilsa — player logicasiga kiritma
+      /* Always allow lock btn */
+      if(e.target.closest('#bm-lock-btn')) return;
+      /* Always allow ffwd overlay */
+      if(e.target.closest('#bm-ffwd-overlay')) return;
+
+      if(isLocked) return; /* block everything else when locked */
+
       if(e.target.closest('.bm-progress-wrap') ||
          e.target.closest('.bm-btn') ||
          e.target.closest('.bm-back-link') ||
          e.target.closest('#bm-exit-fs') ||
-         e.target.closest('.bm-speed-btn')) return;
+         e.target.closest('.bm-speed-btn') ||
+         e.target.closest('.bm-speed-menu') ||
+         e.target.closest('.bm-ffwd-btn')) return;
 
       var now  = Date.now();
       var t    = e.changedTouches[0];
@@ -1291,39 +1513,32 @@ function initBmPlayer(){
       var isDbl = (now - lastTap) < DTAP;
 
       if(isDbl){
-        // ===== DOUBLE TAP =====
         lastTap = 0;
         scheduleReset();
 
         if(xRel < 0.36){
-          // Chap zona — orqaga
           video.currentTime = Math.max(0, video.currentTime - leftSkip);
           showRipple(rippleL, '−' + leftSkip + ' son');
           player.classList.add('show-controls');
           leftSkip += 10;
         } else if(xRel > 0.64){
-          // O'ng zona — oldinga
           video.currentTime = Math.min(video.duration || Infinity, video.currentTime + rightSkip);
           showRipple(rippleR, '+' + rightSkip + ' son');
           player.classList.add('show-controls');
           rightSkip += 10;
         } else {
-          // Markaz — play/pause
           togglePlay();
           player.classList.add('show-controls');
         }
       } else {
-        // ===== SINGLE TAP =====
         var showing = player.classList.contains('show-controls');
         if(showing){
-          // Markazga bosish → play/pause, yon tomonga → yashir
           if(xRel >= 0.36 && xRel <= 0.64){
             togglePlay();
           } else {
             hideControls();
           }
         } else {
-          // Iconlar yo'q — ko'rsat (qayerga bosmasin)
           player.classList.add('show-controls');
         }
         lastTap = now;
@@ -1331,14 +1546,15 @@ function initBmPlayer(){
     }, { passive: true });
   }
 
-  video.addEventListener('pause', function(){ clearTimeout(hideTimer); player.classList.add('show-controls'); });
-  video.addEventListener('ended', function(){ clearTimeout(hideTimer); player.classList.add('show-controls'); });
+  video.addEventListener('pause', function(){ clearTimeout(hideTimer); if(!isLocked) player.classList.add('show-controls'); });
+  video.addEventListener('ended', function(){ clearTimeout(hideTimer); if(!isLocked) player.classList.add('show-controls'); });
 
   /* ================================================================
      KEYBOARD SHORTCUTS (desktop only)
   ================================================================ */
   document.addEventListener('keydown', function(e){
     if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+    if(isLocked) return; /* keyboard blocked when locked */
     switch(e.code){
       case 'Space':
         e.preventDefault(); togglePlay(); showControls(2000); break;
@@ -1400,7 +1616,7 @@ document.addEventListener('click', function(e){
   var nextBtn = document.getElementById('related-next');
   if(!scroll) return;
 
-  var CARD_W = 154; // card width + gap taxminan
+  var CARD_W = 154;
 
   if(prevBtn) prevBtn.addEventListener('click', function(){
     scroll.scrollBy({ left: -CARD_W * 3, behavior: 'smooth' });
@@ -1409,7 +1625,6 @@ document.addEventListener('click', function(e){
     scroll.scrollBy({ left: CARD_W * 3, behavior: 'smooth' });
   });
 
-  /* Mouse drag to scroll (PC) */
   var isDragging = false, startX = 0, scrollLeft = 0;
   scroll.addEventListener('mousedown', function(e){
     isDragging = true;
@@ -1427,7 +1642,6 @@ document.addEventListener('click', function(e){
     var x = e.pageX - scroll.offsetLeft;
     scroll.scrollLeft = scrollLeft - (x - startX);
   });
-  /* Linkka click bo'lsa — drag bo'lsa link ishlamasin */
   scroll.addEventListener('click', function(e){
     if(Math.abs(scroll.scrollLeft - scrollLeft) > 5){
       e.preventDefault();
