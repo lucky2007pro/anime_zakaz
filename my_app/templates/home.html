@@ -18,23 +18,19 @@
         border-radius: 16px;
         margin: 0 auto;
         box-shadow: 0 0 0 2px rgba(0, 243, 255, 0.25), 0 0 40px rgba(0, 243, 255, 0.12);
-        /* GPU layer — repaint oldini oladi */
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
     }
 
     .slides-wrapper {
         display: flex;
         width: 100%;
         height: 100%;
-        will-change: transform;
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         cursor: grab;
         user-select: none;
-        /* transition faqat JS orqali qo'shiladi */
     }
-
     .slides-wrapper.dragging {
         cursor: grabbing;
+        transition: none;
     }
 
     .slide {
@@ -63,8 +59,6 @@
         object-fit: cover;
         object-position: center top;
         display: block;
-        /* parallax GPU layer */
-        will-change: transform;
     }
 
     .slide-bg-video {
@@ -83,7 +77,6 @@
         z-index: 2;
         background: linear-gradient(to right, rgba(15,15,19,0.92) 0%, rgba(15,15,19,0.35) 55%, transparent 100%),
                     linear-gradient(to top, rgba(15,15,19,1) 0%, transparent 50%);
-        pointer-events: none;
     }
 
     .slide-content {
@@ -168,7 +161,6 @@
         display: flex;
         gap: 8px;
         z-index: 20;
-        pointer-events: none; /* dotlar overlap bilan drag ni bloklamasin */
     }
 
     .dot {
@@ -178,7 +170,6 @@
         border-radius: 2px;
         cursor: pointer;
         transition: all 0.3s;
-        pointer-events: auto;
     }
 
     .dot[aria-pressed="true"] {
@@ -236,12 +227,13 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         padding: 10px 4%;
-        /* scroll snap yordamida tekisroq scroll */
-        scroll-snap-type: x mandatory;
+        visibility: visible;
+        opacity: 1;
+        position: relative;
+        z-index: 20;
     }
 
     .story-container::-webkit-scrollbar { display: none; }
-    .story-container { scrollbar-width: none; }
 
     .story-item {
         display: flex;
@@ -252,8 +244,6 @@
         cursor: pointer;
         text-decoration: none;
         color: inherit;
-        scroll-snap-align: start;
-        -webkit-tap-highlight-color: transparent;
     }
 
     .story-ring {
@@ -265,7 +255,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        transition: transform 0.25s ease;
+        transition: 0.3s ease;
     }
 
     .story-ring.seen { background: #444; }
@@ -276,7 +266,6 @@
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid #0f0f13;
-        display: block;
     }
 
     .story-item span {
@@ -317,9 +306,6 @@
         cursor: pointer;
         background: var(--bg-surface);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        /* GPU layer */
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
     }
 
     .card-wrapper:hover .anime-card {
@@ -332,7 +318,6 @@
         height: 100%;
         object-fit: cover;
         transition: transform 0.5s ease;
-        display: block;
     }
 
     .card-wrapper:hover .anime-card img { transform: scale(1.06); }
@@ -405,7 +390,6 @@
     .top-badge-episode {
         background: rgba(0,0,0,0.8);
         backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
         padding: 4px 8px;
         border-radius: 6px;
         font-size: 0.75rem;
@@ -452,7 +436,6 @@
         gap: 3px;
         letter-spacing: 0.5px;
         backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
     }
 
     .tier-badge.vip {
@@ -474,7 +457,6 @@
         right: 8px;
         background: rgba(0,0,0,0.5);
         backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
         width: 32px;
         height: 32px;
         border-radius: 50%;
@@ -485,14 +467,11 @@
         font-size: 1.1rem;
         z-index: 10;
         transition: 0.3s;
-        -webkit-tap-highlight-color: transparent;
     }
-
     .fav-badge:hover {
         background: rgba(255,255,255,0.2);
         color: #ff3366;
     }
-
     .fav-badge i.bxs-star { color: #ff3366; }
 
     .card-info-bottom {
@@ -547,9 +526,7 @@
         padding-bottom: 20px;
         cursor: grab;
         user-select: none;
-        -webkit-tap-highlight-color: transparent;
     }
-
     #marqueeOuter.grabbing {
         cursor: grabbing;
     }
@@ -558,8 +535,6 @@
         display: flex;
         width: max-content;
         gap: 16px;
-        /* GPU compositing */
-        will-change: transform;
     }
 
     .marquee-item {
@@ -676,7 +651,6 @@
         box-shadow: 0 8px 25px rgba(255, 0, 60, 0.35);
         transition: all 0.3s ease;
         margin-left: 0;
-        -webkit-tap-highlight-color: transparent;
     }
 
     .btn-main:hover {
@@ -691,8 +665,12 @@
     /* ----- MOBILE ----- */
     @media (max-width: 600px) {
         .story-container {
+            display: flex;
+            flex-direction: row;
             gap: 10px;
             padding: 10px 4%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .story-ring {
             width: 80px !important;
@@ -715,16 +693,21 @@
             line-height: 1.2;
         }
         .tags {
+            display: flex;
             justify-content: flex-start !important;
             flex-wrap: wrap;
             gap: 6px;
         }
         .slide-meta-row {
+            display: flex;
             justify-content: flex-start !important;
             flex-wrap: wrap;
             gap: 10px;
+            text-align: left;
         }
         .hero-buttons {
+            width: 100%;
+            display: flex;
             justify-content: flex-start !important;
         }
         .btn-main {
@@ -763,8 +746,6 @@
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         .anime-card { height: 240px; }
         .action-btn { padding: 14px 22px; font-size: 0.9rem; }
-        /* Parallax disable mobilda — juda katta CPU yuklaydi */
-        .slide-bg img { will-change: auto !important; }
     }
 
     @media (max-width: 480px) {
@@ -797,545 +778,492 @@
 
 {% block content %}
 
-<div class="story-top-space">
-
 <!-- ANIME HIKOYALAR -->
-<div class="story-container">
-    {% for story in stories %}
-    <a href="{% url 'story_view' story.id %}" class="story-item">
-        <div class="story-ring {% if story.id in seen_stories %}seen{% endif %}">
-            {% if story.image %}
-                <img src="{{ story.image.url }}" alt="{{ story.title }}" loading="lazy">
-            {% else %}
-                <img src="https://via.placeholder.com/150" alt="story" loading="lazy">
-            {% endif %}
+<div class="story-top-space">
+    <div class="section-header">
+        <div class="section-title">
+            <h3>Anime <span>Hikoyalar</span></h3>
         </div>
-        <span>{{ story.title }}</span>
-    </a>
-    {% empty %}
-        <p style="color:#aaa; padding:10px;">Hozircha story yo'q</p>
-    {% endfor %}
-</div>
+    </div>
 
-<!-- HERO SLIDER -->
-{% if hero_movies %}
-<div class="slider-wrapper-outer" style="margin-top: 20px;">
-    <div class="slider-container" id="heroSlider">
-        <div class="slides-wrapper" id="slidesWrapper">
-
-            {% for anime in hero_movies %}
-            {% if anime.id %}
-            <div class="slide">
-
-                {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
-                    <video class="slide-bg-video" autoplay loop muted playsinline preload="none">
-                        <source src="{{ anime.hero_media.url }}">
-                    </video>
-                {% elif anime.hero_media %}
-                    <div class="slide-bg">
-                        <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
-                    </div>
+    <div class="story-container">
+        {% for story in stories %}
+        <a href="{% url 'story_view' story.id %}" class="story-item">
+            <div class="story-ring {% if story.id in seen_stories %}seen{% endif %}">
+                {% if story.image %}
+                    <img src="{{ story.image.url }}" alt="{{ story.title }}">
                 {% else %}
-                    <div class="slide-bg">
-                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
-                    </div>
+                    <img src="https://via.placeholder.com/150" alt="story">
                 {% endif %}
-
-                <div class="slide-overlay"></div>
-
-                <div class="slider-controls">
-                    {% for h_anime in hero_movies %}
-                    {% if h_anime.id %}
-                    <div class="dot dot-{{ forloop.counter0 }}"
-                         role="button"
-                         tabindex="0"
-                         aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}"
-                         onclick="goToSlide({{ forloop.counter0 }})">
-                    </div>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-
-                <div class="slide-content">
-                    <div class="tags">
-                        <span class="tag">YANGI</span>
-                        <span class="tag tag-muted">{{ anime.created_at|date:"Y" }}</span>
-                        {% if anime.episodes.count > 0 %}
-                        <span class="tag">{{ anime.episodes.count }} qism</span>
-                        {% endif %}
-                        {% if anime.category %}
-                        <span class="tag tag-muted">{{ anime.category.name }}</span>
-                        {% endif %}
-                    </div>
-
-                    <h1 class="slide-title">{{ anime.title }}</h1>
-
-                    <div class="slide-meta-row">
-                        {% if anime.release_year %}
-                        <div class="slide-meta-item">
-                            <i class='bx bx-calendar'></i>
-                            <span>{{ anime.release_year }}</span>
-                        </div>
-                        {% endif %}
-                        {% if anime.views_count %}
-                        <div class="slide-meta-item">
-                            <i class='bx bx-show'></i>
-                            <span>{{ anime.views_count }}</span>
-                        </div>
-                        {% endif %}
-                        {% if anime.rating %}
-                        <div class="slide-rating">
-                            <i class='bx bxs-star'></i>
-                            {{ anime.rating }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="hero-buttons">
-                        <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
-                            ▶ Hozir ko'rish
-                        </a>
-                    </div>
-                </div>
             </div>
-            {% endif %}
-            {% endfor %}
-
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<!-- TAVSIYA ETILADIGANLAR -->
-{% if recommended_movies %}
-<div class="container recommendation-section">
-    <div class="section-header" style="margin-top:0; padding: 0;">
-        <div class="section-title">
-            <h3>Tavsiya <span>etiladiganlar</span></h3>
-        </div>
-    </div>
-
-    <div id="marqueeOuter">
-        <div class="marquee-container" id="marqueeContainer">
-            {% for anime in recommended_movies %}
-            {% if anime.id %}
-            <div class="card-wrapper marquee-item">
-                <div class="anime-card" style="cursor:pointer; height: 260px;"
-                     data-href="{% url 'movie_detail' anime.id %}">
-                    <div class="top-badge-group">
-                        <div class="top-badge" style="background: var(--accent); color: #000;">
-                            <i class='bx bx-trending-up'></i> TOP
-                        </div>
-                    </div>
-                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
-                </div>
-                <div class="card-info-bottom">
-                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
-                        <h4 class="card-title">{{ anime.title }}</h4>
-                    </a>
-                    <div class="card-meta" style="margin-top:4px;">
-                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                        <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-            <!-- Duplicate for seamless loop -->
-            {% for anime in recommended_movies %}
-            {% if anime.id %}
-            <div class="card-wrapper marquee-item">
-                <div class="anime-card" style="cursor:pointer; height: 260px;"
-                     data-href="{% url 'movie_detail' anime.id %}">
-                    <div class="top-badge-group">
-                        <div class="top-badge" style="background: var(--accent); color: #000;">
-                            <i class='bx bx-trending-up'></i> TOP
-                        </div>
-                    </div>
-                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
-                </div>
-                <div class="card-info-bottom">
-                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
-                        <h4 class="card-title">{{ anime.title }}</h4>
-                    </a>
-                    <div class="card-meta" style="margin-top:4px;">
-                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                        <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<!-- ALOQA VA CHAT TUGMALAR -->
-<div class="action-buttons-section">
-    <div class="action-buttons-inner">
-        <a href="https://bestmedia-official.uz/aloqa/" class="action-btn action-btn-contact" target="_blank" rel="noopener">
-            <i class='bx bx-phone-call'></i>
-            <span>Aloqa</span>
+            <span>{{ story.title }}</span>
         </a>
-        <a href="https://bestmedia-official.uz/chat/" class="action-btn action-btn-chat" target="_blank" rel="noopener">
-            <i class='bx bx-message-rounded-dots'></i>
-            <span>BestMedia Chat</span>
-        </a>
-    </div>
-</div>
-
-<!-- YANGI QO'SHILGANLAR -->
-<div class="container" id="new-releases">
-    <div class="section-header" style="padding:0;">
-        <div class="section-title">
-            <h3>Yangi <span>Qo'shilganlar</span></h3>
-        </div>
-        <a href="{% url 'anime_catalog' %}" class="view-all">Barchasini ko'rish →</a>
-    </div>
-
-    <div class="cards-grid">
-        {% for anime in movies %}
-        {% if anime.id %}
-        <div class="card-wrapper">
-            <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
-                <div class="top-badge-group">
-                    {% if anime.release_year %}
-                    <div class="top-badge-year">{{ anime.release_year }}</div>
-                    {% endif %}
-                    {% if anime.episodes.count > 0 %}
-                    <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
-                    {% else %}
-                    <div class="top-badge-episode">Film</div>
-                    {% endif %}
-                </div>
-
-                {% if anime.minimum_tier == 'vip' %}
-                <div class="tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
-                {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
-                <div class="tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
-                {% endif %}
-
-                <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
-
-                <div class="card-inner-overlay">
-                    <div class="card-inner-title">{{ anime.title }}</div>
-                    {% if anime.description %}
-                    <div class="card-inner-desc">{{ anime.description|truncatechars:80 }}</div>
-                    {% endif %}
-                    <div class="card-inner-meta">
-                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                        <div class="card-inner-views"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</div>
-                    </div>
-                </div>
-
-                <div class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})">
-                    {% if anime.id in fav_ids %}
-                        <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
-                    {% else %}
-                        <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="card-info-bottom">
-                <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
-                    <h4 class="card-title">{{ anime.title }}</h4>
-                </a>
-                <div class="card-meta" style="margin-top:4px;">
-                    {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                    <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
-                </div>
-                <div class="card-meta" style="justify-content:space-between; margin-top:5px;">
-                    <span style="display:flex; align-items:center; gap:4px; font-size:0.78rem; color:var(--text-dim);">
-                        <i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}
-                    </span>
-                    {% if anime.minimum_tier == 'vip' %}
-                    <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#fbbf24; font-weight:900;"><i class='bx bxs-crown'></i> VIP</span>
-                    {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
-                    <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#f43f5e; font-weight:800;"><i class='bx bxs-diamond'></i> Premium</span>
-                    {% else %}
-                    <span style="font-size:0.78rem; color:#4ade80; font-weight:800;">Bepul</span>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
         {% empty %}
-        <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">
-            Hozircha animelar kiritilmadi.
-        </div>
+            <p style="color:#aaa; padding:10px;">Hozircha story yo'q</p>
         {% endfor %}
     </div>
-</div>
+
+    <!-- HERO SLIDER -->
+    {% if hero_movies %}
+    <div class="slider-wrapper-outer" style="margin-top: 20px;">
+        <div class="slider-container" id="heroSlider">
+            <div class="slides-wrapper" id="slidesWrapper">
+
+                {% for anime in hero_movies %}
+                {% if anime.id %}
+                <div class="slide">
+
+                    {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
+                        <video class="slide-bg-video" autoplay loop muted playsinline>
+                            <source src="{{ anime.hero_media.url }}">
+                        </video>
+                    {% elif anime.hero_media %}
+                        <div class="slide-bg">
+                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}">
+                        </div>
+                    {% else %}
+                        <div class="slide-bg">
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}">
+                        </div>
+                    {% endif %}
+
+                    <div class="slide-overlay"></div>
+
+                    <div class="slider-controls">
+                        {% for h_anime in hero_movies %}
+                        {% if h_anime.id %}
+                        <div class="dot dot-{{ forloop.counter0 }}"
+                             role="button"
+                             tabindex="0"
+                             aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}"
+                             onclick="goToSlide({{ forloop.counter0 }})">
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="slide-content">
+                        <div class="tags">
+                            <span class="tag">YANGI</span>
+                            <span class="tag tag-muted">{{ anime.created_at|date:"Y" }}</span>
+                            {% if anime.episodes.count > 0 %}
+                            <span class="tag">{{ anime.episodes.count }} qism</span>
+                            {% endif %}
+                            {% if anime.category %}
+                            <span class="tag tag-muted">{{ anime.category.name }}</span>
+                            {% endif %}
+                        </div>
+
+                        <h1 class="slide-title">{{ anime.title }}</h1>
+
+                        <div class="slide-meta-row">
+                            {% if anime.release_year %}
+                            <div class="slide-meta-item">
+                                <i class='bx bx-calendar'></i>
+                                <span>{{ anime.release_year }}</span>
+                            </div>
+                            {% endif %}
+                            {% if anime.views_count %}
+                            <div class="slide-meta-item">
+                                <i class='bx bx-show'></i>
+                                <span>{{ anime.views_count }}</span>
+                            </div>
+                            {% endif %}
+                            {% if anime.rating %}
+                            <div class="slide-rating">
+                                <i class='bx bxs-star'></i>
+                                {{ anime.rating }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="hero-buttons">
+                            <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
+                                ▶ Hozir ko'rish
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- TAVSIYA ETILADIGANLAR -->
+    {% if recommended_movies %}
+    <div class="container recommendation-section">
+        <div class="section-header" style="margin-top:0; padding: 0;">
+            <div class="section-title">
+                <h3>Tavsiya <span>etiladiganlar</span></h3>
+            </div>
+        </div>
+
+        <div id="marqueeOuter">
+            <div class="marquee-container" id="marqueeContainer">
+                {% for anime in recommended_movies %}
+                {% if anime.id %}
+                <div class="card-wrapper marquee-item">
+                    <div class="anime-card" style="cursor:pointer; height: 260px;"
+                         data-href="{% url 'movie_detail' anime.id %}">
+                        <div class="top-badge-group">
+                            <div class="top-badge" style="background: var(--accent); color: #000;">
+                                <i class='bx bx-trending-up'></i> TOP
+                            </div>
+                        </div>
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                    </div>
+                    <div class="card-info-bottom">
+                        <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
+                            <h4 class="card-title">{{ anime.title }}</h4>
+                        </a>
+                        <div class="card-meta" style="margin-top:4px;">
+                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                            <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                <!-- Duplicate for seamless loop -->
+                {% for anime in recommended_movies %}
+                {% if anime.id %}
+                <div class="card-wrapper marquee-item">
+                    <div class="anime-card" style="cursor:pointer; height: 260px;"
+                         data-href="{% url 'movie_detail' anime.id %}">
+                        <div class="top-badge-group">
+                            <div class="top-badge" style="background: var(--accent); color: #000;">
+                                <i class='bx bx-trending-up'></i> TOP
+                            </div>
+                        </div>
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                    </div>
+                    <div class="card-info-bottom">
+                        <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
+                            <h4 class="card-title">{{ anime.title }}</h4>
+                        </a>
+                        <div class="card-meta" style="margin-top:4px;">
+                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                            <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ALOQA VA CHAT TUGMALAR -->
+    <div class="action-buttons-section">
+        <div class="action-buttons-inner">
+            <a href="https://bestmedia-official.uz/aloqa/" class="action-btn action-btn-contact" target="_blank" rel="noopener">
+                <i class='bx bx-phone-call'></i>
+                <span>Aloqa</span>
+            </a>
+            <a href="https://bestmedia-official.uz/chat/" class="action-btn action-btn-chat" target="_blank" rel="noopener">
+                <i class='bx bx-message-rounded-dots'></i>
+                <span>BestMedia Chat</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- YANGI QO'SHILGANLAR -->
+    <div class="container" id="new-releases">
+        <div class="section-header" style="padding:0;">
+            <div class="section-title">
+                <h3>Yangi <span>Qo'shilganlar</span></h3>
+            </div>
+            <a href="{% url 'anime_catalog' %}" class="view-all">Barchasini ko'rish →</a>
+        </div>
+
+        <div class="cards-grid">
+            {% for anime in movies %}
+            {% if anime.id %}
+            <div class="card-wrapper">
+                <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
+                    <div class="top-badge-group">
+                        {% if anime.release_year %}
+                        <div class="top-badge-year">{{ anime.release_year }}</div>
+                        {% endif %}
+                        {% if anime.episodes.count > 0 %}
+                        <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
+                        {% else %}
+                        <div class="top-badge-episode">Film</div>
+                        {% endif %}
+                    </div>
+
+                    {% if anime.minimum_tier == 'vip' %}
+                    <div class="tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
+                    {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
+                    <div class="tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
+                    {% endif %}
+
+                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+
+                    <div class="card-inner-overlay">
+                        <div class="card-inner-title">{{ anime.title }}</div>
+                        {% if anime.description %}
+                        <div class="card-inner-desc">{{ anime.description|truncatechars:80 }}</div>
+                        {% endif %}
+                        <div class="card-inner-meta">
+                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                            <div class="card-inner-views"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</div>
+                        </div>
+                    </div>
+
+                    <div class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})">
+                        {% if anime.id in fav_ids %}
+                            <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
+                        {% else %}
+                            <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-info-bottom">
+                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                        <h4 class="card-title">{{ anime.title }}</h4>
+                    </a>
+                    <div class="card-meta" style="margin-top:4px;">
+                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                        <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                    </div>
+                    <div class="card-meta" style="justify-content:space-between; margin-top:5px;">
+                        <span style="display:flex; align-items:center; gap:4px; font-size:0.78rem; color:var(--text-dim);">
+                            <i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}
+                        </span>
+                        {% if anime.minimum_tier == 'vip' %}
+                        <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#fbbf24; font-weight:900;"><i class='bx bxs-crown'></i> VIP</span>
+                        {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
+                        <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#f43f5e; font-weight:800;"><i class='bx bxs-diamond'></i> Premium</span>
+                        {% else %}
+                        <span style="font-size:0.78rem; color:#4ade80; font-weight:800;">Bepul</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">
+                Hozircha animelar kiritilmadi.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 
 </div><!-- /story-top-space -->
 
 <script>
-/* ============================================================
-   HERO SLIDER — tuzatilgan
-   Muammo: drag paytida transition aktiv bo'lsa "elastic" effekt
-   Yechim: drag boshlanganda transition=none, tugaganda qo'shiladi
-============================================================ */
-(function() {
-    var wrapper = document.getElementById('slidesWrapper');
-    if (!wrapper) return;
+    /* ===========================
+       HERO SLIDER
+    =========================== */
+    const wrapper = document.getElementById('slidesWrapper');
+    const dots = document.querySelectorAll('.dot');
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    let autoPlayTimer = null;
 
-    var slides = wrapper.querySelectorAll('.slide');
-    var totalSlides = slides.length;
-    if (totalSlides === 0) return;
-
-    var currentSlide = 0;
-    var autoPlayTimer = null;
-    var TRANSITION = 'transform 0.55s cubic-bezier(0.25, 1, 0.5, 1)';
-
-    /* Dotlarni yangilash */
-    function updateDots(idx) {
-        document.querySelectorAll('.dot').forEach(function(dot) {
-            dot.setAttribute('aria-pressed', 'false');
-        });
-        document.querySelectorAll('.dot-' + idx).forEach(function(dot) {
+    function goToSlide(index) {
+        if (!wrapper || totalSlides === 0) return;
+        currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
+        wrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+        wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+        dots.forEach(dot => dot.setAttribute('aria-pressed', 'false'));
+        document.querySelectorAll('.dot-' + currentSlide).forEach(dot => {
             dot.setAttribute('aria-pressed', 'true');
         });
     }
 
-    /* Slide ga o'tish */
-    window.goToSlide = function(index) {
-        currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
-        wrapper.style.transition = TRANSITION;
-        wrapper.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
-        updateDots(currentSlide);
-    };
-
-    /* Autoplay */
-    function startAutoPlay() {
+    function resetAutoPlay() {
         if (autoPlayTimer) clearInterval(autoPlayTimer);
         if (totalSlides > 1) {
-            autoPlayTimer = setInterval(function() {
-                window.goToSlide(currentSlide + 1);
+            autoPlayTimer = setInterval(() => {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                goToSlide(currentSlide);
             }, 5000);
         }
     }
 
-    startAutoPlay();
+    resetAutoPlay();
 
-    /* ----- TOUCH drag ----- */
-    var touchStartX = 0;
-    var touchMoved  = 0;
-    var touchDragging = false;
+    if (wrapper) {
+        let heroStartX = 0;
+        let heroDragging = false;
+        let heroMoved = 0;
 
-    wrapper.addEventListener('touchstart', function(e) {
-        touchStartX = e.touches[0].clientX;
-        touchMoved  = 0;
-        touchDragging = true;
-        wrapper.style.transition = 'none';
-        clearInterval(autoPlayTimer);
-    }, { passive: true });
-
-    wrapper.addEventListener('touchmove', function(e) {
-        if (!touchDragging) return;
-        touchMoved = e.touches[0].clientX - touchStartX;
-        var base = -(currentSlide * wrapper.offsetWidth);
-        wrapper.style.transform = 'translateX(' + (base + touchMoved) + 'px)';
-    }, { passive: true });
-
-    wrapper.addEventListener('touchend', function() {
-        if (!touchDragging) return;
-        touchDragging = false;
-        if (touchMoved < -50)      window.goToSlide(currentSlide + 1);
-        else if (touchMoved > 50)  window.goToSlide(currentSlide - 1);
-        else                       window.goToSlide(currentSlide);
-        touchMoved = 0;
-        startAutoPlay();
-    }, { passive: true });
-
-    /* ----- MOUSE drag ----- */
-    var mouseStartX   = 0;
-    var mouseMoved    = 0;
-    var mouseDragging = false;
-
-    wrapper.addEventListener('mousedown', function(e) {
-        mouseStartX   = e.clientX;
-        mouseMoved    = 0;
-        mouseDragging = true;
-        wrapper.classList.add('dragging');
-        wrapper.style.transition = 'none';
-        clearInterval(autoPlayTimer);
-        e.preventDefault();
-    });
-
-    window.addEventListener('mousemove', function(e) {
-        if (!mouseDragging) return;
-        mouseMoved = e.clientX - mouseStartX;
-        var base = -(currentSlide * wrapper.offsetWidth);
-        wrapper.style.transform = 'translateX(' + (base + mouseMoved) + 'px)';
-    });
-
-    window.addEventListener('mouseup', function() {
-        if (!mouseDragging) return;
-        mouseDragging = false;
-        wrapper.classList.remove('dragging');
-        if (mouseMoved < -50)      window.goToSlide(currentSlide + 1);
-        else if (mouseMoved > 50)  window.goToSlide(currentSlide - 1);
-        else                       window.goToSlide(currentSlide);
-        mouseMoved = 0;
-        startAutoPlay();
-    });
-
-    /* Boshlang'ich dot */
-    updateDots(0);
-
-    /* ----- PARALLAX — faqat desktop ----- */
-    var isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-    if (!isMobile) {
-        var ticking = false;
-        window.addEventListener('scroll', function() {
-            if (ticking) return;
-            ticking = true;
-            requestAnimationFrame(function() {
-                var scrollY = window.pageYOffset;
-                if (scrollY < 800) {
-                    document.querySelectorAll('.slide-bg img').forEach(function(bg) {
-                        bg.style.transform = 'translateY(' + (scrollY * 0.18) + 'px)';
-                    });
-                }
-                ticking = false;
-            });
+        wrapper.addEventListener('touchstart', e => {
+            heroStartX = e.touches[0].clientX;
+            heroDragging = true;
+            wrapper.style.transition = 'none';
+            if (autoPlayTimer) clearInterval(autoPlayTimer);
         }, { passive: true });
-    }
-})();
 
-/* ============================================================
-   MARQUEE — RAF + Drag
-   Muammo: isDragging flag RAF ichida tekshirilmasa
-   animatsiya drag paytida ham davom etardi → titroq.
-   Yechim: RAF ichida isDragging tekshiriladi va offset
-   drag paytida o'zgartirilmaydi.
-============================================================ */
-(function() {
-    var outer     = document.getElementById('marqueeOuter');
-    var container = document.getElementById('marqueeContainer');
-    if (!outer || !container) return;
+        wrapper.addEventListener('touchmove', e => {
+            if (!heroDragging) return;
+            heroMoved = e.touches[0].clientX - heroStartX;
+            const base = -currentSlide * 100;
+            const pct = (heroMoved / wrapper.offsetWidth) * 100;
+            wrapper.style.transform = `translateX(calc(${base}% + ${pct}px))`;
+        }, { passive: true });
 
-    var SPEED = 0.5;
-    var offset = 0;
-    var isDragging = false;
-    var dragStartX = 0;
-    var dragStartOffset = 0;
-    var dragDelta = 0;
-    var CLICK_THRESHOLD = 6;
-    var rafId = null;
-    var lastTimestamp = null;
-
-    function getHalf() {
-        return container.scrollWidth / 2;
-    }
-
-    function applyTransform() {
-        container.style.transform = 'translateX(' + offset + 'px)';
-    }
-
-    function animate(ts) {
-        if (!isDragging) {
-            /* Delta-time asosida tekis harakatlanish */
-            if (lastTimestamp !== null) {
-                var dt = Math.min(ts - lastTimestamp, 50); /* max 50ms — tab background */
-                offset -= SPEED * (dt / 16.67);
-            }
-            lastTimestamp = ts;
-
-            var half = getHalf();
-            if (Math.abs(offset) >= half) {
-                offset += half;
-            }
-            applyTransform();
-        } else {
-            lastTimestamp = null; /* drag paytida timestamp reset */
-        }
-        rafId = requestAnimationFrame(animate);
-    }
-
-    rafId = requestAnimationFrame(animate);
-
-    /* --- Mouse drag --- */
-    outer.addEventListener('mousedown', function(e) {
-        isDragging = true;
-        dragStartX = e.clientX;
-        dragStartOffset = offset;
-        dragDelta = 0;
-        outer.classList.add('grabbing');
-        e.preventDefault();
-    });
-
-    window.addEventListener('mousemove', function(e) {
-        if (!isDragging) return;
-        dragDelta = e.clientX - dragStartX;
-        offset = dragStartOffset + dragDelta;
-        applyTransform();
-    });
-
-    window.addEventListener('mouseup', function() {
-        if (!isDragging) return;
-        isDragging = false;
-        outer.classList.remove('grabbing');
-        lastTimestamp = null;
-    });
-
-    /* --- Touch drag --- */
-    outer.addEventListener('touchstart', function(e) {
-        isDragging = true;
-        dragStartX = e.touches[0].clientX;
-        dragStartOffset = offset;
-        dragDelta = 0;
-        lastTimestamp = null;
-    }, { passive: true });
-
-    outer.addEventListener('touchmove', function(e) {
-        if (!isDragging) return;
-        dragDelta = e.touches[0].clientX - dragStartX;
-        offset = dragStartOffset + dragDelta;
-        applyTransform();
-    }, { passive: true });
-
-    outer.addEventListener('touchend', function() {
-        if (!isDragging) return;
-        isDragging = false;
-        lastTimestamp = null;
-    }, { passive: true });
-
-    /* --- Card click (drag bo'lmasa navigatsiya) --- */
-    container.addEventListener('click', function(e) {
-        if (Math.abs(dragDelta) > CLICK_THRESHOLD) {
-            e.preventDefault();
-            e.stopPropagation();
-            dragDelta = 0;
-            return;
-        }
-        var card = e.target.closest('[data-href]');
-        if (card) {
-            window.location.href = card.dataset.href;
-        }
-    });
-
-    container.querySelectorAll('a.marquee-link').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            if (Math.abs(dragDelta) > CLICK_THRESHOLD) {
-                e.preventDefault();
-                dragDelta = 0;
-            }
+        wrapper.addEventListener('touchend', () => {
+            heroDragging = false;
+            if (heroMoved < -50) goToSlide(currentSlide + 1);
+            else if (heroMoved > 50) goToSlide(currentSlide - 1);
+            else goToSlide(currentSlide);
+            heroMoved = 0;
+            resetAutoPlay();
         });
+
+        wrapper.addEventListener('mousedown', e => {
+            heroStartX = e.clientX;
+            heroDragging = true;
+            wrapper.classList.add('dragging');
+            wrapper.style.transition = 'none';
+            if (autoPlayTimer) clearInterval(autoPlayTimer);
+        });
+        window.addEventListener('mousemove', e => {
+            if (!heroDragging) return;
+            heroMoved = e.clientX - heroStartX;
+            const base = -currentSlide * 100;
+            const pct = (heroMoved / wrapper.offsetWidth) * 100;
+            wrapper.style.transform = `translateX(calc(${base}% + ${pct}px))`;
+        });
+        window.addEventListener('mouseup', () => {
+            if (!heroDragging) return;
+            heroDragging = false;
+            wrapper.classList.remove('dragging');
+            if (heroMoved < -50) goToSlide(currentSlide + 1);
+            else if (heroMoved > 50) goToSlide(currentSlide - 1);
+            else goToSlide(currentSlide);
+            heroMoved = 0;
+            resetAutoPlay();
+        });
+    }
+
+    /* Parallax scroll */
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        if (scrollY < 800) {
+            document.querySelectorAll('.slide-bg img').forEach(bg => {
+                bg.style.transform = `translateY(${scrollY * 0.18}px)`;
+            });
+        }
     });
 
-    /* Tab yashirilsa/ko'rinsa RAF to'xtatish/boshlash — battery tejash */
-    document.addEventListener('visibilitychange', function() {
-        if (document.hidden) {
-            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-        } else {
-            lastTimestamp = null;
+    /* ===========================
+       MARQUEE — JS RAF + DRAG
+    =========================== */
+    (function () {
+        const outer = document.getElementById('marqueeOuter');
+        const container = document.getElementById('marqueeContainer');
+        if (!outer || !container) return;
+
+        const SPEED = 0.5;
+
+        let offset = 0;
+        let rafId = null;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartOffset = 0;
+        let dragMoved = 0;
+        const DRAG_THRESHOLD = 5;
+
+        function getHalf() {
+            return container.scrollWidth / 2;
+        }
+
+        function applyTransform() {
+            container.style.transform = `translateX(${offset}px)`;
+        }
+
+        function animate() {
+            if (!isDragging) {
+                offset -= SPEED;
+                const half = getHalf();
+                if (Math.abs(offset) >= half) {
+                    offset += half;
+                }
+                applyTransform();
+            }
             rafId = requestAnimationFrame(animate);
         }
-    });
-})();
+
+        rafId = requestAnimationFrame(animate);
+
+        /* Mouse drag */
+        outer.addEventListener('mousedown', e => {
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragStartOffset = offset;
+            dragMoved = 0;
+            outer.classList.add('grabbing');
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            const delta = e.clientX - dragStartX;
+            dragMoved = delta;
+            offset = dragStartOffset + delta;
+            applyTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            outer.classList.remove('grabbing');
+        });
+
+        /* Touch drag */
+        outer.addEventListener('touchstart', e => {
+            isDragging = true;
+            dragStartX = e.touches[0].clientX;
+            dragStartOffset = offset;
+            dragMoved = 0;
+        }, { passive: true });
+
+        outer.addEventListener('touchmove', e => {
+            if (!isDragging) return;
+            const delta = e.touches[0].clientX - dragStartX;
+            dragMoved = delta;
+            offset = dragStartOffset + delta;
+            applyTransform();
+        }, { passive: true });
+
+        outer.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+        });
+
+        /* Card click — drag bo'lmasa navigatsiya */
+        container.addEventListener('click', e => {
+            if (Math.abs(dragMoved) > DRAG_THRESHOLD) {
+                e.preventDefault();
+                e.stopPropagation();
+                dragMoved = 0;
+                return;
+            }
+            const card = e.target.closest('[data-href]');
+            if (card) {
+                window.location.href = card.dataset.href;
+            }
+        });
+
+        /* Link drag paytida o'tkazib yuborish */
+        container.querySelectorAll('a.marquee-link').forEach(link => {
+            link.addEventListener('click', e => {
+                if (Math.abs(dragMoved) > DRAG_THRESHOLD) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+    })();
 </script>
 
 {% endblock %}
