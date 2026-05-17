@@ -27,6 +27,7 @@
         transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         cursor: grab;
         user-select: none;
+        will-change: transform;
     }
     .slides-wrapper.dragging {
         cursor: grabbing;
@@ -41,14 +42,13 @@
         align-items: flex-end;
         padding: 5% 5% 8% 5%;
         overflow: hidden;
+        flex-shrink: 0;
     }
 
     .slide-bg {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
         z-index: 1;
         overflow: hidden;
     }
@@ -59,14 +59,13 @@
         object-fit: cover;
         object-position: center top;
         display: block;
+        will-change: transform;
     }
 
     .slide-bg-video {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
         object-fit: cover;
         z-index: 1;
     }
@@ -170,6 +169,9 @@
         border-radius: 2px;
         cursor: pointer;
         transition: all 0.3s;
+        border: none;
+        padding: 0;
+        outline: none;
     }
 
     .dot[aria-pressed="true"] {
@@ -204,20 +206,16 @@
         font-weight: 800;
     }
 
-    .section-title span {
-        color: var(--accent);
-    }
+    .section-title span { color: var(--accent); }
 
     .view-all {
         color: var(--text-dim);
         text-decoration: none;
         font-weight: 600;
         transition: color 0.3s;
+        white-space: nowrap;
     }
-
-    .view-all:hover {
-        color: var(--text-light);
-    }
+    .view-all:hover { color: var(--text-light); }
 
     /* ----- STORY ----- */
     .story-container {
@@ -227,12 +225,9 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         padding: 10px 4%;
-        visibility: visible;
-        opacity: 1;
-        position: relative;
-        z-index: 20;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
-
     .story-container::-webkit-scrollbar { display: none; }
 
     .story-item {
@@ -244,6 +239,7 @@
         cursor: pointer;
         text-decoration: none;
         color: inherit;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .story-ring {
@@ -255,7 +251,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        transition: 0.3s ease;
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
     }
 
     .story-ring.seen { background: #444; }
@@ -318,6 +315,7 @@
         height: 100%;
         object-fit: cover;
         transition: transform 0.5s ease;
+        display: block;
     }
 
     .card-wrapper:hover .anime-card img { transform: scale(1.06); }
@@ -375,13 +373,11 @@
         color: rgba(255,255,255,0.5);
         font-weight: 700;
     }
-
     .card-inner-views i { font-size: 0.8rem; }
 
     .top-badge-group {
         position: absolute;
-        top: 8px;
-        left: 8px;
+        top: 8px; left: 8px;
         display: flex;
         gap: 4px;
         z-index: 10;
@@ -390,6 +386,7 @@
     .top-badge-episode {
         background: rgba(0,0,0,0.8);
         backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
         padding: 4px 8px;
         border-radius: 6px;
         font-size: 0.75rem;
@@ -408,8 +405,7 @@
 
     .top-badge {
         position: absolute;
-        top: 8px;
-        left: 8px;
+        top: 8px; left: 8px;
         background: #eab308;
         padding: 2px 6px;
         border-radius: 4px;
@@ -424,8 +420,7 @@
 
     .tier-badge {
         position: absolute;
-        top: 8px;
-        right: 8px;
+        top: 8px; right: 8px;
         padding: 3px 8px;
         border-radius: 6px;
         font-size: 0.72rem;
@@ -436,6 +431,7 @@
         gap: 3px;
         letter-spacing: 0.5px;
         backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
     }
 
     .tier-badge.vip {
@@ -453,12 +449,11 @@
 
     .fav-badge {
         position: absolute;
-        bottom: 8px;
-        right: 8px;
+        bottom: 8px; right: 8px;
         background: rgba(0,0,0,0.5);
         backdrop-filter: blur(4px);
-        width: 32px;
-        height: 32px;
+        -webkit-backdrop-filter: blur(4px);
+        width: 32px; height: 32px;
         border-radius: 50%;
         display: flex;
         justify-content: center;
@@ -466,12 +461,11 @@
         color: #fff;
         font-size: 1.1rem;
         z-index: 10;
-        transition: 0.3s;
+        transition: background 0.2s, color 0.2s;
+        border: none;
+        cursor: pointer;
     }
-    .fav-badge:hover {
-        background: rgba(255,255,255,0.2);
-        color: #ff3366;
-    }
+    .fav-badge:hover { background: rgba(255,255,255,0.2); color: #ff3366; }
     .fav-badge i.bxs-star { color: #ff3366; }
 
     .card-info-bottom {
@@ -490,7 +484,6 @@
         text-overflow: ellipsis;
         transition: color 0.3s ease;
     }
-
     .card-wrapper:hover .card-title { color: var(--accent); }
 
     .card-meta {
@@ -527,14 +520,13 @@
         cursor: grab;
         user-select: none;
     }
-    #marqueeOuter.grabbing {
-        cursor: grabbing;
-    }
+    #marqueeOuter.grabbing { cursor: grabbing; }
 
     .marquee-container {
         display: flex;
         width: max-content;
         gap: 16px;
+        will-change: transform;
     }
 
     .marquee-item {
@@ -544,9 +536,7 @@
     }
 
     /* ----- CONTACT / CHAT BUTTONS ----- */
-    .action-buttons-section {
-        padding: 32px 0 10px;
-    }
+    .action-buttons-section { padding: 32px 0 10px; }
 
     .action-buttons-inner {
         display: flex;
@@ -565,23 +555,13 @@
         font-size: 1rem;
         font-weight: 800;
         text-decoration: none;
-        transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-        position: relative;
-        overflow: hidden;
+        transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s, background 0.35s;
         letter-spacing: 0.3px;
         border: none;
         cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
     }
 
-    .action-btn::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        transition: opacity 0.35s;
-    }
-
-    .action-btn:hover::before { opacity: 1; }
     .action-btn:hover { transform: translateY(-4px); }
 
     .action-btn-contact {
@@ -589,46 +569,25 @@
         color: #fff;
         box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
     }
-
-    .action-btn-contact::before {
-        background: linear-gradient(135deg, #38bdf8, #3b82f6);
-    }
-
     .action-btn-contact:hover {
         box-shadow: 0 14px 32px rgba(14, 165, 233, 0.5);
     }
 
     .action-btn-chat {
-        background: linear-gradient(135deg, #00f3ff22, #00f3ff08);
+        background: rgba(0, 243, 255, 0.08);
         color: var(--accent);
         border: 1.5px solid rgba(0, 243, 255, 0.4);
         box-shadow: 0 8px 24px rgba(0, 243, 255, 0.12);
     }
-
-    .action-btn-chat::before {
-        background: rgba(0, 243, 255, 0.08);
-    }
-
     .action-btn-chat:hover {
         box-shadow: 0 14px 32px rgba(0, 243, 255, 0.28);
         border-color: rgba(0, 243, 255, 0.7);
+        background: rgba(0, 243, 255, 0.13);
     }
 
-    .action-btn i {
-        font-size: 1.3rem;
-        position: relative;
-        z-index: 1;
-    }
+    .action-btn i { font-size: 1.3rem; }
 
-    .action-btn span {
-        position: relative;
-        z-index: 1;
-    }
-
-    .story-top-space {
-        margin-top: 75px;
-    }
-
+    /* ----- HERO BUTTON ----- */
     .hero-buttons {
         margin-top: 25px;
         display: flex;
@@ -649,79 +608,65 @@
         font-weight: 600;
         text-decoration: none;
         box-shadow: 0 8px 25px rgba(255, 0, 60, 0.35);
-        transition: all 0.3s ease;
-        margin-left: 0;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
     }
-
     .btn-main:hover {
         transform: translateY(-3px) scale(1.03);
         box-shadow: 0 12px 30px rgba(255, 0, 60, 0.5);
     }
+    .btn-main:active { transform: scale(0.96); }
 
-    .btn-main:active {
-        transform: scale(0.96);
+    /* ----- STORY TOP SPACE ----- */
+    .story-top-space { margin-top: 75px; }
+
+    /* ----- SCROLL TO TOP ----- */
+    .scroll-top-btn {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: rgba(0, 243, 255, 0.15);
+        border: 1px solid rgba(0, 243, 255, 0.3);
+        color: var(--accent);
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 500;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background 0.2s;
+        -webkit-tap-highlight-color: transparent;
     }
+    .scroll-top-btn.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    .scroll-top-btn:hover { background: rgba(0, 243, 255, 0.28); }
+
+    /* tab bar yoqiq bo'lganda scroll-top tugmasi yuqoriroq */
+    body.tabbar-on .scroll-top-btn { bottom: 82px; }
 
     /* ----- MOBILE ----- */
     @media (max-width: 600px) {
-        .story-container {
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-            padding: 10px 4%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .story-ring {
-            width: 80px !important;
-            height: 80px !important;
-        }
-        .story-item span {
-            font-size: 11px !important;
-        }
-        .story-top-space {
-            margin-top: 55px !important;
-        }
-        .slide-content {
-            width: 100% !important;
-            text-align: left !important;
-            align-items: flex-start !important;
-        }
-        .slide-title {
-            font-size: 1.5rem !important;
-            text-align: left !important;
-            line-height: 1.2;
-        }
-        .tags {
-            display: flex;
-            justify-content: flex-start !important;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .slide-meta-row {
-            display: flex;
-            justify-content: flex-start !important;
-            flex-wrap: wrap;
-            gap: 10px;
-            text-align: left;
-        }
-        .hero-buttons {
-            width: 100%;
-            display: flex;
-            justify-content: flex-start !important;
-        }
-        .btn-main {
-            margin-left: 0 !important;
-            width: auto;
-        }
-        .slider-container {
-            aspect-ratio: 16 / 9;
-            min-height: 220px;
-            border-radius: 10px;
-        }
-        .slide {
-            padding: 20px 14px 50px;
-        }
+        .story-container { padding: 10px 4%; }
+        .story-ring { width: 80px !important; height: 80px !important; }
+        .story-item span { font-size: 11px !important; }
+        .story-top-space { margin-top: 55px !important; }
+        .slide-content { width: 100% !important; text-align: left !important; align-items: flex-start !important; }
+        .slide-title { font-size: 1.5rem !important; text-align: left !important; line-height: 1.2; }
+        .tags { display: flex; justify-content: flex-start !important; flex-wrap: wrap; gap: 6px; }
+        .slide-meta-row { display: flex; justify-content: flex-start !important; flex-wrap: wrap; gap: 10px; }
+        .hero-buttons { width: 100%; display: flex; justify-content: flex-start !important; }
+        .btn-main { margin-left: 0 !important; width: auto; }
+        .slider-container { aspect-ratio: 16 / 9; min-height: 220px; border-radius: 10px; }
+        .slide { padding: 20px 14px 50px; }
     }
 
     @media (max-width: 1024px) {
@@ -730,12 +675,7 @@
 
     @media (max-width: 768px) {
         .slider-wrapper-outer { padding: 0 3%; }
-        .slider-container {
-            aspect-ratio: 16 / 9;
-            min-height: 200px;
-            max-height: 56vw;
-            border-radius: 10px;
-        }
+        .slider-container { aspect-ratio: 16 / 9; min-height: 200px; max-height: 56vw; border-radius: 10px; }
         .slide { padding: 18px 16px 54px; align-items: flex-end; }
         .slide-content { max-width: 100%; }
         .slide-title { font-size: 2rem; }
@@ -746,18 +686,12 @@
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         .anime-card { height: 240px; }
         .action-btn { padding: 14px 22px; font-size: 0.9rem; }
+        .scroll-top-btn { bottom: 80px; right: 14px; width: 38px; height: 38px; font-size: 1.1rem; }
     }
 
     @media (max-width: 480px) {
         .slider-wrapper-outer { padding: 0; }
-        .slider-container {
-            aspect-ratio: 4 / 3;
-            min-height: 260px;
-            max-height: 80vw;
-            border-radius: 0;
-            box-shadow: none;
-            margin-top: 0;
-        }
+        .slider-container { aspect-ratio: 4 / 3; min-height: 260px; max-height: 80vw; border-radius: 0; box-shadow: none; margin-top: 0; }
         .slide { padding: 30px 14px 50px; display: flex; flex-direction: column; justify-content: flex-end; }
         .tags { gap: 6px; margin-bottom: 8px; }
         .slide-title { font-size: 1.5rem; line-height: 1.2; }
@@ -768,7 +702,7 @@
         .top-badge-episode, .top-badge-year { font-size: 0.62rem; padding: 3px 6px; }
         .top-badge { font-size: 0.62rem; padding: 3px 6px; }
         .card-title { font-size: 0.88rem; }
-        .card-inner-overlay { padding: 8px 8px; }
+        .card-inner-overlay { padding: 8px; }
         .card-inner-title { font-size: 0.8rem; }
         .card-inner-desc { font-size: 0.68rem; -webkit-line-clamp: 2; }
         .action-btn { padding: 13px 20px; font-size: 0.85rem; width: 100%; justify-content: center; }
@@ -778,20 +712,15 @@
 
 {% block content %}
 
-<!-- ANIME HIKOYALAR -->
 <div class="story-top-space">
-    <div class="section-header">
-        <div class="section-title">
-            <h3>Anime <span>Hikoyalar</span></h3>
-        </div>
-    </div>
 
+    <!-- ANIME HIKOYALAR -->
     <div class="story-container">
         {% for story in stories %}
         <a href="{% url 'story_view' story.id %}" class="story-item">
             <div class="story-ring {% if story.id in seen_stories %}seen{% endif %}">
                 {% if story.image %}
-                    <img src="{{ story.image.url }}" alt="{{ story.title }}">
+                    <img src="{{ story.image.url }}" alt="{{ story.title }}" loading="lazy">
                 {% else %}
                     <img src="https://via.placeholder.com/150" alt="story">
                 {% endif %}
@@ -814,16 +743,16 @@
                 <div class="slide">
 
                     {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
-                        <video class="slide-bg-video" autoplay loop muted playsinline>
+                        <video class="slide-bg-video" autoplay loop muted playsinline preload="metadata">
                             <source src="{{ anime.hero_media.url }}">
                         </video>
                     {% elif anime.hero_media %}
                         <div class="slide-bg">
-                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}">
+                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}" loading="eager">
                         </div>
                     {% else %}
                         <div class="slide-bg">
-                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}">
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="eager">
                         </div>
                     {% endif %}
 
@@ -832,12 +761,10 @@
                     <div class="slider-controls">
                         {% for h_anime in hero_movies %}
                         {% if h_anime.id %}
-                        <div class="dot dot-{{ forloop.counter0 }}"
-                             role="button"
-                             tabindex="0"
+                        <button class="dot dot-{{ forloop.counter0 }}"
                              aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}"
                              onclick="goToSlide({{ forloop.counter0 }})">
-                        </div>
+                        </button>
                         {% endif %}
                         {% endfor %}
                     </div>
@@ -927,7 +854,6 @@
                 </div>
                 {% endif %}
                 {% endfor %}
-                <!-- Duplicate for seamless loop -->
                 {% for anime in recommended_movies %}
                 {% if anime.id %}
                 <div class="card-wrapper marquee-item">
@@ -960,11 +886,11 @@
     <!-- ALOQA VA CHAT TUGMALAR -->
     <div class="action-buttons-section">
         <div class="action-buttons-inner">
-            <a href="https://bestmedia-official.uz/aloqa/" class="action-btn action-btn-contact" target="_blank" rel="noopener">
+            <a href="https://bestmedia-official.uz/aloqa/" class="action-btn action-btn-contact" target="_blank" rel="noopener noreferrer">
                 <i class='bx bx-phone-call'></i>
                 <span>Aloqa</span>
             </a>
-            <a href="https://bestmedia-official.uz/chat/" class="action-btn action-btn-chat" target="_blank" rel="noopener">
+            <a href="https://bestmedia-official.uz/chat/" class="action-btn action-btn-chat" target="_blank" rel="noopener noreferrer">
                 <i class='bx bx-message-rounded-dots'></i>
                 <span>BestMedia Chat</span>
             </a>
@@ -984,7 +910,9 @@
             {% for anime in movies %}
             {% if anime.id %}
             <div class="card-wrapper">
-                <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
+                <div class="anime-card"
+                     onclick="window.location.href='{% url 'movie_detail' anime.id %}'"
+                     style="cursor:pointer;">
                     <div class="top-badge-group">
                         {% if anime.release_year %}
                         <div class="top-badge-year">{{ anime.release_year }}</div>
@@ -1002,7 +930,8 @@
                     <div class="tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
                     {% endif %}
 
-                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                    <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
+                         alt="{{ anime.title }}" loading="lazy">
 
                     <div class="card-inner-overlay">
                         <div class="card-inner-title">{{ anime.title }}</div>
@@ -1015,13 +944,13 @@
                         </div>
                     </div>
 
-                    <div class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})">
+                    <button class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})" aria-label="Saqlash">
                         {% if anime.id in fav_ids %}
                             <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
                         {% else %}
                             <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
                         {% endif %}
-                    </div>
+                    </button>
                 </div>
 
                 <div class="card-info-bottom">
@@ -1057,213 +986,248 @@
 
 </div><!-- /story-top-space -->
 
+<!-- SCROLL TO TOP TUGMASI -->
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" aria-label="Yuqoriga chiqish">
+    <i class='bx bx-chevron-up'></i>
+</button>
+
 <script>
-    /* ===========================
-       HERO SLIDER
-    =========================== */
+/* ===========================
+   HERO SLIDER
+=========================== */
+(function() {
     const wrapper = document.getElementById('slidesWrapper');
-    const dots = document.querySelectorAll('.dot');
-    const slides = document.querySelectorAll('.slide');
+    if (!wrapper) return;
+
+    const slides = wrapper.querySelectorAll('.slide');
     const totalSlides = slides.length;
+    if (totalSlides === 0) return;
+
     let currentSlide = 0;
     let autoPlayTimer = null;
+    let heroStartX = 0;
+    let heroDragging = false;
+    let heroMoved = 0;
+
+    function updateDots() {
+        document.querySelectorAll('.dot').forEach(d => d.setAttribute('aria-pressed', 'false'));
+        document.querySelectorAll('.dot-' + currentSlide).forEach(d => d.setAttribute('aria-pressed', 'true'));
+    }
 
     function goToSlide(index) {
-        if (!wrapper || totalSlides === 0) return;
         currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
         wrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
-        wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
-        dots.forEach(dot => dot.setAttribute('aria-pressed', 'false'));
-        document.querySelectorAll('.dot-' + currentSlide).forEach(dot => {
-            dot.setAttribute('aria-pressed', 'true');
-        });
+        wrapper.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+        updateDots();
     }
+
+    window.goToSlide = goToSlide;
 
     function resetAutoPlay() {
         if (autoPlayTimer) clearInterval(autoPlayTimer);
         if (totalSlides > 1) {
-            autoPlayTimer = setInterval(() => {
-                currentSlide = (currentSlide + 1) % totalSlides;
-                goToSlide(currentSlide);
+            autoPlayTimer = setInterval(function() {
+                goToSlide(currentSlide + 1);
             }, 5000);
         }
     }
 
+    updateDots();
     resetAutoPlay();
 
-    if (wrapper) {
-        let heroStartX = 0;
-        let heroDragging = false;
-        let heroMoved = 0;
+    /* Touch */
+    wrapper.addEventListener('touchstart', function(e) {
+        heroStartX = e.touches[0].clientX;
+        heroDragging = true;
+        heroMoved = 0;
+        wrapper.style.transition = 'none';
+        if (autoPlayTimer) clearInterval(autoPlayTimer);
+    }, { passive: true });
 
-        wrapper.addEventListener('touchstart', e => {
-            heroStartX = e.touches[0].clientX;
-            heroDragging = true;
-            wrapper.style.transition = 'none';
-            if (autoPlayTimer) clearInterval(autoPlayTimer);
-        }, { passive: true });
+    wrapper.addEventListener('touchmove', function(e) {
+        if (!heroDragging) return;
+        heroMoved = e.touches[0].clientX - heroStartX;
+        const base = -currentSlide * 100;
+        const pct = (heroMoved / wrapper.offsetWidth) * 100;
+        wrapper.style.transform = 'translateX(calc(' + base + '% + ' + pct + 'px))';
+    }, { passive: true });
 
-        wrapper.addEventListener('touchmove', e => {
-            if (!heroDragging) return;
-            heroMoved = e.touches[0].clientX - heroStartX;
-            const base = -currentSlide * 100;
-            const pct = (heroMoved / wrapper.offsetWidth) * 100;
-            wrapper.style.transform = `translateX(calc(${base}% + ${pct}px))`;
-        }, { passive: true });
-
-        wrapper.addEventListener('touchend', () => {
-            heroDragging = false;
-            if (heroMoved < -50) goToSlide(currentSlide + 1);
-            else if (heroMoved > 50) goToSlide(currentSlide - 1);
-            else goToSlide(currentSlide);
-            heroMoved = 0;
-            resetAutoPlay();
-        });
-
-        wrapper.addEventListener('mousedown', e => {
-            heroStartX = e.clientX;
-            heroDragging = true;
-            wrapper.classList.add('dragging');
-            wrapper.style.transition = 'none';
-            if (autoPlayTimer) clearInterval(autoPlayTimer);
-        });
-        window.addEventListener('mousemove', e => {
-            if (!heroDragging) return;
-            heroMoved = e.clientX - heroStartX;
-            const base = -currentSlide * 100;
-            const pct = (heroMoved / wrapper.offsetWidth) * 100;
-            wrapper.style.transform = `translateX(calc(${base}% + ${pct}px))`;
-        });
-        window.addEventListener('mouseup', () => {
-            if (!heroDragging) return;
-            heroDragging = false;
-            wrapper.classList.remove('dragging');
-            if (heroMoved < -50) goToSlide(currentSlide + 1);
-            else if (heroMoved > 50) goToSlide(currentSlide - 1);
-            else goToSlide(currentSlide);
-            heroMoved = 0;
-            resetAutoPlay();
-        });
-    }
-
-    /* Parallax scroll */
-    window.addEventListener('scroll', () => {
-        const scrollY = window.scrollY;
-        if (scrollY < 800) {
-            document.querySelectorAll('.slide-bg img').forEach(bg => {
-                bg.style.transform = `translateY(${scrollY * 0.18}px)`;
-            });
-        }
+    wrapper.addEventListener('touchend', function() {
+        if (!heroDragging) return;
+        heroDragging = false;
+        if (heroMoved < -50) goToSlide(currentSlide + 1);
+        else if (heroMoved > 50) goToSlide(currentSlide - 1);
+        else goToSlide(currentSlide);
+        heroMoved = 0;
+        resetAutoPlay();
     });
 
-    /* ===========================
-       MARQUEE — JS RAF + DRAG
-    =========================== */
-    (function () {
-        const outer = document.getElementById('marqueeOuter');
-        const container = document.getElementById('marqueeContainer');
-        if (!outer || !container) return;
+    /* Mouse */
+    wrapper.addEventListener('mousedown', function(e) {
+        heroStartX = e.clientX;
+        heroDragging = true;
+        heroMoved = 0;
+        wrapper.classList.add('dragging');
+        wrapper.style.transition = 'none';
+        if (autoPlayTimer) clearInterval(autoPlayTimer);
+    });
 
-        const SPEED = 0.5;
+    window.addEventListener('mousemove', function(e) {
+        if (!heroDragging) return;
+        heroMoved = e.clientX - heroStartX;
+        const base = -currentSlide * 100;
+        const pct = (heroMoved / wrapper.offsetWidth) * 100;
+        wrapper.style.transform = 'translateX(calc(' + base + '% + ' + pct + 'px))';
+    });
 
-        let offset = 0;
-        let rafId = null;
-        let isDragging = false;
-        let dragStartX = 0;
-        let dragStartOffset = 0;
-        let dragMoved = 0;
-        const DRAG_THRESHOLD = 5;
+    window.addEventListener('mouseup', function() {
+        if (!heroDragging) return;
+        heroDragging = false;
+        wrapper.classList.remove('dragging');
+        if (heroMoved < -50) goToSlide(currentSlide + 1);
+        else if (heroMoved > 50) goToSlide(currentSlide - 1);
+        else goToSlide(currentSlide);
+        heroMoved = 0;
+        resetAutoPlay();
+    });
 
-        function getHalf() {
-            return container.scrollWidth / 2;
-        }
-
-        function applyTransform() {
-            container.style.transform = `translateX(${offset}px)`;
-        }
-
-        function animate() {
-            if (!isDragging) {
-                offset -= SPEED;
-                const half = getHalf();
-                if (Math.abs(offset) >= half) {
-                    offset += half;
-                }
-                applyTransform();
+    /* Parallax — faqat desktop, pastga scrollda */
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function() {
+            var scrollY = window.scrollY;
+            if (scrollY < 800) {
+                document.querySelectorAll('.slide-bg img').forEach(function(bg) {
+                    bg.style.transform = 'translateY(' + (scrollY * 0.18) + 'px)';
+                });
             }
-            rafId = requestAnimationFrame(animate);
-        }
+            ticking = false;
+        });
+    }, { passive: true });
+})();
 
+
+/* ===========================
+   MARQUEE — RAF + DRAG
+=========================== */
+(function() {
+    const outer = document.getElementById('marqueeOuter');
+    const container = document.getElementById('marqueeContainer');
+    if (!outer || !container) return;
+
+    const SPEED = 0.5;
+    let offset = 0;
+    let rafId = null;
+    let isPaused = false;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartOffset = 0;
+    let dragMoved = 0;
+    const DRAG_THRESHOLD = 5;
+
+    function getHalf() { return container.scrollWidth / 2; }
+
+    function applyTransform() {
+        container.style.transform = 'translateX(' + offset + 'px)';
+    }
+
+    function animate() {
+        if (!isDragging && !isPaused) {
+            offset -= SPEED;
+            const half = getHalf();
+            if (Math.abs(offset) >= half) offset += half;
+            applyTransform();
+        }
         rafId = requestAnimationFrame(animate);
+    }
 
-        /* Mouse drag */
-        outer.addEventListener('mousedown', e => {
-            isDragging = true;
-            dragStartX = e.clientX;
-            dragStartOffset = offset;
+    rafId = requestAnimationFrame(animate);
+
+    /* Hover paytida to'xtatish */
+    outer.addEventListener('mouseenter', function() { isPaused = true; });
+    outer.addEventListener('mouseleave', function() { isPaused = false; });
+
+    /* Mouse drag */
+    outer.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartOffset = offset;
+        dragMoved = 0;
+        outer.classList.add('grabbing');
+    });
+
+    window.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        const delta = e.clientX - dragStartX;
+        dragMoved = delta;
+        offset = dragStartOffset + delta;
+        applyTransform();
+    });
+
+    window.addEventListener('mouseup', function() {
+        if (!isDragging) return;
+        isDragging = false;
+        outer.classList.remove('grabbing');
+        isPaused = false;
+    });
+
+    /* Touch drag */
+    outer.addEventListener('touchstart', function(e) {
+        isDragging = true;
+        dragStartX = e.touches[0].clientX;
+        dragStartOffset = offset;
+        dragMoved = 0;
+    }, { passive: true });
+
+    outer.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        const delta = e.touches[0].clientX - dragStartX;
+        dragMoved = delta;
+        offset = dragStartOffset + delta;
+        applyTransform();
+    }, { passive: true });
+
+    outer.addEventListener('touchend', function() {
+        if (!isDragging) return;
+        isDragging = false;
+    });
+
+    /* Card click — drag bo'lmasa navigatsiya */
+    container.addEventListener('click', function(e) {
+        if (Math.abs(dragMoved) > DRAG_THRESHOLD) {
+            e.preventDefault();
+            e.stopPropagation();
             dragMoved = 0;
-            outer.classList.add('grabbing');
+            return;
+        }
+        const card = e.target.closest('[data-href]');
+        if (card) window.location.href = card.dataset.href;
+    });
+
+    container.querySelectorAll('a.marquee-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            if (Math.abs(dragMoved) > DRAG_THRESHOLD) e.preventDefault();
         });
+    });
+})();
 
-        window.addEventListener('mousemove', e => {
-            if (!isDragging) return;
-            const delta = e.clientX - dragStartX;
-            dragMoved = delta;
-            offset = dragStartOffset + delta;
-            applyTransform();
-        });
 
-        window.addEventListener('mouseup', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            outer.classList.remove('grabbing');
-        });
+/* ===========================
+   SCROLL TO TOP
+=========================== */
+var scrollTopBtn = document.getElementById('scrollTopBtn');
 
-        /* Touch drag */
-        outer.addEventListener('touchstart', e => {
-            isDragging = true;
-            dragStartX = e.touches[0].clientX;
-            dragStartOffset = offset;
-            dragMoved = 0;
-        }, { passive: true });
+window.addEventListener('scroll', function() {
+    if (!scrollTopBtn) return;
+    if (window.scrollY > 400) scrollTopBtn.classList.add('visible');
+    else scrollTopBtn.classList.remove('visible');
+}, { passive: true });
 
-        outer.addEventListener('touchmove', e => {
-            if (!isDragging) return;
-            const delta = e.touches[0].clientX - dragStartX;
-            dragMoved = delta;
-            offset = dragStartOffset + delta;
-            applyTransform();
-        }, { passive: true });
-
-        outer.addEventListener('touchend', () => {
-            if (!isDragging) return;
-            isDragging = false;
-        });
-
-        /* Card click — drag bo'lmasa navigatsiya */
-        container.addEventListener('click', e => {
-            if (Math.abs(dragMoved) > DRAG_THRESHOLD) {
-                e.preventDefault();
-                e.stopPropagation();
-                dragMoved = 0;
-                return;
-            }
-            const card = e.target.closest('[data-href]');
-            if (card) {
-                window.location.href = card.dataset.href;
-            }
-        });
-
-        /* Link drag paytida o'tkazib yuborish */
-        container.querySelectorAll('a.marquee-link').forEach(link => {
-            link.addEventListener('click', e => {
-                if (Math.abs(dragMoved) > DRAG_THRESHOLD) {
-                    e.preventDefault();
-                }
-            });
-        });
-
-    })();
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 </script>
 
 {% endblock %}
