@@ -7,7 +7,6 @@
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>{% block title %}BESTMEDIA - O'zbekistondagi Eng Yaxshi Media Sayti{% endblock %}</title>
 
-    <!-- ===== SEO META TAGS ===== -->
     <meta name="description"
           content="Eng sara va yangi anime seriallarni yuqori sifatda o'zbek tilida bepul tomosha qiling.">
     <meta name="keywords"
@@ -15,7 +14,6 @@
     <meta name="author" content="BESTMEDIA">
     <meta name="robots" content="index, follow">
 
-    <!-- Open Graph -->
     <meta property="og:title" content="BESTMEDIA - O'zbekistondagi Eng Yaxshi Media Sayti">
     <meta property="og:description"
           content="Eng sara va yangi anime seriallarni yuqori sifatda o'zbek tilida bepul tomosha qiling.">
@@ -65,12 +63,10 @@
             min-height: 100vh;
         }
 
-        /* iOS scroll lock yordamchi class */
         body.nav-open {
             overflow: hidden;
             position: fixed;
             width: 100%;
-            /* top JS orqali o'rnatiladi */
         }
 
         img, video, iframe {
@@ -231,21 +227,11 @@
             transform-origin: center;
         }
 
-        /* Hamburger → X animatsiyasi */
-        .hamburger.active span:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-        }
+        .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-            transform: scaleX(0);
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
-        }
-
-        /* ==================== PROFIL YON MENYUSI (SIDEBAR) ==================== */
+        /* ==================== PROFIL SIDEBAR ==================== */
         .profile-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -259,10 +245,7 @@
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
-        .profile-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .profile-overlay.active { opacity: 1; visibility: visible; }
 
         .profile-sidebar {
             position: fixed;
@@ -278,7 +261,6 @@
             -webkit-overflow-scrolling: touch;
             padding: 20px;
             box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-            /* RIGHT emas — TRANSFORM bilan harakat */
             transform: translateX(110%);
             transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
             will-change: transform;
@@ -286,10 +268,7 @@
 
         .profile-sidebar::-webkit-scrollbar { display: none; }
         .profile-sidebar { scrollbar-width: none; }
-
-        .profile-sidebar.active {
-            transform: translateX(0);
-        }
+        .profile-sidebar.active { transform: translateX(0); }
 
         .sidebar-header {
             display: flex;
@@ -427,7 +406,6 @@
         .logout-btn:hover { background: rgba(255, 59, 48, 0.1) !important; color: #ff3b30 !important; }
         .sidebar-footer { text-align: center; margin-top: 40px; color: var(--text-dim); font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; }
 
-
         /* ==================== MOBILE NAV OVERLAY ==================== */
         .mobile-nav-overlay {
             position: fixed;
@@ -457,32 +435,22 @@
             max-width: 320px;
             height: 100%;
             height: 100dvh;
-
             background: rgba(16, 16, 22, 0.96);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-
             border-top-left-radius: 28px;
             border-bottom-left-radius: 28px;
-
             padding: 24px 20px;
-
             display: flex;
             flex-direction: column;
             gap: 4px;
-
-            /* overflow-y SCROLL kerak, hidden emas! */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
-
             scrollbar-width: none;
-
             box-shadow:
                 -8px 0 32px rgba(0, 0, 0, 0.5),
                 -1px 0 20px rgba(0, 212, 255, 0.15);
-
-            /* RIGHT emas — TRANSFORM bilan harakat (qotmaslik uchun) */
             transform: translateX(110%);
             transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
             will-change: transform;
@@ -567,9 +535,7 @@
         }
 
         .mobile-menu-item:hover i,
-        .mobile-menu-item:active i {
-            color: var(--accent);
-        }
+        .mobile-menu-item:active i { color: var(--accent); }
 
         .mobile-menu-item .m-arrow {
             margin-left: auto;
@@ -593,7 +559,8 @@
             padding: 4px 14px;
             flex-shrink: 0;
         }
-        .mobile-hr{
+
+        .mobile-hr {
             border: none;
             height: 1px;
             background: rgba(255,255,255,0.08);
@@ -618,9 +585,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        .mobile-profile-action:hover {
-            background: rgba(0, 243, 255, 0.14);
-        }
+        .mobile-profile-action:hover { background: rgba(0, 243, 255, 0.14); }
 
         .mobile-nav-footer {
             margin-top: auto;
@@ -657,6 +622,137 @@
         .form-control:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
         .btn-submit { width: 100%; padding: 14px; background: var(--accent); color: black; border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.3s; font-family: 'Outfit'; box-shadow: 0 8px 25px rgba(0, 243, 255, 0.3); }
         .btn-submit:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255, 255, 255, 0.5); }
+
+        /* ==================== BOTTOM TAB BAR ==================== */
+        .bottom-tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 68px;
+            background: rgba(11, 11, 17, 0.97);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 6px;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            z-index: 998;
+            box-shadow: 0 -6px 30px rgba(0,0,0,0.5);
+            transform: translateY(0);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Tab bar yashirilganda */
+        .bottom-tab-bar.tab-hidden {
+            transform: translateY(110%);
+        }
+
+        .bottom-tab-bar {
+            border-radius: 20px 20px 0 0;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            text-decoration: none;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            padding: 7px 10px;
+            border-radius: 16px;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            min-width: 50px;
+            flex: 1;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
+
+        .tab-item i {
+            font-size: 1.45rem;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            line-height: 1;
+        }
+
+        .tab-item:active {
+            transform: scale(0.86);
+        }
+
+        /* Aktiv holat */
+        .tab-item.tab-active {
+            color: #fff;
+        }
+
+        .tab-item.tab-active i {
+            color: var(--accent);
+            filter: drop-shadow(0 0 5px rgba(0,243,255,0.55));
+        }
+
+        /* Aktiv chiziq — pastda */
+        .tab-item.tab-active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 22px;
+            height: 2.5px;
+            background: var(--accent);
+            border-radius: 2px 2px 0 0;
+            box-shadow: 0 0 8px rgba(0,243,255,0.6);
+        }
+
+        /* Profil tab — pill shakli, sariq rang */
+        .tab-item.tab-profile-btn {
+            background: rgba(255, 160, 0, 0.09);
+            border: 1px solid rgba(255, 160, 0, 0.18);
+            border-radius: 20px;
+            flex: 0 0 auto;
+            min-width: 62px;
+        }
+
+        .tab-item.tab-profile-btn i {
+            color: #ffaa00;
+        }
+
+        .tab-item.tab-profile-btn.tab-active {
+            background: rgba(255, 160, 0, 0.18);
+            border-color: rgba(255, 160, 0, 0.45);
+        }
+
+        .tab-item.tab-profile-btn.tab-active i {
+            color: #ffcc44;
+            filter: drop-shadow(0 0 6px rgba(255,180,0,0.65));
+        }
+
+        .tab-item.tab-profile-btn.tab-active::after {
+            display: none;
+        }
+
+        /* Faqat mobil qurilmalarda ko'rsatish */
+        @media (min-width: 769px) {
+            .bottom-tab-bar { display: none; }
+        }
+
+        /* Tab bar yoqilganda sahifa pastiga joy qoldirish */
+        body.tabbar-on main.main-content {
+            padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 16px);
+        }
+
+        body.tabbar-on footer {
+            padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 16px);
+        }
 
         /* ==================== RESPONSIVE ==================== */
         @media (max-width: 1024px) {
@@ -741,7 +837,7 @@
         <hr class="mobile-hr">
 
         <a href="{% url 'anime_catalog' %}" class="mobile-menu-item">
-            <i class='bx bx-play-circle' ></i>
+            <i class='bx bx-play-circle'></i>
             Katalog
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
@@ -775,23 +871,19 @@
         </a>
         <hr class="mobile-hr">
 
-        <!-- PROFILE -->
         <a href="javascript:void(0)" class="mobile-profile-action" onclick="openProfileFromMobile()">
             <i class='bx bx-grid-alt'></i>
-            Qo‘shimcha Bo‘limlar
+            Qo'shimcha Bo'limlar
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
 
-        <!-- MENING HISOBIM -->
         <h4 class="menu-title">MENING HISOBIM</h4>
 
         <a href="{% url 'profile' %}" class="menu-item">
             <span class="icon-left" style="color:#00f3ff;">
                 <i class='bx bx-user-circle'></i>
             </span>
-
             Mening Hisobim
-
             <span class="value" style="color:var(--text-light); font-weight:800;">
                 {% if request.user.vip_data and request.user.vip_data.vip_active %}
                     VIP
@@ -799,13 +891,31 @@
                     Oddiy
                 {% endif %}
             </span>
-
             <span class="arrow">›</span>
         </a>
 
         <div class="mobile-nav-footer">
-            VERSION 1.8 &nbsp;•&nbsp; ANI BEST
+            VERSION 2.1 &nbsp;•&nbsp; ANI BEST
+
+            <!-- TAB BAR TOGGLE -->
+            <div style="margin-top:14px; display:flex; align-items:center; justify-content:center; gap:10px;">
+                <i class='bx bx-grid-alt' style="font-size:1rem; color:var(--text-dim);"></i>
+                <span style="font-size:0.68rem; font-weight:800; color:rgba(255,255,255,0.3); letter-spacing:0.5px;">TAB BAR</span>
+
+                <div id="tabBarToggleWrap"
+                     onclick="toggleTabBar()"
+                     role="switch"
+                     aria-checked="false"
+                     aria-label="Tab barni yoqish"
+                     style="position:relative; width:42px; height:24px; border-radius:12px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); cursor:pointer; transition:background 0.3s, border-color 0.3s; flex-shrink:0;">
+                    <div id="tabBarToggleThumb" style="position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:rgba(255,255,255,0.35); transition:transform 0.3s cubic-bezier(0.22,1,0.36,1), background 0.3s;"></div>
+                </div>
+
+                <span id="tabBarToggleLabel" style="font-size:0.7rem; font-weight:800; color:rgba(255,255,255,0.25); min-width:20px;">OFF</span>
+            </div>
+
         </div>
+
 
     </div>
 </div>
@@ -944,6 +1054,38 @@
     <div class="sidebar-footer">BESTMEDIA PLATFORM V1.8</div>
 </div>
 
+<!-- ==================== BOTTOM TAB BAR ==================== -->
+<!-- Sahifa yuklanganda: default OFF (tab-hidden), foydalanuvchi yoqsa saqlanadi -->
+<nav class="bottom-tab-bar tab-hidden" id="bottomTabBar" aria-label="Pastki navigatsiya">
+
+
+    <a href="{% url 'aloqa' %}" class="tab-item" data-tab="aloqa">
+        <i class='bx bx-support'></i>
+        <span>Aloqa</span>
+    </a>
+
+    <a href="{% url 'chat' %}" class="tab-item" data-tab="chat">
+        <i class='bx bx-message-dots'></i>
+        <span>Chat</span>
+    </a>
+
+    <a href="{% url 'home' %}" class="tab-item" data-tab="home">
+        <i class='bx bxs-home'></i>
+        <span>Bosh</span>
+    </a>
+
+    <a href="{% url 'search' %}" class="tab-item" data-tab="search">
+        <i class='bx bx-search'></i>
+        <span>Qidirish</span>
+    </a>
+
+    <a href="{% url 'profile' %}" class="tab-item" data-tab="profile">
+        <i class='bx bx-user'></i>
+        <span>Qidirish</span>
+    </a>
+
+</nav>
+
 {% block footer %}
 <footer style="background: rgba(10,10,15,0.95); border-top: 1px solid rgba(255,255,255,0.05); padding: 60px 5% 30px; margin-top: 60px; color: var(--text-dim); font-size: 0.9rem;">
     <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-bottom: 40px;">
@@ -984,10 +1126,14 @@
             </ul>
         </div>
     </div>
+
+    <!-- ==================== FOOTER PASTKI QISMI ==================== -->
     <div style="max-width:1280px; margin:0 auto; padding-top:30px; border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
         <p style="margin:0;">&copy; {% now "Y" %} BESTMEDIA. Barcha huquqlar himoyalangan.</p>
         <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700;">ANI BEST JAMOASI TOMONIDAN YARATILGAN</p>
     </div>
+
+
 </footer>
 {% endblock footer %}
 
@@ -1033,11 +1179,8 @@ function toggleMobileNav() {
         btn.setAttribute('aria-expanded', isOpen);
     }
 
-    if (isOpen) {
-        lockBodyScroll();
-    } else {
-        unlockBodyScroll();
-    }
+    if (isOpen) lockBodyScroll();
+    else unlockBodyScroll();
 }
 
 function closeMobileNav() {
@@ -1053,12 +1196,10 @@ function closeMobileNav() {
     unlockBodyScroll();
 }
 
-/* Overlay sirtiga bosish → yopiladi */
 document.getElementById('mobileNavOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeMobileNav();
 });
 
-/* ESC tugmasi */
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeMobileNav();
@@ -1076,11 +1217,8 @@ function toggleProfileMenu() {
     const isOpen = sidebar.classList.toggle('active');
     overlay.classList.toggle('active', isOpen);
 
-    if (isOpen) {
-        lockBodyScroll();
-    } else {
-        unlockBodyScroll();
-    }
+    if (isOpen) lockBodyScroll();
+    else unlockBodyScroll();
 }
 
 function closeProfileMenu() {
@@ -1095,7 +1233,6 @@ function closeProfileMenu() {
 
 function openProfileFromMobile() {
     closeMobileNav();
-    /* Sidebar animatsiyasi tugaguncha kichik kechikish */
     setTimeout(() => {
         const sidebar = document.getElementById('profileSidebar');
         const overlay = document.getElementById('profileOverlay');
@@ -1108,11 +1245,9 @@ function openProfileFromMobile() {
 }
 
 
-/* ================= SWIPE (chapdan o'ngga yopish) ================= */
+/* ================= SWIPE ================= */
 (function() {
-    let startX = 0;
-    let startY = 0;
-    let isSwipe = false;
+    let startX = 0, startY = 0, isSwipe = false;
 
     document.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
@@ -1123,27 +1258,17 @@ function openProfileFromMobile() {
     document.addEventListener('touchmove', function(e) {
         const dx = Math.abs(e.touches[0].clientX - startX);
         const dy = Math.abs(e.touches[0].clientY - startY);
-        /* Gorizontal harakat aniq bo'lsa — swipe */
         if (dx > dy && dx > 10) isSwipe = true;
     }, { passive: true });
 
     document.addEventListener('touchend', function(e) {
         if (!isSwipe) return;
-
         const endX = e.changedTouches[0].clientX;
         const diff = startX - endX;
         const overlay = document.getElementById('mobileNavOverlay');
         if (!overlay) return;
-
-        /* Chap tomonga ≥70px — ochiladi (faqat ekranning chap qirrasi: startX < 30) */
-        if (diff > 70 && startX < 30) {
-            if (!overlay.classList.contains('active')) toggleMobileNav();
-        }
-
-        /* O'ng tomonga ≥70px — yopiladi */
-        if (diff < -70) {
-            if (overlay.classList.contains('active')) closeMobileNav();
-        }
+        if (diff > 70 && startX < 30) { if (!overlay.classList.contains('active')) toggleMobileNav(); }
+        if (diff < -70) { if (overlay.classList.contains('active')) closeMobileNav(); }
     }, { passive: true });
 })();
 
@@ -1171,6 +1296,67 @@ function toggleFavorite(e, movieId) {
     })
     .catch(err => alert(err.message));
 }
+
+
+/* ================= BOTTOM TAB BAR ================= */
+const TAB_KEY = 'anibest_tabbar_on';
+
+function setTabBarUI(isOn) {
+    const bar     = document.getElementById('bottomTabBar');
+    const wrap    = document.getElementById('tabBarToggleWrap');
+    const thumb   = document.getElementById('tabBarToggleThumb');
+    const label   = document.getElementById('tabBarToggleLabel');
+    if (!bar) return;
+
+    if (isOn) {
+        bar.classList.remove('tab-hidden');
+        document.body.classList.add('tabbar-on');
+        if (wrap)  { wrap.style.background = 'rgba(0,243,255,0.25)'; wrap.style.borderColor = 'rgba(0,243,255,0.5)'; wrap.setAttribute('aria-checked','true'); }
+        if (thumb) { thumb.style.transform = 'translateX(20px)'; thumb.style.background = '#00f3ff'; }
+        if (label) { label.textContent = 'ON'; label.style.color = '#00f3ff'; }
+    } else {
+        bar.classList.add('tab-hidden');
+        document.body.classList.remove('tabbar-on');
+        if (wrap)  { wrap.style.background = 'rgba(255,255,255,0.1)'; wrap.style.borderColor = 'rgba(255,255,255,0.15)'; wrap.setAttribute('aria-checked','false'); }
+        if (thumb) { thumb.style.transform = 'translateX(0)'; thumb.style.background = 'rgba(255,255,255,0.35)'; }
+        if (label) { label.textContent = 'OFF'; label.style.color = 'rgba(255,255,255,0.25)'; }
+    }
+}
+
+function toggleTabBar() {
+    const current = localStorage.getItem(TAB_KEY) === '1';
+    const next = !current;
+    localStorage.setItem(TAB_KEY, next ? '1' : '0');
+    setTabBarUI(next);
+}
+
+/* Aktiv tab belgisi — joriy URL ga qarab */
+function markActiveTab() {
+    const path = window.location.pathname;
+    document.querySelectorAll('.tab-item[data-tab]').forEach(function(el) {
+        el.classList.remove('tab-active');
+    });
+    let active = null;
+    if (path === '/' || path.startsWith('/home')) active = 'home';
+    else if (path.includes('/catalog') || path.includes('/anime')) active = 'catalog';
+    else if (path.includes('/chat')) active = 'chat';
+    else if (path.includes('/search')) active = 'search';
+    else if (path.includes('/profile') || path.includes('/profil')) active = 'profile';
+
+    if (active) {
+        const el = document.querySelector('.tab-item[data-tab="' + active + '"]');
+        if (el) el.classList.add('tab-active');
+    }
+}
+
+/* Sahifa yuklanganda saqlangan holat o'qiladi — default OFF */
+(function() {
+    const saved = localStorage.getItem(TAB_KEY);
+    const isOn = saved === null ? true : saved === '1';
+    setTabBarUI(isOn);
+    markActiveTab();
+})();
+
 </script>
 
 </body>
