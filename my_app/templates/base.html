@@ -65,31 +65,6 @@
             min-height: 100vh;
         }
 
-        body.premium-bg-active::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-
-            background-image: inherit;
-            background-size: cover;
-            background-position: center;
-
-            filter: blur(6px);
-            transform: scale(1.03);
-
-            z-index: -2;
-        }
-
-        body.premium-bg-active::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-
-            background: rgba(0,0,0,0.25);
-
-            z-index: -1;
-        }
-
         /* iOS scroll lock yordamchi class */
         body.nav-open {
             overflow: hidden;
@@ -561,167 +536,6 @@
             transform: scale(1.1);
         }
 
-        /* === PREMIUM TOGGLES === */
-        .mobile-premium-toggles {
-            margin-top: 12px;
-            padding: 12px 14px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .premium-toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .premium-toggle-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #e0e0f0;
-        }
-
-        /* Toggle switch */
-        .toggle-switch {
-            position: relative;
-            width: 44px;
-            height: 24px;
-            flex-shrink: 0;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-            position: absolute;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            inset: 0;
-            background: rgba(255,255,255,0.12);
-            border-radius: 24px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .toggle-slider::before {
-            content: '';
-            position: absolute;
-            left: 3px;
-            top: 3px;
-            width: 18px;
-            height: 18px;
-            background: #fff;
-            border-radius: 50%;
-            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background: linear-gradient(135deg, #00f3ff, #0051ff);
-        }
-
-        .toggle-switch input:checked + .toggle-slider::before {
-            transform: translateX(20px);
-        }
-
-        /* Fon rasm tanlash */
-        .bg-image-options {
-            display: flex;
-            gap: 8px;
-        }
-
-        .bg-thumb {
-            width: 64px;
-            height: 64px;
-            border-radius: 10px;
-            object-fit: cover;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.2s, transform 0.2s;
-        }
-
-        .bg-thumb.active,
-        .bg-thumb:hover {
-            border-color: #00f3ff;
-            transform: scale(1.05);
-        }
-
-        /* === BOTTOM NAV BAR === */
-        .bottom-nav-bar {
-            display: none; /* JS yoqadi */
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 999;
-            background: rgba(12, 12, 18, 0.92);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(0, 243, 255, 0.12);
-            padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-            box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
-        }
-
-        .bottom-nav-inner {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .bottom-nav-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            text-decoration: none;
-            color: rgba(255,255,255,0.45);
-            padding: 4px 10px;
-            border-radius: 12px;
-            transition: color 0.2s, transform 0.2s;
-            min-width: 52px;
-            -webkit-tap-highlight-color: transparent;
-            position: relative;
-        }
-
-        .bottom-nav-btn i {
-            font-size: 1.5rem;
-            transition: color 0.2s;
-        }
-
-        .bottom-nav-btn span {
-            font-size: 0.6rem;
-            font-weight: 800;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-        }
-
-        .bottom-nav-btn.active,
-        .bottom-nav-btn:active {
-            color: #00f3ff;
-            transform: translateY(-2px);
-        }
-
-        .bottom-nav-btn.active i {
-            filter: drop-shadow(0 0 6px rgba(0,243,255,0.7));
-        }
-
-        /* Bottom nav yoqilganda body padding */
-        body.has-bottom-nav {
-            padding-bottom: 64px;
-        }
-
-
         /* ==================== MOBILE MENU ITEMS ==================== */
         .mobile-menu-item {
             display: flex;
@@ -989,52 +803,10 @@
             <span class="arrow">›</span>
         </a>
 
-        <!-- Premium togglelar -->
-        <div class="mobile-premium-toggles">
-            <div class="premium-toggle-row">
-                <div class="premium-toggle-left">
-                    <i class='bx bxs-bolt' style="color:#00f3ff;"></i>
-                    <span>Premium sayt</span>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="toggleBottomNav"
-                        {% if request.user.is_authenticated and request.user.premium_settings.bottom_nav_enabled %}checked{% endif %}>
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div class="premium-toggle-row">
-                <div class="premium-toggle-left">
-                    <i class='bx bxs-palette' style="color:#a855f7;"></i>
-                    <span>Premium dizayn</span>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="togglePremiumDesign"
-                        {% if request.user.is_authenticated and request.user.premium_settings.premium_design_enabled %}checked{% endif %}>
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <!-- Rasm tanlash (premium dizayn yoqilganda ko'rinadi) -->
-            <div class="bg-image-picker" id="bgImagePicker"
-                 style="{% if not request.user.is_authenticated or not request.user.premium_settings.premium_design_enabled %}display:none{% endif %}">
-                <p style="font-size:0.7rem; color:#aaa; margin-bottom:8px;">Fon rasmini tanlang:</p>
-                <div class="bg-image-options">
-                    <img src="https://i.pinimg.com/1200x/bf/0e/ac/bf0eac0610c4da4240bc4ad31c639807.jpg"
-                         class="bg-thumb {% if request.user.is_authenticated and request.user.premium_settings.selected_bg_image == 'https://i.pinimg.com/1200x/bf/0e/ac/bf0eac0610c4da4240bc4ad31c639807.jpg' %}active{% endif %}"
-                         data-url="https://i.pinimg.com/1200x/bf/0e/ac/bf0eac0610c4da4240bc4ad31c639807.jpg"
-                         onclick="selectBgImage(this)">
-                    <img src="https://i.pinimg.com/1200x/20/f4/da/20f4da78b3ccb66a0858c0591d080b23.jpg"
-                         class="bg-thumb {% if request.user.is_authenticated and request.user.premium_settings.selected_bg_image == 'https://i.pinimg.com/1200x/20/f4/da/20f4da78b3ccb66a0858c0591d080b23.jpg' %}active{% endif %}"
-                         data-url="https://i.pinimg.com/1200x/20/f4/da/20f4da78b3ccb66a0858c0591d080b23.jpg"
-                         onclick="selectBgImage(this)">
-                </div>
-            </div>
-        </div>
-
         <div class="mobile-nav-footer">
-            VERSION 2.1 &nbsp;•&nbsp; ANI BEST
+            VERSION 1.8 &nbsp;•&nbsp; ANI BEST
         </div>
+
     </div>
 </div>
 
@@ -1225,32 +997,6 @@
 </audio>
 {% endif %}
 
-<!-- ===== BOTTOM NAV BAR ===== -->
-<nav class="bottom-nav-bar" id="bottomNavBar">
-    <div class="bottom-nav-inner">
-        <a href="{% url 'news_feed' %}" class="bottom-nav-btn" data-page="news">
-            <i class='bx bx-news'></i>
-            <span>Yangiliklar</span>
-        </a>
-        <a href="{% url 'chat' %}" class="bottom-nav-btn" data-page="chat">
-            <i class='bx bx-message-dots'></i>
-            <span>Chat</span>
-        </a>
-        <a href="{% url 'home' %}" class="bottom-nav-btn bottom-nav-home" data-page="home">
-            <i class='bx bxs-home-alt-2'></i>
-            <span>Bosh</span>
-        </a>
-        <a href="{% url 'aloqa' %}" class="bottom-nav-btn" data-page="aloqa">
-            <i class='bx bx-support'></i>
-            <span>Aloqa</span>
-        </a>
-        <a href="{% url 'profile' %}" class="bottom-nav-btn" data-page="profile">
-            <i class='bx bx-user'></i>
-            <span>Profil</span>
-        </a>
-    </div>
-</nav>
-
 <script>
 /* ================= SCROLL ================= */
 window.addEventListener('scroll', () => {
@@ -1425,111 +1171,7 @@ function toggleFavorite(e, movieId) {
     })
     .catch(err => alert(err.message));
 }
-
-/* ===== BOTTOM NAV + PREMIUM SETTINGS ===== */
-(function() {
-    const CSRF = '{{ csrf_token }}';
-    const API = '/premium-settings/toggle/';
-
-    // Server dan kelgan boshlang'ich holat
-    const initBottomNav = {% if request.user.is_authenticated and request.user.premium_settings.bottom_nav_enabled %}true{% else %}false{% endif %};
-    const initDesign = {% if request.user.is_authenticated and request.user.premium_settings.premium_design_enabled %}true{% else %}false{% endif %};
-    const initBg = "{% if request.user.is_authenticated and request.user.premium_settings.selected_bg_image %}{{ request.user.premium_settings.selected_bg_image }}{% endif %}";
-
-    function applyBottomNav(enabled) {
-        const bar = document.getElementById('bottomNavBar');
-        if (!bar) return;
-        bar.style.display = enabled ? 'block' : 'none';
-        document.body.classList.toggle('has-bottom-nav', enabled);
-
-        // Aktiv sahifani belgilash
-        const path = window.location.pathname;
-        bar.querySelectorAll('.bottom-nav-btn').forEach(btn => {
-            const page = btn.dataset.page;
-            const active =
-                (page === 'home' && (path === '/' || path === '/home/')) ||
-                (page !== 'home' && path.includes(page));
-            btn.classList.toggle('active', active);
-        });
-    }
-
-    function applyDesign(enabled, bgUrl) {
-        if (enabled && bgUrl) {
-            document.body.style.backgroundImage = `url('${bgUrl}')`;
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundPosition = 'center';
-            document.body.style.backgroundAttachment = 'fixed';
-            document.body.style.backgroundImage = `url('${bgUrl}')`;
-            document.body.classList.add('premium-bg-active');
-
-        } else {
-            document.body.style.backgroundImage = '';
-            document.body.style.backgroundAttachment = '';
-            document.body.classList.remove('premium-bg-active');
-        }
-    }
-
-    // Boshlang'ich qo'llash
-    applyBottomNav(initBottomNav);
-    applyDesign(initDesign, initBg);
-
-    // Toggle — Bottom Nav
-    const toggleBottomNav = document.getElementById('toggleBottomNav');
-    if (toggleBottomNav) {
-        toggleBottomNav.addEventListener('change', function() {
-            const val = this.checked;
-            applyBottomNav(val);
-            fetch(API, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': CSRF,
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `field=bottom_nav&value=${val}`
-            });
-        });
-    }
-
-    // Toggle — Premium Design
-    const toggleDesign = document.getElementById('togglePremiumDesign');
-    const bgPicker = document.getElementById('bgImagePicker');
-    if (toggleDesign) {
-        toggleDesign.addEventListener('change', function() {
-            const val = this.checked;
-            if (bgPicker) bgPicker.style.display = val ? 'block' : 'none';
-            const currentBg = document.querySelector('.bg-thumb.active')?.dataset.url || '';
-            applyDesign(val, currentBg);
-            fetch(API, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': CSRF,
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `field=premium_design&value=${val}&bg_image=${encodeURIComponent(currentBg)}`
-            });
-        });
-    }
-
-    // Fon rasm tanlash
-    window.selectBgImage = function(el) {
-        document.querySelectorAll('.bg-thumb').forEach(t => t.classList.remove('active'));
-        el.classList.add('active');
-        const url = el.dataset.url;
-        applyDesign(true, url);
-        fetch(API, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': CSRF,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `field=premium_design&value=true&bg_image=${encodeURIComponent(url)}`
-        });
-    };
-})();
 </script>
-
-
 
 </body>
 </html>
-
