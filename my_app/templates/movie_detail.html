@@ -121,10 +121,12 @@
     cursor: pointer;
     touch-action: manipulation;
 }
+/* VIDEO — hech qanday filter/overlay yo'q, original va tiniq */
 .bm-player video {
     width: 100%; display: block;
     aspect-ratio: 16/9; background: #000;
     outline: none; pointer-events: none;
+    /* filter olib tashlandi — original sifat */
 }
 
 /* -- TOP BAR -- */
@@ -192,7 +194,7 @@
 }
 .bm-player.show-controls .bm-controls { opacity: 1; pointer-events: auto; }
 
-/* -- PROGRESS — o'rtacha hajm -- */
+/* -- PROGRESS -- */
 .bm-progress-wrap {
     width: 100%; height: 4px; border-radius: 3px;
     background: rgba(255,255,255,.22); cursor: pointer;
@@ -255,15 +257,9 @@
     width: 13px; height: 13px; border: none;
     border-radius: 50%; background: #ef4444; cursor: pointer;
 }
-.bm-quality-btn {
-    font-size: .7rem; font-weight: 900; padding: 3px 8px; border-radius: 6px;
-    background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.35);
-    color: #f87171; cursor: default; letter-spacing: .04em; white-space: nowrap;
-    flex-shrink: 0;
-}
 
 /* =====================================================================
-   SPEED BUTTON + POPUP MENU (rasmda ko'rsatilgandek)
+   SPEED BUTTON + POPUP MENU
 ===================================================================== */
 .bm-speed-wrap {
     position: relative; flex-shrink: 0;
@@ -301,14 +297,13 @@
 .bm-speed-item .bm-speed-name { font-size: .75rem; color: rgba(255,255,255,.45); font-weight: 600; }
 .bm-speed-item.active .bm-speed-name { color: rgba(239,68,68,.6); }
 
-/* Loop & Chromecast items */
 .bm-speed-divider {
     height: 1px; background: rgba(255,255,255,.08);
     margin: 4px 0;
 }
 
 /* =====================================================================
-   LOCK BUTTON (o'ng tomonda vertikal markazda)
+   LOCK BUTTON
 ===================================================================== */
 .bm-lock-btn {
     position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
@@ -325,29 +320,11 @@
 .bm-lock-btn:hover { background: rgba(239,68,68,.25); border-color: rgba(239,68,68,.4); }
 .bm-lock-btn svg { width: 22px; height: 22px; fill: currentColor; pointer-events: none; }
 
-/* Lock aktiv bo'lganda — lock icon doim ko'rinadi */
 .bm-player.locked .bm-lock-btn {
     opacity: 1 !important; pointer-events: auto !important;
     background: rgba(239,68,68,.25); border-color: rgba(239,68,68,.5);
     color: #ef4444;
 }
-
-/* Expand (to'liq ekran) button — top-right */
-.bm-expand-btn {
-    position: absolute; top: 12px; right: 12px; z-index: 32;
-    width: 40px; height: 40px; border-radius: 10px;
-    background: rgba(20,20,28,.7); backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,.14);
-    color: #fff; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .2s, border-color .2s, opacity .2s;
-    opacity: 0; pointer-events: none;
-}
-.bm-player.show-controls .bm-expand-btn { opacity: 1; pointer-events: auto; }
-.bm-expand-btn:hover { background: rgba(239,68,68,.25); border-color: rgba(239,68,68,.4); }
-.bm-expand-btn i { font-size: 1.2rem; pointer-events: none; }
-/* Lock modeda expand ham yashiriladi */
-.bm-player.locked .bm-expand-btn { opacity: 0 !important; pointer-events: none !important; }
 
 /* -- BIG CENTER PLAY -- */
 .bm-big-play {
@@ -386,9 +363,6 @@
 .bm-player:fullscreen video { height: 100vh !important; aspect-ratio: unset !important; object-fit: contain !important; }
 .bm-player:-moz-full-screen { border-radius: 0 !important; }
 .bm-player:-moz-full-screen video { height: 100vh !important; aspect-ratio: unset !important; object-fit: contain !important; }
-.bm-player:-ms-fullscreen { border-radius: 0 !important; }
-.bm-player:-ms-fullscreen video { height: 100vh !important; aspect-ratio: unset !important; object-fit: contain !important; }
-
 :-webkit-full-screen .bm-controls,
 :-webkit-full-screen .bm-top-bar { display: flex !important; }
 :fullscreen .bm-controls,
@@ -449,7 +423,7 @@
 .movie-info p  { font-size: .95rem; color: var(--text-dim); }
 
 /* =====================================================================
-   RELATED CARDS — 1 qator, 10 ta, gorizontal scroll, barcha card bir xil balandlik
+   RELATED CARDS
 ===================================================================== */
 .related-section {
     background: rgba(17,17,24,.88);
@@ -473,7 +447,6 @@
 }
 .related-nav-btn:hover { background: rgba(220,38,38,.25); border-color: rgba(220,38,38,.4); }
 
-/* Scroll container */
 .related-scroll {
     display: flex;
     gap: 14px;
@@ -483,12 +456,11 @@
     padding-bottom: 8px;
     scrollbar-width: none;
     cursor: grab;
-    align-items: stretch; /* barcha cardlar bir xil balandlik */
+    align-items: stretch;
 }
 .related-scroll:active { cursor: grabbing; }
 .related-scroll::-webkit-scrollbar { display: none; }
 
-/* 10 ta card, 1 qatorda — barcha card aynan bir xil o'lchamda */
 .related-card-link {
     text-decoration: none; color: inherit;
     display: flex; flex-direction: column; gap: 7px;
@@ -500,7 +472,7 @@
 
 .related-card-img {
     width: 140px;
-    height: 200px; /* Barcha card rasmlar bir xil balandlik */
+    height: 200px;
     border-radius: 10px; overflow: hidden;
     position: relative; background: var(--bg-surface);
     transition: box-shadow .3s;
@@ -539,7 +511,7 @@
 }
 
 /* =====================================================================
-   COMMENTS — maksimal 5 ta, batafsil tugma
+   COMMENTS
 ===================================================================== */
 .comments-section {
     background: rgba(17,17,24,.88);
@@ -585,7 +557,6 @@
 .comment-time { color: var(--text-dim); font-size: .82rem; }
 .comment-text { color: rgba(255,255,255,.85); font-size: .95rem; line-height: 1.55; word-break: break-word; }
 
-/* Batafsil tugma */
 .comments-show-more {
     display: flex; justify-content: center; margin-top: 20px;
 }
@@ -644,7 +615,6 @@
     .episodes-box, .movie-info { padding: 14px; }
 
     .bm-vol-wrap  { display: none; }
-    .bm-quality-btn { display: none; }
 
     .video-container { padding: 0; }
     .bm-player { border-radius: 0; }
@@ -684,16 +654,6 @@
         </div>
       </div>
       <h2 class="movie-title">{{ movie.title }}</h2>
-      <div style="display:flex;gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap;">
-        <span style="padding:4px 10px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);border-radius:8px;font-weight:800;font-size:.82rem;color:#fff;">
-          Sifat: {{ max_quality }} gacha
-        </span>
-        {% if show_ads %}
-        <span style="padding:4px 10px;background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.4);border-radius:8px;font-weight:800;font-size:.82rem;color:#f87171;">
-          Reklamalar mavjud
-        </span>
-        {% endif %}
-      </div>
       <p class="movie-summary">{{ movie.description|default:"Bu anime uchun izoh kiritilmagan." }}</p>
     </div>
   </section>
@@ -847,7 +807,7 @@
 
   </div><!-- /movie-grid -->
 
-  <!-- ================= COMMENTS — max 5 ta, batafsil tugma ================= -->
+  <!-- ================= COMMENTS ================= -->
   <section class="comments-section" id="comments">
     <h3>Izohlar ({{ comments.count|default:"0" }})</h3>
 
@@ -909,7 +869,7 @@
     {% endif %}
   </section>
 
-  <!-- ================= RELATED — 1 qator, 10 ta, gorizontal scroll ================= -->
+  <!-- ================= RELATED ================= -->
   {% if random_movies %}
   <section class="related-section">
     <div class="related-section-header">
@@ -948,7 +908,6 @@
    SVG helpers
 --------------------------------------------------------------- */
 const _T = (typeof BM_MOVIE_TITLE !== 'undefined') ? BM_MOVIE_TITLE : '';
-const _Q = '{{ max_quality|escapejs }}';
 
 function svgIcon(path){ return `<svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="${path}"/></svg>`; }
 
@@ -971,7 +930,7 @@ function btn(id, title, svgKey){
 }
 
 /* ---------------------------------------------------------------
-   SPEED options — rasmda ko'rsatilgandek
+   SPEED options
 --------------------------------------------------------------- */
 const SPEED_LIST = [
   { val: 0.2, label: '0.2x', name: 'Juda sekin' },
@@ -983,6 +942,7 @@ const SPEED_LIST = [
 
 /* ---------------------------------------------------------------
    Build inner HTML for .bm-player
+   — sifat badge olib tashlandi (top-bar va hero dan ham)
 --------------------------------------------------------------- */
 function buildSpeedMenu(){
   let items = SPEED_LIST.map(function(s, i){
@@ -1001,20 +961,13 @@ function buildSpeedMenu(){
   return `<div class="bm-speed-menu" id="bm-speed-menu">${items}</div>`;
 }
 
-function buildInner(title, quality){
+function buildInner(title){
   return `
 <div class="bm-top-bar" id="bm-top-bar">
   <button type="button" class="bm-back-link" title="Kichik ekran" id="bm-exit-fs">${svgIcon(SVG.back)}</button>
   <span class="bm-title-bar">${title || ''}</span>
-  ${quality ? `<span class="bm-quality-btn">${quality}</span>` : ''}
 </div>
 
-<!-- Expand (to'liq ekran) — yuqori o'ngda, Boxoffice uslubi -->
-<button type="button" class="bm-expand-btn" id="bm-expand-btn" title="To'liq ekran">
-  <i class='bx bx-expand-alt'></i>
-</button>
-
-<!-- Lock button — o'rta o'ngda -->
 <button type="button" class="bm-lock-btn" id="bm-lock-btn" title="Qulflash">
   ${svgIcon(SVG.unlock)}
 </button>
@@ -1067,42 +1020,42 @@ function buildInner(title, quality){
 --------------------------------------------------------------- */
 (function injectAll(){
   document.querySelectorAll('.bm-player').forEach(function(p){
-    const vid = p.querySelector('video');
+    var vid = p.querySelector('video');
     if(!vid || p.querySelector('.bm-controls')) return;
-    vid.insertAdjacentHTML('afterend', buildInner(_T, _Q));
+    vid.insertAdjacentHTML('afterend', buildInner(_T));
   });
 })();
 
 /* ---------------------------------------------------------------
    EPISODE SWITCHING
 --------------------------------------------------------------- */
-const episodeBtns      = document.querySelectorAll('.episode-btn');
-const videoContainerEl = document.getElementById('video-container');
-const episodeDescEl    = document.getElementById('episode-description');
+var episodeBtns      = document.querySelectorAll('.episode-btn');
+var videoContainerEl = document.getElementById('video-container');
+var episodeDescEl    = document.getElementById('episode-description');
 
 function setEpDesc(btn){
   if(!episodeDescEl) return;
-  const d = btn ? ((btn.dataset.description || '').trim() || 'Bu qism uchun izoh kiritilmagan.') : 'Bu qism uchun izoh kiritilmagan.';
+  var d = btn ? ((btn.dataset.description || '').trim() || 'Bu qism uchun izoh kiritilmagan.') : 'Bu qism uchun izoh kiritilmagan.';
   episodeDescEl.textContent = d;
 }
 
 function buildBmHTML(src){
-  return `<div class="bm-player paused" id="bm-player">
-    <video id="video-player" playsinline webkit-playsinline preload="metadata">
-      <source src="${src}" type="video/mp4">
-    </video>
-    ${buildInner(_T, _Q)}
-  </div>`;
+  return '<div class="bm-player paused" id="bm-player">'
+    + '<video id="video-player" playsinline webkit-playsinline preload="metadata">'
+    + '<source src="' + src + '" type="video/mp4">'
+    + '</video>'
+    + buildInner(_T)
+    + '</div>';
 }
 
 function buildIframeHTML(src){
-  const url = src.includes('?') ? src + '&autoplay=false' : src + '?autoplay=false';
-  return `<div class="bunny-player-wrapper">
-    <button type="button" class="fullscreen-btn" id="fullscreen-toggle">⛶</button>
-    <iframe id="iframe-player" src="${url}"
-      allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen"
-      allowfullscreen webkitallowfullscreen loading="lazy"></iframe>
-  </div>`;
+  var url = src.includes('?') ? src + '&autoplay=false' : src + '?autoplay=false';
+  return '<div class="bunny-player-wrapper">'
+    + '<button type="button" class="fullscreen-btn" id="fullscreen-toggle">⛶</button>'
+    + '<iframe id="iframe-player" src="' + url + '"'
+    + ' allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen"'
+    + ' allowfullscreen webkitallowfullscreen loading="lazy"></iframe>'
+    + '</div>';
 }
 
 function isIframeSrc(src){
@@ -1111,7 +1064,7 @@ function isIframeSrc(src){
 
 episodeBtns.forEach(function(b){
   b.addEventListener('click', function(){
-    const src = b.dataset.videoSrc || '';
+    var src = b.dataset.videoSrc || '';
     if(!src){ return; }
 
     if(isIframeSrc(src)){
@@ -1137,15 +1090,15 @@ if(episodeBtns.length){ setEpDesc(episodeBtns[0]); }
 --------------------------------------------------------------- */
 function fmtTime(s){
   if(!isFinite(s) || isNaN(s)) return '0:00';
-  const m   = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
+  var m   = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
   return m + ':' + (sec < 10 ? '0' : '') + sec;
 }
 
 function showRipple(el, label){
   if(!el) return;
   if(label){
-    const span = el.querySelector('span');
+    var span = el.querySelector('span');
     if(span) span.textContent = label;
   }
   el.classList.add('active');
@@ -1161,18 +1114,18 @@ function isTouch(){
    FULLSCREEN HELPERS
 --------------------------------------------------------------- */
 function reqFS(el){
-  if(el.requestFullscreen)              return el.requestFullscreen();
-  if(el.webkitRequestFullscreen)        return el.webkitRequestFullscreen();
-  if(el.mozRequestFullScreen)           return el.mozRequestFullScreen();
-  if(el.msRequestFullscreen)            return el.msRequestFullscreen();
+  if(el.requestFullscreen)         return el.requestFullscreen();
+  if(el.webkitRequestFullscreen)   return el.webkitRequestFullscreen();
+  if(el.mozRequestFullScreen)      return el.mozRequestFullScreen();
+  if(el.msRequestFullscreen)       return el.msRequestFullscreen();
   return Promise.reject(new Error('FS not supported'));
 }
 
 function exitFS(){
-  if(document.exitFullscreen)           return document.exitFullscreen();
-  if(document.webkitExitFullscreen)     return document.webkitExitFullscreen();
-  if(document.mozCancelFullScreen)      return document.mozCancelFullScreen();
-  if(document.msExitFullscreen)         return document.msExitFullscreen();
+  if(document.exitFullscreen)          return document.exitFullscreen();
+  if(document.webkitExitFullscreen)    return document.webkitExitFullscreen();
+  if(document.mozCancelFullScreen)     return document.mozCancelFullScreen();
+  if(document.msExitFullscreen)        return document.msExitFullscreen();
 }
 
 function getFSElement(){
@@ -1189,57 +1142,122 @@ function lockLandscape(){
   }
 }
 function unlockOrientation(){
-  try {
+  try{
     if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-  } catch(e){}
+  }catch(e){}
+}
+
+/* ---------------------------------------------------------------
+   URL FRAGMENT / QUERY TIME SEEK
+   Google va boshqa saytlardan #t=120 yoki ?t=120 bilan kelganda
+   video o'sha vaqtdan boshlanadi.
+   Qo'llab-quvvatlanadiganlar:
+     #t=90        → 90 soniya
+     #t=1m30s     → 90 soniya
+     #t=1h2m3s    → 3723 soniya
+     ?t=90        → 90 soniya
+--------------------------------------------------------------- */
+function parseTimeParam(raw){
+  if(!raw) return 0;
+  raw = raw.trim();
+  /* Sof raqam */
+  if(/^\d+(\.\d+)?$/.test(raw)) return parseFloat(raw);
+  /* HH:MM:SS yoki MM:SS */
+  if(/^\d+:\d+(:\d+)?$/.test(raw)){
+    var parts = raw.split(':').map(Number);
+    if(parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
+    if(parts.length === 2) return parts[0]*60 + parts[1];
+  }
+  /* 1h2m3s / 2m30s / 90s */
+  var h = (/(\d+)h/.exec(raw)||[0,0])[1];
+  var m = (/(\d+)m/.exec(raw)||[0,0])[1];
+  var s = (/(\d+)s/.exec(raw)||[0,0])[1];
+  return parseInt(h)*3600 + parseInt(m)*60 + parseInt(s);
+}
+
+function getSeekTarget(){
+  /* 1) URL fragment: #t=... */
+  var hash = window.location.hash;
+  if(hash){
+    var hm = hash.match(/[#&]t=([^&]+)/);
+    if(hm) return parseTimeParam(hm[1]);
+  }
+  /* 2) Query string: ?t=... */
+  var qs = window.location.search;
+  if(qs){
+    var qm = qs.match(/[?&]t=([^&]+)/);
+    if(qm) return parseTimeParam(qm[1]);
+  }
+  return 0;
 }
 
 /* ---------------------------------------------------------------
    MAIN PLAYER INIT
 --------------------------------------------------------------- */
+/* Global event listeners ro'yxati — reinit qilganda eski listenerlar
+   qolmasligi uchun AbortController ishlatiladi                      */
+var _bmAbort = null;
+
 function initBmPlayer(){
-  const player  = document.getElementById('bm-player');
-  const video   = document.getElementById('video-player');
+  /* Avvalgi listenerlarni o'chirish */
+  if(_bmAbort){ _bmAbort.abort(); }
+  _bmAbort = new AbortController();
+  var sig  = { signal: _bmAbort.signal };
+
+  var player  = document.getElementById('bm-player');
+  var video   = document.getElementById('video-player');
   if(!player || !video) return;
 
-  const $id = function(id){ return document.getElementById(id); };
+  var $id = function(id){ return document.getElementById(id); };
 
-  const playBtn   = $id('bm-play-btn');
-  const back10    = $id('bm-back10');
-  const fwd10     = $id('bm-fwd10');
-  const timeEl    = $id('bm-time-display');
-  const progress  = $id('bm-progress');
-  const fill      = $id('bm-fill');
-  const thumb     = $id('bm-thumb');
-  const buf       = $id('bm-buf');
-  const volBtn    = $id('bm-vol-btn');
-  const volSlider = $id('bm-volume');
-  const fsBtn     = $id('bm-fullscreen');
-  const exitFsBtn = $id('bm-exit-fs');
-  const rippleL   = $id('bm-ripple-left');
-  const rippleR   = $id('bm-ripple-right');
-  const speedBtn  = $id('bm-speed-btn');
-  const speedMenu = $id('bm-speed-menu');
-  const lockBtn   = $id('bm-lock-btn');
-  const expandBtn = $id('bm-expand-btn');
+  var playBtn   = $id('bm-play-btn');
+  var back10    = $id('bm-back10');
+  var fwd10     = $id('bm-fwd10');
+  var timeEl    = $id('bm-time-display');
+  var progress  = $id('bm-progress');
+  var fill      = $id('bm-fill');
+  var thumb     = $id('bm-thumb');
+  var buf       = $id('bm-buf');
+  var volBtn    = $id('bm-vol-btn');
+  var volSlider = $id('bm-volume');
+  var fsBtn     = $id('bm-fullscreen');
+  var exitFsBtn = $id('bm-exit-fs');
+  var rippleL   = $id('bm-ripple-left');
+  var rippleR   = $id('bm-ripple-right');
+  var speedBtn  = $id('bm-speed-btn');
+  var speedMenu = $id('bm-speed-menu');
+  var lockBtn   = $id('bm-lock-btn');
 
   /* ================================================================
-     SPEED MENU — popup (rasmda ko'rsatilgandek)
+     DEEP LINK — URL orqali kelgan vaqt pozitsiyasi
+     loadedmetadata yoki canplay hodisasida bir marta seek qilinadi
   ================================================================ */
-  var currentSpeedIdx = 2; // default 1x
+  var seekTarget = getSeekTarget();
+  var _seekDone  = false;
 
-  function closeSpeedMenu(){
-    if(speedMenu) speedMenu.classList.remove('open');
+  function applySeek(){
+    if(_seekDone || seekTarget <= 0) return;
+    if(!isFinite(video.duration) || video.duration <= 0) return;
+    /* Vaqt videoning uzunligidan oshib ketmasin */
+    video.currentTime = Math.min(seekTarget, video.duration - 1);
+    _seekDone = true;
   }
-  function openSpeedMenu(){
-    if(speedMenu) speedMenu.classList.add('open');
-  }
-  function toggleSpeedMenu(e){
+
+  video.addEventListener('loadedmetadata', applySeek, sig);
+  /* canplay — ba'zi brauzerlar loadedmetadata ga kech yetadi */
+  video.addEventListener('canplay', applySeek, sig);
+
+  /* ================================================================
+     SPEED MENU
+  ================================================================ */
+  var currentSpeedIdx = 2;
+
+  function closeSpeedMenu(){ if(speedMenu) speedMenu.classList.remove('open'); }
+
+  if(speedBtn) speedBtn.addEventListener('click', function(e){
     e.stopPropagation();
     if(speedMenu) speedMenu.classList.toggle('open');
-  }
-
-  if(speedBtn) speedBtn.addEventListener('click', toggleSpeedMenu);
+  }, sig);
 
   if(speedMenu){
     speedMenu.querySelectorAll('.bm-speed-item[data-speed]').forEach(function(item){
@@ -1253,10 +1271,9 @@ function initBmPlayer(){
         speedMenu.querySelectorAll('.bm-speed-item').forEach(function(i){ i.classList.remove('active'); });
         item.classList.add('active');
         closeSpeedMenu();
-      });
+      }, sig);
     });
 
-    /* Loop button */
     var loopBtn = $id('bm-loop-btn');
     if(loopBtn){
       loopBtn.addEventListener('click', function(e){
@@ -1264,31 +1281,24 @@ function initBmPlayer(){
         video.loop = !video.loop;
         loopBtn.querySelector('.bm-speed-label').textContent = video.loop ? '✓ Takrorlash' : '↺ Takrorlash';
         closeSpeedMenu();
-      });
+      }, sig);
     }
 
-    /* Chromecast button (placeholder) */
     var castBtn = $id('bm-cast-btn');
     if(castBtn){
       castBtn.addEventListener('click', function(e){
         e.stopPropagation();
         closeSpeedMenu();
-      });
+      }, sig);
     }
   }
 
-  /* Close speed menu when clicking outside */
   document.addEventListener('click', function(e){
-    if(speedMenu && !e.target.closest('#bm-speed-wrap')){
-      closeSpeedMenu();
-    }
-  });
+    if(speedMenu && !e.target.closest('#bm-speed-wrap')) closeSpeedMenu();
+  }, sig);
 
   /* ================================================================
      LOCK BUTTON
-     - Bosilganda: barcha controls va top-bar yashiriladi
-     - Faqat double-tap va play/pause ishlaydi
-     - Lock icon doim ko'rinadi, bosilganda unlock bo'ladi
   ================================================================ */
   var isLocked = false;
 
@@ -1298,22 +1308,8 @@ function initBmPlayer(){
       isLocked = !isLocked;
       player.classList.toggle('locked', isLocked);
       lockBtn.innerHTML = svgIcon(isLocked ? SVG.lock : SVG.unlock);
-      /* Lock bo'lganda controls yashiriladi */
-      if(isLocked){
-        player.classList.remove('show-controls');
-      }
-    });
-  }
-
-  /* ================================================================
-     EXPAND BUTTON (bx bx-expand-alt) — to'liq ekran uchun
-  ================================================================ */
-  if(expandBtn){
-    expandBtn.addEventListener('click', function(e){
-      e.stopPropagation();
-      if(getFSElement()){ exitFullscreen(); }
-      else { enterFullscreen(); }
-    });
+      if(isLocked) player.classList.remove('show-controls');
+    }, sig);
   }
 
   /* ---- Helpers ---- */
@@ -1327,135 +1323,145 @@ function initBmPlayer(){
   }
 
   function updateProgress(){
-    if(!video.duration) return;
-    const pct = (video.currentTime / video.duration) * 100;
+    if(!video.duration || !isFinite(video.duration)) return;
+    var pct = (video.currentTime / video.duration) * 100;
     if(fill)  fill.style.width  = pct + '%';
     if(thumb) thumb.style.left  = pct + '%';
     if(timeEl) timeEl.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
-    if(buf && video.buffered.length)
-      buf.style.width = (video.buffered.end(video.buffered.length - 1) / video.duration * 100) + '%';
+    if(buf && video.buffered.length){
+      try{
+        buf.style.width = (video.buffered.end(video.buffered.length - 1) / video.duration * 100) + '%';
+      }catch(e){}
+    }
   }
 
   function seekRatio(r){
-    if(!video.duration) return;
+    if(!video.duration || !isFinite(video.duration)) return;
     video.currentTime = Math.min(Math.max(r, 0), 1) * video.duration;
     updateProgress();
   }
 
   /* ---- Video events ---- */
-  video.addEventListener('play',           function(){ setPlayState(true); });
-  video.addEventListener('pause',          function(){ setPlayState(false); });
-  video.addEventListener('ended',          function(){ setPlayState(false); });
-  video.addEventListener('timeupdate',     updateProgress);
-  video.addEventListener('waiting',        function(){ player.classList.add('loading'); });
-  video.addEventListener('canplay',        function(){ player.classList.remove('loading'); });
-  video.addEventListener('loadedmetadata', updateProgress);
+  video.addEventListener('play',           function(){ setPlayState(true); },  sig);
+  video.addEventListener('pause',          function(){ setPlayState(false); }, sig);
+  video.addEventListener('ended',          function(){ setPlayState(false); }, sig);
+  video.addEventListener('timeupdate',     updateProgress, sig);
+  video.addEventListener('waiting',        function(){ player.classList.add('loading'); }, sig);
+  video.addEventListener('canplay',        function(){ player.classList.remove('loading'); }, sig);
+  video.addEventListener('loadedmetadata', updateProgress, sig);
 
   /* ---- Play / skip buttons ---- */
-  if(playBtn) playBtn.addEventListener('click', function(e){ e.stopPropagation(); togglePlay(); });
-  if(back10)  back10.addEventListener('click',  function(e){ e.stopPropagation(); video.currentTime = Math.max(0, video.currentTime - 10); showRipple(rippleL, '−10 son'); });
-  if(fwd10)   fwd10.addEventListener('click',   function(e){ e.stopPropagation(); video.currentTime = Math.min(video.duration || Infinity, video.currentTime + 10); showRipple(rippleR, '+10 son'); });
+  if(playBtn) playBtn.addEventListener('click', function(e){ e.stopPropagation(); togglePlay(); }, sig);
+  if(back10)  back10.addEventListener('click',  function(e){
+    e.stopPropagation();
+    video.currentTime = Math.max(0, video.currentTime - 10);
+    showRipple(rippleL, '−10 son');
+  }, sig);
+  if(fwd10)   fwd10.addEventListener('click',   function(e){
+    e.stopPropagation();
+    video.currentTime = Math.min(video.duration || Infinity, video.currentTime + 10);
+    showRipple(rippleR, '+10 son');
+  }, sig);
 
   /* ---- Progress: mouse ---- */
   var seeking = false;
+  var _seekScrollLeft = 0; /* related scroll bilan konflikt bo'lmasin */
+
   function seekFromMouse(e){
     var r = progress.getBoundingClientRect();
     seekRatio((e.clientX - r.left) / r.width);
   }
+
   if(progress){
-    progress.addEventListener('mousedown', function(e){ e.stopPropagation(); seeking = true; seekFromMouse(e); });
-    window.addEventListener('mousemove',   function(e){ if(seeking) seekFromMouse(e); });
-    window.addEventListener('mouseup',     function(){ seeking = false; });
+    progress.addEventListener('mousedown', function(e){
+      e.stopPropagation();
+      seeking = true;
+      seekFromMouse(e);
+    }, sig);
 
     progress.addEventListener('touchstart', function(e){
       e.stopPropagation();
       var r = progress.getBoundingClientRect();
       seekRatio((e.touches[0].clientX - r.left) / r.width);
-    }, { passive: true });
+    }, { passive: true, signal: _bmAbort.signal });
+
     progress.addEventListener('touchmove', function(e){
       e.stopPropagation();
       var r = progress.getBoundingClientRect();
       seekRatio((e.touches[0].clientX - r.left) / r.width);
-    }, { passive: true });
+    }, { passive: true, signal: _bmAbort.signal });
   }
+
+  /* window-level mouse listeners — signal bilan olib tashlanadi */
+  window.addEventListener('mousemove', function(e){ if(seeking) seekFromMouse(e); }, sig);
+  window.addEventListener('mouseup',   function(){ seeking = false; }, sig);
 
   /* ---- Volume ---- */
   if(volSlider) volSlider.addEventListener('input', function(){
     video.volume = parseFloat(volSlider.value);
     video.muted  = video.volume === 0;
     if(volBtn) volBtn.innerHTML = svgIcon(video.muted ? SVG.mute : SVG.vol);
-  });
+  }, sig);
+
   if(volBtn) volBtn.addEventListener('click', function(e){
     e.stopPropagation();
     video.muted = !video.muted;
     if(volSlider) volSlider.value = video.muted ? 0 : video.volume;
     volBtn.innerHTML = svgIcon(video.muted ? SVG.mute : SVG.vol);
-  });
+  }, sig);
 
   /* ---- Fullscreen ---- */
   function enterFullscreen(){
     if(video.webkitEnterFullscreen && !document.fullscreenEnabled && !document.webkitFullscreenEnabled){
-      try { video.webkitEnterFullscreen(); } catch(e){}
+      try{ video.webkitEnterFullscreen(); }catch(e){}
       return;
     }
-    reqFS(player)
-      .then(function(){ lockLandscape(); })
-      .catch(function(){
-        if(video.webkitEnterFullscreen){
-          try { video.webkitEnterFullscreen(); } catch(e){}
-        }
-      });
+    reqFS(player).then(function(){ lockLandscape(); }).catch(function(){
+      if(video.webkitEnterFullscreen){ try{ video.webkitEnterFullscreen(); }catch(e){} }
+    });
   }
 
-  function exitFullscreen(){
+  function doExitFullscreen(){
     unlockOrientation();
-    try { exitFS(); } catch(e){}
+    try{ exitFS(); }catch(e){}
   }
 
-  /* Bottom bar fullscreen btn (eski) */
   if(fsBtn) fsBtn.addEventListener('click', function(e){
     e.stopPropagation();
-    if(getFSElement()){ exitFullscreen(); }
-    else { enterFullscreen(); }
-  });
+    getFSElement() ? doExitFullscreen() : enterFullscreen();
+  }, sig);
 
   if(exitFsBtn) exitFsBtn.addEventListener('click', function(e){
     e.stopPropagation();
     e.preventDefault();
-    if(getFSElement()){ exitFullscreen(); }
-  });
+    if(getFSElement()) doExitFullscreen();
+  }, sig);
 
   function onFsChange(){
     var inFs = !!getFSElement();
     if(fsBtn) fsBtn.innerHTML = svgIcon(inFs ? SVG.collapse : SVG.expand);
-    /* expand btn icon ham yangilash */
-    if(expandBtn){
-      expandBtn.querySelector('i').className = inFs ? 'bx bx-collapse-alt' : 'bx bx-expand-alt';
-    }
     if(!inFs) unlockOrientation();
   }
-  document.addEventListener('fullscreenchange',       onFsChange);
-  document.addEventListener('webkitfullscreenchange', onFsChange);
-  document.addEventListener('mozfullscreenchange',    onFsChange);
-  document.addEventListener('MSFullscreenChange',     onFsChange);
+  document.addEventListener('fullscreenchange',       onFsChange, sig);
+  document.addEventListener('webkitfullscreenchange', onFsChange, sig);
+  document.addEventListener('mozfullscreenchange',    onFsChange, sig);
+  document.addEventListener('MSFullscreenChange',     onFsChange, sig);
 
   video.addEventListener('webkitbeginfullscreen', function(){
     if(fsBtn) fsBtn.innerHTML = svgIcon(SVG.collapse);
-    if(expandBtn) expandBtn.querySelector('i').className = 'bx bx-collapse-alt';
-  });
+  }, sig);
   video.addEventListener('webkitendfullscreen', function(){
     if(fsBtn) fsBtn.innerHTML = svgIcon(SVG.expand);
-    if(expandBtn) expandBtn.querySelector('i').className = 'bx bx-expand-alt';
     unlockOrientation();
-  });
+  }, sig);
 
   /* ================================================================
-     CONTROLS VISIBILITY — 1 marta touch: ko'rsat, yana 1 marta: yashir
+     CONTROLS VISIBILITY
   ================================================================ */
   var hideTimer = null;
 
   function showControls(ms){
-    if(isLocked) return; /* Lock rejimida controls ko'rsatilmaydi */
+    if(isLocked) return;
     player.classList.add('show-controls');
     clearTimeout(hideTimer);
     if(!isTouch() && !video.paused){
@@ -1467,26 +1473,23 @@ function initBmPlayer(){
     clearTimeout(hideTimer);
   }
 
-  /* -- PC: mouse -- */
   if(!isTouch()){
-    player.addEventListener('mousemove',  function(){ if(!isLocked) showControls(3000); });
-    player.addEventListener('mouseleave', function(){ clearTimeout(hideTimer); if(!video.paused) hideControls(); });
+    player.addEventListener('mousemove',  function(){ if(!isLocked) showControls(3000); }, sig);
+    player.addEventListener('mouseleave', function(){ clearTimeout(hideTimer); if(!video.paused) hideControls(); }, sig);
     player.addEventListener('click', function(e){
       if(e.target.closest('.bm-progress-wrap') ||
          e.target.closest('.bm-btn') ||
          e.target.closest('.bm-back-link') ||
          e.target.closest('#bm-exit-fs') ||
          e.target.closest('.bm-speed-wrap') ||
-         e.target.closest('#bm-lock-btn') ||
-         e.target.closest('#bm-expand-btn')) return;
+         e.target.closest('#bm-lock-btn')) return;
       togglePlay();
       showControls(2500);
-    });
+    }, sig);
   }
 
   /* ================================================================
      MOBILE TOUCH LOGIC
-     Lock rejimida: faqat double-tap (chap/o'ng) va play/pause markaz
   ================================================================ */
   if(isTouch()){
     var lastTap    = 0;
@@ -1502,10 +1505,8 @@ function initBmPlayer(){
     }
 
     player.addEventListener('touchend', function(e){
-      /* Lock btn har doim ishlaydi */
       if(e.target.closest('#bm-lock-btn')) return;
 
-      /* Lock rejimida: faqat double-tap va play/pause */
       var now  = Date.now();
       var t    = e.changedTouches[0];
       var rect = player.getBoundingClientRect();
@@ -1513,13 +1514,11 @@ function initBmPlayer(){
       var isDbl = (now - lastTap) < DTAP;
 
       if(isLocked){
-        /* Lock rejimida controls tugmalarini bloklash */
         if(e.target.closest('.bm-progress-wrap') ||
            e.target.closest('.bm-btn') ||
            e.target.closest('.bm-back-link') ||
            e.target.closest('#bm-exit-fs') ||
-           e.target.closest('.bm-speed-wrap') ||
-           e.target.closest('#bm-expand-btn')) return;
+           e.target.closest('.bm-speed-wrap')) return;
 
         if(isDbl){
           lastTap = 0;
@@ -1536,10 +1535,7 @@ function initBmPlayer(){
             togglePlay();
           }
         } else {
-          /* Single tap lock rejimida — markazga bosish → play/pause */
-          if(xRel >= 0.36 && xRel <= 0.64){
-            togglePlay();
-          }
+          if(xRel >= 0.36 && xRel <= 0.64) togglePlay();
           lastTap = now;
         }
         return;
@@ -1550,13 +1546,11 @@ function initBmPlayer(){
          e.target.closest('.bm-btn') ||
          e.target.closest('.bm-back-link') ||
          e.target.closest('#bm-exit-fs') ||
-         e.target.closest('.bm-speed-wrap') ||
-         e.target.closest('#bm-expand-btn')) return;
+         e.target.closest('.bm-speed-wrap')) return;
 
       if(isDbl){
         lastTap = 0;
         scheduleReset();
-
         if(xRel < 0.36){
           video.currentTime = Math.max(0, video.currentTime - leftSkip);
           showRipple(rippleL, '−' + leftSkip + ' son');
@@ -1574,28 +1568,25 @@ function initBmPlayer(){
       } else {
         var showing = player.classList.contains('show-controls');
         if(showing){
-          if(xRel >= 0.36 && xRel <= 0.64){
-            togglePlay();
-          } else {
-            hideControls();
-          }
+          if(xRel >= 0.36 && xRel <= 0.64){ togglePlay(); }
+          else { hideControls(); }
         } else {
           player.classList.add('show-controls');
         }
         lastTap = now;
       }
-    }, { passive: true });
+    }, { passive: true, signal: _bmAbort.signal });
   }
 
-  video.addEventListener('pause', function(){ clearTimeout(hideTimer); if(!isLocked) player.classList.add('show-controls'); });
-  video.addEventListener('ended', function(){ clearTimeout(hideTimer); if(!isLocked) player.classList.add('show-controls'); });
+  video.addEventListener('pause', function(){ clearTimeout(hideTimer); if(!isLocked) player.classList.add('show-controls'); }, sig);
+  video.addEventListener('ended', function(){ clearTimeout(hideTimer); if(!isLocked) player.classList.add('show-controls'); }, sig);
 
   /* ================================================================
      KEYBOARD SHORTCUTS (desktop only)
   ================================================================ */
   document.addEventListener('keydown', function(e){
     if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
-    if(isLocked) return; /* Lock rejimida klaviatura ham bloklanadi */
+    if(isLocked) return;
     switch(e.code){
       case 'Space':
         e.preventDefault(); togglePlay(); showControls(2000); break;
@@ -1619,14 +1610,14 @@ function initBmPlayer(){
         if(volSlider) volSlider.value = video.volume;
         if(volBtn) volBtn.innerHTML = svgIcon(video.muted ? SVG.mute : SVG.vol);
         break;
-      case 'KeyM': if(volBtn)     volBtn.click();     break;
-      case 'KeyF': if(expandBtn)  expandBtn.click();  break;
-      case 'KeyL': if(fwd10)      fwd10.click();      break;
-      case 'KeyJ': if(back10)     back10.click();     break;
+      case 'KeyM': if(volBtn)  volBtn.click();  break;
+      case 'KeyF': if(fsBtn)   fsBtn.click();   break;
+      case 'KeyL': if(fwd10)   fwd10.click();   break;
+      case 'KeyJ': if(back10)  back10.click();  break;
       case 'Escape':
-        if(getFSElement()) exitFullscreen(); break;
+        if(getFSElement()) doExitFullscreen(); break;
     }
-  });
+  }, sig);
 }
 
 /* Init on page load */
@@ -1649,10 +1640,10 @@ document.addEventListener('click', function(e){
 });
 
 /* ---------------------------------------------------------------
-   RELATED CARDS — strelka tugmalar + qo'l bilan surish
+   RELATED CARDS
 --------------------------------------------------------------- */
 (function(){
-  var scroll = document.getElementById('related-scroll');
+  var scroll  = document.getElementById('related-scroll');
   var prevBtn = document.getElementById('related-prev');
   var nextBtn = document.getElementById('related-next');
   if(!scroll) return;
@@ -1666,7 +1657,6 @@ document.addEventListener('click', function(e){
     scroll.scrollBy({ left: CARD_W * 3, behavior: 'smooth' });
   });
 
-  /* Mouse drag to scroll (PC) */
   var isDragging = false, startX = 0, scrollLeft = 0;
   scroll.addEventListener('mousedown', function(e){
     isDragging = true;
@@ -1681,18 +1671,15 @@ document.addEventListener('click', function(e){
   scroll.addEventListener('mousemove', function(e){
     if(!isDragging) return;
     e.preventDefault();
-    var x = e.pageX - scroll.offsetLeft;
-    scroll.scrollLeft = scrollLeft - (x - startX);
+    scroll.scrollLeft = scrollLeft - (e.pageX - scroll.offsetLeft - startX);
   });
   scroll.addEventListener('click', function(e){
-    if(Math.abs(scroll.scrollLeft - scrollLeft) > 5){
-      e.preventDefault();
-    }
+    if(Math.abs(scroll.scrollLeft - scrollLeft) > 5) e.preventDefault();
   });
 })();
 
 /* ---------------------------------------------------------------
-   COMMENTS — 5 tadan batafsil toggle
+   COMMENTS toggle
 --------------------------------------------------------------- */
 var _commentsExpanded = false;
 function toggleAllComments(){
@@ -1700,9 +1687,7 @@ function toggleAllComments(){
   var items = document.querySelectorAll('#comments-list .comment-item');
   items.forEach(function(item){
     var idx = parseInt(item.getAttribute('data-comment-index'), 10);
-    if(idx >= 5){
-      item.style.display = _commentsExpanded ? 'flex' : 'none';
-    }
+    if(idx >= 5) item.style.display = _commentsExpanded ? 'flex' : 'none';
   });
   var btn = document.getElementById('comments-toggle-btn');
   if(btn){
