@@ -12,11 +12,11 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import F
 from django.db import models
-from django.views.decorators.http import require_POST
+
 
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
-    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,UserPremiumSettings
+    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare
 )
 
 User = get_user_model()
@@ -104,9 +104,6 @@ def home(request):
 
     categories = Category.objects.all()
 
-    premium_settings = None
-    if request.user.is_authenticated:
-        premium_settings, _ = UserPremiumSettings.objects.get_or_create(user=request.user)
 
     # ================= STORY =================
     stories = Story.objects.filter(
@@ -159,10 +156,10 @@ def home(request):
         'total_users': User.objects.count(),
         'user_id': request.user.id if request.user.is_authenticated else None,
         'fav_ids': fav_ids,
-        'premium_settings': premium_settings,
     }
 
     return render(request, 'home.html', context)
+
 
 
 
@@ -875,23 +872,4 @@ def reel_detail(request, reel_id):
         'prev_reel': prev_reel,
     })
 
-
-@login_required
-@require_POST
-def toggle_premium_settings(request):
-    settings_obj, _ = UserPremiumSettings.objects.get_or_create(user=request.user)
-
-    field = request.POST.get('field')  # 'bottom_nav' yoki 'premium_design'
-    value = request.POST.get('value') == 'true'
-    bg_image = request.POST.get('bg_image', '')
-
-    if field == 'bottom_nav':
-        settings_obj.bottom_nav_enabled = value
-    elif field == 'premium_design':
-        settings_obj.premium_design_enabled = value
-        if bg_image:
-            settings_obj.selected_bg_image = bg_image
-
-    settings_obj.save()
-    return JsonResponse({'status': 'ok', 'value': value})
 
