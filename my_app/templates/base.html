@@ -626,32 +626,31 @@
         /* ==================== BOTTOM TAB BAR ==================== */
         .bottom-tab-bar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 68px;
-            background: rgba(11, 11, 17, 0.97);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-top: 1px solid rgba(255,255,255,0.07);
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 64px;
+            background: rgba(20, 20, 30, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             display: flex;
             align-items: center;
             justify-content: space-around;
-            padding: 0 6px;
-            padding-bottom: env(safe-area-inset-bottom, 0px);
+            padding: 0 12px;
             z-index: 998;
-            box-shadow: 0 -6px 30px rgba(0,0,0,0.5);
-            transform: translateY(0);
-            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            border-radius: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+            width: auto;
+            min-width: 320px;
+            max-width: 90vw;
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease, bottom 0.4s ease;
         }
 
-        /* Tab bar yashirilganda */
         .bottom-tab-bar.tab-hidden {
-            transform: translateY(110%);
-        }
-
-        .bottom-tab-bar {
-            border-radius: 20px 20px 0 0;
+            transform: translateX(-50%) translateY(120px);
+            opacity: 0;
+            pointer-events: none;
         }
 
         .tab-item {
@@ -661,79 +660,65 @@
             justify-content: center;
             gap: 3px;
             text-decoration: none;
-            color: rgba(255,255,255,0.35);
-            font-size: 0.58rem;
-            font-weight: 800;
-            letter-spacing: 0.4px;
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
-            padding: 7px 10px;
-            border-radius: 16px;
+            padding: 8px 16px;
+            border-radius: 40px;
             transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
             position: relative;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            min-width: 50px;
-            flex: 1;
+            min-width: 56px;
             cursor: pointer;
             border: none;
             background: transparent;
+            white-space: nowrap;
         }
 
         .tab-item i {
-            font-size: 1.45rem;
+            font-size: 1.4rem;
             transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
             line-height: 1;
         }
 
         .tab-item:active {
-            transform: scale(0.86);
+            transform: scale(0.88);
         }
 
-        /* Aktiv holat */
         .tab-item.tab-active {
             color: #fff;
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .tab-item.tab-active i {
-            color: var(--accent);
-            filter: drop-shadow(0 0 5px rgba(0,243,255,0.55));
+            color: #fff;
         }
 
-        /* Aktiv chiziq — pastda */
         .tab-item.tab-active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 22px;
-            height: 2.5px;
-            background: var(--accent);
-            border-radius: 2px 2px 0 0;
-            box-shadow: 0 0 8px rgba(0,243,255,0.6);
+            display: none;
         }
 
-        /* Profil tab — pill shakli, sariq rang */
         .tab-item.tab-profile-btn {
-            background: rgba(255, 160, 0, 0.09);
-            border: 1px solid rgba(255, 160, 0, 0.18);
-            border-radius: 20px;
-            flex: 0 0 auto;
-            min-width: 62px;
+            background: transparent;
+            border: none;
+            border-radius: 40px;
         }
 
         .tab-item.tab-profile-btn i {
-            color: #ffaa00;
+            color: rgba(255, 255, 255, 0.45);
         }
 
         .tab-item.tab-profile-btn.tab-active {
-            background: rgba(255, 160, 0, 0.18);
-            border-color: rgba(255, 160, 0, 0.45);
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
         }
 
         .tab-item.tab-profile-btn.tab-active i {
-            color: #ffcc44;
-            filter: drop-shadow(0 0 6px rgba(255,180,0,0.65));
+            color: #fff;
+            filter: none;
         }
 
         .tab-item.tab-profile-btn.tab-active::after {
@@ -743,6 +728,14 @@
         /* Faqat mobil qurilmalarda ko'rsatish */
         @media (min-width: 769px) {
             .bottom-tab-bar { display: none; }
+        }
+
+        body.tabbar-on main.main-content {
+            padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 30px);
+        }
+
+        body.tabbar-on footer {
+            padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 30px);
         }
 
         /* Tab bar yoqilganda sahifa pastiga joy qoldirish */
@@ -1058,7 +1051,6 @@
 <!-- Sahifa yuklanganda: default OFF (tab-hidden), foydalanuvchi yoqsa saqlanadi -->
 <nav class="bottom-tab-bar tab-hidden" id="bottomTabBar" aria-label="Pastki navigatsiya">
 
-
     <a href="{% url 'aloqa' %}" class="tab-item" data-tab="aloqa">
         <i class='bx bx-support'></i>
         <span>Aloqa</span>
@@ -1079,9 +1071,9 @@
         <span>Qidirish</span>
     </a>
 
-    <a href="{% url 'profile' %}" class="tab-item" data-tab="profile">
+    <a href="{% url 'profile' %}" class="tab-item tab-profile-btn" data-tab="profile">
         <i class='bx bx-user'></i>
-        <span>Qidirish</span>
+        <span>Profil</span>
     </a>
 
 </nav>
