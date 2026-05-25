@@ -1078,6 +1078,31 @@
 
 </nav>
 
+<!-- ==================== INTERNET HOLAT XABARI ==================== -->
+<div id="networkToast" style="
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+"></div>
+
 {% block footer %}
 <footer style="background: rgba(10,10,15,0.95); border-top: 1px solid rgba(255,255,255,0.05); padding: 60px 5% 30px; margin-top: 60px; color: var(--text-dim); font-size: 0.9rem;">
     <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-bottom: 40px;">
@@ -1118,6 +1143,7 @@
             </ul>
         </div>
     </div>
+
 
     <!-- ==================== FOOTER PASTKI QISMI ==================== -->
     <div style="max-width:1280px; margin:0 auto; padding-top:30px; border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
@@ -1349,7 +1375,44 @@ function markActiveTab() {
     markActiveTab();
 })();
 
+(function() {
+    var toast = document.getElementById('networkToast');
+    var timer = null;
+
+    function showToast(isOnline) {
+        clearTimeout(timer);
+
+        if (isOnline) {
+            toast.innerHTML = "<i class='bx bx-wifi'></i> Online siz";
+            toast.style.background = "rgba(16, 185, 129, 0.92)";
+            toast.style.color = "#fff";
+            toast.style.border = "1px solid rgba(255,255,255,0.2)";
+        } else {
+            toast.innerHTML = "<i class='bx bx-wifi-off'></i> Offline siz";
+            toast.style.background = "rgba(239, 68, 68, 0.92)";
+            toast.style.color = "#fff";
+            toast.style.border = "1px solid rgba(255,255,255,0.2)";
+        }
+
+        toast.style.opacity = "1";
+        toast.style.transform = "translateX(-50%) translateY(0)";
+
+        if (isOnline) {
+            timer = setTimeout(function() {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateX(-50%) translateY(-20px)";
+            }, 3000);
+        }
+    }
+
+    window.addEventListener('offline', function() { showToast(false); });
+    window.addEventListener('online',  function() { showToast(true);  });
+})();
+
 </script>
 
 </body>
 </html>
+
+
+Hojiakbar2007
