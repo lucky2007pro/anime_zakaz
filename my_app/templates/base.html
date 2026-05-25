@@ -886,7 +886,7 @@
             </span>
             <span class="arrow">›</span>
         </a>
-        
+
         <!-- TAB BAR TOGGLE — shu yerga -->
         <div style="display:flex; align-items:center; gap:10px; padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.03);">
             <i class='bx bx-grid-alt' style="font-size:1.15rem; color:var(--text-dim);"></i>
@@ -1101,6 +1101,9 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
 "></div>
 
 {% block footer %}
@@ -1379,8 +1382,71 @@ function markActiveTab() {
     var toast = document.getElementById('networkToast');
     var timer = null;
 
+    /* ---- DRAG / SWIPE TO DISMISS ---- */
+    var startX = 0, startY = 0, currentX = 0, isDragging = false;
+    var baseTransform = 'translateX(-50%) translateY(0)';
+
+    function onDragStart(clientX, clientY) {
+        isDragging = true;
+        startX = clientX;
+        startY = clientY;
+        currentX = 0;
+        toast.style.transition = 'none';
+        toast.style.cursor = 'grabbing';
+    }
+
+    function onDragMove(clientX, clientY) {
+        if (!isDragging) return;
+        currentX = clientX - startX;
+        var dy = clientY - startY;
+        var opacity = Math.max(0, 1 - Math.abs(currentX) / 120);
+        toast.style.transform = 'translateX(calc(-50% + ' + currentX + 'px)) translateY(' + dy * 0.3 + 'px)';
+        toast.style.opacity = opacity;
+    }
+
+    function onDragEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        toast.style.cursor = 'grab';
+
+        if (Math.abs(currentX) > 80) {
+            /* Yetarli siljish — dismiss */
+            var dir = currentX > 0 ? 1 : -1;
+            toast.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+            toast.style.transform = 'translateX(calc(-50% + ' + (dir * 300) + 'px)) translateY(0)';
+            toast.style.opacity = '0';
+            toast.style.pointerEvents = 'none';
+            clearTimeout(timer);
+        } else {
+            /* Qaytarish */
+            toast.style.transition = 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1)';
+            toast.style.transform = baseTransform;
+            toast.style.opacity = '1';
+        }
+    }
+
+    /* Mouse events */
+    toast.addEventListener('mousedown', function(e) { onDragStart(e.clientX, e.clientY); });
+    document.addEventListener('mousemove', function(e) { onDragMove(e.clientX, e.clientY); });
+    document.addEventListener('mouseup', function() { onDragEnd(); });
+
+    /* Touch events */
+    toast.addEventListener('touchstart', function(e) {
+        onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    document.addEventListener('touchmove', function(e) {
+        onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    document.addEventListener('touchend', function() { onDragEnd(); });
+
+    /* ---- SHOW TOAST ---- */
     function showToast(isOnline) {
         clearTimeout(timer);
+
+        toast.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1)';
+        toast.style.transform = 'translateX(-50%) translateY(-20px)';
+        toast.style.opacity = '0';
+        toast.style.pointerEvents = 'auto';
 
         if (isOnline) {
             toast.innerHTML = "<i class='bx bx-wifi'></i> Online siz";
@@ -1394,13 +1460,19 @@ function markActiveTab() {
             toast.style.border = "1px solid rgba(255,255,255,0.2)";
         }
 
-        toast.style.opacity = "1";
-        toast.style.transform = "translateX(-50%) translateY(0)";
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                toast.style.transform = baseTransform;
+                toast.style.opacity = '1';
+            });
+        });
 
         if (isOnline) {
             timer = setTimeout(function() {
-                toast.style.opacity = "0";
-                toast.style.transform = "translateX(-50%) translateY(-20px)";
+                toast.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                toast.style.pointerEvents = 'none';
             }, 3000);
         }
     }
