@@ -175,9 +175,10 @@
     z-index: 2;
     background: linear-gradient(
         to top,
-        rgba(10, 10, 15, 0.97) 0%,
-        rgba(10, 10, 15, 0.55) 45%,
-        rgba(10, 10, 15, 0.15) 100%
+        rgba(10, 10, 15, 1) 0%,
+        rgba(10, 10, 15, 0.75) 35%,
+        rgba(10, 10, 15, 0.2) 65%,
+        transparent 100%
     );
 }
 
@@ -188,10 +189,10 @@
     left: 0;
     right: 0;
     z-index: 10;
-    padding: 18px;
+    padding: 14px 16px 16px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 /* Slide — genre tags */
@@ -713,10 +714,38 @@ body.tabbar-on .scroll-top-btn { bottom: 82px; }
     .story-container { padding: 10px 4%; }
 
     .slider-wrapper-outer { padding: 0; }
-    .slide { width: 95%; max-height: 280px; border-radius: 14px; }
-    .slide-content { padding: 14px 14px 50px; }
-    .slide-genre-tags { gap: 6px; margin-bottom: 8px; }
-    .slide-title { font-size: 1.25rem; line-height: 1.2; }
+    .slide-content {
+        padding: 10px 12px 12px;
+        gap: 6px;
+    }
+    .slide-title {
+        font-size: 0.95rem;
+        line-height: 1.2;
+    }
+    .slide-genre-tags {
+        gap: 5px;
+    }
+    .slide-genre-tag {
+        font-size: 0.6rem;
+        padding: 2px 7px;
+        letter-spacing: 0.5px;
+    }
+    .slide-bottom-row {
+        gap: 7px;
+    }
+    .slide-year-badge {
+        font-size: 0.68rem;
+        padding: 5px 10px;
+    }
+    .slide-watch-btn {
+        font-size: 0.75rem;
+        padding: 7px 13px;
+        gap: 5px;
+    }
+    .slide-watch-btn i {
+        font-size: 0.85rem;
+    }
+    }
 
     .cards-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
