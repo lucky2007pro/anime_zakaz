@@ -7,902 +7,753 @@
 
 {% block extra_css %}
 <style>
-    /* ----- HERO SLIDER ----- */
-    .slider-container {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        min-height: 320px;
-        max-height: 90vh;
-        overflow: hidden;
-        border-radius: 16px;
-        margin: 0 auto;
-        box-shadow: 0 0 0 2px rgba(0, 243, 255, 0.25), 0 0 40px rgba(0, 243, 255, 0.12);
-    }
+/* =====================================================
+   CSS VARIABLES (base.html dan kelishi kerak, bu yerda fallback)
+===================================================== */
+:root {
+    --accent: #00f3ff;
+    --bg-surface: #1a1a22;
+    --text-light: #f0f0f0;
+    --text-dim: #888;
+}
 
-    .slides-wrapper {
-        display: flex;
-        width: 100%;
-        height: 100%;
-        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-        cursor: grab;
-        user-select: none;
-        will-change: transform;
-    }
-    .slides-wrapper.dragging {
-        cursor: grabbing;
-        transition: none;
-    }
+/* =====================================================
+   STORY TOP SPACE
+===================================================== */
+.story-top-space {
+    margin-top: 75px;
+}
 
-    .slide {
-        flex-shrink: 0;
-        width: 44%;
-        border-radius: 20px;
-        position: relative;
-        overflow: hidden;
-        aspect-ratio: 16 / 9;
-        min-height: 160px;
-        max-height: 320px;
-        background: #111;
-        transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1),
-                    opacity 0.55s ease,
-                    box-shadow 0.55s ease;
-        opacity: 0.45;
-        transform: scale(0.88);
-        box-shadow: none;
-    }
+/* =====================================================
+   STORY SECTION
+===================================================== */
+.story-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 4%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.story-container::-webkit-scrollbar { display: none; }
 
-    .slide-bg {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        z-index: 1;
-        overflow: hidden;
-    }
+.story-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 70px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
 
-    .slide-bg img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center top;
-        display: block;
-        will-change: transform;
-    }
+.story-ring {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+.story-ring.seen { background: #444; }
 
-    .slide-bg-video {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        object-fit: cover;
-        z-index: 1;
-    }
+.story-ring img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #0f0f13;
+}
 
-    .slide-overlay {
-        position: absolute;
-        inset: 0;
-        z-index: 2;
-        background: linear-gradient(to right, rgba(15,15,19,0.92) 0%, rgba(15,15,19,0.35) 55%, transparent 100%),
-                    linear-gradient(to top, rgba(15,15,19,1) 0%, transparent 50%);
-    }
+.story-item span {
+    font-size: 12px;
+    color: #aaa;
+    max-width: 70px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-    .slide-content {
-        position: relative;
-        z-index: 10;
-        max-width: 680px;
-    }
+.story-item:hover .story-ring { transform: scale(1.08); }
+.story-item:active .story-ring { transform: scale(0.95); }
 
-    .tags {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 14px;
-        flex-wrap: wrap;
-        align-items: center;
-    }
+/* =====================================================
+   HERO SLIDER — OUTER WRAPPER
+===================================================== */
+.slider-wrapper-outer {
+    max-width: 1400px;
+    margin: 20px auto 0;
+    padding: 0 5%;
+}
 
-    .tag {
-        background: rgba(0, 243, 255, 0.13);
-        color: var(--accent);
-        padding: 4px 11px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 1px;
-        border: 1px solid rgba(0, 243, 255, 0.28);
-    }
+.slider-outer-track {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding-bottom: 28px;
+}
 
-    .tag-muted {
-        background: rgba(255,255,255,0.07);
-        color: var(--text-light);
-        border-color: rgba(255,255,255,0.12);
-    }
+/* =====================================================
+   HERO SLIDER — SLIDES WRAPPER
+===================================================== */
+.slides-wrapper {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: grab;
+    user-select: none;
+    will-change: transform;
+}
+.slides-wrapper.dragging {
+    cursor: grabbing;
+    transition: none;
+}
 
-    .slide-title {
-        font-size: 3.4rem;
-        font-weight: 900;
-        line-height: 1.08;
-        margin-bottom: 12px;
-        text-shadow: 0 8px 24px rgba(0,0,0,0.6);
-        letter-spacing: -0.02em;
-    }
+/* =====================================================
+   HERO SLIDER — INDIVIDUAL SLIDE
+===================================================== */
+.slide {
+    flex-shrink: 0;
+    width: 44%;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    min-height: 160px;
+    max-height: 320px;
+    background: #111;
+    transition:
+        transform  0.55s cubic-bezier(0.25, 1, 0.5, 1),
+        opacity    0.55s ease,
+        box-shadow 0.55s ease;
+    opacity: 0.45;
+    transform: scale(0.88);
+    box-shadow: none;
+}
+.slide.active-slide {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+}
 
-    .slide-meta-row {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 10px;
-        flex-wrap: wrap;
-    }
+/* Slide — background image / video */
+.slide-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+.slide-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+.slide-bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
 
-    .slide-meta-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 0.82rem;
-        font-weight: 700;
-        color: var(--text-dim);
-    }
+/* Slide — gradient overlay */
+.slide-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+        to top,
+        rgba(10, 10, 15, 0.97) 0%,
+        rgba(10, 10, 15, 0.55) 45%,
+        rgba(10, 10, 15, 0.15) 100%
+    );
+}
 
-    .slide-meta-item i {
-        font-size: 0.95rem;
-        color: var(--accent);
-    }
+/* Slide — content block */
+.slide-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
-    .slide-rating {
-        background: rgba(234, 179, 8, 0.18);
-        color: #fbbf24;
-        padding: 3px 10px;
-        border-radius: 5px;
-        font-size: 0.78rem;
-        font-weight: 800;
-        border: 1px solid rgba(234, 179, 8, 0.35);
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
+/* Slide — genre tags */
+.slide-genre-tags {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+.slide-genre-tag {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.75);
+    padding: 4px 11px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
 
-    .slider-controls {
-        position: absolute;
-        bottom: 22px;
-        left: 5%;
-        display: flex;
-        gap: 8px;
-        z-index: 20;
-    }
+/* Slide — title */
+.slide-title {
+    font-size: 1.7rem;
+    font-weight: 900;
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    letter-spacing: -0.01em;
+    margin: 0;
+}
 
-    .dot {
-        width: 28px;
-        height: 3px;
-        background: rgba(255,255,255,0.18);
-        border-radius: 2px;
-        cursor: pointer;
-        transition: all 0.3s;
-        border: none;
-        padding: 0;
-        outline: none;
-    }
+/* Slide — bottom row (year + watch button) */
+.slide-bottom-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
-    .dot[aria-pressed="true"] {
-        background: var(--accent);
-        width: 46px;
-        box-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
-    }
+.slide-year-badge {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.85);
+    padding: 7px 16px;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
 
-    /* ----- MAIN CONTENT ----- */
-    .container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 5%;
-    }
+.slide-watch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #ef4444;
+    color: #fff;
+    padding: 9px 22px;
+    border-radius: 50px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 4px 18px rgba(239, 68, 68, 0.45);
+    transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+    border: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.slide-watch-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.55);
+}
+.slide-watch-btn i { font-size: 1rem; line-height: 1; }
 
-    /* ----- HERO SLIDER ----- */
-    .slider-wrapper-outer {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 5%;
-    }
+/* =====================================================
+   HERO SLIDER — DOTS
+===================================================== */
+.slider-dots-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+}
 
-    .slider-outer-track {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
-        padding-bottom: 28px;
-    }
+.slider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.25);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    outline: none;
+    flex-shrink: 0;
+}
+.slider-dot.active {
+    background: #ef4444;
+    width: 28px;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
 
-    .slides-wrapper {
-        display: flex;
-        gap: 14px;
-        transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
-        cursor: grab;
-        user-select: none;
-        will-change: transform;
-        align-items: center;
-    }
+/* =====================================================
+   MAIN CONTAINER
+===================================================== */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 5%;
+}
 
-    .slides-wrapper.dragging {
-        cursor: grabbing;
-        transition: none;
-    }
+/* =====================================================
+   SECTION HEADER
+===================================================== */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 32px 0 18px;
+}
+.section-title h3 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text-light);
+    margin: 0;
+}
+.section-title h3 span {
+    color: var(--accent);
+}
+.view-all {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+.view-all:hover { opacity: 1; }
 
-    .slide {
-        flex-shrink: 0;
-        width: 44%;
-        border-radius: 20px;
-        position: relative;
-        overflow: hidden;
-        aspect-ratio: 16 / 9;
-        min-height: 160px;
-        max-height: 320px;
-        background: #111;
-        transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1),
-                    opacity 0.55s ease,
-                    box-shadow 0.55s ease;
-        opacity: 0.45;
-        transform: scale(0.88);
-        box-shadow: none;
-    }
+/* =====================================================
+   RECOMMENDATION MARQUEE
+===================================================== */
+.recommendation-section {
+    padding: 30px 0 0;
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+}
 
-    .slide.active-slide {
-        opacity: 1;
-        transform: scale(1);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
-    }
+#marqueeOuter {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+    padding-bottom: 20px;
+    cursor: grab;
+    user-select: none;
+}
+#marqueeOuter.grabbing { cursor: grabbing; }
 
-    .slide-bg {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        z-index: 1;
-    }
+.marquee-container {
+    display: flex;
+    width: max-content;
+    gap: 16px;
+    will-change: transform;
+}
 
-    .slide-bg img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center top;
-        display: block;
-    }
+.marquee-item {
+    width: 220px;
+    flex-shrink: 0;
+    pointer-events: auto;
+}
 
-    .slide-bg-video {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        object-fit: cover;
-        z-index: 1;
-    }
+/* =====================================================
+   CARDS GRID
+===================================================== */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 22px;
+    padding-bottom: 50px;
+}
 
-    .slide-overlay {
-        position: absolute;
-        inset: 0;
-        z-index: 2;
-        background: linear-gradient(
-            to top,
-            rgba(10, 10, 15, 0.97) 0%,
-            rgba(10, 10, 15, 0.55) 45%,
-            rgba(10, 10, 15, 0.15) 100%
-        );
-    }
+.card-wrapper {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
 
-    .slide-content {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 10;
-        padding: 18px 18px 18px 18px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
+/* anime-card — base */
+.anime-card {
+    width: 100%;
+    height: 290px;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg-surface);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-wrapper:hover .anime-card {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.8);
+}
+.anime-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    display: block;
+}
+.card-wrapper:hover .anime-card img { transform: scale(1.06); }
 
-    /* Janr teglari */
-    .slide-genre-tags {
-        display: flex;
-        gap: 7px;
-        flex-wrap: wrap;
-    }
+/* card — hover overlay */
+.card-inner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,10,15,0.98) 0%, rgba(10,10,15,0.6) 40%, transparent 70%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12px 11px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.card-wrapper:hover .card-inner-overlay { opacity: 1; }
 
-    .slide-genre-tag {
-        background: rgba(255, 255, 255, 0.12);
-        color: rgba(255, 255, 255, 0.75);
-        padding: 4px 11px;
-        border-radius: 6px;
-        font-size: 0.72rem;
-        font-weight: 800;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-    }
+.card-inner-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+}
+.card-inner-desc {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.65);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+.card-inner-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.card-inner-views {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+}
+.card-inner-views i { font-size: 0.8rem; }
 
-    /* Sarlavha */
-    .slide-title {
-        font-size: 1.7rem;
-        font-weight: 900;
-        line-height: 1.1;
-        color: #fff;
-        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
-        letter-spacing: -0.01em;
-        margin: 0;
-    }
+/* card — badges */
+.top-badge-group {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+}
+.top-badge-episode {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #FFC107;
+}
+.top-badge-year {
+    background: #eab308;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #000;
+}
+.top-badge {
+    background: #eab308;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #000;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
 
-    /* Pastki qator: yil + tugma */
-    .slide-bottom-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
+/* tier badges — top right */
+.tier-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.tier-badge.vip {
+    background: rgba(251, 191, 36, 0.25);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+}
+.tier-badge.premium {
+    background: rgba(244, 63, 94, 0.2);
+    color: #f43f5e;
+    border: 1px solid rgba(244, 63, 94, 0.4);
+}
 
-    .slide-year-badge {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: rgba(255, 255, 255, 0.85);
-        padding: 7px 16px;
-        border-radius: 50px;
-        font-size: 0.82rem;
-        font-weight: 800;
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-    }
+/* favourite button — bottom right */
+.fav-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 1.1rem;
+    z-index: 10;
+    transition: background 0.2s, color 0.2s;
+    border: none;
+    cursor: pointer;
+}
+.fav-badge:hover { background: rgba(255, 255, 255, 0.2); color: #ff3366; }
+.fav-badge i.bxs-star { color: #ff3366; }
 
-    .slide-watch-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: #ef4444;
-        color: #fff;
-        padding: 9px 22px;
-        border-radius: 50px;
-        font-size: 0.88rem;
-        font-weight: 800;
-        text-decoration: none;
-        box-shadow: 0 4px 18px rgba(239, 68, 68, 0.45);
-        transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
-        border: none;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-    }
+/* card — info below image */
+.card-info-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 4px 0;
+}
+.card-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.3s ease;
+}
+.card-wrapper:hover .card-title { color: var(--accent); }
+.card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-dim);
+}
+.tag-jp {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--text-light);
+    font-size: 0.65rem;
+    font-weight: 800;
+}
 
-    .slide-watch-btn:hover {
-        background: #dc2626;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.55);
-    }
+/* =====================================================
+   ACTION BUTTONS (Aloqa / Chat)
+===================================================== */
+.action-buttons-section { padding: 32px 0 10px; }
+.action-buttons-inner {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 5%;
+}
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 32px;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 800;
+    text-decoration: none;
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s, background 0.35s;
+    letter-spacing: 0.3px;
+    border: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.action-btn:hover { transform: translateY(-4px); }
 
-    .slide-watch-btn i {
-        font-size: 1rem;
-        line-height: 1;
-    }
+.action-btn-contact {
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
+}
+.action-btn-contact:hover { box-shadow: 0 14px 32px rgba(14, 165, 233, 0.5); }
 
-    /* Dots */
-    .slider-dots-row {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;
-        margin-top: 14px;
-    }
+.action-btn-chat {
+    background: rgba(0, 243, 255, 0.08);
+    color: var(--accent);
+    border: 1.5px solid rgba(0, 243, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 243, 255, 0.12);
+}
+.action-btn-chat:hover {
+    box-shadow: 0 14px 32px rgba(0, 243, 255, 0.28);
+    border-color: rgba(0, 243, 255, 0.7);
+    background: rgba(0, 243, 255, 0.13);
+}
+.action-btn i { font-size: 1.3rem; }
 
-    .slider-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50px;
-        background: rgba(255, 255, 255, 0.25);
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-        outline: none;
-        flex-shrink: 0;
-    }
+/* =====================================================
+   SCROLL TO TOP BUTTON
+===================================================== */
+.scroll-top-btn {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(0, 243, 255, 0.15);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    color: var(--accent);
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 500;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+.scroll-top-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.scroll-top-btn:hover { background: rgba(0, 243, 255, 0.28); }
+body.tabbar-on .scroll-top-btn { bottom: 82px; }
 
-    .slider-dot.active {
-        background: #ef4444;
-        width: 28px;
-        box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
-    }
+/* =====================================================
+   RESPONSIVE — TABLET (≤ 1024px)
+===================================================== */
+@media (max-width: 1024px) {
+    .slide-title { font-size: 1.4rem; }
+}
 
-    /* ----- STORY ----- */
-    .story-container {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding: 10px 4%;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-    .story-container::-webkit-scrollbar { display: none; }
+/* =====================================================
+   RESPONSIVE — SMALL TABLET (≤ 768px)
+===================================================== */
+@media (max-width: 768px) {
+    .story-top-space { margin-top: 55px; }
+    .story-ring { width: 80px !important; height: 80px !important; }
+    .story-item span { font-size: 11px; }
 
-    .story-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-        min-width: 70px;
-        cursor: pointer;
-        text-decoration: none;
-        color: inherit;
-        -webkit-tap-highlight-color: transparent;
-    }
+    .slider-wrapper-outer { padding: 0 3%; }
+    .slide { width: 78%; max-height: 320px; }
+    .slide-content { max-width: 100%; }
+    .slide-title { font-size: 1.3rem; }
+    .slide-meta-row { display: none; }
 
-    .story-ring {
-        width: 85px;
-        height: 85px;
-        border-radius: 50%;
-        padding: 3px;
-        background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: transform 0.3s ease;
-        flex-shrink: 0;
-    }
+    .container { padding: 0 4%; }
+    .section-title h3 { font-size: 1.3rem; }
+    .section-header { margin: 24px 0 14px; }
 
-    .story-ring.seen { background: #444; }
-
-    .story-ring img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #0f0f13;
-    }
-
-    .story-item span {
-        font-size: 12px;
-        color: #aaa;
-        max-width: 70px;
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .story-item:hover .story-ring { transform: scale(1.08); }
-    .story-item:active .story-ring { transform: scale(0.95); }
-
-    /* ----- CARDS ----- */
     .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 22px;
-        padding-bottom: 50px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
     }
+    .anime-card { height: 240px; }
 
-    .card-wrapper {
-        text-decoration: none;
-        color: inherit;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
+    .action-btn { padding: 14px 22px; font-size: 0.9rem; }
+    .scroll-top-btn { bottom: 80px; right: 14px; width: 38px; height: 38px; font-size: 1.1rem; }
+}
+
+/* =====================================================
+   RESPONSIVE — MOBILE (≤ 480px)
+===================================================== */
+@media (max-width: 480px) {
+    .story-top-space { margin-top: 55px; }
+    .story-container { padding: 10px 4%; }
+
+    .slider-wrapper-outer { padding: 0; }
+    .slide { width: 95%; max-height: 280px; border-radius: 14px; }
+    .slide-content { padding: 14px 14px 50px; }
+    .slide-genre-tags { gap: 6px; margin-bottom: 8px; }
+    .slide-title { font-size: 1.25rem; line-height: 1.2; }
+
+    .cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
     }
+    .anime-card { height: 200px; }
+    .card-title { font-size: 0.88rem; }
+    .card-meta { font-size: 0.7rem; }
+    .card-inner-overlay { padding: 8px; }
+    .card-inner-title { font-size: 0.8rem; }
+    .card-inner-desc { font-size: 0.68rem; -webkit-line-clamp: 2; }
 
-    .anime-card {
-        width: 100%;
-        height: 290px;
-        border-radius: 12px;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-        background: var(--bg-surface);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card-wrapper:hover .anime-card {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 32px rgba(0,0,0,0.8);
-    }
-
-    .anime-card img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-        display: block;
-    }
-
-    .card-wrapper:hover .anime-card img { transform: scale(1.06); }
-
-    .card-inner-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to top, rgba(10,10,15,0.98) 0%, rgba(10,10,15,0.6) 40%, transparent 70%);
-        z-index: 3;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 12px 11px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .card-wrapper:hover .card-inner-overlay { opacity: 1; }
-
-    .card-inner-title {
-        font-size: 0.88rem;
-        font-weight: 800;
-        color: #fff;
-        margin-bottom: 4px;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        line-height: 1.3;
-    }
-
-    .card-inner-desc {
-        font-size: 0.72rem;
-        color: rgba(255,255,255,0.65);
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        line-height: 1.4;
-        margin-bottom: 6px;
-    }
-
-    .card-inner-meta {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
-
-    .card-inner-views {
-        display: flex;
-        align-items: center;
-        gap: 3px;
-        font-size: 0.7rem;
-        color: rgba(255,255,255,0.5);
-        font-weight: 700;
-    }
-    .card-inner-views i { font-size: 0.8rem; }
-
-    .top-badge-group {
-        position: absolute;
-        top: 8px; left: 8px;
-        display: flex;
-        gap: 4px;
-        z-index: 10;
-    }
-
-    .top-badge-episode {
-        background: rgba(0,0,0,0.8);
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 800;
-        color: #FFC107;
-    }
-
-    .top-badge-year {
-        background: #eab308;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 800;
-        color: #000;
-    }
-
-    .top-badge {
-        position: absolute;
-        top: 8px; left: 8px;
-        background: #eab308;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 800;
-        color: #000;
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        gap: 2px;
-    }
-
-    .tier-badge {
-        position: absolute;
-        top: 8px; right: 8px;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 0.72rem;
-        font-weight: 900;
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        gap: 3px;
-        letter-spacing: 0.5px;
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-    }
-
-    .tier-badge.vip {
-        background: rgba(251, 191, 36, 0.25);
-        color: #fbbf24;
-        border: 1px solid rgba(251, 191, 36, 0.5);
-        box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
-    }
-
-    .tier-badge.premium {
-        background: rgba(244, 63, 94, 0.2);
-        color: #f43f5e;
-        border: 1px solid rgba(244, 63, 94, 0.4);
-    }
-
-    .fav-badge {
-        position: absolute;
-        bottom: 8px; right: 8px;
-        background: rgba(0,0,0,0.5);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-        width: 32px; height: 32px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #fff;
-        font-size: 1.1rem;
-        z-index: 10;
-        transition: background 0.2s, color 0.2s;
-        border: none;
-        cursor: pointer;
-    }
-    .fav-badge:hover { background: rgba(255,255,255,0.2); color: #ff3366; }
-    .fav-badge i.bxs-star { color: #ff3366; }
-
-    .card-info-bottom {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        padding: 10px 4px 0;
-    }
-
-    .card-title {
-        font-size: 1rem;
-        font-weight: 800;
-        color: var(--text-light);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        transition: color 0.3s ease;
-    }
-    .card-wrapper:hover .card-title { color: var(--accent); }
-
-    .card-meta {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: var(--text-dim);
-    }
-
-    .tag-jp {
-        background: rgba(255,255,255,0.1);
-        padding: 1px 5px;
-        border-radius: 3px;
-        color: var(--text-light);
-        font-size: 0.65rem;
-        font-weight: 800;
-    }
-
-    /* ----- RECOMMENDATION MARQUEE ----- */
-    .recommendation-section {
-        padding: 30px 0 0 0;
-        overflow: hidden;
-        width: 100%;
-        position: relative;
-    }
-
-    #marqueeOuter {
-        overflow: hidden;
-        width: 100%;
-        position: relative;
-        padding-bottom: 20px;
-        cursor: grab;
-        user-select: none;
-    }
-    #marqueeOuter.grabbing { cursor: grabbing; }
-
-    .marquee-container {
-        display: flex;
-        width: max-content;
-        gap: 16px;
-        will-change: transform;
-    }
-
-    .marquee-item {
-        width: 220px;
-        flex-shrink: 0;
-        pointer-events: auto;
-    }
-
-    /* ----- CONTACT / CHAT BUTTONS ----- */
-    .action-buttons-section { padding: 32px 0 10px; }
-
-    .action-buttons-inner {
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
-        justify-content: center;
-        padding: 0 5%;
-    }
+    .top-badge-episode,
+    .top-badge-year,
+    .top-badge { font-size: 0.62rem; padding: 3px 6px; }
 
     .action-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 16px 32px;
-        border-radius: 14px;
-        font-size: 1rem;
-        font-weight: 800;
-        text-decoration: none;
-        transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s, background 0.35s;
-        letter-spacing: 0.3px;
-        border: none;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    .action-btn:hover { transform: translateY(-4px); }
-
-    .action-btn-contact {
-        background: linear-gradient(135deg, #0ea5e9, #2563eb);
-        color: #fff;
-        box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
-    }
-    .action-btn-contact:hover {
-        box-shadow: 0 14px 32px rgba(14, 165, 233, 0.5);
-    }
-
-    .action-btn-chat {
-        background: rgba(0, 243, 255, 0.08);
-        color: var(--accent);
-        border: 1.5px solid rgba(0, 243, 255, 0.4);
-        box-shadow: 0 8px 24px rgba(0, 243, 255, 0.12);
-    }
-    .action-btn-chat:hover {
-        box-shadow: 0 14px 32px rgba(0, 243, 255, 0.28);
-        border-color: rgba(0, 243, 255, 0.7);
-        background: rgba(0, 243, 255, 0.13);
-    }
-
-    .action-btn i { font-size: 1.3rem; }
-
-    /* ----- HERO BUTTON ----- */
-    .hero-buttons {
-        margin-top: 25px;
-        display: flex;
-        justify-content: flex-start;
+        padding: 13px 20px;
+        font-size: 0.85rem;
         width: 100%;
-    }
-
-    .btn-main {
-        display: inline-flex;
-        align-items: center;
         justify-content: center;
-        gap: 8px;
-        padding: 14px 28px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #ff003c, #ff4d6d);
-        color: #fff;
-        font-size: 16px;
-        font-weight: 600;
-        text-decoration: none;
-        box-shadow: 0 8px 25px rgba(255, 0, 60, 0.35);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .btn-main:hover {
-        transform: translateY(-3px) scale(1.03);
-        box-shadow: 0 12px 30px rgba(255, 0, 60, 0.5);
-    }
-    .btn-main:active { transform: scale(0.96); }
-
-    /* ----- STORY TOP SPACE ----- */
-    .story-top-space { margin-top: 75px; }
-
-    /* ----- SCROLL TO TOP ----- */
-    .scroll-top-btn {
-        position: fixed;
-        bottom: 90px;
-        right: 20px;
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        background: rgba(0, 243, 255, 0.15);
-        border: 1px solid rgba(0, 243, 255, 0.3);
-        color: var(--accent);
-        font-size: 1.3rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 500;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(10px);
-        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background 0.2s;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .scroll-top-btn.visible {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-    .scroll-top-btn:hover { background: rgba(0, 243, 255, 0.28); }
-
-    /* tab bar yoqiq bo'lganda scroll-top tugmasi yuqoriroq */
-    body.tabbar-on .scroll-top-btn { bottom: 82px; }
-
-    /* ----- MOBILE ----- */
-    @media (max-width: 600px) {
-        .story-container { padding: 10px 4%; }
-        .story-ring { width: 80px !important; height: 80px !important; }
-        .story-item span { font-size: 11px !important; }
-        .story-top-space { margin-top: 55px !important; }
-        .slide-content { width: 100% !important; text-align: left !important; align-items: flex-start !important; }
-        .slide-title { font-size: 1.5rem !important; text-align: left !important; line-height: 1.2; }
-        .tags { display: flex; justify-content: flex-start !important; flex-wrap: wrap; gap: 6px; }
-        .slide-meta-row { display: flex; justify-content: flex-start !important; flex-wrap: wrap; gap: 10px; }
-        .hero-buttons { width: 100%; display: flex; justify-content: flex-start !important; }
-        .btn-main { margin-left: 0 !important; width: auto; }
-        .slider-container { aspect-ratio: 16 / 9; min-height: 220px; border-radius: 10px; }
-        .slide { padding: 20px 14px 50px; }
     }
 
-    @media (max-width: 1024px) {
-        .slide-title { font-size: 2.8rem; }
-    }
-
-    @media (max-width: 768px) {
-        .slide { width: 78%; max-height: 320px; }
-        .slider-wrapper-outer { padding: 0 3%; }
-        .slider-container { aspect-ratio: 16 / 9; min-height: 200px; max-height: 56vw; border-radius: 10px; }
-        .slide { padding: 18px 16px 54px; align-items: flex-end; }
-        .slide-content { max-width: 100%; }
-        .slide-title { font-size: 2rem; }
-        .slide-meta-row { display: none; }
-        .container { padding: 0 4%; }
-        .section-title h3 { font-size: 1.3rem; }
-        .section-header { margin: 24px 0 14px; }
-        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-        .anime-card { height: 240px; }
-        .action-btn { padding: 14px 22px; font-size: 0.9rem; }
-        .scroll-top-btn { bottom: 80px; right: 14px; width: 38px; height: 38px; font-size: 1.1rem; }
-    }
-
-    @media (max-width: 480px) {
-        .slide { width: 95%; max-height: 280px; border-radius: 14px; }
-        .slider-wrapper-outer { padding: 0; }
-        .slider-container { aspect-ratio: 4 / 3; min-height: 260px; max-height: 80vw; border-radius: 0; box-shadow: none; margin-top: 0; }
-        .slide { padding: 30px 14px 50px; display: flex; flex-direction: column; justify-content: flex-end; }
-        .tags { gap: 6px; margin-bottom: 8px; }
-        .slide-title { font-size: 1.5rem; line-height: 1.2; }
-        .slider-controls { bottom: 10px; }
-        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-        .anime-card { height: 200px; }
-        .card-meta { font-size: 0.7rem; }
-        .top-badge-episode, .top-badge-year { font-size: 0.62rem; padding: 3px 6px; }
-        .top-badge { font-size: 0.62rem; padding: 3px 6px; }
-        .card-title { font-size: 0.88rem; }
-        .card-inner-overlay { padding: 8px; }
-        .card-inner-title { font-size: 0.8rem; }
-        .card-inner-desc { font-size: 0.68rem; -webkit-line-clamp: 2; }
-        .action-btn { padding: 13px 20px; font-size: 0.85rem; width: 100%; justify-content: center; }
-    }
+    .slide-watch-btn { padding: 8px 16px; font-size: 0.8rem; }
+    .slide-year-badge { padding: 6px 12px; font-size: 0.75rem; }
+}
 </style>
 {% endblock %}
+
 
 {% block content %}
 
 <div class="story-top-space">
 
-    <!-- ANIME HIKOYALAR -->
+    <!-- ================================================
+         STORY SECTION
+    ================================================ -->
     <div class="story-container">
         {% for story in stories %}
         <a href="{% url 'story_view' story.id %}" class="story-item">
@@ -916,65 +767,81 @@
             <span>{{ story.title }}</span>
         </a>
         {% empty %}
-            <p style="color:#aaa; padding:10px;">Hozircha story yo'q</p>
+        <p style="color:#aaa; padding:10px;">Hozircha story yo'q</p>
         {% endfor %}
     </div>
 
-    <!-- HERO SLIDER -->
+    <!-- ================================================
+         HERO SLIDER
+    ================================================ -->
     {% if hero_movies %}
-    <div class="slider-wrapper-outer" style="margin-top: 20px;">
+    <div class="slider-wrapper-outer">
         <div class="slider-outer-track" id="heroSliderTrack">
             <div class="slides-wrapper" id="slidesWrapper">
 
                 {% for anime in hero_movies %}
                 {% if anime.id %}
-                <div class="slide {% if forloop.first %}active-slide{% endif %}" data-index="{{ forloop.counter0 }}">
+                <div class="slide {% if forloop.first %}active-slide{% endif %}"
+                     data-index="{{ forloop.counter0 }}">
 
-                    {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
-                        <video class="slide-bg-video" autoplay loop muted playsinline preload="metadata">
-                            <source src="{{ anime.hero_media.url }}">
-                        </video>
-                    {% elif anime.hero_media %}
-                        <div class="slide-bg">
-                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}" loading="eager">
-                        </div>
+                    {% if anime.hero_media %}
+                        {% with ext=anime.hero_media.url|slice:"-4:" %}
+                            {% if ext == ".mp4" or ext == "webm" %}
+                                <video class="slide-bg-video"
+                                       autoplay loop muted playsinline preload="metadata">
+                                    <source src="{{ anime.hero_media.url }}">
+                                </video>
+                            {% else %}
+                                <div class="slide-bg">
+                                    <img src="{{ anime.hero_media.url }}"
+                                         alt="{{ anime.title }}" loading="eager">
+                                </div>
+                            {% endif %}
+                        {% endwith %}
                     {% else %}
                         <div class="slide-bg">
-                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="eager">
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
+                                 alt="{{ anime.title }}" loading="eager">
                         </div>
                     {% endif %}
 
                     <div class="slide-overlay"></div>
 
                     <div class="slide-content">
+                        <!-- Genre + episode tags -->
                         <div class="slide-genre-tags">
                             {% if anime.category %}
                                 <span class="slide-genre-tag">{{ anime.category.name }}</span>
                             {% endif %}
-                            {% if anime.episodes.count > 0 %}
-                                <span class="slide-genre-tag">{{ anime.episodes.count }} qism</span>
-                            {% endif %}
+                            {% with ep_count=anime.episodes.count %}
+                                {% if ep_count > 0 %}
+                                    <span class="slide-genre-tag">{{ ep_count }} qism</span>
+                                {% endif %}
+                            {% endwith %}
                         </div>
 
+                        <!-- Title -->
                         <h2 class="slide-title">{{ anime.title }}</h2>
 
+                        <!-- Year + Watch button -->
                         <div class="slide-bottom-row">
                             {% if anime.release_year %}
-                            <span class="slide-year-badge">{{ anime.release_year }}</span>
+                                <span class="slide-year-badge">{{ anime.release_year }}</span>
                             {% elif anime.created_at %}
-                            <span class="slide-year-badge">{{ anime.created_at|date:"Y" }}</span>
+                                <span class="slide-year-badge">{{ anime.created_at|date:"Y" }}</span>
                             {% endif %}
                             <a href="{% url 'movie_detail' anime.id %}" class="slide-watch-btn">
                                 <i class='bx bx-play'></i> Tomosha qilish
                             </a>
                         </div>
                     </div>
+
                 </div>
                 {% endif %}
                 {% endfor %}
 
-            </div>
-        </div>
+            </div><!-- /slidesWrapper -->
+        </div><!-- /slider-outer-track -->
 
         <!-- Dots -->
         <div class="slider-dots-row" id="sliderDotsRow">
@@ -982,17 +849,21 @@
             {% if anime.id %}
             <button class="slider-dot {% if forloop.first %}active{% endif %}"
                     data-dot="{{ forloop.counter0 }}"
-                    onclick="heroGoTo({{ forloop.counter0 }})"></button>
+                    onclick="heroGoTo({{ forloop.counter0 }})">
+            </button>
             {% endif %}
             {% endfor %}
         </div>
     </div>
     {% endif %}
 
-    <!-- TAVSIYA ETILADIGANLAR -->
+
+    <!-- ================================================
+         TAVSIYA ETILADIGANLAR (Marquee)
+    ================================================ -->
     {% if recommended_movies %}
     <div class="container recommendation-section">
-        <div class="section-header" style="margin-top:0; padding: 0;">
+        <div class="section-header" style="padding:0; margin-top:0;">
             <div class="section-title">
                 <h3>Tavsiya <span>etiladiganlar</span></h3>
             </div>
@@ -1000,74 +871,103 @@
 
         <div id="marqueeOuter">
             <div class="marquee-container" id="marqueeContainer">
+
+                <!-- First copy -->
                 {% for anime in recommended_movies %}
                 {% if anime.id %}
                 <div class="card-wrapper marquee-item">
-                    <div class="anime-card" style="cursor:pointer; height: 260px;"
+                    <div class="anime-card"
+                         style="cursor:pointer; height:260px;"
                          data-href="{% url 'movie_detail' anime.id %}">
                         <div class="top-badge-group">
-                            <div class="top-badge" style="background: var(--accent); color: #000;">
+                            <div class="top-badge" style="background:var(--accent); color:#000;">
                                 <i class='bx bx-trending-up'></i> TOP
                             </div>
                         </div>
-                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
+                             alt="{{ anime.title }}" loading="lazy">
                     </div>
                     <div class="card-info-bottom">
-                        <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
+                        <a href="{% url 'movie_detail' anime.id %}"
+                           style="text-decoration:none; color:inherit;" class="marquee-link">
                             <h4 class="card-title">{{ anime.title }}</h4>
                         </a>
                         <div class="card-meta" style="margin-top:4px;">
-                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                            <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                            {% if anime.category %}
+                                <span class="tag-jp">{{ anime.category.name }}</span>
+                            {% endif %}
+                            <span style="font-weight:800; color:var(--text-dim);">
+                                {{ anime.release_year|default:anime.created_at|date:"Y" }}
+                            </span>
                         </div>
                     </div>
                 </div>
                 {% endif %}
                 {% endfor %}
+
+                <!-- Duplicate copy for seamless loop -->
                 {% for anime in recommended_movies %}
                 {% if anime.id %}
                 <div class="card-wrapper marquee-item">
-                    <div class="anime-card" style="cursor:pointer; height: 260px;"
+                    <div class="anime-card"
+                         style="cursor:pointer; height:260px;"
                          data-href="{% url 'movie_detail' anime.id %}">
                         <div class="top-badge-group">
-                            <div class="top-badge" style="background: var(--accent); color: #000;">
+                            <div class="top-badge" style="background:var(--accent); color:#000;">
                                 <i class='bx bx-trending-up'></i> TOP
                             </div>
                         </div>
-                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
+                             alt="{{ anime.title }}" loading="lazy">
                     </div>
                     <div class="card-info-bottom">
-                        <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
+                        <a href="{% url 'movie_detail' anime.id %}"
+                           style="text-decoration:none; color:inherit;" class="marquee-link">
                             <h4 class="card-title">{{ anime.title }}</h4>
                         </a>
                         <div class="card-meta" style="margin-top:4px;">
-                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                            <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                            {% if anime.category %}
+                                <span class="tag-jp">{{ anime.category.name }}</span>
+                            {% endif %}
+                            <span style="font-weight:800; color:var(--text-dim);">
+                                {{ anime.release_year|default:anime.created_at|date:"Y" }}
+                            </span>
                         </div>
                     </div>
                 </div>
                 {% endif %}
                 {% endfor %}
-            </div>
-        </div>
+
+            </div><!-- /marquee-container -->
+        </div><!-- /marqueeOuter -->
     </div>
     {% endif %}
 
-    <!-- ALOQA VA CHAT TUGMALAR -->
+
+    <!-- ================================================
+         ALOQA VA CHAT TUGMALAR
+    ================================================ -->
     <div class="action-buttons-section">
         <div class="action-buttons-inner">
-            <a href="https://bestmedia-official.uz/aloqa/" class="action-btn action-btn-contact" target="_blank" rel="noopener noreferrer">
+            <a href="https://bestmedia-official.uz/aloqa/"
+               class="action-btn action-btn-contact"
+               target="_blank" rel="noopener noreferrer">
                 <i class='bx bx-phone-call'></i>
                 <span>Aloqa</span>
             </a>
-            <a href="https://bestmedia-official.uz/chat/" class="action-btn action-btn-chat" target="_blank" rel="noopener noreferrer">
+            <a href="https://bestmedia-official.uz/chat/"
+               class="action-btn action-btn-chat"
+               target="_blank" rel="noopener noreferrer">
                 <i class='bx bx-message-rounded-dots'></i>
                 <span>BestMedia Chat</span>
             </a>
         </div>
     </div>
 
-    <!-- YANGI QO'SHILGANLAR -->
+
+    <!-- ================================================
+         YANGI QO'SHILGANLAR (Cards grid)
+    ================================================ -->
     <div class="container" id="new-releases">
         <div class="section-header" style="padding:0;">
             <div class="section-title">
@@ -1080,129 +980,180 @@
             {% for anime in movies %}
             {% if anime.id %}
             <div class="card-wrapper">
+
+                <!-- Card image block -->
                 <div class="anime-card"
                      onclick="window.location.href='{% url 'movie_detail' anime.id %}'"
                      style="cursor:pointer;">
+
+                    <!-- Top-left: year + episode count -->
                     <div class="top-badge-group">
                         {% if anime.release_year %}
-                        <div class="top-badge-year">{{ anime.release_year }}</div>
+                            <div class="top-badge-year">{{ anime.release_year }}</div>
                         {% endif %}
-                        {% if anime.episodes.count > 0 %}
-                        <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
-                        {% else %}
-                        <div class="top-badge-episode">Film</div>
-                        {% endif %}
+                        {% with ep_count=anime.episodes.count %}
+                            {% if ep_count > 0 %}
+                                <div class="top-badge-episode">{{ ep_count }} qism</div>
+                            {% else %}
+                                <div class="top-badge-episode">Film</div>
+                            {% endif %}
+                        {% endwith %}
                     </div>
 
+                    <!-- Top-right: tier badge -->
                     {% if anime.minimum_tier == 'vip' %}
-                    <div class="tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
+                        <div class="tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
                     {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
-                    <div class="tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
+                        <div class="tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
                     {% endif %}
 
+                    <!-- Poster image -->
                     <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
                          alt="{{ anime.title }}" loading="lazy">
 
+                    <!-- Hover overlay -->
                     <div class="card-inner-overlay">
                         <div class="card-inner-title">{{ anime.title }}</div>
                         {% if anime.description %}
-                        <div class="card-inner-desc">{{ anime.description|truncatechars:80 }}</div>
+                            <div class="card-inner-desc">{{ anime.description|truncatechars:80 }}</div>
                         {% endif %}
                         <div class="card-inner-meta">
-                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                            <div class="card-inner-views"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</div>
+                            {% if anime.category %}
+                                <span class="tag-jp">{{ anime.category.name }}</span>
+                            {% endif %}
+                            <div class="card-inner-views">
+                                <i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}
+                            </div>
                         </div>
                     </div>
 
-                    <button class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})" aria-label="Saqlash">
+                    <!-- Favourite button -->
+                    <button class="fav-badge"
+                            onclick="toggleFavorite(event, {{ anime.id }})"
+                            aria-label="Saqlash">
                         {% if anime.id in fav_ids %}
                             <i class='bx bxs-star' id="fav-icon-{{ anime.id }}"></i>
                         {% else %}
-                            <i class='bx bx-star' id="fav-icon-{{ anime.id }}"></i>
+                            <i class='bx bx-star'   id="fav-icon-{{ anime.id }}"></i>
                         {% endif %}
                     </button>
-                </div>
 
+                </div><!-- /anime-card -->
+
+                <!-- Card info below image -->
                 <div class="card-info-bottom">
-                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                    <a href="{% url 'movie_detail' anime.id %}"
+                       style="text-decoration:none; color:inherit;">
                         <h4 class="card-title">{{ anime.title }}</h4>
                     </a>
+
                     <div class="card-meta" style="margin-top:4px;">
-                        {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
-                        <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                        {% if anime.category %}
+                            <span class="tag-jp">{{ anime.category.name }}</span>
+                        {% endif %}
+                        <span style="font-weight:800; color:var(--text-dim);">
+                            {{ anime.release_year|default:anime.created_at|date:"Y" }}
+                        </span>
                     </div>
+
                     <div class="card-meta" style="justify-content:space-between; margin-top:5px;">
-                        <span style="display:flex; align-items:center; gap:4px; font-size:0.78rem; color:var(--text-dim);">
+                        <span style="display:flex; align-items:center; gap:4px;
+                                     font-size:0.78rem; color:var(--text-dim);">
                             <i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}
                         </span>
                         {% if anime.minimum_tier == 'vip' %}
-                        <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#fbbf24; font-weight:900;"><i class='bx bxs-crown'></i> VIP</span>
+                            <span style="display:flex; align-items:center; gap:3px;
+                                         font-size:0.78rem; color:#fbbf24; font-weight:900;">
+                                <i class='bx bxs-crown'></i> VIP
+                            </span>
                         {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
-                        <span style="display:flex; align-items:center; gap:3px; font-size:0.78rem; color:#f43f5e; font-weight:800;"><i class='bx bxs-diamond'></i> Premium</span>
+                            <span style="display:flex; align-items:center; gap:3px;
+                                         font-size:0.78rem; color:#f43f5e; font-weight:800;">
+                                <i class='bx bxs-diamond'></i> Premium
+                            </span>
                         {% else %}
-                        <span style="font-size:0.78rem; color:#4ade80; font-weight:800;">Bepul</span>
+                            <span style="font-size:0.78rem; color:#4ade80; font-weight:800;">
+                                Bepul
+                            </span>
                         {% endif %}
                     </div>
                 </div>
-            </div>
+
+            </div><!-- /card-wrapper -->
             {% endif %}
+
             {% empty %}
-            <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-dim);">
+            <div style="grid-column:1/-1; text-align:center;
+                        padding:40px; color:var(--text-dim);">
                 Hozircha animelar kiritilmadi.
             </div>
             {% endfor %}
-        </div>
-    </div>
+        </div><!-- /cards-grid -->
+    </div><!-- /container #new-releases -->
 
 </div><!-- /story-top-space -->
 
-<!-- SCROLL TO TOP TUGMASI -->
-<button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" aria-label="Yuqoriga chiqish">
+
+<!-- ================================================
+     SCROLL TO TOP BUTTON
+================================================ -->
+<button class="scroll-top-btn" id="scrollTopBtn"
+        onclick="scrollToTop()" aria-label="Yuqoriga chiqish">
     <i class='bx bx-chevron-up'></i>
 </button>
 
+
+<!-- ================================================
+     JAVASCRIPT
+================================================ -->
 <script>
-/* ===========================
-   HERO SLIDER — card peek
-=========================== */
-(function() {
-    const wrapper = document.getElementById('slidesWrapper');
+/* -----------------------------------------------
+   HERO SLIDER — card-peek style
+----------------------------------------------- */
+(function () {
+    'use strict';
+
+    var wrapper = document.getElementById('slidesWrapper');
     if (!wrapper) return;
 
-    const slides = Array.from(wrapper.querySelectorAll('.slide'));
-    const dots   = Array.from(document.querySelectorAll('.slider-dot'));
-    const total  = slides.length;
+    var slides   = Array.from(wrapper.querySelectorAll('.slide'));
+    var dots     = Array.from(document.querySelectorAll('.slider-dot'));
+    var total    = slides.length;
     if (total === 0) return;
 
-    let current = 0;
-    let autoTimer = null;
-    let startX = 0;
-    let dragging = false;
-    let moved = 0;
+    var current   = 0;
+    var autoTimer = null;
+    var startX    = 0;
+    var dragging  = false;
+    var moved     = 0;
 
+    /* helpers */
     function getSlideWidth() {
-        return slides[0] ? slides[0].offsetWidth + 14 : 0;
+        return slides[0] ? slides[0].offsetWidth + 14 : 0; /* 14 = gap */
     }
 
-    function applyPos(anim) {
-        const sw = getSlideWidth();
-        const trackW = wrapper.parentElement.offsetWidth;
-        const offset = (trackW / 2) - (slides[0].offsetWidth / 2) - (current * sw);
-        wrapper.style.transition = anim ? 'transform 0.55s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
+    function applyPos(animate) {
+        var sw     = getSlideWidth();
+        var trackW = wrapper.parentElement.offsetWidth;
+        var offset = (trackW / 2) - (slides[0].offsetWidth / 2) - (current * sw);
+        wrapper.style.transition = animate
+            ? 'transform 0.55s cubic-bezier(0.25, 1, 0.5, 1)'
+            : 'none';
         wrapper.style.transform = 'translateX(' + offset + 'px)';
     }
 
     function updateActive() {
-        slides.forEach(function(s, i) {
+        slides.forEach(function (s, i) {
             s.classList.toggle('active-slide', i === current);
         });
-        dots.forEach(function(d, i) {
+        dots.forEach(function (d, i) {
             d.classList.toggle('active', i === current);
         });
         applyPos(true);
     }
 
-    window.heroGoTo = function(index) {
+    /* public: called from dot onclick */
+    window.heroGoTo = function (index) {
         current = Math.max(0, Math.min(index, total - 1));
         updateActive();
         resetAuto();
@@ -1211,96 +1162,98 @@
     function resetAuto() {
         if (autoTimer) clearInterval(autoTimer);
         if (total > 1) {
-            autoTimer = setInterval(function() {
+            autoTimer = setInterval(function () {
                 current = (current + 1) % total;
                 updateActive();
             }, 5000);
         }
     }
 
+    /* init */
     applyPos(false);
     updateActive();
     resetAuto();
 
-    window.addEventListener('resize', function() { applyPos(false); }, { passive: true });
+    window.addEventListener('resize', function () { applyPos(false); }, { passive: true });
 
-    /* Touch */
-    wrapper.addEventListener('touchstart', function(e) {
-        startX = e.touches[0].clientX;
+    /* ---- Touch events ---- */
+    wrapper.addEventListener('touchstart', function (e) {
+        startX   = e.touches[0].clientX;
         dragging = true;
-        moved = 0;
+        moved    = 0;
         wrapper.style.transition = 'none';
         if (autoTimer) clearInterval(autoTimer);
     }, { passive: true });
 
-    wrapper.addEventListener('touchmove', function(e) {
+    wrapper.addEventListener('touchmove', function (e) {
         if (!dragging) return;
         moved = e.touches[0].clientX - startX;
-        const sw = getSlideWidth();
-        const trackW = wrapper.parentElement.offsetWidth;
-        const base = (trackW / 2) - (slides[0].offsetWidth / 2) - (current * sw);
+        var sw     = getSlideWidth();
+        var trackW = wrapper.parentElement.offsetWidth;
+        var base   = (trackW / 2) - (slides[0].offsetWidth / 2) - (current * sw);
         wrapper.style.transform = 'translateX(' + (base + moved) + 'px)';
     }, { passive: true });
 
-    wrapper.addEventListener('touchend', function() {
+    wrapper.addEventListener('touchend', function () {
         if (!dragging) return;
         dragging = false;
-        if (moved < -50 && current < total - 1) current++;
-        else if (moved > 50 && current > 0) current--;
+        if      (moved < -50 && current < total - 1) current++;
+        else if (moved > 50  && current > 0)         current--;
         moved = 0;
         updateActive();
         resetAuto();
     });
 
-    /* Mouse */
-    wrapper.addEventListener('mousedown', function(e) {
-        startX = e.clientX;
+    /* ---- Mouse events ---- */
+    wrapper.addEventListener('mousedown', function (e) {
+        startX   = e.clientX;
         dragging = true;
-        moved = 0;
+        moved    = 0;
         wrapper.classList.add('dragging');
         wrapper.style.transition = 'none';
         if (autoTimer) clearInterval(autoTimer);
     });
 
-    window.addEventListener('mousemove', function(e) {
+    window.addEventListener('mousemove', function (e) {
         if (!dragging) return;
         moved = e.clientX - startX;
-        const sw = getSlideWidth();
-        const trackW = wrapper.parentElement.offsetWidth;
-        const base = (trackW / 2) - (slides[0].offsetWidth / 2) - (current * sw);
+        var sw     = getSlideWidth();
+        var trackW = wrapper.parentElement.offsetWidth;
+        var base   = (trackW / 2) - (slides[0].offsetWidth / 2) - (current * sw);
         wrapper.style.transform = 'translateX(' + (base + moved) + 'px)';
     });
 
-    window.addEventListener('mouseup', function() {
+    window.addEventListener('mouseup', function () {
         if (!dragging) return;
         dragging = false;
         wrapper.classList.remove('dragging');
-        if (moved < -50 && current < total - 1) current++;
-        else if (moved > 50 && current > 0) current--;
+        if      (moved < -50 && current < total - 1) current++;
+        else if (moved > 50  && current > 0)         current--;
         moved = 0;
         updateActive();
         resetAuto();
     });
-})();
+}());
 
 
-/* ===========================
-   MARQUEE — RAF + DRAG
-=========================== */
-(function() {
-    const outer = document.getElementById('marqueeOuter');
-    const container = document.getElementById('marqueeContainer');
+/* -----------------------------------------------
+   MARQUEE — requestAnimationFrame + drag
+----------------------------------------------- */
+(function () {
+    'use strict';
+
+    var outer     = document.getElementById('marqueeOuter');
+    var container = document.getElementById('marqueeContainer');
     if (!outer || !container) return;
 
-    const SPEED = 0.5;
-    let offset = 0;
-    let rafId = null;
-    let isPaused = false;
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartOffset = 0;
-    let dragMoved = 0;
-    const DRAG_THRESHOLD = 5;
+    var SPEED          = 0.5;
+    var offset         = 0;
+    var isPaused       = false;
+    var isDragging     = false;
+    var dragStartX     = 0;
+    var dragStartOffset = 0;
+    var dragMoved      = 0;
+    var DRAG_THRESHOLD = 5;
 
     function getHalf() { return container.scrollWidth / 2; }
 
@@ -1311,94 +1264,100 @@
     function animate() {
         if (!isDragging && !isPaused) {
             offset -= SPEED;
-            const half = getHalf();
+            var half = getHalf();
             if (Math.abs(offset) >= half) offset += half;
             applyTransform();
         }
-        rafId = requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
     }
 
-    rafId = requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 
-    outer.addEventListener('mouseenter', function() { isPaused = true; });
-    outer.addEventListener('mouseleave', function() { isPaused = false; });
+    /* hover pause */
+    outer.addEventListener('mouseenter', function () { isPaused = true; });
+    outer.addEventListener('mouseleave', function () { isPaused = false; });
 
-    outer.addEventListener('mousedown', function(e) {
-        isDragging = true;
-        dragStartX = e.clientX;
+    /* mouse drag */
+    outer.addEventListener('mousedown', function (e) {
+        isDragging      = true;
+        dragStartX      = e.clientX;
         dragStartOffset = offset;
-        dragMoved = 0;
+        dragMoved       = 0;
         outer.classList.add('grabbing');
     });
 
-    window.addEventListener('mousemove', function(e) {
+    window.addEventListener('mousemove', function (e) {
         if (!isDragging) return;
-        const delta = e.clientX - dragStartX;
+        var delta = e.clientX - dragStartX;
         dragMoved = delta;
-        offset = dragStartOffset + delta;
+        offset    = dragStartOffset + delta;
         applyTransform();
     });
 
-    window.addEventListener('mouseup', function() {
+    window.addEventListener('mouseup', function () {
         if (!isDragging) return;
         isDragging = false;
         outer.classList.remove('grabbing');
         isPaused = false;
     });
 
-    outer.addEventListener('touchstart', function(e) {
-        isDragging = true;
-        dragStartX = e.touches[0].clientX;
+    /* touch drag */
+    outer.addEventListener('touchstart', function (e) {
+        isDragging      = true;
+        dragStartX      = e.touches[0].clientX;
         dragStartOffset = offset;
-        dragMoved = 0;
+        dragMoved       = 0;
     }, { passive: true });
 
-    outer.addEventListener('touchmove', function(e) {
+    outer.addEventListener('touchmove', function (e) {
         if (!isDragging) return;
-        const delta = e.touches[0].clientX - dragStartX;
+        var delta = e.touches[0].clientX - dragStartX;
         dragMoved = delta;
-        offset = dragStartOffset + delta;
+        offset    = dragStartOffset + delta;
         applyTransform();
     }, { passive: true });
 
-    outer.addEventListener('touchend', function() {
-        if (!isDragging) return;
+    outer.addEventListener('touchend', function () {
         isDragging = false;
     });
 
-    container.addEventListener('click', function(e) {
+    /* click navigation (blocked when dragging) */
+    container.addEventListener('click', function (e) {
         if (Math.abs(dragMoved) > DRAG_THRESHOLD) {
             e.preventDefault();
             e.stopPropagation();
             dragMoved = 0;
             return;
         }
-        const card = e.target.closest('[data-href]');
+        var card = e.target.closest('[data-href]');
         if (card) window.location.href = card.dataset.href;
     });
 
-    container.querySelectorAll('a.marquee-link').forEach(function(link) {
-        link.addEventListener('click', function(e) {
+    container.querySelectorAll('a.marquee-link').forEach(function (link) {
+        link.addEventListener('click', function (e) {
             if (Math.abs(dragMoved) > DRAG_THRESHOLD) e.preventDefault();
         });
     });
-})();
+}());
 
 
-/* ===========================
+/* -----------------------------------------------
    SCROLL TO TOP
-=========================== */
-var scrollTopBtn = document.getElementById('scrollTopBtn');
+----------------------------------------------- */
+(function () {
+    'use strict';
 
-window.addEventListener('scroll', function() {
-    if (!scrollTopBtn) return;
-    if (window.scrollY > 400) scrollTopBtn.classList.add('visible');
-    else scrollTopBtn.classList.remove('visible');
-}, { passive: true });
+    var btn = document.getElementById('scrollTopBtn');
 
-function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+    window.addEventListener('scroll', function () {
+        if (!btn) return;
+        btn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+
+    window.scrollToTop = function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+}());
 </script>
 
 {% endblock %}
