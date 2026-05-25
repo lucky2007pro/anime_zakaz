@@ -886,26 +886,26 @@
             </span>
             <span class="arrow">›</span>
         </a>
+        
+        <!-- TAB BAR TOGGLE — shu yerga -->
+        <div style="display:flex; align-items:center; gap:10px; padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.03);">
+            <i class='bx bx-grid-alt' style="font-size:1.15rem; color:var(--text-dim);"></i>
+            <span style="font-size:0.9rem; font-weight:700; color:#fff; flex:1;">Pastki panel</span>
+
+            <div id="tabBarToggleWrap"
+                 onclick="toggleTabBar()"
+                 role="switch"
+                 aria-checked="false"
+                 aria-label="Tab barni yoqish"
+                 style="position:relative; width:42px; height:24px; border-radius:12px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); cursor:pointer; transition:background 0.3s, border-color 0.3s; flex-shrink:0;">
+                <div id="tabBarToggleThumb" style="position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:rgba(255,255,255,0.35); transition:transform 0.3s cubic-bezier(0.22,1,0.36,1), background 0.3s;"></div>
+            </div>
+
+            <span id="tabBarToggleLabel" style="font-size:0.7rem; font-weight:800; color:rgba(255,255,255,0.25); min-width:20px;">OFF</span>
+        </div>
 
         <div class="mobile-nav-footer">
             VERSION 2.1 &nbsp;•&nbsp; ANI BEST
-
-            <!-- TAB BAR TOGGLE -->
-            <div style="margin-top:14px; display:flex; align-items:center; justify-content:center; gap:10px;">
-                <i class='bx bx-grid-alt' style="font-size:1rem; color:var(--text-dim);"></i>
-                <span style="font-size:0.68rem; font-weight:800; color:rgba(255,255,255,0.3); letter-spacing:0.5px;">TAB BAR</span>
-
-                <div id="tabBarToggleWrap"
-                     onclick="toggleTabBar()"
-                     role="switch"
-                     aria-checked="false"
-                     aria-label="Tab barni yoqish"
-                     style="position:relative; width:42px; height:24px; border-radius:12px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); cursor:pointer; transition:background 0.3s, border-color 0.3s; flex-shrink:0;">
-                    <div id="tabBarToggleThumb" style="position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:rgba(255,255,255,0.35); transition:transform 0.3s cubic-bezier(0.22,1,0.36,1), background 0.3s;"></div>
-                </div>
-
-                <span id="tabBarToggleLabel" style="font-size:0.7rem; font-weight:800; color:rgba(255,255,255,0.25); min-width:20px;">OFF</span>
-            </div>
 
         </div>
 
