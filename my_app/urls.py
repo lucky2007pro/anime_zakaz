@@ -6,6 +6,8 @@ from .views import (
     chat, chat_messages_api, edit_message, delete_message, ban_user,
     logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,reels, aloqa, news_feed, news_detail, toggle_like,next_story_view, prev_story_view, story_view, mark_story_seen,
     reels_feed, reel_detail, toggle_reel_like, add_reel_comment, reel_comments_api, reel_share,
+    settings_privacy,settings_devices,settings_premium,settings_telegram,settings_general,
+
  
 )
 from .admin_views import *
@@ -97,6 +99,13 @@ urlpatterns = [
     path('reels/<int:reel_id>/comment/', add_reel_comment, name='add_reel_comment'),
     path('reels/<int:reel_id>/comments/', reel_comments_api, name='reel_comments_api'),
     path('reels/<int:reel_id>/share/', reel_share, name='reel_share'),
+
+    
+    path('settings/', settings_general, name='settings_general'),
+    path('settings/telegram/', settings_telegram, name='settings_telegram'),
+    path('settings/premium/', settings_premium, name='settings_premium'),
+    path('settings/devices/', settings_devices, name='settings_devices'),
+    path('settings/privacy/', settings_privacy, name='settings_privacy'),
 
 
 ]
