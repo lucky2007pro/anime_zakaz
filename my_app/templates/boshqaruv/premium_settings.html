@@ -1,0 +1,631 @@
+{% extends 'boshqaruv/settings_base.html' %}
+{% load static %}
+
+{% block title %}BESTMEDIA – Premium Imkoniyatlar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin-bottom: 32px;
+    }
+    .page-header h1 {
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 6px;
+    }
+    .page-header p {
+        color: var(--text-dim);
+        font-size: 0.875rem;
+    }
+
+    /* ===== STATUS CARD ===== */
+    .status-card {
+        border-radius: var(--radius-card);
+        padding: 24px;
+        margin-bottom: 28px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid transparent;
+    }
+    .status-card.basic {
+        background: linear-gradient(135deg, rgba(138,138,157,0.1), rgba(138,138,157,0.04));
+        border-color: rgba(138,138,157,0.2);
+    }
+    .status-card.premium {
+        background: linear-gradient(135deg, rgba(255,149,0,0.1), rgba(255,149,0,0.04));
+        border-color: rgba(255,149,0,0.25);
+    }
+    .status-card.vip {
+        background: linear-gradient(135deg, rgba(191,148,228,0.12), rgba(0,243,255,0.06));
+        border-color: rgba(191,148,228,0.3);
+    }
+    .status-card::before {
+        content: '';
+        position: absolute;
+        top: -50px; right: -50px;
+        width: 160px; height: 160px;
+        pointer-events: none;
+        border-radius: 50%;
+    }
+    .status-card.basic::before    { background: radial-gradient(circle, rgba(138,138,157,0.1) 0%, transparent 70%); }
+    .status-card.premium::before  { background: radial-gradient(circle, rgba(255,149,0,0.12) 0%, transparent 70%); }
+    .status-card.vip::before      { background: radial-gradient(circle, rgba(191,148,228,0.15) 0%, transparent 70%); }
+
+    .tier-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border-radius: 20px;
+        padding: 5px 14px;
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+        border: 1px solid transparent;
+    }
+    .tier-badge.basic   { background: rgba(138,138,157,0.12); border-color: rgba(138,138,157,0.25); color: #8a8a9d; }
+    .tier-badge.premium { background: rgba(255,149,0,0.12);   border-color: rgba(255,149,0,0.3);   color: #ff9500; }
+    .tier-badge.vip     { background: rgba(191,148,228,0.14); border-color: rgba(191,148,228,0.3); color: #bf94e4; }
+    .tier-badge i { font-size: 1rem; }
+
+    .status-title {
+        font-size: 1.1rem;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 6px;
+    }
+    .status-sub {
+        font-size: 0.83rem;
+        color: var(--text-dim);
+    }
+    .expire-row {
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.82rem;
+    }
+    .expire-chip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 13px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px;
+        color: var(--text-dim);
+    }
+    .expire-chip i { font-size: 0.9rem; color: var(--accent); }
+    .expire-chip strong { color: var(--text-light); }
+
+    /* ===== FEATURES GRID ===== */
+    .section-label {
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 14px;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+
+    .feature-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 14px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: border-color 0.2s, transform 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+    .feature-card:hover {
+        border-color: rgba(255,255,255,0.12);
+        transform: translateY(-2px);
+    }
+    .feature-card.unlocked { border-color: rgba(0,243,255,0.15); }
+    .feature-card.locked   { opacity: 0.55; }
+
+    .feature-icon {
+        width: 40px; height: 40px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+    .feature-icon.cyan   { background: rgba(0,243,255,0.1);  color: var(--accent); }
+    .feature-icon.orange { background: rgba(255,149,0,0.1);  color: #ff9500; }
+    .feature-icon.purple { background: rgba(191,148,228,0.12); color: #bf94e4; }
+    .feature-icon.red    { background: rgba(255,51,102,0.1); color: var(--accent2); }
+    .feature-icon.green  { background: rgba(48,209,88,0.1);  color: #30d158; }
+    .feature-icon.blue   { background: rgba(10,132,255,0.12); color: #0a84ff; }
+
+    .feature-title {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: var(--text-light);
+    }
+    .feature-desc {
+        font-size: 0.77rem;
+        color: var(--text-dim);
+        line-height: 1.45;
+    }
+    .feature-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.72rem;
+        font-weight: 800;
+    }
+    .feature-status.on  { color: #30d158; }
+    .feature-status.off { color: var(--text-dim); }
+    .feature-status.premium-req { color: #ff9500; }
+    .feature-status.vip-req     { color: #bf94e4; }
+    .feature-status i { font-size: 0.85rem; }
+
+    .lock-overlay {
+        position: absolute;
+        top: 10px; right: 10px;
+        font-size: 0.9rem;
+        color: var(--text-dim);
+        opacity: 0.5;
+    }
+
+    /* ===== PLANS ===== */
+    .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .plan-card {
+        background: var(--bg-card);
+        border: 2px solid rgba(255,255,255,0.06);
+        border-radius: var(--radius-card);
+        padding: 22px 18px;
+        cursor: pointer;
+        transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+        position: relative;
+        text-align: center;
+    }
+    .plan-card:hover {
+        border-color: rgba(0,243,255,0.3);
+        transform: translateY(-3px);
+    }
+    .plan-card.selected {
+        border-color: var(--accent);
+        box-shadow: 0 0 24px rgba(0,243,255,0.12);
+        background: rgba(0,243,255,0.04);
+    }
+    .plan-card.popular::before {
+        content: 'Ko\'p tanlangan';
+        position: absolute;
+        top: -1px; left: 50%; transform: translateX(-50%);
+        background: var(--accent);
+        color: #000;
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        padding: 3px 10px;
+        border-radius: 0 0 8px 8px;
+    }
+    .plan-name {
+        font-size: 0.75rem;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 8px;
+    }
+    .plan-price {
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 2px;
+    }
+    .plan-price span { font-size: 0.85rem; color: var(--text-dim); font-weight: 400; }
+    .plan-period {
+        font-size: 0.76rem;
+        color: var(--text-dim);
+        margin-bottom: 14px;
+    }
+    .plan-features-list {
+        list-style: none;
+        text-align: left;
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .plan-features-list li {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+    .plan-features-list li i {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .plan-features-list li i.yes { color: #30d158; }
+    .plan-features-list li i.no  { color: #ff453a; }
+
+    /* ===== UPLOAD CHEK ===== */
+    .upload-section {
+        background: var(--bg-card);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: var(--radius-card);
+        padding: 24px;
+        margin-top: 24px;
+        display: none;
+    }
+    .upload-section.visible { display: block; }
+
+    .upload-label {
+        font-size: 0.92rem;
+        font-weight: 800;
+        color: var(--text-light);
+        margin-bottom: 6px;
+    }
+    .upload-hint {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        margin-bottom: 18px;
+    }
+
+    .file-drop-zone {
+        border: 2px dashed rgba(0,243,255,0.2);
+        border-radius: 12px;
+        padding: 32px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+        margin-bottom: 16px;
+        position: relative;
+    }
+    .file-drop-zone:hover, .file-drop-zone.dragover {
+        border-color: rgba(0,243,255,0.5);
+        background: rgba(0,243,255,0.03);
+    }
+    .file-drop-zone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .file-drop-zone i {
+        font-size: 2.2rem;
+        color: var(--text-dim);
+        display: block;
+        margin-bottom: 10px;
+    }
+    .file-drop-zone p {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+    }
+    .file-drop-zone .file-name {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin-top: 8px;
+    }
+
+    .btn-submit-premium {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, rgba(0,243,255,0.15), rgba(0,243,255,0.08));
+        border: 1px solid rgba(0,243,255,0.3);
+        color: var(--accent);
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 900;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+        letter-spacing: 0.5px;
+    }
+    .btn-submit-premium:hover {
+        background: linear-gradient(135deg, rgba(0,243,255,0.22), rgba(0,243,255,0.12));
+        box-shadow: 0 0 20px rgba(0,243,255,0.15);
+    }
+    .btn-submit-premium:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .pending-notice {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255,204,0,0.07);
+        border: 1px solid rgba(255,204,0,0.2);
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 0.83rem;
+        color: #ffcc00;
+        margin-top: 14px;
+    }
+    .pending-notice i { font-size: 1.3rem; flex-shrink: 0; }
+
+    @media (max-width: 480px) {
+        .features-grid { grid-template-columns: 1fr 1fr; }
+        .plans-grid    { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block settings_content %}
+
+<div class="page-header">
+    <h1>Premium Imkoniyatlar</h1>
+    <p>Hisobingizning obuna holati va afzalliklari</p>
+</div>
+
+<!-- ===== JORIY STATUS ===== -->
+{% with tier=vip_data.get_tier %}
+<div class="status-card {{ tier }}">
+    <div class="tier-badge {{ tier }}">
+        {% if tier == 'vip' %}
+        <i class='bx bxs-crown'></i> VIP
+        {% elif tier == 'premium' %}
+        <i class='bx bxs-star'></i> PREMIUM
+        {% else %}
+        <i class='bx bx-user'></i> BASIC
+        {% endif %}
+    </div>
+    <div class="status-title">
+        {% if tier == 'vip' %}
+        Siz VIP a'zo!
+        {% elif tier == 'premium' %}
+        Premium foydalanuvchi
+        {% else %}
+        Bepul tarif
+        {% endif %}
+    </div>
+    <div class="status-sub">
+        {% if tier == 'vip' %}
+        Barcha imkoniyatlar ochiq. Siz eng yuqori darajadagi a'zosiz.
+        {% elif tier == 'premium' %}
+        Premium imkoniyatlar faol. Yuqori sifatli kontent va ko'proq afzalliklar.
+        {% else %}
+        Asosiy imkoniyatlar. Premium yoki VIP ga yangilang.
+        {% endif %}
+    </div>
+    {% if vip_data.vip_active and vip_data.vip_expire %}
+    <div class="expire-row">
+        <div class="expire-chip">
+            <i class='bx bx-calendar-check'></i>
+            Muddati: <strong>{{ vip_data.vip_expire|date:"d.m.Y" }}</strong>
+        </div>
+        <div class="expire-chip">
+            <i class='bx bx-time'></i>
+            <strong>{{ vip_data.vip_expire|timeuntil }}</strong> qoldi
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ===== IMKONIYATLAR ===== -->
+<div class="section-label">Imkoniyatlar holati</div>
+<div class="features-grid">
+
+    <div class="feature-card {% if tier != 'basic' %}unlocked{% else %}locked{% endif %}">
+        <div class="feature-icon cyan"><i class='bx bx-hd'></i></div>
+        <div>
+            <div class="feature-title">Full HD / 4K</div>
+            <div class="feature-desc">Premium: 1080p, VIP: 4K sifatda tomosha</div>
+        </div>
+        <div class="feature-status {% if tier != 'basic' %}on{% else %}premium-req{% endif %}">
+            {% if tier != 'basic' %}<i class='bx bx-check-circle'></i> Faol
+            {% else %}<i class='bx bx-lock'></i> Premium talab{% endif %}
+        </div>
+        {% if tier == 'basic' %}<i class='bx bx-lock-alt lock-overlay'></i>{% endif %}
+    </div>
+
+    <div class="feature-card {% if tier == 'vip' or tier == 'premium' %}unlocked{% else %}locked{% endif %}">
+        <div class="feature-icon red"><i class='bx bx-block'></i></div>
+        <div>
+            <div class="feature-title">Reklama yo'q</div>
+            <div class="feature-desc">Reklama ko'rsatilmaydi, tomosha uzilmaydi</div>
+        </div>
+        <div class="feature-status {% if tier != 'basic' %}on{% else %}premium-req{% endif %}">
+            {% if tier != 'basic' %}<i class='bx bx-check-circle'></i> Faol
+            {% else %}<i class='bx bx-lock'></i> Premium talab{% endif %}
+        </div>
+        {% if tier == 'basic' %}<i class='bx bx-lock-alt lock-overlay'></i>{% endif %}
+    </div>
+
+    <div class="feature-card {% if tier == 'vip' %}unlocked{% else %}locked{% endif %}">
+        <div class="feature-icon green"><i class='bx bx-download'></i></div>
+        <div>
+            <div class="feature-title">Yuklash</div>
+            <div class="feature-desc">Animeni qurilmangizga yuklab oling</div>
+        </div>
+        <div class="feature-status {% if tier == 'vip' %}on{% else %}vip-req{% endif %}">
+            {% if tier == 'vip' %}<i class='bx bx-check-circle'></i> Faol
+            {% else %}<i class='bx bx-lock'></i> VIP talab{% endif %}
+        </div>
+        {% if tier != 'vip' %}<i class='bx bx-lock-alt lock-overlay'></i>{% endif %}
+    </div>
+
+    <div class="feature-card {% if tier != 'basic' %}unlocked{% else %}locked{% endif %}">
+        <div class="feature-icon orange"><i class='bx bxs-star'></i></div>
+        <div>
+            <div class="feature-title">Eksklyuziv kontent</div>
+            <div class="feature-desc">Faqat premium va VIP uchun maxsus animeler</div>
+        </div>
+        <div class="feature-status {% if tier != 'basic' %}on{% else %}premium-req{% endif %}">
+            {% if tier != 'basic' %}<i class='bx bx-check-circle'></i> Faol
+            {% else %}<i class='bx bx-lock'></i> Premium talab{% endif %}
+        </div>
+        {% if tier == 'basic' %}<i class='bx bx-lock-alt lock-overlay'></i>{% endif %}
+    </div>
+
+    <div class="feature-card {% if tier == 'vip' %}unlocked{% else %}locked{% endif %}">
+        <div class="feature-icon purple"><i class='bx bxs-crown'></i></div>
+        <div>
+            <div class="feature-title">VIP Badge</div>
+            <div class="feature-desc">Chat va profilida maxsus VIP belgisi</div>
+        </div>
+        <div class="feature-status {% if tier == 'vip' %}on{% else %}vip-req{% endif %}">
+            {% if tier == 'vip' %}<i class='bx bx-check-circle'></i> Faol
+            {% else %}<i class='bx bx-lock'></i> VIP talab{% endif %}
+        </div>
+        {% if tier != 'vip' %}<i class='bx bx-lock-alt lock-overlay'></i>{% endif %}
+    </div>
+
+    <div class="feature-card unlocked">
+        <div class="feature-icon blue"><i class='bx bx-chat'></i></div>
+        <div>
+            <div class="feature-title">Chat</div>
+            <div class="feature-desc">Umumiy chatda xabar yozish imkoni</div>
+        </div>
+        <div class="feature-status on">
+            <i class='bx bx-check-circle'></i> Faol
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== YANGILASH (faqat basic yoki premium uchun) ===== -->
+{% if tier == 'basic' or tier == 'premium' %}
+
+<div class="section-label" style="margin-top:8px;">
+    Obunani yangilash
+</div>
+
+{% if pending_receipt %}
+<div class="pending-notice">
+    <i class='bx bx-time-five'></i>
+    So'rovingiz ko'rib chiqilmoqda. Admin tez orada tasdiqlaydi.
+</div>
+{% else %}
+
+<div class="plans-grid" id="plansGrid">
+
+    {% if tier == 'basic' %}
+    <div class="plan-card" data-plan="premium" onclick="selectPlan(this)">
+        <div class="plan-name">Premium</div>
+        <div class="plan-price">29 900 <span>so'm</span></div>
+        <div class="plan-period">/ oyiga</div>
+        <ul class="plan-features-list">
+            <li><i class='bx bx-check yes'></i> Full HD (1080p)</li>
+            <li><i class='bx bx-check yes'></i> Reklama yo'q</li>
+            <li><i class='bx bx-check yes'></i> Eksklyuziv kontent</li>
+            <li><i class='bx bx-x no'></i> Yuklash</li>
+            <li><i class='bx bx-x no'></i> VIP Badge</li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="plan-card popular" data-plan="vip" onclick="selectPlan(this)">
+        <div class="plan-name">VIP</div>
+        <div class="plan-price">49 900 <span>so'm</span></div>
+        <div class="plan-period">/ oyiga</div>
+        <ul class="plan-features-list">
+            <li><i class='bx bx-check yes'></i> 4K sifat</li>
+            <li><i class='bx bx-check yes'></i> Reklama yo'q</li>
+            <li><i class='bx bx-check yes'></i> Eksklyuziv kontent</li>
+            <li><i class='bx bx-check yes'></i> Yuklash</li>
+            <li><i class='bx bx-check yes'></i> VIP Badge</li>
+        </ul>
+    </div>
+
+</div>
+
+<!-- CHEK YUKLASH -->
+<div class="upload-section" id="uploadSection">
+    <form method="post" enctype="multipart/form-data" id="premiumForm">
+        {% csrf_token %}
+        <input type="hidden" name="plan" id="selectedPlan" value="">
+
+        <div class="upload-label">To'lov chekini yuklang</div>
+        <div class="upload-hint">
+            To'lovni amalga oshirib, skrinshot yoki chekni yuklang. Admin tekshirib tasdiqlaydi.
+        </div>
+
+        <div class="file-drop-zone" id="dropZone">
+            <input type="file" name="receipt_image" id="receiptFile" accept="image/*" onchange="onFileChange(event)">
+            <i class='bx bx-image-add' id="dropIcon"></i>
+            <p id="dropText">Rasm tanlash uchun bosing yoki torting</p>
+            <div class="file-name" id="fileName"></div>
+        </div>
+
+        <button type="submit" class="btn-submit-premium" id="submitBtn" disabled>
+            <i class='bx bx-send'></i>
+            So'rov yuborish
+        </button>
+    </form>
+</div>
+{% endif %}
+{% endif %}
+
+{% endwith %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selectedPlanValue = '';
+
+function selectPlan(card) {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedPlanValue = card.dataset.plan;
+    document.getElementById('selectedPlan').value = selectedPlanValue;
+
+    const section = document.getElementById('uploadSection');
+    section.classList.add('visible');
+
+    // Scroll to upload
+    setTimeout(() => {
+        section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+
+    updateSubmitBtn();
+}
+
+function onFileChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('dropText').textContent = 'Fayl tanlandi';
+        document.getElementById('dropIcon').className = 'bx bx-check-circle';
+        document.getElementById('dropIcon').style.color = '#30d158';
+    }
+    updateSubmitBtn();
+}
+
+function updateSubmitBtn() {
+    const btn = document.getElementById('submitBtn');
+    if (!btn) return;
+    const hasFile  = document.getElementById('receiptFile')?.files?.length > 0;
+    const hasPlan  = !!selectedPlanValue;
+    btn.disabled = !(hasFile && hasPlan);
+}
+
+// Drag-and-drop visual
+const dz = document.getElementById('dropZone');
+if (dz) {
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); });
+}
+</script>
+{% endblock %}

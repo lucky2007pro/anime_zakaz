@@ -1,0 +1,382 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>{% block title %}BESTMEDIA – Sozlamalar{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+
+    <style>
+        :root {
+            --bg-base:      #0a0a0f;
+            --bg-surface:   #111118;
+            --bg-card:      #16161f;
+            --accent:       #00f3ff;
+            --accent2:      #ff3366;
+            --text-light:   #ffffff;
+            --text-dim:     #8a8a9d;
+            --sidebar-w:    260px;
+            --topbar-h:     56px;
+            --glass-bg:     rgba(17,17,24,0.85);
+            --glass-border: rgba(0,243,255,0.12);
+            --radius-card:  16px;
+        }
+
+        *, *::before, *::after {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        html, body {
+            width: 100%; max-width: 100%;
+            overflow-x: hidden;
+            background: var(--bg-base);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        /* ===== LAYOUT ===== */
+        .settings-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .settings-sidebar {
+            width: var(--sidebar-w);
+            background: var(--bg-surface);
+            border-right: 1px solid rgba(255,255,255,0.06);
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.38s cubic-bezier(0.22,1,0.36,1);
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .settings-sidebar::-webkit-scrollbar { display: none; }
+
+        /* ===== SIDEBAR HEADER ===== */
+        .sb-header {
+            padding: 22px 20px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .sb-header-left { display: flex; flex-direction: column; gap: 3px; }
+        .sb-brand {
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+        .sb-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--text-light);
+        }
+
+        .sb-close {
+            display: none;
+            background: rgba(255,255,255,0.06);
+            border: none;
+            color: #fff;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .sb-close:hover { background: rgba(255,59,48,0.2); color: #ff3b30; }
+
+        /* ===== NAV ===== */
+        .sb-nav {
+            flex: 1;
+            padding: 14px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 11px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 700;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .sb-item i {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            transition: color 0.2s;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+        .sb-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-light);
+        }
+        .sb-item:hover i { color: var(--accent); }
+        .sb-item.active {
+            background: rgba(0,243,255,0.08);
+            color: var(--text-light);
+            border-color: rgba(0,243,255,0.18);
+        }
+        .sb-item.active i { color: var(--accent); }
+
+        .sb-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.05);
+            margin: 8px 10px;
+        }
+
+        .sb-item.danger { color: #ff453a; }
+        .sb-item.danger i { color: #ff453a; }
+        .sb-item.danger:hover { background: rgba(255,69,58,0.1); color: #ff453a; }
+
+        /* ===== FOOTER ===== */
+        .sb-footer {
+            padding: 10px 10px 24px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+
+        /* ===== MAIN ===== */
+        .settings-main {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            padding: 36px 40px 60px;
+            max-width: calc(860px + var(--sidebar-w));
+        }
+
+        /* ===== MOBILE TOPBAR ===== */
+        .settings-topbar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--topbar-h);
+            background: rgba(10,10,15,0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            z-index: 200;
+            padding: 0 16px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .topbar-back {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.88rem;
+        }
+        .topbar-back i {
+            font-size: 1.2rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        .topbar-title {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--text-light);
+        }
+        .topbar-menu-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ===== OVERLAY ===== */
+        .sb-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 299;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .sb-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .settings-sidebar {
+                transform: translateX(-110%);
+                box-shadow: 12px 0 40px rgba(0,0,0,0.6);
+            }
+            .settings-sidebar.open { transform: translateX(0); }
+            .sb-close { display: flex; }
+            .sb-overlay { display: block; }
+            .settings-topbar { display: flex; }
+            .settings-main {
+                margin-left: 0;
+                padding: calc(var(--topbar-h) + 24px) 16px 60px;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .settings-main { padding: calc(var(--topbar-h) + 16px) 12px 60px; }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ===== MOBILE TOPBAR ===== -->
+<div class="settings-topbar">
+    <a href="{% url 'home' %}" class="topbar-back">
+        <i class='bx bx-arrow-back'></i>
+        Orqaga
+    </a>
+    <span class="topbar-title">Sozlamalar</span>
+    <button class="topbar-menu-btn" onclick="openSidebar()" aria-label="Menyu">
+        <i class='bx bx-menu'></i>
+    </button>
+</div>
+
+<!-- ===== OVERLAY ===== -->
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+<div class="settings-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="settings-sidebar" id="settingsSidebar">
+
+        <div class="sb-header">
+            <div class="sb-header-left">
+                <span class="sb-brand">BESTMEDIA</span>
+                <span class="sb-title">Sozlamalar</span>
+            </div>
+            <button class="sb-close" onclick="closeSidebar()" aria-label="Yopish">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+
+        <nav class="sb-nav">
+
+            <a href="{% url 'settings_general' %}"
+               class="sb-item {% if active_section == 'general' %}active{% endif %}"
+               onclick="closeSidebar()">
+                <i class='bx bx-slider-alt'></i>
+                Umumiy nazorat
+            </a>
+
+            <a href="{% url 'settings_telegram' %}"
+               class="sb-item {% if active_section == 'telegram' %}active{% endif %}"
+               onclick="closeSidebar()">
+                <i class='bx bxl-telegram'></i>
+                Telegram hisob
+            </a>
+
+            <a href="{% url 'settings_premium' %}"
+               class="sb-item {% if active_section == 'premium' %}active{% endif %}"
+               onclick="closeSidebar()">
+                <i class='bx bxs-crown'></i>
+                Premium imkoniyatlar
+            </a>
+
+            <a href="{% url 'settings_devices' %}"
+               class="sb-item {% if active_section == 'devices' %}active{% endif %}"
+               onclick="closeSidebar()">
+                <i class='bx bx-devices'></i>
+                Faol qurilmalar
+            </a>
+
+            <a href="{% url 'settings_privacy' %}"
+               class="sb-item {% if active_section == 'privacy' %}active{% endif %}"
+               onclick="closeSidebar()">
+                <i class='bx bx-shield-quarter'></i>
+                Maxfiylik siyosati
+            </a>
+
+            <div class="sb-divider"></div>
+
+            <a href="{% url 'home' %}" class="sb-item" onclick="closeSidebar()">
+                <i class='bx bxs-home'></i>
+                Asosiy sahifa
+            </a>
+
+        </nav>
+
+        <div class="sb-footer">
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="sb-item danger" style="width:100%;">
+                    <i class='bx bx-log-out'></i>
+                    Hisobdan chiqish
+                </button>
+            </form>
+        </div>
+
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="settings-main">
+        {% block settings_content %}{% endblock %}
+    </main>
+
+</div>
+
+<script>
+function openSidebar() {
+    document.getElementById('settingsSidebar').classList.add('open');
+    document.getElementById('sbOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+    document.getElementById('settingsSidebar').classList.remove('open');
+    document.getElementById('sbOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeSidebar();
+});
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

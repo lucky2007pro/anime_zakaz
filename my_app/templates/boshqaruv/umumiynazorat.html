@@ -1,0 +1,844 @@
+{% extends 'boshqaruv/settings_base.html' %}
+{% load static %}
+
+{% block title %}Umumiy Nazorat – BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== PAGE HEADER ===== */
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 {
+        font-size: 1.65rem;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 5px;
+    }
+    .page-header p {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    /* ===== SECTION ===== */
+    .settings-section {
+        background: var(--bg-card);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: var(--radius-card);
+        padding: 22px 24px;
+        margin-bottom: 20px;
+        transition: background 0.4s, border-color 0.4s;
+    }
+
+    .section-title {
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .section-title i {
+        font-size: 0.95rem;
+        color: var(--accent);
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* ===== SETTING ROW ===== */
+    .setting-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        gap: 16px;
+    }
+    .setting-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .setting-row:first-of-type { padding-top: 0; }
+
+    .row-info { flex: 1; min-width: 0; }
+    .row-label {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: var(--text-light);
+        margin-bottom: 3px;
+    }
+    .row-desc {
+        font-size: 0.73rem;
+        color: var(--text-dim);
+        font-weight: 500;
+        line-height: 1.5;
+    }
+
+    /* ===== TOGGLE ===== */
+    .toggle-wrap {
+        position: relative;
+        width: 46px; height: 26px;
+        border-radius: 13px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.15);
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: background 0.3s, border-color 0.3s;
+    }
+    .toggle-wrap.on {
+        background: rgba(0,243,255,0.22);
+        border-color: rgba(0,243,255,0.45);
+    }
+    .toggle-thumb {
+        position: absolute;
+        top: 3px; left: 3px;
+        width: 18px; height: 18px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), background 0.3s;
+    }
+    .toggle-wrap.on .toggle-thumb {
+        transform: translateX(20px);
+        background: var(--accent);
+    }
+
+    /* ===== THEME GRID ===== */
+    .theme-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 10px;
+        margin-top: 4px;
+    }
+
+    .theme-card {
+        border-radius: 12px;
+        border: 2px solid rgba(255,255,255,0.07);
+        overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.25s, transform 0.25s;
+        position: relative;
+    }
+    .theme-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.2); }
+    .theme-card.selected { border-color: var(--accent); box-shadow: 0 0 16px rgba(0,243,255,0.25); }
+    .theme-card.selected::after {
+        content: '✓';
+        position: absolute;
+        top: 6px; right: 7px;
+        background: var(--accent);
+        color: #000;
+        font-size: 0.6rem;
+        font-weight: 900;
+        width: 17px; height: 17px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .theme-preview {
+        height: 68px;
+        display: flex;
+        flex-direction: column;
+        padding: 6px;
+        gap: 4px;
+    }
+    .tp-bar  { height: 7px; border-radius: 4px; }
+    .tp-content { display: flex; gap: 4px; flex: 1; }
+    .tp-sidebar { width: 27%; border-radius: 3px; }
+    .tp-main    { flex: 1; border-radius: 3px; }
+
+    .theme-dark .theme-preview    { background: #0a0a0f; }
+    .theme-dark .tp-bar           { background: #1a1a28; }
+    .theme-dark .tp-sidebar       { background: #111118; }
+    .theme-dark .tp-main          { background: #16161f; }
+
+    .theme-white .theme-preview   { background: #f0f0f6; }
+    .theme-white .tp-bar          { background: #dde1ee; }
+    .theme-white .tp-sidebar      { background: #e4e8f5; }
+    .theme-white .tp-main         { background: #ffffff; }
+
+    .theme-rose .theme-preview    { background: #120a0f; }
+    .theme-rose .tp-bar           { background: #2a0e18; }
+    .theme-rose .tp-sidebar       { background: #1a0a12; }
+    .theme-rose .tp-main          { background: #200d16; }
+
+    .theme-pink .theme-preview    { background: linear-gradient(135deg,#1a0818,#200d20); }
+    .theme-pink .tp-bar           { background: #3a1030; }
+    .theme-pink .tp-sidebar       { background: #280a22; }
+    .theme-pink .tp-main          { background: #320e2a; }
+
+    .theme-premium .theme-preview { background: linear-gradient(135deg,#0a0818,#120a1f); }
+    .theme-premium .tp-bar        { background: #1e1040; }
+    .theme-premium .tp-sidebar    { background: #160d38; }
+    .theme-premium .tp-main       { background: #1a1030; }
+
+    .theme-ocean .theme-preview   { background: linear-gradient(135deg,#050d1a,#060b22); }
+    .theme-ocean .tp-bar          { background: #0e1f3e; }
+    .theme-ocean .tp-sidebar      { background: #081528; }
+    .theme-ocean .tp-main         { background: #0c1a32; }
+
+    .theme-forest .theme-preview  { background: #060f0a; }
+    .theme-forest .tp-bar         { background: #0d2015; }
+    .theme-forest .tp-sidebar     { background: #091a0f; }
+    .theme-forest .tp-main        { background: #0b1f12; }
+
+    .theme-label {
+        font-size: 0.68rem;
+        font-weight: 800;
+        text-align: center;
+        padding: 6px 4px;
+        background: rgba(0,0,0,0.35);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ===== BG SWATCHES ===== */
+    .bg-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 4px;
+    }
+
+    .bg-swatch {
+        width: 42px; height: 42px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: border-color 0.2s, transform 0.2s;
+        position: relative;
+        flex-shrink: 0;
+    }
+    .bg-swatch:hover { transform: scale(1.1); }
+    .bg-swatch.selected {
+        border-color: rgba(255,255,255,0.9);
+        box-shadow: 0 0 10px rgba(255,255,255,0.35);
+    }
+    .bg-swatch.selected::after {
+        content: '✓';
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.9);
+        font-size: 0.72rem;
+        font-weight: 900;
+    }
+
+    .custom-color-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .custom-color-wrap input[type="color"] {
+        width: 42px; height: 42px;
+        border-radius: 10px;
+        border: 2px solid rgba(255,255,255,0.15);
+        padding: 3px;
+        cursor: pointer;
+        background: transparent;
+        transition: border-color 0.2s;
+    }
+    .custom-color-wrap input[type="color"]:hover {
+        border-color: rgba(255,255,255,0.4);
+    }
+
+    /* ===== BUTTONS ROW ===== */
+    .btn-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+    }
+
+    .save-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 13px 30px;
+        background: var(--accent);
+        color: #000;
+        border: none;
+        border-radius: 13px;
+        font-weight: 900;
+        font-size: 0.93rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 8px 26px rgba(0,243,255,0.22);
+        letter-spacing: 0.3px;
+    }
+    .save-btn:hover {
+        background: #fff;
+        box-shadow: 0 12px 32px rgba(255,255,255,0.18);
+        transform: translateY(-2px);
+    }
+    .save-btn:active { transform: scale(0.97); }
+    .save-btn i { font-size: 1.1rem; display: inline-flex; align-items: center; }
+
+    /* Reset button */
+    .reset-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 13px 24px;
+        background: transparent;
+        color: var(--text-dim);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 13px;
+        font-weight: 800;
+        font-size: 0.88rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        letter-spacing: 0.3px;
+    }
+    .reset-btn:hover {
+        background: rgba(255,69,58,0.12);
+        border-color: rgba(255,69,58,0.35);
+        color: #ff453a;
+    }
+    .reset-btn:hover i { color: #ff453a; }
+    .reset-btn:active { transform: scale(0.97); }
+    .reset-btn i { font-size: 1.1rem; display: inline-flex; align-items: center; transition: color 0.2s; }
+
+    /* ===== TOAST ===== */
+    .toast-notify {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: rgba(0,243,255,0.12);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(0,243,255,0.3);
+        color: var(--text-light);
+        padding: 11px 24px;
+        border-radius: 40px;
+        font-size: 0.84rem;
+        font-weight: 800;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+    .toast-notify.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    .toast-notify.error {
+        background: rgba(255,69,58,0.15);
+        border-color: rgba(255,69,58,0.4);
+    }
+
+    /* ===== RESET CONFIRM MODAL ===== */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 9998;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+    .modal-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .modal-box {
+        background: var(--bg-card);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 28px 28px 24px;
+        max-width: 380px;
+        width: 100%;
+        transform: scale(0.92) translateY(16px);
+        transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+        box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .modal-overlay.show .modal-box {
+        transform: scale(1) translateY(0);
+    }
+    .modal-icon {
+        width: 52px; height: 52px;
+        border-radius: 50%;
+        background: rgba(255,69,58,0.14);
+        border: 1px solid rgba(255,69,58,0.3);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 1.6rem;
+        color: #ff453a;
+    }
+    .modal-icon i { display: inline-flex; align-items: center; }
+    .modal-title {
+        font-size: 1.05rem;
+        font-weight: 900;
+        color: var(--text-light);
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    .modal-desc {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        text-align: center;
+        line-height: 1.6;
+        margin-bottom: 24px;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+    }
+    .modal-cancel {
+        flex: 1;
+        padding: 12px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: var(--text-light);
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.88rem;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .modal-cancel:hover { background: rgba(255,255,255,0.1); }
+    .modal-confirm {
+        flex: 1;
+        padding: 12px;
+        background: rgba(255,69,58,0.15);
+        border: 1px solid rgba(255,69,58,0.35);
+        color: #ff453a;
+        border-radius: 12px;
+        font-weight: 900;
+        font-size: 0.88rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .modal-confirm:hover { background: rgba(255,69,58,0.28); }
+
+    @media (max-width: 480px) {
+        .theme-grid { grid-template-columns: repeat(3, 1fr); }
+        .bg-swatch, .custom-color-wrap input[type="color"] { width: 38px; height: 38px; }
+        .btn-row { flex-direction: column; align-items: stretch; }
+        .save-btn, .reset-btn { justify-content: center; }
+    }
+</style>
+{% endblock %}
+
+
+{% block settings_content %}
+<div class="page-header">
+    <h1>Umumiy Nazorat</h1>
+    <p>Sahifa ko'rinishini va asosiy xususiyatlarni boshqaring</p>
+</div>
+
+<form method="post" id="generalForm">
+    {% csrf_token %}
+
+    <!-- ===== MAVZU ===== -->
+    <div class="settings-section">
+        <div class="section-title">
+            <i class='bx bx-palette'></i>
+            Mavzu tanlash
+        </div>
+
+        <div class="theme-grid" id="themeGrid">
+
+            <div class="theme-card theme-dark {% if not settings.theme or settings.theme == 'dark' %}selected{% endif %}"
+                 data-theme="dark" onclick="selectTheme(this)">
+                <div class="theme-preview">
+                    <div class="tp-bar"></div>
+                    <div class="tp-content"><div class="tp-sidebar"></div><div class="tp-main"></div></div>
+                </div>
+                <div class="theme-label" style="color:#aaa;">Qorong'i</div>
+            </div>
+
+            <div class="theme-card theme-white {% if settings.theme == 'white' %}selected{% endif %}"
+                 data-theme="white" onclick="selectTheme(this)">
+                <div class="theme-preview">
+                    <div class="tp-bar"></div>
+                    <div class="tp-content"><div class="tp-sidebar"></div><div class="tp-main"></div></div>
+                </div>
+                <div class="theme-label" style="color:#444;">Oq</div>
+            </div>
+
+            <div class="theme-card theme-rose {% if settings.theme == 'rose' %}selected{% endif %}"
+                 data-theme="rose" onclick="selectTheme(this)">
+                <div class="theme-preview">
+                    <div class="tp-bar"></div>
+                    <div class="tp-content"><div class="tp-sidebar"></div><div class="tp-main"></div></div>
+                </div>
+                <div class="theme-label" style="color:#ff3366;">Qizil</div>
+            </div>
+
+            <div class="theme-card theme-pink {% if settings.theme == 'pink' %}selected{% endif %}"
+                 data-theme="pink" onclick="selectTheme(this)">
+                <div class="theme-preview">
+                    <div class="tp-bar"></div>
+                    <div class="tp-content"><div class="tp-sidebar"></div><div class="tp-main"></div></div>
+                </div>
+                <div class="theme-label" style="color:#e879f9;">Ro'za</div>
+            </div>
+
+            <div class="theme-card theme-premium {% if settings.theme == 'premium' %}selected{% endif %}"
+                 data-theme="premium" onclick="selectTheme(this)">
+                <div class="theme-preview">
+                    <div class="tp-bar"></div>
+                    <div class="tp-content"><div class="tp-sidebar"></div><div class="tp-main"></div></div>
+                </div>
+                <div class="theme-label" style="color:#a78bfa;">Premium</div>
+            </div>
+
+            <div class="theme-card theme-ocean {% if settings.theme == 'ocean' %}selected{% endif %}"
+                 data-theme="ocean" onclick="selectTheme(this)">
+                <div class="theme-preview">
+                    <div class="tp-bar"></div>
+                    <div class="tp-content"><div class="tp-sidebar"></div><div class="tp-main"></div></div>
+                </div>
+                <div class="theme-label" style="color:#38bdf8;">Okean</div>
+            </div>
+
+            <div class="theme-card theme-forest {% if settings.theme == 'forest' %}selected{% endif %}"
+                 data-theme="forest" onclick="selectTheme(this)">
+                <div class="theme-preview">
+                    <div class="tp-bar"></div>
+                    <div class="tp-content"><div class="tp-sidebar"></div><div class="tp-main"></div></div>
+                </div>
+                <div class="theme-label" style="color:#4ade80;">O'rmon</div>
+            </div>
+
+        </div>
+        <input type="hidden" name="theme" id="themeInput" value="{{ settings.theme|default:'dark' }}">
+    </div>
+
+    <!-- ===== FON RANGI ===== -->
+    <div class="settings-section">
+        <div class="section-title">
+            <i class='bx bx-color-fill'></i>
+            Asosiy sahifa fon rangi
+        </div>
+
+        <div class="setting-row">
+            <div class="row-info">
+                <div class="row-label">Fon rangi</div>
+                <div class="row-desc">Bosh sahifaning asosiy fon rangini tanlang</div>
+            </div>
+        </div>
+
+        <div class="bg-options" id="bgOptions">
+            {% for color in bg_colors %}
+            <div class="bg-swatch {% if settings.bg_color == color.value %}selected{% endif %}"
+                 style="background: {{ color.css }};"
+                 data-value="{{ color.value }}"
+                 title="{{ color.name }}"
+                 onclick="selectBg(this)">
+            </div>
+            {% endfor %}
+
+            <div class="custom-color-wrap">
+                <input type="color"
+                       id="customColorPicker"
+                       value="{{ settings.bg_color_custom|default:'#0a0a0f' }}"
+                       onchange="selectCustomColor(this.value)"
+                       title="Maxsus rang">
+            </div>
+        </div>
+
+        <input type="hidden" name="bg_color"        id="bgColorInput"       value="{{ settings.bg_color|default:'#0a0a0f' }}">
+        <input type="hidden" name="bg_color_custom" id="bgColorCustomInput" value="{{ settings.bg_color_custom|default:'#0a0a0f' }}">
+    </div>
+
+    <!-- ===== TAB BAR ===== -->
+    <div class="settings-section">
+        <div class="section-title">
+            <i class='bx bx-layout'></i>
+            Pastki panel
+        </div>
+
+        <div class="setting-row">
+            <div class="row-info">
+                <div class="row-label">Tab Bar</div>
+                <div class="row-desc">Mobil qurilmalarda quyi navigatsiya panelini yoqish yoki o'chirish</div>
+            </div>
+            <div class="toggle-wrap {% if settings.tabbar_on %}on{% endif %}"
+                 id="tabbarToggle"
+                 onclick="toggleSetting(this, 'tabbar_on')">
+                <div class="toggle-thumb"></div>
+            </div>
+        </div>
+        <input type="hidden" name="tabbar_on" id="tabbar_on_input"
+               value="{% if settings.tabbar_on %}1{% else %}0{% endif %}">
+    </div>
+
+    <!-- ===== SAVE + RESET ===== -->
+    <div class="btn-row">
+        <button type="submit" class="save-btn">
+            <i class='bx bx-save'></i>
+            Saqlash
+        </button>
+        <button type="button" class="reset-btn" onclick="openResetModal()">
+            <i class='bx bx-reset'></i>
+            Asl holatga qaytarish
+        </button>
+    </div>
+</form>
+
+<!-- ===== RESET CONFIRM MODAL ===== -->
+<div class="modal-overlay" id="resetModal">
+    <div class="modal-box">
+        <div class="modal-icon"><i class='bx bx-revision'></i></div>
+        <div class="modal-title">Asl holatga qaytarish</div>
+        <div class="modal-desc">
+            Barcha sozlamalar dastlabki holatiga qaytadi:<br>
+            <strong style="color:var(--text-light);">Qorong'i mavzu, standart fon, Tab Bar yoqiq.</strong><br><br>
+            Bu amalni bekor qilib bo'lmaydi.
+        </div>
+        <div class="modal-actions">
+            <button class="modal-cancel" onclick="closeResetModal()">Bekor qilish</button>
+            <button class="modal-confirm" onclick="confirmReset()">
+                <i class='bx bx-reset' style="vertical-align:-2px; margin-right:4px;"></i>
+                Qaytarish
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-notify" id="toastNotify">
+    <i class='bx bx-check-circle' id="toastIcon"></i>
+    <span id="toastMsg">Sozlamalar saqlandi!</span>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* ==============================
+   DEFAULT STATE
+============================== */
+const DEFAULT_STATE = {
+    theme:    'dark',
+    bg_color: '#0a0a0f',
+    tabbar_on: true,
+};
+
+/* ==============================
+   THEME MAP
+============================== */
+const THEMES = {
+    dark:    { bg: '#0a0a0f', surface: '#111118', card: '#16161f', accent: '#00f3ff' },
+    white:   { bg: '#f0f0f8', surface: '#e8ecf5', card: '#ffffff', accent: '#3b82f6' },
+    rose:    { bg: '#120a0f', surface: '#1a0a12', card: '#200d16', accent: '#ff3366' },
+    pink:    { bg: '#1a0818', surface: '#280a22', card: '#320e2a', accent: '#e879f9' },
+    premium: { bg: '#0a0818', surface: '#100820', card: '#160d38', accent: '#a78bfa' },
+    ocean:   { bg: '#050d1a', surface: '#081528', card: '#0c1a32', accent: '#38bdf8' },
+    forest:  { bg: '#060f0a', surface: '#091a0f', card: '#0b1f12', accent: '#4ade80' },
+};
+
+function applyThemeVars(theme) {
+    const t = THEMES[theme] || THEMES.dark;
+    const root = document.documentElement;
+    root.style.setProperty('--bg-base',    t.bg);
+    root.style.setProperty('--bg-surface', t.surface);
+    root.style.setProperty('--bg-card',    t.card);
+    root.style.setProperty('--accent',     t.accent);
+}
+
+/* ==============================
+   THEME SELECT — live, saqlashsiz
+============================== */
+function selectTheme(el) {
+    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    const theme = el.dataset.theme;
+    document.getElementById('themeInput').value = theme;
+    applyThemeVars(theme);
+}
+
+/* ==============================
+   BG COLOR
+============================== */
+function selectBg(el) {
+    document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    const val = el.dataset.value;
+    document.getElementById('bgColorInput').value = val;
+    document.documentElement.style.setProperty('--bg-base', val);
+}
+
+function selectCustomColor(val) {
+    document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('selected'));
+    document.getElementById('bgColorInput').value       = val;
+    document.getElementById('bgColorCustomInput').value = val;
+    document.documentElement.style.setProperty('--bg-base', val);
+}
+
+/* ==============================
+   TOGGLE — live, saqlashsiz
+============================== */
+function toggleSetting(el, name) {
+    el.classList.toggle('on');
+    const isOn = el.classList.contains('on');
+    const inp = document.getElementById(name + '_input');
+    if (inp) inp.value = isOn ? '1' : '0';
+
+    if (name === 'tabbar_on') {
+        const bar = document.getElementById('bottomTabBar');
+        if (bar) {
+            if (isOn) {
+                bar.classList.remove('tab-hidden');
+                document.body.classList.add('tabbar-on');
+            } else {
+                bar.classList.add('tab-hidden');
+                document.body.classList.remove('tabbar-on');
+            }
+        }
+        localStorage.setItem('anibest_tabbar_on', isOn ? '1' : '0');
+    }
+}
+
+/* ==============================
+   RESET MODAL
+============================== */
+function openResetModal() {
+    document.getElementById('resetModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+function closeResetModal() {
+    document.getElementById('resetModal').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+function confirmReset() {
+    closeResetModal();
+
+    /* 1. Mavzuni dark ga qaytarish */
+    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+    const darkCard = document.querySelector('.theme-card[data-theme="dark"]');
+    if (darkCard) darkCard.classList.add('selected');
+    document.getElementById('themeInput').value = 'dark';
+    applyThemeVars('dark');
+
+    /* 2. Fon rangni asl holatga qaytarish */
+    document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('selected'));
+    /* Birinchi swatchni select qilish (default) */
+    const firstSwatch = document.querySelector('.bg-swatch[data-value="#0a0a0f"]')
+                     || document.querySelector('.bg-swatch');
+    if (firstSwatch) {
+        firstSwatch.classList.add('selected');
+        document.getElementById('bgColorInput').value = firstSwatch.dataset.value || '#0a0a0f';
+    } else {
+        document.getElementById('bgColorInput').value = '#0a0a0f';
+    }
+    document.documentElement.style.setProperty('--bg-base', '#0a0a0f');
+
+    /* 3. Custom color picker reset */
+    const picker = document.getElementById('customColorPicker');
+    if (picker) picker.value = '#0a0a0f';
+    document.getElementById('bgColorCustomInput').value = '#0a0a0f';
+
+    /* 4. Tab Bar — yoqiq (on) */
+    const tabToggle = document.getElementById('tabbarToggle');
+    if (tabToggle) {
+        tabToggle.classList.add('on');
+        document.getElementById('tabbar_on_input').value = '1';
+        const bar = document.getElementById('bottomTabBar');
+        if (bar) {
+            bar.classList.remove('tab-hidden');
+            document.body.classList.add('tabbar-on');
+        }
+        localStorage.setItem('anibest_tabbar_on', '1');
+    }
+
+    /* 5. Serverga saqlash */
+    const fd = new FormData(document.getElementById('generalForm'));
+    fetch(window.location.href, {
+        method: 'POST',
+        body: fd,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        showToast('Asl holatga qaytarildi!', false);
+    })
+    .catch(() => {
+        document.getElementById('generalForm').submit();
+    });
+}
+
+/* ==============================
+   FORM SUBMIT (AJAX)
+============================== */
+document.getElementById('generalForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const fd = new FormData(this);
+
+    fetch(window.location.href, {
+        method: 'POST',
+        body: fd,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) showToast('Sozlamalar saqlandi!', false);
+    })
+    .catch(() => {
+        this.submit();
+    });
+});
+
+/* ==============================
+   TOAST
+============================== */
+let _toastTimer = null;
+function showToast(msg, isError) {
+    const t = document.getElementById('toastNotify');
+    const icon = document.getElementById('toastIcon');
+    const msgEl = document.getElementById('toastMsg');
+    if (!t) return;
+
+    t.classList.remove('show', 'error');
+    clearTimeout(_toastTimer);
+
+    msgEl.textContent = msg;
+    if (isError) {
+        t.classList.add('error');
+        icon.className = 'bx bx-error-circle';
+    } else {
+        icon.className = 'bx bx-check-circle';
+    }
+
+    /* Force reflow */
+    void t.offsetWidth;
+    t.classList.add('show');
+    _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ==============================
+   ESC — modal yopish
+============================== */
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeResetModal();
+});
+document.getElementById('resetModal').addEventListener('click', function(e) {
+    if (e.target === this) closeResetModal();
+});
+
+/* ==============================
+   INIT
+============================== */
+(function() {
+    const theme = document.getElementById('themeInput').value;
+    if (theme && theme !== 'dark') applyThemeVars(theme);
+})();
+</script>
+{% endblock %}

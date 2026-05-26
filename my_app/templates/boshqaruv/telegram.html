@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Button</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    background:#0f172a;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Arial, sans-serif;
+}
+
+/* Home button */
+.home-btn{
+    position:fixed;
+    bottom:25px;
+    left:25px;
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    padding:14px 22px;
+
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.18);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    border-radius:18px;
+
+    color:white;
+    text-decoration:none;
+
+    font-size:16px;
+    font-weight:600;
+
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.35),
+        inset 0 1px 1px rgba(255,255,255,0.12);
+
+    transition:0.3s ease;
+    z-index:999;
+}
+
+.home-btn:hover{
+    transform:translateY(-4px) scale(1.03);
+    background:rgba(255,255,255,0.18);
+}
+
+.home-btn:active{
+    transform:scale(0.96);
+}
+
+/* icon */
+.home-icon{
+    font-size:20px;
+}
+</style>
+</head>
+<body>
+
+<a href="/settings/" class="home-btn">
+    <span class="home-icon">🏠</span>
+    <span>orqaga</span>
+</a>
+
+</body>
+</html>
