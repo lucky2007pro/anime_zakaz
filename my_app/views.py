@@ -16,7 +16,7 @@ from django.db import models
 
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
-    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare
+    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,UserSettings
 )
 
 User = get_user_model()
@@ -872,4 +872,91 @@ def reel_detail(request, reel_id):
         'prev_reel': prev_reel,
     })
 
+
+
+
+# confikuchun viev qismi
+
+BG_COLORS = [
+    {'name': 'Qora',           'value': '#0a0a0f',   'css': '#0a0a0f'},
+    {'name': 'Qoʻngʻir qora',  'value': '#0d0d0d',   'css': '#0d0d0d'},
+    {'name': 'To\'q ko\'k',    'value': '#050d1a',   'css': '#050d1a'},
+    {'name': 'Chuqur ko\'k',   'value': '#060b18',   'css': 'linear-gradient(135deg,#060b18,#0a0f22)'},
+    {'name': 'Qoʻngʻir',       'value': '#120a06',   'css': '#120a06'},
+    {'name': 'Qizil-qora',     'value': '#120a0f',   'css': '#120a0f'},
+    {'name': 'Roʻza-qora',     'value': '#180810',   'css': 'linear-gradient(135deg,#180810,#0d0510)'},
+    {'name': 'Binafsha-qora',  'value': '#0a0818',   'css': 'linear-gradient(135deg,#0a0818,#120a1f)'},
+    {'name': 'Yashil-qora',    'value': '#060f0a',   'css': '#060f0a'},
+    {'name': 'Kulrang',        'value': '#101014',   'css': '#101014'},
+]
+
+
+@login_required(login_url='login')
+def settings_general(request):
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        settings_obj.theme         = request.POST.get('theme', 'dark')
+        settings_obj.bg_color      = request.POST.get('bg_color', '#0a0a0f')
+        settings_obj.bg_color_custom = request.POST.get('bg_color_custom', '#0a0a0f')
+        settings_obj.tabbar_on     = request.POST.get('tabbar_on', '0') == '1'
+        settings_obj.save()
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'ok': True})
+        return redirect('settings_general')
+
+    return render(request, 'boshqaruv/umumiynazorat.html', {
+        'settings':   settings_obj,
+        'bg_colors':  BG_COLORS,
+        'active_section': 'general',
+    })
+
+
+@login_required(login_url='login')
+def settings_telegram(request):
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        settings_obj.telegram_username  = request.POST.get('telegram_username', '').strip()
+        settings_obj.telegram_chat_id   = request.POST.get('telegram_chat_id', '').strip()
+        settings_obj.telegram_bot_token = request.POST.get('telegram_bot_token', '').strip()
+        settings_obj.telegram_notify_on = request.POST.get('telegram_notify_on', '0') == '1'
+        settings_obj.save()
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'ok': True})
+        return redirect('settings_telegram')
+
+    return render(request, 'boshqaruv/telegram.html', {
+        'settings':       settings_obj,
+        'active_section': 'telegram',
+    })
+
+
+@login_required(login_url='login')
+def settings_premium(request):
+    from .models import VipUser
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    return render(request, 'boshqaruv/premium_settings.html', {
+        'vip_data':       vip_data,
+        'active_section': 'premium',
+    })
+
+
+@login_required(login_url='login')
+def settings_devices(request):
+    from .models import ActiveSession
+    sessions = ActiveSession.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'boshqaruv/devices.html', {
+        'sessions':       sessions,
+        'active_section': 'devices',
+    })
+
+
+@login_required(login_url='login')
+def settings_privacy(request):
+    return render(request, 'boshqaruv/privacy.html', {
+        'active_section': 'privacy',
+    })
 
