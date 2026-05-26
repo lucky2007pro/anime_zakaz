@@ -473,3 +473,60 @@ class ReelShare(models.Model):
 
 
 
+# ========================
+# setting uchun confik lr
+# ========================
+
+class UserSettings(models.Model):
+    THEME_CHOICES = [
+        ('dark',    'Qorong\'i'),
+        ('white',   'Oq'),
+        ('rose',    'Qizil / Ro\'za'),
+        ('premium', 'Premium (To\'q binafsha)'),
+    ]
+
+    user = models.OneToOneField(
+        'CustomUser',
+        on_delete=models.CASCADE,
+        related_name='settings'
+    )
+
+    # Mavzu
+    theme = models.CharField(
+        max_length=20,
+        choices=THEME_CHOICES,
+        default='dark'
+    )
+
+    # Fon rangi (tayyor swatchlar uchun)
+    bg_color = models.CharField(
+        max_length=30,
+        default='#0a0a0f',
+        help_text="Hex yoki gradient kalit so'z"
+    )
+
+    # Custom color picker qiymati
+    bg_color_custom = models.CharField(
+        max_length=30,
+        default='#0a0a0f',
+        blank=True, null=True
+    )
+
+    # Tab bar (mobil pastki panel)
+    tabbar_on = models.BooleanField(default=True)
+
+    # Telegram sozlamalari
+    telegram_username  = models.CharField(max_length=100, blank=True, null=True)
+    telegram_chat_id   = models.CharField(max_length=50,  blank=True, null=True)
+    telegram_bot_token = models.CharField(max_length=200, blank=True, null=True)
+    telegram_notify_on = models.BooleanField(
+        default=False,
+        help_text="Yangi epizod yoki xabar bo'lganda Telegram orqali xabar yuborish"
+    )
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username} – sozlamalar"
+
+
