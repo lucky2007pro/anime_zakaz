@@ -12,6 +12,8 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import F
 from django.db import models
+import re
+from django.contrib.sessions.models import Session
 
 
 from .models import (
@@ -960,3 +962,146 @@ def settings_privacy(request):
         'active_section': 'privacy',
     })
 
+
+
+
+
+
+def parse_user_agent(ua_string):
+    """User-Agent stringidan browser va OS ni ajratib olish"""
+    if not ua_string:
+        return 'Noma\'lum', 'Noma\'lum', 'unknown'
+
+    ua = ua_string.lower()
+
+    # Browser aniqlash
+    if 'edg/' in ua or 'edge/' in ua:
+        browser = 'Microsoft Edge'
+    elif 'opr/' in ua or 'opera' in ua:
+        browser = 'Opera'
+    elif 'chrome/' in ua and 'safari/' in ua:
+        browser = 'Google Chrome'
+    elif 'firefox/' in ua:
+        browser = 'Mozilla Firefox'
+    elif 'safari/' in ua and 'chrome/' not in ua:
+        browser = 'Safari'
+    elif 'samsungbrowser' in ua:
+        browser = 'Samsung Browser'
+    elif 'miuibrowser' in ua:
+        browser = 'MIUI Browser'
+    else:
+        browser = 'Boshqa brauzer'
+
+    # OS aniqlash
+    if 'windows nt 10' in ua:
+        os_name = 'Windows 10/11'
+    elif 'windows nt 6.3' in ua:
+        os_name = 'Windows 8.1'
+    elif 'windows nt 6.1' in ua:
+        os_name = 'Windows 7'
+    elif 'windows' in ua:
+        os_name = 'Windows'
+    elif 'android' in ua:
+        match = re.search(r'android\s([\d.]+)', ua)
+        version = match.group(1) if match else ''
+        os_name = f'Android {version}'.strip()
+    elif 'iphone os' in ua or 'iphone' in ua:
+        match = re.search(r'os\s([\d_]+)', ua)
+        version = match.group(1).replace('_', '.') if match else ''
+        os_name = f'iOS {version}'.strip()
+    elif 'ipad' in ua:
+        os_name = 'iPadOS'
+    elif 'mac os x' in ua:
+        os_name = 'macOS'
+    elif 'linux' in ua:
+        os_name = 'Linux'
+    else:
+        os_name = 'Noma\'lum OS'
+
+    # Qurilma turi
+    if any(x in ua for x in ['iphone', 'android', 'mobile', 'blackberry', 'windows phone']):
+        device_type = 'mobile'
+    elif any(x in ua for x in ['ipad', 'tablet']):
+        device_type = 'tablet'
+    elif any(x in ua for x in ['windows', 'macintosh', 'linux', 'x11']):
+        device_type = 'desktop'
+    else:
+        device_type = 'unknown'
+
+    return browser, os_name, device_type
+
+
+def get_client_ip(request):
+    x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded:
+        return x_forwarded.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', '0.0.0.0')
+
+
+@login_required(login_url='login')
+def settings_devices(request):
+    from .models import ActiveSession
+    from django.contrib.sessions.models import Session
+
+    # Joriy sessionni ro'yxatga olish / yangilash
+    session_key = request.session.session_key
+    if not session_key:
+        request.session.create()
+        session_key = request.session.session_key
+
+    ua_string  = request.META.get('HTTP_USER_AGENT', '')
+    ip         = get_client_ip(request)
+    browser, os_name, device_type = parse_user_agent(ua_string)
+    device_name = f"{browser} / {os_name}"
+
+    ActiveSession.objects.update_or_create(
+        session_key=session_key,
+        defaults={
+            'user':        request.user,
+            'ip_address':  ip,
+            'user_agent':  ua_string,
+            'browser':     browser,
+            'os_name':     os_name,
+            'device_type': device_type,
+            'device_name': device_name,
+        }
+    )
+
+    # Foydalanuvchining barcha sessionlari
+    sessions = ActiveSession.objects.filter(user=request.user).order_by('-last_activity')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        target_key = request.POST.get('session_key')
+
+        if action == 'logout_single' and target_key:
+            # Tanlangan qurilmani chiqarish
+            if target_key != session_key:  # O'zini chiqarmasin
+                try:
+                    Session.objects.filter(session_key=target_key).delete()
+                except Exception:
+                    pass
+                ActiveSession.objects.filter(
+                    session_key=target_key,
+                    user=request.user
+                ).delete()
+
+        elif action == 'logout_all':
+            # Joriy qurilmadan tashqari hammasini chiqarish
+            other_sessions = ActiveSession.objects.filter(
+                user=request.user
+            ).exclude(session_key=session_key)
+            for s in other_sessions:
+                try:
+                    Session.objects.filter(session_key=s.session_key).delete()
+                except Exception:
+                    pass
+            other_sessions.delete()
+
+        return redirect('settings_devices')
+
+    return render(request, 'boshqaruv/devices.html', {
+        'sessions':          sessions,
+        'current_session':   session_key,
+        'active_section':    'devices',
+    })
