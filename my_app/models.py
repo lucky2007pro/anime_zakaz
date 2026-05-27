@@ -530,3 +530,33 @@ class UserSettings(models.Model):
         return f"{self.user.username} – sozlamalar"
 
 
+# =======================
+# ACTIVE SESSIONS (DEVICE LIMITS)
+# =======================
+class ActiveSession(models.Model):
+    DEVICE_CHOICES = [
+        ('mobile', 'Mobil'),
+        ('tablet', 'Planshet'),
+        ('desktop', 'Kompyuter'),
+        ('unknown', 'Noma\'lum'),
+    ]
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='active_sessions')
+    session_key = models.CharField(max_length=40, unique=True)
+
+    # Qurilma ma'lumotlari
+    device_type   = models.CharField(max_length=20, choices=DEVICE_CHOICES, default='unknown')
+    device_name   = models.CharField(max_length=200, blank=True, null=True, help_text="Browser + OS")
+    ip_address    = models.GenericIPAddressField(blank=True, null=True)
+    user_agent    = models.TextField(blank=True, null=True)
+    browser       = models.CharField(max_length=100, blank=True, null=True)
+    os_name       = models.CharField(max_length=100, blank=True, null=True)
+    location      = models.CharField(max_length=200, blank=True, null=True, help_text="Taxminiy joylashuv")
+
+    created_at    = models.DateTimeField(auto_now_add=True)
+    last_activity = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username} — {self.device_name or 'Noma\'lum qurilma'} ({self.ip_address})"
+
+
