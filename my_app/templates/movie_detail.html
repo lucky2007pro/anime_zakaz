@@ -8,14 +8,6 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;}
 
-/* =====================================================================
-   TOUCH HIGHLIGHT O'CHIRISH — barcha elementlarda
-===================================================================== */
-*, *::before, *::after {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-}
-
 .movie-page {
     max-width: 1280px;
     margin: 0 auto;
@@ -128,16 +120,13 @@
     user-select: none; -webkit-user-select: none;
     cursor: pointer;
     touch-action: manipulation;
-    /* Touch highlight o'chirish */
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 /* VIDEO — hech qanday filter/overlay yo'q, original va tiniq */
 .bm-player video {
     width: 100%; display: block;
     aspect-ratio: 16/9; background: #000;
     outline: none; pointer-events: none;
-    -webkit-tap-highlight-color: transparent;
+    /* filter olib tashlandi — original sifat */
 }
 
 /* -- TOP BAR -- */
@@ -163,8 +152,6 @@
     cursor: pointer; flex-shrink: 0; transition: .2s;
     -webkit-appearance: none; appearance: none;
     text-decoration: none;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .bm-back-link:hover { background: rgba(220,38,38,.35); border-color: rgba(220,38,38,.5); }
 .bm-back-link svg { width: 18px; height: 18px; fill: currentColor; pointer-events: none; }
@@ -245,8 +232,6 @@
     display: inline-flex; align-items: center; justify-content: center;
     border-radius: 6px; transition: background .17s, color .17s; flex-shrink: 0;
     min-width: 36px; min-height: 36px;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .bm-btn:hover  { background: rgba(239,68,68,.2); color: #f87171; }
 .bm-btn:active { background: rgba(239,68,68,.35); }
@@ -285,8 +270,6 @@
     color: #fff; cursor: pointer; letter-spacing: .04em; white-space: nowrap;
     flex-shrink: 0; transition: background .18s, border-color .18s, color .18s;
     min-height: 30px;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .bm-speed-btn:hover { background: rgba(239,68,68,.2); border-color: rgba(239,68,68,.4); color: #f87171; }
 
@@ -307,8 +290,6 @@
     cursor: pointer; font-size: .85rem; font-weight: 700;
     transition: background .15s, color .15s;
     border: none; background: none; text-align: left; width: 100%;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .bm-speed-item:hover { background: rgba(239,68,68,.15); color: #f87171; }
 .bm-speed-item.active { color: #ef4444; }
@@ -325,8 +306,7 @@
    LOCK BUTTON
 ===================================================================== */
 .bm-lock-btn {
-    position: absolute; right: 12px; top: 60%; transform: translateY(-50%);
-    z-index: 35;
+    position: absolute; right: 12px; top: 60%; transform: translateY(-50%);    z-index: 35;
     width: 46px; height: 46px; border-radius: 12px;
     background: rgba(20,20,28,.75); backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,.15);
@@ -334,8 +314,6 @@
     display: flex; align-items: center; justify-content: center;
     transition: background .2s, border-color .2s, opacity .2s;
     opacity: 0; pointer-events: none;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .bm-player.show-controls .bm-lock-btn { opacity: 1; pointer-events: auto; }
 .bm-lock-btn:hover { background: rgba(239,68,68,.25); border-color: rgba(239,68,68,.4); }
@@ -346,31 +324,6 @@
     background: rgba(239,68,68,.25); border-color: rgba(239,68,68,.5);
     color: #ef4444;
 }
-
-/* =====================================================================
-   LANDSCAPE / ROTATE BUTTON — faqat mobil uchun
-===================================================================== */
-.bm-landscape-btn {
-    position: absolute; right: 66px; top: 60%; transform: translateY(-50%);
-    z-index: 35;
-    width: 46px; height: 46px; border-radius: 12px;
-    background: rgba(20,20,28,.75); backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,.15);
-    color: #fff; cursor: pointer;
-    display: none; /* JS orqali faqat mobilda ko'rsatiladi */
-    align-items: center; justify-content: center;
-    transition: background .2s, border-color .2s, opacity .2s;
-    opacity: 0; pointer-events: none;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-}
-.bm-player.show-controls .bm-landscape-btn {
-    opacity: 1; pointer-events: auto;
-}
-.bm-landscape-btn:hover { background: rgba(239,68,68,.25); border-color: rgba(239,68,68,.4); }
-.bm-landscape-btn svg { width: 22px; height: 22px; fill: currentColor; pointer-events: none; }
-/* Fullscreen bo'lganda yashirish */
-.bm-player.in-fullscreen .bm-landscape-btn { opacity: 0 !important; pointer-events: none !important; }
 
 /* -- BIG CENTER PLAY -- */
 .bm-big-play {
@@ -429,8 +382,6 @@
     color: #fff; font-size: 1.1rem; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center;
     backdrop-filter: blur(8px); transition: .25s ease;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .fullscreen-btn:hover { background: rgba(220,38,38,.25); border-color: rgba(220,38,38,.45); }
 
@@ -448,8 +399,6 @@
     cursor: pointer; font-weight: 800; text-align: center;
     transition: all .25s ease; font-size: .9rem;
     min-height: 44px;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .episode-btn:hover,
 .episode-btn[aria-pressed="true"] {
@@ -494,8 +443,6 @@
     color: #fff; cursor: pointer; font-size: 1rem;
     display: inline-flex; align-items: center; justify-content: center;
     transition: .2s; flex-shrink: 0;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .related-nav-btn:hover { background: rgba(220,38,38,.25); border-color: rgba(220,38,38,.4); }
 
@@ -519,7 +466,6 @@
     flex: 0 0 140px;
     scroll-snap-align: start;
     transition: transform .2s;
-    -webkit-tap-highlight-color: transparent;
 }
 .related-card-link:hover { transform: translateY(-3px); }
 
@@ -585,7 +531,6 @@
     border-bottom: 1px solid rgba(255,255,255,.2); color: white;
     font-size: 1rem; padding: 8px 0; resize: none; outline: none; transition: .3s;
     font-family: inherit;
-    -webkit-tap-highlight-color: transparent;
 }
 .comment-input:focus { border-bottom-color: #ef4444; }
 .comment-actions { display: flex; justify-content: flex-end; gap: 10px; }
@@ -594,8 +539,6 @@
     padding: 9px 22px; border-radius: 50px;
     font-weight: 800; cursor: pointer; transition: .2s;
     min-height: 40px;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .comment-btn:disabled { background: rgba(255,255,255,.1); color: rgba(255,255,255,.3); cursor: not-allowed; }
 .comment-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(220,38,38,.4); }
@@ -622,8 +565,6 @@
     font-weight: 800; font-size: .9rem; cursor: pointer;
     transition: .2s; display: flex; align-items: center; gap: 8px;
     min-height: 42px;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 }
 .comments-show-more-btn:hover { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.3); color: #f87171; }
 
@@ -981,8 +922,6 @@ const SVG = {
   collapse: 'M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z',
   lock:     'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z',
   unlock:   'M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5-2.28 0-4.27 1.54-4.84 3.75l1.94.49C9.43 3.93 10.63 3 12 3c1.65 0 3 1.35 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z',
-  /* Landscape / rotate icon — telefon yotiq holatda */
-  landscape: 'M19 6H5C3.9 6 3 6.9 3 8v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8zM1 4h2v16H1zm20 0h2v16h-2z',
 };
 
 function btn(id, title, svgKey){
@@ -1002,6 +941,7 @@ const SPEED_LIST = [
 
 /* ---------------------------------------------------------------
    Build inner HTML for .bm-player
+   — sifat badge olib tashlandi (top-bar va hero dan ham)
 --------------------------------------------------------------- */
 function buildSpeedMenu(){
   let items = SPEED_LIST.map(function(s, i){
@@ -1026,11 +966,6 @@ function buildInner(title){
   <button type="button" class="bm-back-link" title="Kichik ekran" id="bm-exit-fs">${svgIcon(SVG.back)}</button>
   <span class="bm-title-bar">${title || ''}</span>
 </div>
-
-<!-- LANDSCAPE tugmasi — faqat mobilda ko'rinadi, JS orqali display:flex -->
-<button type="button" class="bm-landscape-btn" id="bm-landscape-btn" title="Ekranni yotqizish">
-  ${svgIcon(SVG.landscape)}
-</button>
 
 <button type="button" class="bm-lock-btn" id="bm-lock-btn" title="Qulflash">
   ${svgIcon(SVG.unlock)}
@@ -1213,16 +1148,26 @@ function unlockOrientation(){
 
 /* ---------------------------------------------------------------
    URL FRAGMENT / QUERY TIME SEEK
+   Google va boshqa saytlardan #t=120 yoki ?t=120 bilan kelganda
+   video o'sha vaqtdan boshlanadi.
+   Qo'llab-quvvatlanadiganlar:
+     #t=90        → 90 soniya
+     #t=1m30s     → 90 soniya
+     #t=1h2m3s    → 3723 soniya
+     ?t=90        → 90 soniya
 --------------------------------------------------------------- */
 function parseTimeParam(raw){
   if(!raw) return 0;
   raw = raw.trim();
+  /* Sof raqam */
   if(/^\d+(\.\d+)?$/.test(raw)) return parseFloat(raw);
+  /* HH:MM:SS yoki MM:SS */
   if(/^\d+:\d+(:\d+)?$/.test(raw)){
     var parts = raw.split(':').map(Number);
     if(parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
     if(parts.length === 2) return parts[0]*60 + parts[1];
   }
+  /* 1h2m3s / 2m30s / 90s */
   var h = (/(\d+)h/.exec(raw)||[0,0])[1];
   var m = (/(\d+)m/.exec(raw)||[0,0])[1];
   var s = (/(\d+)s/.exec(raw)||[0,0])[1];
@@ -1230,11 +1175,13 @@ function parseTimeParam(raw){
 }
 
 function getSeekTarget(){
+  /* 1) URL fragment: #t=... */
   var hash = window.location.hash;
   if(hash){
     var hm = hash.match(/[#&]t=([^&]+)/);
     if(hm) return parseTimeParam(hm[1]);
   }
+  /* 2) Query string: ?t=... */
   var qs = window.location.search;
   if(qs){
     var qm = qs.match(/[?&]t=([^&]+)/);
@@ -1246,9 +1193,12 @@ function getSeekTarget(){
 /* ---------------------------------------------------------------
    MAIN PLAYER INIT
 --------------------------------------------------------------- */
+/* Global event listeners ro'yxati — reinit qilganda eski listenerlar
+   qolmasligi uchun AbortController ishlatiladi                      */
 var _bmAbort = null;
 
 function initBmPlayer(){
+  /* Avvalgi listenerlarni o'chirish */
   if(_bmAbort){ _bmAbort.abort(); }
   _bmAbort = new AbortController();
   var sig  = { signal: _bmAbort.signal };
@@ -1259,60 +1209,27 @@ function initBmPlayer(){
 
   var $id = function(id){ return document.getElementById(id); };
 
-  var playBtn      = $id('bm-play-btn');
-  var back10       = $id('bm-back10');
-  var fwd10        = $id('bm-fwd10');
-  var timeEl       = $id('bm-time-display');
-  var progress     = $id('bm-progress');
-  var fill         = $id('bm-fill');
-  var thumb        = $id('bm-thumb');
-  var buf          = $id('bm-buf');
-  var volBtn       = $id('bm-vol-btn');
-  var volSlider    = $id('bm-volume');
-  var fsBtn        = $id('bm-fullscreen');
-  var exitFsBtn    = $id('bm-exit-fs');
-  var rippleL      = $id('bm-ripple-left');
-  var rippleR      = $id('bm-ripple-right');
-  var speedBtn     = $id('bm-speed-btn');
-  var speedMenu    = $id('bm-speed-menu');
-  var lockBtn      = $id('bm-lock-btn');
-  var landscapeBtn = $id('bm-landscape-btn');
+  var playBtn   = $id('bm-play-btn');
+  var back10    = $id('bm-back10');
+  var fwd10     = $id('bm-fwd10');
+  var timeEl    = $id('bm-time-display');
+  var progress  = $id('bm-progress');
+  var fill      = $id('bm-fill');
+  var thumb     = $id('bm-thumb');
+  var buf       = $id('bm-buf');
+  var volBtn    = $id('bm-vol-btn');
+  var volSlider = $id('bm-volume');
+  var fsBtn     = $id('bm-fullscreen');
+  var exitFsBtn = $id('bm-exit-fs');
+  var rippleL   = $id('bm-ripple-left');
+  var rippleR   = $id('bm-ripple-right');
+  var speedBtn  = $id('bm-speed-btn');
+  var speedMenu = $id('bm-speed-menu');
+  var lockBtn   = $id('bm-lock-btn');
 
   /* ================================================================
-     LANDSCAPE BUTTON — faqat touch qurilmalarda ko'rsatish
-     va fullscreen bo'lganda yashirish
-  ================================================================ */
-  if(landscapeBtn){
-    /* Faqat touch (mobil) qurilmalarda ko'rsatamiz */
-    if(isTouch()){
-      landscapeBtn.style.display = 'flex';
-    }
-
-    landscapeBtn.addEventListener('click', function(e){
-      e.stopPropagation();
-      /* Ekranni landscape qilib to'liq ekranga o'tkazamiz */
-      reqFS(player)
-        .then(function(){
-          /* Fullscreen bo'lgandan keyin landscape lock */
-          if(screen.orientation && screen.orientation.lock){
-            screen.orientation.lock('landscape-primary').catch(function(){});
-          }
-        })
-        .catch(function(){
-          /* reqFS ishlamasa faqat orientation lock urinib ko'ramiz */
-          if(screen.orientation && screen.orientation.lock){
-            screen.orientation.lock('landscape-primary').catch(function(){});
-          }
-          /* iOS uchun video.webkitEnterFullscreen fallback */
-          if(video.webkitEnterFullscreen){
-            try{ video.webkitEnterFullscreen(); }catch(err){}
-          }
-        });
-    }, sig);
-  }
-
-  /* ================================================================
-     DEEP LINK SEEK
+     DEEP LINK — URL orqali kelgan vaqt pozitsiyasi
+     loadedmetadata yoki canplay hodisasida bir marta seek qilinadi
   ================================================================ */
   var seekTarget = getSeekTarget();
   var _seekDone  = false;
@@ -1320,11 +1237,13 @@ function initBmPlayer(){
   function applySeek(){
     if(_seekDone || seekTarget <= 0) return;
     if(!isFinite(video.duration) || video.duration <= 0) return;
+    /* Vaqt videoning uzunligidan oshib ketmasin */
     video.currentTime = Math.min(seekTarget, video.duration - 1);
     _seekDone = true;
   }
 
   video.addEventListener('loadedmetadata', applySeek, sig);
+  /* canplay — ba'zi brauzerlar loadedmetadata ga kech yetadi */
   video.addEventListener('canplay', applySeek, sig);
 
   /* ================================================================
@@ -1445,7 +1364,7 @@ function initBmPlayer(){
 
   /* ---- Progress: mouse ---- */
   var seeking = false;
-  var _seekScrollLeft = 0;
+  var _seekScrollLeft = 0; /* related scroll bilan konflikt bo'lmasin */
 
   function seekFromMouse(e){
     var r = progress.getBoundingClientRect();
@@ -1472,6 +1391,7 @@ function initBmPlayer(){
     }, { passive: true, signal: _bmAbort.signal });
   }
 
+  /* window-level mouse listeners — signal bilan olib tashlanadi */
   window.addEventListener('mousemove', function(e){ if(seeking) seekFromMouse(e); }, sig);
   window.addEventListener('mouseup',   function(){ seeking = false; }, sig);
 
@@ -1519,15 +1439,6 @@ function initBmPlayer(){
   function onFsChange(){
     var inFs = !!getFSElement();
     if(fsBtn) fsBtn.innerHTML = svgIcon(inFs ? SVG.collapse : SVG.expand);
-    /* Fullscreen holatida landscape tugmasini yashiramiz */
-    if(landscapeBtn){
-      if(inFs){
-        player.classList.add('in-fullscreen');
-      } else {
-        player.classList.remove('in-fullscreen');
-        unlockOrientation();
-      }
-    }
     if(!inFs) unlockOrientation();
   }
   document.addEventListener('fullscreenchange',       onFsChange, sig);
@@ -1537,11 +1448,9 @@ function initBmPlayer(){
 
   video.addEventListener('webkitbeginfullscreen', function(){
     if(fsBtn) fsBtn.innerHTML = svgIcon(SVG.collapse);
-    player.classList.add('in-fullscreen');
   }, sig);
   video.addEventListener('webkitendfullscreen', function(){
     if(fsBtn) fsBtn.innerHTML = svgIcon(SVG.expand);
-    player.classList.remove('in-fullscreen');
     unlockOrientation();
   }, sig);
 
@@ -1572,8 +1481,7 @@ function initBmPlayer(){
          e.target.closest('.bm-back-link') ||
          e.target.closest('#bm-exit-fs') ||
          e.target.closest('.bm-speed-wrap') ||
-         e.target.closest('#bm-lock-btn') ||
-         e.target.closest('#bm-landscape-btn')) return;
+         e.target.closest('#bm-lock-btn')) return;
       togglePlay();
       showControls(2500);
     }, sig);
@@ -1597,7 +1505,6 @@ function initBmPlayer(){
 
     player.addEventListener('touchend', function(e){
       if(e.target.closest('#bm-lock-btn')) return;
-      if(e.target.closest('#bm-landscape-btn')) return;
 
       var now  = Date.now();
       var t    = e.changedTouches[0];
@@ -1788,5 +1695,13 @@ function toggleAllComments(){
       : '📋 Batafsil (' + items.length + ' izoh)';
   }
 }
+
+
 </script>
 {% endblock %}
+
+
+
+
+
+
