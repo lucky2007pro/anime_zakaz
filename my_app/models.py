@@ -559,4 +559,39 @@ class ActiveSession(models.Model):
     def __str__(self):
         return f"{self.user.username} — {self.device_name or 'Noma\'lum qurilma'} ({self.ip_address})"
 
+ =======================
+# ANIME SCHEDULE (Chiqish kunlari)
+# =======================
+class AnimeSchedule(models.Model):
+    DAY_CHOICES = [
+        ('dushanba',  'Dushanba'),
+        ('seshanba',  'Seshanba'),
+        ('chorshanba','Chorshanba'),
+        ('payshanba', 'Payshanba'),
+        ('juma',      'Juma'),
+        ('shanba',    'Shanba'),
+        ('yakshanba', 'Yakshanba'),
+    ]
+
+    name        = models.CharField(max_length=200, help_text="Anime nomi")
+    subtitle    = models.CharField(max_length=200, blank=True, null=True, help_text="Kichik sarlavha")
+    image_url   = models.URLField(help_text="Poster rasmi URL (masalan: https://i.pinimg.com/...)")
+    day         = models.CharField(max_length=20, choices=DAY_CHOICES, help_text="Chiqish kuni")
+    episode_number = models.PositiveIntegerField(default=1, help_text="Chiqadigan qism raqami")
+    fandub      = models.CharField(max_length=100, default='AniBest', help_text="Fandub nomi")
+    watch_url   = models.URLField(help_text="Ko'rish havolasi (masalan: https://bestmedia-official.uz/movie/7/)")
+    is_active   = models.BooleanField(default=True)
+    order       = models.PositiveSmallIntegerField(default=0, help_text="Kichik raqam avval chiqadi")
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+
+    def __str__(self):
+        return f"{self.name} — {self.get_day_display()} ({self.episode_number}-qism)"
+
+
+
+
+
 
