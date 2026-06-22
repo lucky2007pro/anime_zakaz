@@ -650,8 +650,184 @@
     }
     .scroll-top-btn:hover { background: rgba(0, 243, 255, 0.28); }
 
-    /* tab bar yoqiq bo'lganda scroll-top tugmasi yuqoriroq */
     body.tabbar-on .scroll-top-btn { bottom: 82px; }
+
+    /* ----- ANIME SCHEDULE ----- */
+    .schedule-section {
+        padding: 0 0 10px 0;
+    }
+
+    .schedule-days {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 0 5% 14px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .schedule-days::-webkit-scrollbar { display: none; }
+
+    .schedule-day-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 10px 18px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.05);
+        border: 1.5px solid rgba(255,255,255,0.08);
+        color: var(--text-dim);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.25s ease;
+        flex-shrink: 0;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .schedule-day-btn i {
+        font-size: 1.1rem;
+    }
+
+    .schedule-day-btn.active {
+        background: linear-gradient(135deg, #ff003c, #ff4d6d);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 6px 20px rgba(255, 0, 60, 0.35);
+    }
+
+    .schedule-day-btn:not(.active):hover {
+        background: rgba(255,255,255,0.1);
+        color: var(--text-light);
+        border-color: rgba(255,255,255,0.18);
+    }
+
+    .schedule-cards-wrapper {
+        padding: 0 5%;
+    }
+
+    .schedule-card {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 18px;
+        margin-bottom: 14px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .schedule-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+        border-color: rgba(255, 0, 60, 0.3);
+    }
+
+   .schedule-card-poster {
+        width: 140px;
+        height: 200px;
+        border-radius: 12px;
+        object-fit: cover;
+        object-position: center top;
+        flex-shrink: 0;
+        background: #1a1a22;
+    }
+
+    .schedule-card-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .schedule-card-title {
+        font-size: 1.15rem;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 4px;
+        line-height: 1.2;
+    }
+
+    .schedule-card-subtitle {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #ff4d6d;
+        margin-bottom: 14px;
+    }
+
+    .schedule-card-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .schedule-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 10px;
+        padding: 8px 12px;
+    }
+
+    .schedule-meta-row i {
+        font-size: 1rem;
+        color: #ff4d6d;
+        flex-shrink: 0;
+    }
+
+    .schedule-meta-label {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        font-weight: 600;
+        flex: 1;
+    }
+
+    .schedule-meta-value {
+        font-size: 0.9rem;
+        font-weight: 900;
+        color: #ff4d6d;
+    }
+
+    .schedule-watch-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 12px 20px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #ff003c, #ff4d6d);
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 800;
+        text-decoration: none;
+        box-shadow: 0 6px 20px rgba(255, 0, 60, 0.3);
+        transition: transform 0.2s, box-shadow 0.2s;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .schedule-watch-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(255, 0, 60, 0.5);
+    }
+
+    .schedule-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-dim);
+        font-size: 0.9rem;
+    }
+
+    .schedule-empty i {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 10px;
+        opacity: 0.4;
+    }
 
     /* ----- MOBILE ----- */
     @media (max-width: 600px) {
@@ -667,6 +843,8 @@
         .btn-main { margin-left: 0 !important; width: auto; }
         .slider-container { aspect-ratio: 16 / 9; min-height: 220px; border-radius: 10px; }
         .slide { padding: 20px 14px 50px; }
+        .schedule-card { flex-direction: column; align-items: flex-start; }
+        .schedule-card-poster { width: 100%; height: 220px; border-radius: 12px; object-fit: cover; object-position: center top; }
     }
 
     @media (max-width: 1024px) {
@@ -883,6 +1061,100 @@
     </div>
     {% endif %}
 
+    <!-- ANIME CHIQISH KUNLARI -->
+    {% if schedule_list %}
+    <div class="container schedule-section" style="margin-top: 40px;">
+        <div class="section-header" style="padding:0; margin-bottom: 20px;">
+            <div class="section-title">
+                <h3>Anime <span>chiqish kunlari</span></h3>
+            </div>
+        </div>
+        <p style="color:var(--text-dim); font-size:0.82rem; padding: 0 0 16px 0; margin:0;">
+            <i class='bx bx-calendar' style="color:var(--accent);"></i>
+            Sevimli animelaringiz yangi qismini qachon chiqishini bilib oling!
+        </p>
+
+        <!-- KUN TUGMALARI -->
+        <div class="schedule-days" id="scheduleDays">
+            {% with days_order="dushanba,seshanba,chorshanba,payshanba,juma,shanba,yakshanba" %}
+            {% for day_key in days_order.split|slice:"7" %}
+            {% endfor %}
+            {% endwith %}
+
+            <button class="schedule-day-btn {% if active_day == 'dushanba' or not active_day and today_day == 'dushanba' %}active{% endif %}"
+                    onclick="filterSchedule('dushanba', this)" data-day="dushanba">
+                <i class='bx bx-sun'></i> Dushanba
+            </button>
+            <button class="schedule-day-btn {% if active_day == 'seshanba' or not active_day and today_day == 'seshanba' %}active{% endif %}"
+                    onclick="filterSchedule('seshanba', this)" data-day="seshanba">
+                <i class='bx bx-sun'></i> Seshanba
+            </button>
+            <button class="schedule-day-btn {% if active_day == 'chorshanba' or not active_day and today_day == 'chorshanba' %}active{% endif %}"
+                    onclick="filterSchedule('chorshanba', this)" data-day="chorshanba">
+                <i class='bx bx-calendar'></i> Chorshanba
+            </button>
+            <button class="schedule-day-btn {% if active_day == 'payshanba' or not active_day and today_day == 'payshanba' %}active{% endif %}"
+                    onclick="filterSchedule('payshanba', this)" data-day="payshanba">
+                <i class='bx bx-cloud'></i> Payshanba
+            </button>
+            <button class="schedule-day-btn {% if active_day == 'juma' or not active_day and today_day == 'juma' %}active{% endif %}"
+                    onclick="filterSchedule('juma', this)" data-day="juma">
+                <i class='bx bx-star'></i> Juma
+            </button>
+            <button class="schedule-day-btn {% if active_day == 'shanba' or not active_day and today_day == 'shanba' %}active{% endif %}"
+                    onclick="filterSchedule('shanba', this)" data-day="shanba">
+                <i class='bx bx-moon'></i> Shanba
+            </button>
+            <button class="schedule-day-btn {% if active_day == 'yakshanba' or not active_day and today_day == 'yakshanba' %}active{% endif %}"
+                    onclick="filterSchedule('yakshanba', this)" data-day="yakshanba">
+                <i class='bx bx-sun'></i> Yakshanba
+            </button>
+        </div>
+
+        <!-- SCHEDULE CARDS -->
+        <div class="schedule-cards-wrapper" id="scheduleCardsWrapper">
+            {% for item in schedule_list %}
+            <div class="schedule-card" data-day="{{ item.day }}"
+                 style="display:none;">
+                <img class="schedule-card-poster"
+                     src="{{ item.image_url }}"
+                     alt="{{ item.name }}"
+                     onerror="this.src='{{ default_movie_poster }}'">
+
+                <div class="schedule-card-info">
+                    <div class="schedule-card-title">{{ item.name }}</div>
+                    {% if item.subtitle %}
+                    <div class="schedule-card-subtitle">{{ item.subtitle }}</div>
+                    {% endif %}
+
+                    <div class="schedule-card-meta">
+                        <div class="schedule-meta-row">
+                            <i class='bx bx-play-circle'></i>
+                            <span class="schedule-meta-label">Chiqadigan qism:</span>
+                            <span class="schedule-meta-value">{{ item.episode_number }}</span>
+                        </div>
+                        <div class="schedule-meta-row">
+                            <i class='bx bx-microphone'></i>
+                            <span class="schedule-meta-label">Fandub:</span>
+                            <span class="schedule-meta-value">{{ item.fandub }}</span>
+                        </div>
+                    </div>
+
+                    <a href="{{ item.watch_url }}" class="schedule-watch-btn">
+                        <i class='bx bx-play'></i> KO'RISH
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="schedule-empty" id="scheduleEmpty" style="display:none;">
+                <i class='bx bx-calendar-x'></i>
+                Bu kunda rejalashtirilgan anime yo'q
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- ALOQA VA CHAT TUGMALAR -->
     <div class="action-buttons-section">
         <div class="action-buttons-inner">
@@ -1035,7 +1307,6 @@
     updateDots();
     resetAutoPlay();
 
-    /* Touch */
     wrapper.addEventListener('touchstart', function(e) {
         heroStartX = e.touches[0].clientX;
         heroDragging = true;
@@ -1062,7 +1333,6 @@
         resetAutoPlay();
     });
 
-    /* Mouse */
     wrapper.addEventListener('mousedown', function(e) {
         heroStartX = e.clientX;
         heroDragging = true;
@@ -1091,7 +1361,6 @@
         resetAutoPlay();
     });
 
-    /* Parallax — faqat desktop, pastga scrollda */
     var ticking = false;
     window.addEventListener('scroll', function() {
         if (ticking) return;
@@ -1145,11 +1414,9 @@
 
     rafId = requestAnimationFrame(animate);
 
-    /* Hover paytida to'xtatish */
     outer.addEventListener('mouseenter', function() { isPaused = true; });
     outer.addEventListener('mouseleave', function() { isPaused = false; });
 
-    /* Mouse drag */
     outer.addEventListener('mousedown', function(e) {
         isDragging = true;
         dragStartX = e.clientX;
@@ -1173,7 +1440,6 @@
         isPaused = false;
     });
 
-    /* Touch drag */
     outer.addEventListener('touchstart', function(e) {
         isDragging = true;
         dragStartX = e.touches[0].clientX;
@@ -1194,7 +1460,6 @@
         isDragging = false;
     });
 
-    /* Card click — drag bo'lmasa navigatsiya */
     container.addEventListener('click', function(e) {
         if (Math.abs(dragMoved) > DRAG_THRESHOLD) {
             e.preventDefault();
@@ -1211,6 +1476,70 @@
             if (Math.abs(dragMoved) > DRAG_THRESHOLD) e.preventDefault();
         });
     });
+})();
+
+
+/* ===========================
+   ANIME SCHEDULE FILTER
+=========================== */
+(function() {
+    const DAYS_UZ = ['yakshanba','dushanba','seshanba','chorshanba','payshanba','juma','shanba'];
+    const todayIndex = new Date().getDay(); // 0=sunday
+    const todayKey = DAYS_UZ[todayIndex];
+
+    // Bugungi kunni belgilash
+    const btns = document.querySelectorAll('.schedule-day-btn');
+    let activeDayKey = null;
+
+    // Avval active btn ni topamiz
+    btns.forEach(function(btn) {
+        if (btn.classList.contains('active')) {
+            activeDayKey = btn.dataset.day;
+        }
+    });
+
+    // Agar hech biri active emas bo'lsa, bugungi kunni active qilamiz
+    if (!activeDayKey) {
+        btns.forEach(function(btn) {
+            if (btn.dataset.day === todayKey) {
+                btn.classList.add('active');
+                activeDayKey = todayKey;
+            }
+        });
+    }
+
+    // Agar hali ham yo'q bo'lsa birinchisini active qilamiz
+    if (!activeDayKey && btns.length > 0) {
+        btns[0].classList.add('active');
+        activeDayKey = btns[0].dataset.day;
+    }
+
+    showDay(activeDayKey);
+
+    window.filterSchedule = function(dayKey, clickedBtn) {
+        btns.forEach(function(b) { b.classList.remove('active'); });
+        if (clickedBtn) clickedBtn.classList.add('active');
+        showDay(dayKey);
+    };
+
+    function showDay(dayKey) {
+        const cards = document.querySelectorAll('.schedule-card');
+        const emptyEl = document.getElementById('scheduleEmpty');
+        let found = 0;
+
+        cards.forEach(function(card) {
+            if (card.dataset.day === dayKey) {
+                card.style.display = 'flex';
+                found++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (emptyEl) {
+            emptyEl.style.display = found === 0 ? 'block' : 'none';
+        }
+    }
 })();
 
 
