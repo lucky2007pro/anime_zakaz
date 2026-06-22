@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode, 
     SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
-    Reel, ReelLike, ReelComment, ReelShare
+    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule
 )
 
 
@@ -146,6 +146,15 @@ class ReelShareAdmin(admin.ModelAdmin):
     list_filter = ('shared_at',)
     search_fields = ('user__username',)
     ordering = ('-shared_at',)
+
+@admin.register(AnimeSchedule)
+class AnimeScheduleAdmin(admin.ModelAdmin):
+    list_display  = ('name', 'day', 'episode_number', 'fandub', 'is_active', 'order')
+    list_filter   = ('day', 'is_active')
+    list_editable = ('is_active', 'order', 'episode_number')
+    search_fields = ('name', 'fandub')
+    ordering      = ('order',)
+
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
