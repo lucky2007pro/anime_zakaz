@@ -18,7 +18,7 @@ from django.contrib.sessions.models import Session
 
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
-    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,UserSettings
+    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,UserSettings,AnimeSchedule
 )
 
 User = get_user_model()
@@ -106,7 +106,6 @@ def home(request):
 
     categories = Category.objects.all()
 
-
     # ================= STORY =================
     stories = Story.objects.filter(
         is_active=True
@@ -142,6 +141,9 @@ def home(request):
         mp3_to_play = mp3_file if not request.session.get('mp3_played', False) else None
         request.session['mp3_played'] = True
 
+    # ================= SCHEDULE =================
+    schedule_list = list(AnimeSchedule.objects.filter(is_active=True))
+
     # ================= CONTEXT =================
     context = {
         'movies': movies,
@@ -158,6 +160,7 @@ def home(request):
         'total_users': User.objects.count(),
         'user_id': request.user.id if request.user.is_authenticated else None,
         'fav_ids': fav_ids,
+        'schedule_list': schedule_list,
     }
 
     return render(request, 'home.html', context)
