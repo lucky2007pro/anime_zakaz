@@ -559,7 +559,7 @@ class ActiveSession(models.Model):
     def __str__(self):
         return f"{self.user.username} — {self.device_name or 'Noma\'lum qurilma'} ({self.ip_address})"
 
- =======================
+# =======================
 # ANIME SCHEDULE (Chiqish kunlari)
 # =======================
 class AnimeSchedule(models.Model):
