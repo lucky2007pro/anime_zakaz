@@ -47,6 +47,10 @@ INSTALLED_APPS = [
 
     'my_app.apps.MyAppConfig',
 
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
+
     'cloudinary_storage',
     'cloudinary',
 ]
@@ -54,6 +58,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Static fayllarni yetkazish uchun
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -178,3 +183,21 @@ else:
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000
 FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000
+
+# --- REST FRAMEWORK VA CORS ---
+CORS_ALLOW_ALL_ORIGINS = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+}
