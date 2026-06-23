@@ -85,7 +85,6 @@
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
-            /* RANG: bg-base dan foydalanadi */
             background: linear-gradient(to bottom, color-mix(in srgb, var(--bg-base) 90%, transparent), transparent);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -93,7 +92,6 @@
         }
 
         .navbar.scrolled {
-            /* RANG: bg-base dan foydalanadi */
             background: color-mix(in srgb, var(--bg-base) 98%, transparent);
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
@@ -135,7 +133,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            /* RANG: bg-surface asosida */
             background: color-mix(in srgb, var(--bg-surface) 100%, transparent);
             padding: 8px 20px;
             border-radius: 25px;
@@ -190,7 +187,6 @@
         }
 
         .profile-btn {
-            /* RANG: bg-surface asosida */
             background: color-mix(in srgb, var(--bg-surface) 100%, transparent);
             border: 1px solid var(--glass-border);
             transition: all 0.3s ease;
@@ -258,7 +254,6 @@
             width: 350px;
             height: 100%;
             height: 100dvh;
-            /* RANG: bg-surface */
             background: var(--bg-surface);
             border-left: 1px solid var(--glass-border);
             z-index: 2000;
@@ -440,7 +435,6 @@
             max-width: 320px;
             height: 100%;
             height: 100dvh;
-            /* RANG: bg-base asosida */
             background: color-mix(in srgb, var(--bg-base) 96%, transparent);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -744,13 +738,51 @@
             padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 30px);
         }
 
-        /* Tab bar yoqilganda sahifa pastiga joy qoldirish */
         body.tabbar-on main.main-content {
             padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 16px);
         }
 
         body.tabbar-on footer {
             padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 16px);
+        }
+
+        /* ==================== NETWORK TOAST — faqat mobil, tab bar ustidan ==================== */
+        #networkToast {
+            position: fixed;
+            /* Tab bar balandligi (64px) + pastdan masofa (20px) + biroz yuqori (10px) */
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            /* Pastdan yuqoriga chiqish animatsiyasi */
+            transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            /* Faqat mobilda ko'rinsin */
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            #networkToast {
+                display: flex;
+            }
         }
 
         /* ==================== RESPONSIVE ==================== */
@@ -784,7 +816,6 @@
     </style>
 
     {# ===== USER THEME/BG SETTINGS ===== #}
-    {# Agar foydalanuvchi sozlamalarida tema saqlangan bo'lsa — CSS o'zgaruvchilarini override qilamiz #}
     {% if request.user.is_authenticated %}
     {% with s=request.user.settings %}
     {% if s %}
@@ -977,8 +1008,6 @@
             <span class="arrow">›</span>
         </a>
 
-        {# ===== TAB BAR TOGGLE — OLIB TASHLANDI (v2.1) ===== #}
-
         <div class="mobile-nav-footer">
             VERSION 2.1 &nbsp;•&nbsp; ANI BEST
         </div>
@@ -1125,7 +1154,6 @@
 </div>
 
 <!-- ==================== BOTTOM TAB BAR ==================== -->
-
 <nav class="bottom-tab-bar{% if request.user.is_authenticated and request.user.settings and not request.user.settings.tabbar_on %} tab-hidden{% endif %}"
      id="bottomTabBar"
      aria-label="Pastki navigatsiya">
@@ -1157,33 +1185,8 @@
 
 </nav>
 
-<!-- ==================== INTERNET HOLAT XABARI ==================== -->
-<div id="networkToast" style="
-    position: fixed;
-    top: 70px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    z-index: 99999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1);
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    cursor: grab;
-    user-select: none;
-    -webkit-user-select: none;
-"></div>
+<!-- ==================== NETWORK TOAST — tab bar ustidan chiqadi ==================== -->
+<div id="networkToast"></div>
 
 {% block footer %}
 <footer style="
@@ -1233,7 +1236,6 @@
         </div>
     </div>
 
-    <!-- ==================== FOOTER PASTKI QISMI ==================== -->
     <div style="max-width:1280px; margin:0 auto; padding-top:30px; border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
         <p style="margin:0;">&copy; {% now "Y" %} BESTMEDIA. Barcha huquqlar himoyalangan.</p>
         <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700;">ANI BEST JAMOASI TOMONIDAN YARATILGAN</p>
@@ -1404,13 +1406,6 @@ function toggleFavorite(e, movieId) {
 
 
 /* ================= BOTTOM TAB BAR ================= */
-/*
-  MUHIM: Tab bar holati endi server tarafdan ham boshqariladi.
-  Sahifa birinchi yuklanishida:
-    - Agar server user.settings.tabbar_on == False desa => HTML da tab-hidden bor => ko'rinmaydi.
-    - localStorage qiymati server qiymatiga sinxronlanadi.
-  Shu tarzda settings dan o'chirilsa, istalgan sahifaga qaytganda ham tab bar yashiringan bo'ladi.
-*/
 const TAB_KEY = 'anibest_tabbar_on';
 
 function setTabBarUI(isOn) {
@@ -1426,7 +1421,6 @@ function setTabBarUI(isOn) {
     }
 }
 
-/* Aktiv tab belgisi — joriy URL ga qarab */
 function markActiveTab() {
     const path = window.location.pathname;
     document.querySelectorAll('.tab-item[data-tab]').forEach(function(el) {
@@ -1445,23 +1439,13 @@ function markActiveTab() {
     }
 }
 
-/*
-  Sahifa yuklanishida:
-  1. Server tarafdan kelgan qiymatni aniqlash (HTML classiga qarab).
-  2. LocalStorage ni server qiymatiga sinxronlash.
-  3. body.tabbar-on klassini to'g'ri qo'yish.
-*/
 (function() {
     const bar = document.getElementById('bottomTabBar');
     if (!bar) return;
 
-    // Server HTML da tab-hidden bor-yo'qligini tekshirish
     const serverIsOn = !bar.classList.contains('tab-hidden');
-
-    // localStorage ni server qiymatiga sinxronlaymiz
     localStorage.setItem(TAB_KEY, serverIsOn ? '1' : '0');
 
-    // Body class ni to'g'ralaymiz
     if (serverIsOn) {
         document.body.classList.add('tabbar-on');
     } else {
@@ -1471,16 +1455,52 @@ function markActiveTab() {
     markActiveTab();
 })();
 
-/* ================= NETWORK TOAST ================= */
-(function() {
+
+/* ================= NETWORK TOAST — tab bar ustidan, faqat mobil ================= */
+(function () {
     var toast = document.getElementById('networkToast');
+    if (!toast) return;
+
+    /* --- Bazaviy CSS (inline, CSS blokdagi display:none ni JS orqali boshqaramiz) --- */
+    Object.assign(toast.style, {
+        position:        'fixed',
+        bottom:          '96px',          /* tab bar (64px) + pastdan (20px) + bo'shliq (12px) */
+        left:            '50%',
+        transform:       'translateX(-50%) translateY(20px)',
+        padding:         '10px 22px',
+        borderRadius:    '30px',
+        fontFamily:      "'Outfit', sans-serif",
+        fontSize:        '0.82rem',
+        fontWeight:      '700',
+        letterSpacing:   '0.5px',
+        zIndex:          '99999',
+        opacity:         '0',
+        pointerEvents:   'none',
+        transition:      'opacity 0.45s cubic-bezier(0.22,1,0.36,1), transform 0.45s cubic-bezier(0.22,1,0.36,1)',
+        whiteSpace:      'nowrap',
+        display:         'flex',
+        alignItems:      'center',
+        gap:             '8px',
+        boxShadow:       '0 4px 24px rgba(0,0,0,0.5)',
+        backdropFilter:  'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        cursor:          'grab',
+        userSelect:      'none',
+        WebkitUserSelect:'none',
+    });
+
+    /* Faqat mobilda (768px va kichik) ishlatamiz */
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+
     var timer = null;
 
-    /* ---- DRAG / SWIPE TO DISMISS ---- */
+    /* --- DRAG / SWIPE TO DISMISS --- */
     var startX = 0, startY = 0, currentX = 0, isDragging = false;
-    var baseTransform = 'translateX(-50%) translateY(0)';
 
     function onDragStart(clientX, clientY) {
+        if (!isMobile()) return;
         isDragging = true;
         startX = clientX;
         startY = clientY;
@@ -1494,7 +1514,7 @@ function markActiveTab() {
         currentX = clientX - startX;
         var dy = clientY - startY;
         var opacity = Math.max(0, 1 - Math.abs(currentX) / 120);
-        toast.style.transform = 'translateX(calc(-50% + ' + currentX + 'px)) translateY(' + dy * 0.3 + 'px)';
+        toast.style.transform = 'translateX(calc(-50% + ' + currentX + 'px)) translateY(' + (dy * 0.3) + 'px)';
         toast.style.opacity = opacity;
     }
 
@@ -1507,72 +1527,81 @@ function markActiveTab() {
             /* Yetarli siljish — dismiss */
             var dir = currentX > 0 ? 1 : -1;
             toast.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
-            toast.style.transform = 'translateX(calc(-50% + ' + (dir * 300) + 'px)) translateY(0)';
-            toast.style.opacity = '0';
+            toast.style.transform   = 'translateX(calc(-50% + ' + (dir * 300) + 'px)) translateY(0)';
+            toast.style.opacity     = '0';
             toast.style.pointerEvents = 'none';
             clearTimeout(timer);
         } else {
             /* Qaytarish */
             toast.style.transition = 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1)';
-            toast.style.transform = baseTransform;
-            toast.style.opacity = '1';
+            toast.style.transform  = 'translateX(-50%) translateY(0)';
+            toast.style.opacity    = '1';
         }
     }
 
-    /* Mouse events */
-    toast.addEventListener('mousedown', function(e) { onDragStart(e.clientX, e.clientY); });
-    document.addEventListener('mousemove', function(e) { onDragMove(e.clientX, e.clientY); });
-    document.addEventListener('mouseup', function() { onDragEnd(); });
+    /* Mouse */
+    toast.addEventListener('mousedown', function (e) { onDragStart(e.clientX, e.clientY); });
+    document.addEventListener('mousemove', function (e) { onDragMove(e.clientX, e.clientY); });
+    document.addEventListener('mouseup', function () { onDragEnd(); });
 
-    /* Touch events */
-    toast.addEventListener('touchstart', function(e) {
+    /* Touch */
+    toast.addEventListener('touchstart', function (e) {
         onDragStart(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
-    document.addEventListener('touchmove', function(e) {
+    document.addEventListener('touchmove', function (e) {
         onDragMove(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
-    document.addEventListener('touchend', function() { onDragEnd(); });
+    document.addEventListener('touchend', function () { onDragEnd(); });
 
-    /* ---- SHOW TOAST ---- */
+
+    /* --- TOAST KO'RSATISH --- */
     function showToast(isOnline) {
+        /* Faqat mobilda ishlaydi */
+        if (!isMobile()) return;
+
         clearTimeout(timer);
 
-        toast.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1)';
-        toast.style.transform = 'translateX(-50%) translateY(-20px)';
-        toast.style.opacity = '0';
+        /* Avval yashirib, keyin yuqoriga chiqaramiz (pastdan animatsiya) */
+        toast.style.transition = 'none';
+        toast.style.transform  = 'translateX(-50%) translateY(20px)';
+        toast.style.opacity    = '0';
         toast.style.pointerEvents = 'auto';
 
         if (isOnline) {
-            toast.innerHTML = "<i class='bx bx-wifi'></i> Online siz";
-            toast.style.background = "rgba(16, 185, 129, 0.92)";
-            toast.style.color = "#fff";
-            toast.style.border = "1px solid rgba(255,255,255,0.2)";
+            toast.innerHTML        = "<i class='bx bx-wifi'></i> Online siz";
+            toast.style.background = 'rgba(16, 185, 129, 0.92)';
+            toast.style.color      = '#fff';
+            toast.style.border     = '1px solid rgba(255,255,255,0.2)';
         } else {
-            toast.innerHTML = "<i class='bx bx-wifi-off'></i> Offline siz";
-            toast.style.background = "rgba(239, 68, 68, 0.92)";
-            toast.style.color = "#fff";
-            toast.style.border = "1px solid rgba(255,255,255,0.2)";
+            toast.innerHTML        = "<i class='bx bx-wifi-off'></i> Offline siz";
+            toast.style.background = 'rgba(239, 68, 68, 0.92)';
+            toast.style.color      = '#fff';
+            toast.style.border     = '1px solid rgba(255,255,255,0.2)';
         }
 
-        requestAnimationFrame(function() {
-            requestAnimationFrame(function() {
-                toast.style.transform = baseTransform;
-                toast.style.opacity = '1';
+        /* Bir frame kutib animatsiyani boshlaymiz — pastdan yuqoriga */
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                toast.style.transition = 'opacity 0.45s cubic-bezier(0.22,1,0.36,1), transform 0.45s cubic-bezier(0.22,1,0.36,1)';
+                toast.style.transform  = 'translateX(-50%) translateY(0)';
+                toast.style.opacity    = '1';
             });
         });
 
+        /* Online bo'lsa 3 sekunddan keyin o'chadi, offline bo'lsa qoladi */
         if (isOnline) {
-            timer = setTimeout(function() {
-                toast.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+            timer = setTimeout(function () {
+                toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                toast.style.opacity    = '0';
+                toast.style.transform  = 'translateX(-50%) translateY(20px)';
                 toast.style.pointerEvents = 'none';
             }, 3000);
         }
     }
 
-    window.addEventListener('offline', function() { showToast(false); });
-    window.addEventListener('online',  function() { showToast(true);  });
+    window.addEventListener('offline', function () { showToast(false); });
+    window.addEventListener('online',  function () { showToast(true);  });
+
 })();
 
 </script>
