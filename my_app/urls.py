@@ -108,6 +108,25 @@ urlpatterns = [
     path('settings/privacy/', settings_privacy, name='settings_privacy'),
 
 
+    # admin uchun:
+    path('control-panel/schedule/', admin_schedule, name='admin_schedule'),
+    path('control-panel/schedule/add/', admin_schedule_form, name='admin_schedule_form'),
+    path('control-panel/schedule/<int:pk>/edit/', admin_schedule_form, name='admin_schedule_form'),
+    path('control-panel/schedule/<int:pk>/delete/', admin_schedule_delete, name='admin_schedule_delete'),
+
+    path('control-panel/stories/', admin_stories, name='admin_stories'),
+    path('control-panel/stories/add/', admin_story_form, name='admin_story_form'),
+    path('control-panel/stories/<int:pk>/edit/', admin_story_form, name='admin_story_form'),
+    path('control-panel/stories/<int:pk>/delete/', admin_story_delete, name='admin_story_delete'),
+    path('control-panel/stories/<int:pk>/views/', admin_story_views, name='admin_story_views'),
+
+    path('control-panel/news/', admin_news, name='admin_news'),
+    path('control-panel/news/add/', admin_news_form, name='admin_news_form'),
+    path('control-panel/news/<int:pk>/edit/', admin_news_form, name='admin_news_form'),
+    path('control-panel/news/<int:pk>/delete/', admin_news_delete, name='admin_news_delete'),
+    path('control-panel/news/<int:pk>/likes/', admin_news_likes, name='admin_news_likes'),
+    
+
 ]
 
 
