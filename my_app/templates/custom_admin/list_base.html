@@ -15,13 +15,22 @@
     td { padding: 15px; font-size: 0.95rem; border-bottom: 1px solid #111; }
     tr:hover td { background: #111; }
 
-    .action-btn { background: #1e1e24; color: white; border: 1px solid #333; padding: 5px 10px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 0.8rem; transition: 0.3s;}
+    .action-btn { background: #1e1e24; color: white; border: 1px solid #333; padding: 5px 10px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 0.8rem; transition: 0.3s; display: inline-block; margin: 2px;}
     .action-btn:hover { background: var(--accent); color: black; border-color: var(--accent); }
     .action-btn.delete { background: #fee2e2; color: #ef4444; border-color: #fca5a5;}
     .action-btn.delete:hover { background: #ef4444; color: white; }
+    .action-btn.success { background: rgba(52,211,153,0.15); color: #34d399; border-color: rgba(52,211,153,0.4);}
+    .action-btn.success:hover { background: #34d399; color: black; }
 
     .table-wrap { width: 100%; overflow-x: auto; }
     .table-wrap table { min-width: 720px; }
+
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+    .badge-green { background: rgba(52,211,153,0.15); color: #34d399; }
+    .badge-red { background: rgba(248,113,113,0.15); color: #f87171; }
+    .badge-yellow { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .badge-blue { background: rgba(0,243,255,0.12); color: var(--accent); }
+    .badge-purple { background: rgba(176,0,255,0.15); color: #d8b4fe; }
 
     @media (max-width: 768px) {
         .glass-panel { padding: 18px; }
@@ -37,19 +46,21 @@
         <h2>{{ page_title }} ro'yxati</h2>
         <div class="header-actions">
             {% if type == 'movie' %}
-            <a href="{% url 'admin_movie_form' %}" class="btn">+ Qo'shish</a>
+                <a href="{% url 'admin_movie_form' %}" class="btn">+ Qo'shish</a>
             {% elif type == 'episode' %}
-            <a href="/control-panel/episodes/add/" class="btn">+ Qo'shish</a>
+                <a href="/control-panel/episodes/add/" class="btn">+ Qo'shish</a>
             {% elif type == 'genre' %}
-            <a href="/control-panel/genres/add/" class="btn">+ Qo'shish</a>
-            {% elif type == 'user' %}
-            <button class="btn" style="opacity:0.6; pointer-events:none;" title="Vakolatlar ro'yxatdan boshqariladi">+ Qo'shish</button>
-            {% elif type == 'receipt' %}
-            <button class="btn" style="opacity:0.6; pointer-events:none;" title="Fayllar foydalanuvchilar tomonidan yuklanadi">+ Qo'shish</button>
+                <a href="/control-panel/genres/add/" class="btn">+ Qo'shish</a>
             {% elif type == 'avatar' %}
-            <a href="{% url 'admin_avatar_form' %}" class="btn">+ Qo'shish</a>
+                <a href="{% url 'admin_avatar_form' %}" class="btn">+ Qo'shish</a>
+            {% elif type == 'news' %}
+                <a href="{% url 'admin_news_form' %}" class="btn">+ Qo'shish</a>
+            {% elif type == 'story' %}
+                <a href="{% url 'admin_story_form' %}" class="btn">+ Qo'shish</a>
+            {% elif type == 'schedule' %}
+                <a href="{% url 'admin_schedule_form' %}" class="btn">+ Qo'shish</a>
             {% else %}
-            <button class="btn" style="opacity:0.5; pointer-events:none;" title="Keyingi updatelarda qo'shiladi">+ Qo'shish</button>
+                <button class="btn" style="opacity:0.5; pointer-events:none;">+ Qo'shish</button>
             {% endif %}
         </div>
     </div>
@@ -59,21 +70,31 @@
         <thead>
             <tr>
                 {% if type == 'movie' %}
-                <th>Nom</th><th>Rasmi</th><th>Sana</th><th>Harakatlar</th>
+                    <th>Nom</th><th>Rasmi</th><th>Tier</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'genre' %}
-                <th>Nomi</th><th>Sana</th><th>Harakatlar</th>
+                    <th>Nomi</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'episode' %}
-                <th>Anime</th><th>Qism No</th><th>Nomi</th><th>Harakatlar</th>
+                    <th>Anime</th><th>Qism No</th><th>Nomi</th><th>Harakatlar</th>
                 {% elif type == 'chat' %}
-                <th>Foydalanuvchi</th><th>Xabar</th><th>Sana</th><th>Harakatlar</th>
+                    <th>Foydalanuvchi</th><th>Xabar</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'user' %}
-                <th>Username</th><th>Email</th><th>Vakolat</th><th>Holat</th><th>Harakatlar</th>
+                    <th>Username</th><th>Email</th><th>Vakolat</th><th>Holat</th><th>Harakatlar</th>
                 {% elif type == 'receipt' %}
-                <th>Foydalanuvchi</th><th>Obuna reja</th><th>Chek rasmi</th><th>Holat</th><th>Harakatlar</th>
+                    <th>Foydalanuvchi</th><th>Reja</th><th>Chek</th><th>Holat</th><th>Harakatlar</th>
                 {% elif type == 'avatar' %}
-                <th>Nomi</th><th>Rasm</th><th>Sana</th><th>Harakatlar</th>
+                    <th>Nomi</th><th>Rasm</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'comment' %}
-                <th>Foydalanuvchi</th><th>Anime</th><th>Izoh</th><th>Sana</th><th>Harakatlar</th>
+                    <th>Foydalanuvchi</th><th>Anime</th><th>Izoh</th><th>Sana</th><th>Harakatlar</th>
+                {% elif type == 'news' %}
+                    <th>Rasm</th><th>Sarlavha</th><th>Muallif</th><th>Likelar</th><th>Sana</th><th>Harakatlar</th>
+                {% elif type == 'newslike' %}
+                    <th>Foydalanuvchi</th><th>Sana</th>
+                {% elif type == 'story' %}
+                    <th>Rasm</th><th>Sarlavha</th><th>Holat</th><th>Ko'rishlar</th><th>Tugash vaqti</th><th>Harakatlar</th>
+                {% elif type == 'storyview' %}
+                    <th>Foydalanuvchi</th><th>Ko'rilgan vaqt</th>
+                {% elif type == 'schedule' %}
+                    <th>Anime nomi</th><th>Kun</th><th>Qism</th><th>Fandub</th><th>Tartib</th><th>Holat</th><th>Harakatlar</th>
                 {% endif %}
             </tr>
         </thead>
@@ -81,111 +102,216 @@
             {% for item in items %}
             <tr>
                 {% if type == 'movie' %}
-                <td style="font-weight:600;">{{ item.title }}</td>
-                <td>{% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.title }} poster" style="height:30px; border-radius:4px;">{% else %}-{% endif %}</td>
-                <td>{{ item.created_at|date:"d.m.Y" }}</td>
+                    <td style="font-weight:600;">{{ item.title }}</td>
+                    <td>{% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.title }}" style="height:40px; width:60px; object-fit:cover; border-radius:4px;">{% else %}-{% endif %}</td>
+                    <td>
+                        {% if item.minimum_tier == 'vip' %}
+                            <span class="badge badge-purple">VIP</span>
+                        {% elif item.minimum_tier == 'premium' %}
+                            <span class="badge badge-yellow">Premium</span>
+                        {% else %}
+                            <span class="badge badge-green">Free</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.created_at|date:"d.m.Y" }}</td>
+
                 {% elif type == 'genre' %}
-                <td style="font-weight:600;">{{ item.name }}</td>
-                <td>{{ item.created_at|date:"d.m.Y" }}</td>
+                    <td style="font-weight:600;">{{ item.name }}</td>
+                    <td>{{ item.created_at|date:"d.m.Y" }}</td>
+
                 {% elif type == 'episode' %}
-                <td style="font-weight:600;">{{ item.movie.title }}</td>
-                <td>{{ item.episode_number }}</td>
-                <td>{{ item.title|default:"-" }}</td>
+                    <td style="font-weight:600;">{{ item.movie.title }}</td>
+                    <td>{{ item.episode_number }}</td>
+                    <td>{{ item.title|default:"-" }}</td>
+
                 {% elif type == 'chat' %}
-                <td style="font-weight:600;">{{ item.user.username }}</td>
-                <td>{{ item.message|truncatechars:50 }}</td>
-                <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+                    <td style="font-weight:600;">{{ item.user.username }}</td>
+                    <td>{{ item.message|truncatechars:50 }}</td>
+                    <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+
                 {% elif type == 'user' %}
-                <td style="font-weight:600;">{{ item.username }}</td>
-                <td>{{ item.email|default:"-" }}</td>
-                <td>
-                    {% if item.is_superuser %}
-                        <span style="display:inline-block; padding:4px 8px; border-radius:999px; background: rgba(176,0,255,0.15); color:#d8b4fe; margin:2px 4px 2px 0;">Superadmin</span>
-                    {% endif %}
-                    {% if item.is_staff %}
-                        <span style="display:inline-block; padding:4px 8px; border-radius:999px; background: rgba(0,243,255,0.12); color: var(--accent); margin:2px 4px 2px 0;">Staff</span>
-                    {% endif %}
-                    {% if item.is_admin_user %}
-                        <span style="display:inline-block; padding:4px 8px; border-radius:999px; background: rgba(16,185,129,0.12); color:#34d399; margin:2px 4px 2px 0;">Kontent admin</span>
-                    {% endif %}
-                    {% if not item.is_superuser and not item.is_staff and not item.is_admin_user %}
-                        <span style="color: var(--text-dim);">Oddiy user</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if item.is_active %}
-                        <span style="color:#34d399; font-weight:700;">Faol</span>
-                    {% else %}
-                        <span style="color:#f87171; font-weight:700;">Nofaol</span>
-                    {% endif %}
-                </td>
+                    <td style="font-weight:600;">{{ item.username }}</td>
+                    <td>{{ item.email|default:"-" }}</td>
+                    <td>
+                        {% if item.is_superuser %}<span class="badge badge-purple">Superadmin</span>{% endif %}
+                        {% if item.is_staff %}<span class="badge badge-blue">Staff</span>{% endif %}
+                        {% if item.is_admin_user %}<span class="badge badge-green">Kontent admin</span>{% endif %}
+                        {% if not item.is_superuser and not item.is_staff and not item.is_admin_user %}<span style="color:var(--text-dim);">Oddiy user</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if item.is_active %}<span class="badge badge-green">Faol</span>
+                        {% else %}<span class="badge badge-red">Nofaol</span>{% endif %}
+                    </td>
+
                 {% elif type == 'receipt' %}
-                <td style="font-weight:600;">{{ item.user.username }}</td>
-                <td>{{ item.get_plan_display }}</td>
-                <td><a href="{{ item.image.url }}" target="_blank" style="color:var(--accent);">Ko'rish</a></td>
-                <td>
-                    {% if item.is_approved %}<span style="color:#34d399; font-weight:700;">Tasdiqlangan</span>
-                    {% elif item.is_rejected %}<span style="color:#f87171; font-weight:700;">Rad etilgan</span>
-                    {% else %}<span style="color:yellow; font-weight:700;">Kutmoqda</span>{% endif %}
-                </td>
+                    <td style="font-weight:600;">{{ item.user.username }}</td>
+                    <td>{{ item.plan }}</td>
+                    <td><a href="{{ item.image.url }}" target="_blank" style="color:var(--accent);">Ko'rish</a></td>
+                    <td>
+                        {% if item.is_approved %}<span class="badge badge-green">Tasdiqlangan</span>
+                        {% elif item.is_rejected %}<span class="badge badge-red">Rad etilgan</span>
+                        {% else %}<span class="badge badge-yellow">Kutmoqda</span>{% endif %}
+                    </td>
+
                 {% elif type == 'avatar' %}
-                <td style="font-weight:600;">{{ item.name|default:"Avatar" }}</td>
-                <td><img src="{{ item.image.url }}" alt="avatar" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"></td>
-                <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+                    <td style="font-weight:600;">{{ item.name|default:"Avatar" }}</td>
+                    <td><img src="{{ item.image.url }}" alt="avatar" style="width:45px; height:45px; border-radius:50%; object-fit:cover;"></td>
+                    <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+
                 {% elif type == 'comment' %}
-                <td style="font-weight:600;">{{ item.user.username }}</td>
-                <td style="font-weight:600;">{{ item.movie.title }}</td>
-                <td>{{ item.text|truncatechars:50 }}</td>
-                <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+                    <td style="font-weight:600;">{{ item.user.username }}</td>
+                    <td>{{ item.movie.title|truncatechars:30 }}</td>
+                    <td>{{ item.text|truncatechars:50 }}</td>
+                    <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+
+                {% elif type == 'news' %}
+                    <td>
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" style="width:65px; height:42px; object-fit:cover; border-radius:4px; border:1px solid var(--border-line);">
+                        {% else %}
+                            <div style="width:65px; height:42px; background:var(--border-line); border-radius:4px; display:flex; align-items:center; justify-content:center;">
+                                <i class='bx bx-image' style="color:var(--text-dim);"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="font-weight:700; color:#fff;">{{ item.title|truncatechars:50 }}</div>
+                        <div style="color:var(--text-dim); font-size:0.8rem; margin-top:3px;">{{ item.description|truncatechars:55 }}</div>
+                    </td>
+                    <td style="color:var(--text-dim);">{{ item.author.username|default:"—" }}</td>
+                    <td><span class="badge badge-blue">♥ {{ item.total_likes }}</span></td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">{{ item.created_at|date:"d.m.Y H:i" }}</td>
+
+                {% elif type == 'newslike' %}
+                    <td style="font-weight:600;">{{ item.user.username }}</td>
+                    <td style="color:var(--text-dim);">{{ item.created_at|date:"d.m.Y H:i" }}</td>
+
+                {% elif type == 'story' %}
+                    <td>
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" style="width:55px; height:55px; object-fit:cover; border-radius:8px; border:1px solid var(--border-line);">
+                        {% elif item.video %}
+                            <div style="width:55px; height:55px; background:var(--border-line); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                                <i class='bx bx-video' style="color:var(--accent); font-size:1.4rem;"></i>
+                            </div>
+                        {% else %}
+                            <div style="width:55px; height:55px; background:var(--border-line); border-radius:8px;"></div>
+                        {% endif %}
+                    </td>
+                    <td style="font-weight:700; color:#fff;">{{ item.title|truncatechars:40 }}</td>
+                    <td>
+                        {% if item.is_active and not item.is_expired %}
+                            <span class="badge badge-green">Faol</span>
+                        {% elif item.is_expired %}
+                            <span class="badge badge-red">Muddati tugagan</span>
+                        {% else %}
+                            <span class="badge badge-red">Nofaol</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="badge badge-blue">👁 {{ item.views.count }}</span></td>
+                    <td style="color:var(--text-dim); font-size:0.85rem; white-space:nowrap;">
+                        {% if item.expires_at %}{{ item.expires_at|date:"d.m.Y H:i" }}{% else %}—{% endif %}
+                    </td>
+
+                {% elif type == 'storyview' %}
+                    <td style="font-weight:600;">{{ item.user.username }}</td>
+                    <td style="color:var(--text-dim);">{{ item.viewed_at|date:"d.m.Y H:i" }}</td>
+
+                {% elif type == 'schedule' %}
+                    <td style="font-weight:700; color:#fff;">
+                        {{ item.name|truncatechars:35 }}
+                        {% if item.subtitle %}<div style="font-size:0.8rem; color:var(--text-dim); font-weight:400;">{{ item.subtitle|truncatechars:30 }}</div>{% endif %}
+                    </td>
+                    <td><span class="badge badge-blue">{{ item.get_day_display }}</span></td>
+                    <td style="color:var(--accent); font-weight:700;">{{ item.episode_number }}-qism</td>
+                    <td style="color:var(--text-dim);">{{ item.fandub }}</td>
+                    <td style="color:var(--text-dim);">{{ item.order }}</td>
+                    <td>
+                        {% if item.is_active %}<span class="badge badge-green">Faol</span>
+                        {% else %}<span class="badge badge-red">Nofaol</span>{% endif %}
+                    </td>
                 {% endif %}
-                
+
+                <!-- HARAKATLAR -->
                 <td>
                     {% if type == 'movie' %}
-                    <a href="{% url 'admin_movie_form' item.id %}" class="action-btn">Tahrirlash</a>
-                    <a href="{% url 'admin_movie_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                        <a href="{% url 'admin_movie_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_movie_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
                     {% elif type == 'genre' %}
-                    <a href="{% url 'admin_genre_form' item.id %}" class="action-btn">Tahrirlash</a>
-                    <a href="{% url 'admin_genre_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                        <a href="{% url 'admin_genre_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_genre_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
                     {% elif type == 'episode' %}
-                    <a href="{% url 'admin_episode_form' item.id %}" class="action-btn">Tahrirlash</a>
-                    <a href="{% url 'admin_episode_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
-                    {% elif type == 'user' %}
-                    <form method="post" action="{% url 'admin_user_role' item.id %}" style="display:inline; margin-right:6px;">
-                        {% csrf_token %}
-                        <input type="hidden" name="role" value="content_admin">
-                        <input type="hidden" name="value" value="{% if item.is_admin_user %}0{% else %}1{% endif %}">
-                        <button type="submit" class="action-btn">{% if item.is_admin_user %}Adminni olish{% else %}Admin berish{% endif %}</button>
-                    </form>
-                    <form method="post" action="{% url 'admin_user_role' item.id %}" style="display:inline; margin-right:6px;">
-                        {% csrf_token %}
-                        <input type="hidden" name="role" value="staff">
-                        <input type="hidden" name="value" value="{% if item.is_staff %}0{% else %}1{% endif %}">
-                        <button type="submit" class="action-btn">{% if item.is_staff %}Staffni olish{% else %}Staff berish{% endif %}</button>
-                    </form>
-                    <form method="post" action="{% url 'admin_user_role' item.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="role" value="superuser">
-                        <input type="hidden" name="value" value="{% if item.is_superuser %}0{% else %}1{% endif %}">
-                        <button type="submit" class="action-btn delete" onclick="return confirm('Superadmin vakolatini o‘zgartirishga ishonchingiz komilmi?');">{% if item.is_superuser %}Superadminni olish{% else %}Superadmin qilish{% endif %}</button>
-                    </form>
+                        <a href="{% url 'admin_episode_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_episode_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
                     {% elif type == 'chat' %}
-                    <a href="{% url 'admin_message_edit' item.id %}" class="action-btn">Tahrirlash</a>
-                    <a href="{% url 'admin_message_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                        <a href="{% url 'admin_message_edit' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_message_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
+                    {% elif type == 'user' %}
+                        <form method="post" action="{% url 'admin_user_role' item.id %}" style="display:inline; margin-right:4px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="role" value="content_admin">
+                            <input type="hidden" name="value" value="{% if item.is_admin_user %}0{% else %}1{% endif %}">
+                            <button type="submit" class="action-btn">{% if item.is_admin_user %}Adminni olish{% else %}Admin berish{% endif %}</button>
+                        </form>
+                        <form method="post" action="{% url 'admin_user_role' item.id %}" style="display:inline; margin-right:4px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="role" value="staff">
+                            <input type="hidden" name="value" value="{% if item.is_staff %}0{% else %}1{% endif %}">
+                            <button type="submit" class="action-btn">{% if item.is_staff %}Staffni olish{% else %}Staff berish{% endif %}</button>
+                        </form>
+                        <form method="post" action="{% url 'admin_user_role' item.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="role" value="superuser">
+                            <input type="hidden" name="value" value="{% if item.is_superuser %}0{% else %}1{% endif %}">
+                            <button type="submit" class="action-btn delete" onclick="return confirm('Superadmin vakolatini o\'zgartirish?');">{% if item.is_superuser %}Superadminni olish{% else %}Superadmin qilish{% endif %}</button>
+                        </form>
+
                     {% elif type == 'receipt' %}
                         {% if not item.is_approved and not item.is_rejected %}
-                        <a href="{% url 'admin_subscription_action' item.id 'approve' %}" class="action-btn" style="background:#34d399; color:black; border:none; margin-right:5px;">Tasdiqlash</a>
-                        <a href="{% url 'admin_subscription_action' item.id 'reject' %}" class="action-btn delete">Rad etish</a>
+                            <a href="{% url 'admin_subscription_action' item.id 'approve' %}" class="action-btn success">Tasdiqlash</a>
+                            <a href="{% url 'admin_subscription_action' item.id 'reject' %}" class="action-btn delete">Rad etish</a>
+                        {% else %}
+                            <span style="color:var(--text-dim); font-size:0.85rem;">Yakunlangan</span>
                         {% endif %}
+
                     {% elif type == 'avatar' %}
-                        <a href="{% url 'admin_avatar_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                        <a href="{% url 'admin_avatar_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
                     {% elif type == 'comment' %}
                         <a href="{% url 'admin_comment_edit' item.id %}" class="action-btn">Tahrirlash</a>
-                        <a href="{% url 'admin_comment_delete' item.id %}" class="action-btn delete" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?');">O'chirish</a>
+                        <a href="{% url 'admin_comment_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
+                    {% elif type == 'news' %}
+                        <a href="{% url 'admin_news_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_news_likes' item.id %}" class="action-btn">Likelar</a>
+                        <a href="{% url 'news_detail' item.id %}" target="_blank" class="action-btn">Ko'rish</a>
+                        <a href="{% url 'admin_news_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
+                    {% elif type == 'story' %}
+                        <a href="{% url 'admin_story_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_story_views' item.id %}" class="action-btn">Ko'rishlar</a>
+                        <a href="{% url 'admin_story_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
+                    {% elif type == 'schedule' %}
+                        <a href="{% url 'admin_schedule_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_schedule_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
+                    {% elif type == 'newslike' or type == 'storyview' %}
+                        <span style="color:var(--text-dim); font-size:0.82rem;">—</span>
                     {% endif %}
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="{% if type == 'movie' %}4{% elif type == 'genre' %}3{% elif type == 'episode' %}4{% elif type == 'chat' %}4{% elif type == 'user' %}5{% elif type == 'receipt' %}5{% elif type == 'avatar' %}4{% elif type == 'comment' %}5{% else %}4{% endif %}" style="text-align:center; padding:30px; color:gray;">Hech narsa topilmadi!</td></tr>
+            <tr>
+                <td colspan="8" style="text-align:center; padding:40px; color:var(--text-dim);">
+                    <i class='bx bx-inbox' style="font-size:2rem; display:block; margin-bottom:8px;"></i>
+                    Hech narsa topilmadi
+                </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
