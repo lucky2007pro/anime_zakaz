@@ -173,6 +173,10 @@
             <li><a href="{% url 'admin_subscriptions' %}" class="{% if request.resolver_match.url_name == 'admin_subscriptions' %}active{% endif %}"><i class='bx bx-credit-card-front'></i> Obunalar</a></li>
             <li><a href="{% url 'admin_chat' %}" class="{% if request.resolver_match.url_name == 'admin_chat' %}active{% endif %}"><i class='bx bx-message-dots'></i> Chat</a></li>
             <li><a href="{% url 'admin_comments' %}" class="{% if request.resolver_match.url_name == 'admin_comments' or request.resolver_match.url_name == 'admin_comment_edit' %}active{% endif %}"><i class='bx bx-comment-dots'></i> Izohlar</a></li>
+            <!-- KONTENT bo'limi ichiga qo'shing -->
+            <li><a href="{% url 'admin_schedule' %}" class="{% if 'schedule' in request.resolver_match.url_name %}active{% endif %}"><i class='bx bx-calendar'></i> Jadval</a></li>
+            <li><a href="{% url 'admin_stories' %}" class="{% if 'story' in request.resolver_match.url_name %}active{% endif %}"><i class='bx bx-slideshow'></i> Storylar</a></li>
+            <li><a href="{% url 'admin_news' %}" class="{% if 'news' in request.resolver_match.url_name %}active{% endif %}"><i class='bx bx-news'></i> Yangiliklar</a></li>
         </ul>
 
         <div class="sidebar-bottom">
