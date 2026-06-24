@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}BESTMEDIA Admin Dashboard{% endblock %}</title>
-    <!-- Include fonts and icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
@@ -24,11 +23,12 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         html, body { width: 100%; min-height: 100%; overflow-x: hidden; }
         body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
-        
+
         /* SIDEBAR */
         .sidebar {
             width: 280px; background: #050505;
             border-right: 1px solid var(--border-line); display: flex; flex-direction: column; padding: 30px 20px;
+            overflow-y: auto;
         }
         .sidebar-overlay {
             display: none;
@@ -45,64 +45,111 @@
             align-items: center;
             gap: 10px;
         }
-        .brand-logo {
-            width: 42px;
-            height: 42px;
-            display: none;
-        }
         .brand-text { font-size: 1.15rem; font-weight: 900; letter-spacing: 1.5px; }
         .brand-text span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
-        .brand-sub { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 40px; display:block;}
-        
+        .brand-sub { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 40px; display: block; }
+
         .menu-title { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 15px; letter-spacing: 2px; }
         .menu-list { list-style: none; margin-bottom: 30px; }
-        .menu-list li { margin-bottom: 10px; }
+        .menu-list li { margin-bottom: 6px; }
         .menu-list a {
-            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+            display: flex; align-items: center; gap: 12px; padding: 11px 15px;
             color: var(--text-dim); text-decoration: none; border-radius: 12px;
-            font-weight: 600; transition: all 0.3s ease;
+            font-weight: 600; transition: all 0.25s ease;
         }
         .menu-list a:hover {
-            color: var(--accent); background: #0a0a0f; transform: translateX(5px); border-left: 2px solid var(--accent);
+            color: var(--accent); background: #0a0a0f;
+            transform: translateX(4px); border-left: 2px solid var(--accent);
         }
         .menu-list a.active {
             color: #000; background: var(--accent);
             border-left: none; box-shadow: 0 0 15px var(--accent-glow); font-weight: 800;
         }
-        .menu-list a i { font-size: 1.4rem; }
-        
-        .sidebar-bottom { margin-top: auto; }
-        .logout-btn { display: flex; align-items: center; gap: 10px; color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: 0.3s;}
-        .logout-btn:hover { color: #ff3b30; }
+        .menu-list a i { font-size: 1.35rem; flex-shrink: 0; }
+
+        .sidebar-bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-line); }
+        .sidebar-bottom-link {
+            display: flex; align-items: center; gap: 10px;
+            color: var(--text-dim); text-decoration: none;
+            font-size: 0.9rem; padding: 9px 12px; border-radius: 10px;
+            transition: 0.25s;
+        }
+        .sidebar-bottom-link:hover { color: #fff; background: #0a0a0f; }
+        .sidebar-bottom-link.danger:hover { color: #ff3b30; background: rgba(255,59,48,0.08); }
+        .sidebar-bottom-link i { font-size: 1.2rem; }
+        .sidebar-user {
+            margin-top: 12px;
+            font-size: 0.78rem;
+            color: #444;
+            padding: 0 4px;
+        }
 
         /* MAIN CONTENT */
         .main-content {
             flex: 1; display: flex; flex-direction: column; overflow-y: auto;
             background: linear-gradient(135deg, #050510 0%, #000000 100%);
         }
+
+        /* TOPBAR */
         .topbar {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 40px; border-bottom: 1px solid var(--border-line);
-            background: rgba(0, 0, 0, 0.9); position: sticky; top: 0; z-index: 10;
+            padding: 0 32px; height: 64px;
+            border-bottom: 1px solid var(--border-line);
+            background: rgba(0, 0, 0, 0.92);
+            position: sticky; top: 0; z-index: 10;
+            gap: 12px;
         }
+        .topbar-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+        .topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+        /* Hamburger */
         .menu-toggle {
             display: none;
-            width: 42px;
-            height: 42px;
-            align-items: center;
-            justify-content: center;
+            width: 38px; height: 38px;
+            align-items: center; justify-content: center;
             border: 1px solid var(--border-line);
             background: #0a0a0f;
             color: var(--text-main);
-            border-radius: 10px;
+            border-radius: 9px;
             cursor: pointer;
-            font-size: 1.25rem;
+            font-size: 1.2rem;
+            flex-shrink: 0;
         }
-        .page-title { font-size: 1.2rem; font-weight: 600; color: white; text-transform: uppercase; letter-spacing: 1px;}
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-role { font-size: 0.75rem; font-weight: 800; background: var(--border-line); color: var(--accent); padding: 5px 12px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,243,255,0.2);}
 
-        .content-area { padding: 40px; }
+        /* Orqaga tugma */
+        .back-btn {
+            display: flex; align-items: center; gap: 6px;
+            background: #0a0a0f;
+            border: 1px solid var(--border-line);
+            color: var(--text-dim);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .back-btn:hover { color: #fff; border-color: #444; }
+        .back-btn i { font-size: 1rem; }
+
+        .page-title {
+            font-size: 1rem; font-weight: 700; color: white;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.72rem; font-weight: 800;
+            background: var(--border-line); color: var(--accent);
+            padding: 5px 12px; border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,243,255,0.15);
+            white-space: nowrap;
+        }
+
+        .content-area { padding: 36px; }
 
         /* GLOBALS */
         .glass-panel {
@@ -110,19 +157,17 @@
             border: 1px solid var(--border-line); border-radius: 8px;
             padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.8);
         }
-        
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+        /* RESPONSIVE */
         @media (max-width: 992px) {
             body { display: block; overflow: auto; }
             .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100vh;
-                z-index: 20;
+                position: fixed; top: 0; left: 0;
+                height: 100vh; z-index: 20;
                 transform: translateX(-100%);
                 transition: transform 0.28s ease;
                 box-shadow: 10px 0 30px rgba(0,0,0,0.6);
@@ -131,16 +176,17 @@
             .sidebar-overlay.active { display: block; }
             .main-content { width: 100%; min-height: 100vh; }
             .menu-toggle { display: inline-flex; }
-            .topbar { padding: 16px 18px; gap: 12px; }
+            .topbar { padding: 0 16px; }
             .content-area { padding: 18px; }
         }
 
         @media (max-width: 640px) {
-            .page-title { font-size: 0.95rem; }
-            .user-role { padding: 4px 10px; }
-            .sidebar { width: min(88vw, 320px); padding: 24px 16px; }
-            .brand-logo { width: 36px; height: 36px; border-radius: 8px; }
+            .page-title { font-size: 0.85rem; }
+            .user-role { padding: 4px 9px; font-size: 0.68rem; }
+            .sidebar { width: min(88vw, 300px); padding: 22px 14px; }
             .brand-text { font-size: 1rem; }
+            .back-btn span { display: none; }
+            .back-btn { padding: 7px 10px; }
         }
 
         {% block extra_css %}{% endblock %}
@@ -148,74 +194,139 @@
 </head>
 <body>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleAdminSidebar(false)"></div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleAdminSidebar(false)"></div>
 
-    <aside class="sidebar">
-        <a href="{% url 'home' %}" class="brand" aria-label="Ani Best bosh sahifa">
-            <span class="brand-text">ANI <span>BEST</span></span>
+<aside class="sidebar" id="adminSidebar">
+    <a href="{% url 'home' %}" class="brand" aria-label="Ani Best bosh sahifa">
+        <span class="brand-text">ANI <span>BEST</span></span>
+    </a>
+    <span class="brand-sub">Admin panel</span>
+
+    <h4 class="menu-title">UMUMIY</h4>
+    <ul class="menu-list">
+        <li>
+            <a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class='bx bxs-dashboard'></i> Dashboard
+            </a>
+        </li>
+        {% if request.user.is_superuser %}
+        <li>
+            <a href="{% url 'admin_users' %}" class="{% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
+                <i class='bx bxs-user-detail'></i> Foydalanuvchilar
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+
+    <h4 class="menu-title">KONTENT</h4>
+    <ul class="menu-list">
+        <li>
+            <a href="{% url 'admin_genres' %}" class="{% if request.resolver_match.url_name == 'admin_genres' %}active{% endif %}">
+                <i class='bx bxs-category'></i> Janrlar
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_avatars' %}" class="{% if request.resolver_match.url_name == 'admin_avatars' or request.resolver_match.url_name == 'admin_avatar_form' %}active{% endif %}">
+                <i class='bx bxs-user-rectangle'></i> Rasmlar
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_movies' %}" class="{% if request.resolver_match.url_name == 'admin_movies' or request.resolver_match.url_name == 'admin_movie_form' %}active{% endif %}">
+                <i class='bx bx-movie-play'></i> Animelar
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_episodes' %}" class="{% if request.resolver_match.url_name == 'admin_episodes' or request.resolver_match.url_name == 'admin_episode_form' %}active{% endif %}">
+                <i class='bx bx-list-ol'></i> Qismlar
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_subscriptions' %}" class="{% if request.resolver_match.url_name == 'admin_subscriptions' %}active{% endif %}">
+                <i class='bx bx-credit-card-front'></i> Obunalar
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_chat' %}" class="{% if request.resolver_match.url_name == 'admin_chat' %}active{% endif %}">
+                <i class='bx bx-message-dots'></i> Chat
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_comments' %}" class="{% if request.resolver_match.url_name == 'admin_comments' or request.resolver_match.url_name == 'admin_comment_edit' %}active{% endif %}">
+                <i class='bx bx-comment-dots'></i> Izohlar
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_schedule' %}" class="{% if 'schedule' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-calendar'></i> Jadval
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_stories' %}" class="{% if 'story' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-slideshow'></i> Storylar
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_news' %}" class="{% if 'news' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-news'></i> Yangiliklar
+            </a>
+        </li>
+    </ul>
+
+    <div class="sidebar-bottom">
+        <a href="{% url 'home' %}" class="sidebar-bottom-link">
+            <i class='bx bx-globe'></i> Saytga o'tish
         </a>
-        <span class="brand-sub">Admin panel</span>
+        <a href="{% url 'home' %}" class="sidebar-bottom-link danger">
+            <i class='bx bx-log-out'></i> Chiqish
+        </a>
+        <div class="sidebar-user">{{ request.user.username }} &nbsp;·&nbsp; #{{ request.user.id }}</div>
+    </div>
+</aside>
 
-        <h4 class="menu-title">UMUMIY</h4>
-        <ul class="menu-list">
-            <li><a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"><i class='bx bxs-dashboard'></i> Dashboard</a></li>
-            {% if request.user.is_superuser %}
-            <li><a href="{% url 'admin_users' %}" class="{% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}"><i class='bx bxs-user-detail'></i> Foydalanuvchilar</a></li>
-            {% endif %}
-        </ul>
+<main class="main-content">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button type="button" class="menu-toggle" aria-label="Menu" onclick="toggleAdminSidebar()">
+                <i class='bx bx-menu'></i>
+            </button>
 
-        <h4 class="menu-title">KONTENT</h4>
-        <ul class="menu-list">
-            <li><a href="{% url 'admin_genres' %}" class="{% if request.resolver_match.url_name == 'admin_genres' %}active{% endif %}"><i class='bx bxs-category'></i> Janrlar</a></li>
-            <li><a href="{% url 'admin_avatars' %}" class="{% if request.resolver_match.url_name == 'admin_avatars' or request.resolver_match.url_name == 'admin_avatar_form' %}active{% endif %}"><i class='bx bxs-user-rectangle'></i> Rasmlar</a></li>
-            <li><a href="{% url 'admin_movies' %}" class="{% if request.resolver_match.url_name == 'admin_movies' or request.resolver_match.url_name == 'admin_movie_form' %}active{% endif %}"><i class='bx bx-movie-play'></i> Animelar</a></li>
-            <li><a href="{% url 'admin_episodes' %}" class="{% if request.resolver_match.url_name == 'admin_episodes' or request.resolver_match.url_name == 'admin_episode_form' %}active{% endif %}"><i class='bx bx-list-ol'></i> Qismlar</a></li>
-            <li><a href="{% url 'admin_subscriptions' %}" class="{% if request.resolver_match.url_name == 'admin_subscriptions' %}active{% endif %}"><i class='bx bx-credit-card-front'></i> Obunalar</a></li>
-            <li><a href="{% url 'admin_chat' %}" class="{% if request.resolver_match.url_name == 'admin_chat' %}active{% endif %}"><i class='bx bx-message-dots'></i> Chat</a></li>
-            <li><a href="{% url 'admin_comments' %}" class="{% if request.resolver_match.url_name == 'admin_comments' or request.resolver_match.url_name == 'admin_comment_edit' %}active{% endif %}"><i class='bx bx-comment-dots'></i> Izohlar</a></li>
-            <!-- KONTENT bo'limi ichiga qo'shing -->
-            <li><a href="{% url 'admin_schedule' %}" class="{% if 'schedule' in request.resolver_match.url_name %}active{% endif %}"><i class='bx bx-calendar'></i> Jadval</a></li>
-            <li><a href="{% url 'admin_stories' %}" class="{% if 'story' in request.resolver_match.url_name %}active{% endif %}"><i class='bx bx-slideshow'></i> Storylar</a></li>
-            <li><a href="{% url 'admin_news' %}" class="{% if 'news' in request.resolver_match.url_name %}active{% endif %}"><i class='bx bx-news'></i> Yangiliklar</a></li>
-        </ul>
+            <!-- Orqaga tugma -->
+            <button type="button" class="back-btn" onclick="history.back()" title="Orqaga">
+                <i class='bx bx-arrow-back'></i>
+                <span>Orqaga</span>
+            </button>
 
-        <div class="sidebar-bottom">
-            <a href="{% url 'home' %}" class="logout-btn"><i class='bx bx-arrow-back'></i> Saytga qaytish</a>
-            <div style="margin-top:15px; font-size:0.8rem; color: #555;">{{ request.user.username }} (#{{ request.user.id }})</div>
+            <div class="page-title">{% block page_title %}Dashboard{% endblock %}</div>
         </div>
-    </aside>
 
-    <main class="main-content">
-        <header class="topbar">
-            <button type="button" class="menu-toggle" aria-label="Menu" onclick="toggleAdminSidebar()"><i class='bx bx-menu'></i></button>
-            <div class="page-title">Admin / {% block page_title %}Dashboard{% endblock %}</div>
-            <div class="user-info">
-                <div class="user-role">{% if request.user.is_superuser %}Superadmin{% else %}Staff{% endif %}</div>
+        <div class="topbar-right">
+            <div class="user-role">
+                {% if request.user.is_superuser %}Superadmin{% elif request.user.is_staff %}Staff{% else %}Admin{% endif %}
             </div>
-        </header>
-
-        <div class="content-area">
-            {% block content %}{% endblock %}
         </div>
-    </main>
+    </header>
 
-    <script>
-        function toggleAdminSidebar(forceState) {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            const shouldOpen = typeof forceState === 'boolean' ? forceState : !sidebar.classList.contains('open');
+    <div class="content-area">
+        {% block content %}{% endblock %}
+    </div>
+</main>
 
-            sidebar.classList.toggle('open', shouldOpen);
-            overlay.classList.toggle('active', shouldOpen);
-            document.body.style.overflow = shouldOpen ? 'hidden' : '';
-        }
+<script>
+    function toggleAdminSidebar(forceState) {
+        const sidebar = document.getElementById('adminSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const shouldOpen = typeof forceState === 'boolean' ? forceState : !sidebar.classList.contains('open');
+        sidebar.classList.toggle('open', shouldOpen);
+        overlay.classList.toggle('active', shouldOpen);
+        document.body.style.overflow = shouldOpen ? 'hidden' : '';
+    }
 
-        document.querySelectorAll('.sidebar a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 992) toggleAdminSidebar(false);
-            });
+    document.querySelectorAll('.sidebar a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 992) toggleAdminSidebar(false);
         });
-    </script>
+    });
+</script>
 
 </body>
 </html>
