@@ -1,0 +1,238 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block page_title %}{% if news %}Yangilik Tahrirlash{% else %}Yangi Yangilik Qo'shish{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container { max-width: 600px; margin: 0 auto; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--text-dim); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+    .form-control {
+        width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-line);
+        color: white; border-radius: 4px; font-family: 'Outfit', sans-serif; font-size: 1rem; transition: 0.3s;
+    }
+    .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+
+    .btn-submit {
+        background: var(--accent); color: black; border: none; padding: 14px 20px; border-radius: 4px;
+        width: 100%; font-weight: 900; font-size: 1rem; cursor: pointer; transition: 0.3s;
+        text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .btn-submit:hover { background: white; box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+    .upload-progress-wrap {
+        display: none;
+        margin: 14px 0 6px;
+        padding: 12px;
+        background: rgba(0, 243, 255, 0.08);
+        border: 1px solid var(--border-line);
+        border-radius: 8px;
+    }
+    .upload-progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+    .upload-progress-track {
+        height: 10px;
+        background: rgba(255,255,255,0.12);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+    .upload-progress-fill {
+        width: 0;
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #34d399);
+        transition: width 0.2s ease;
+    }
+    .upload-progress-text {
+        margin-top: 8px;
+        color: var(--text-dim);
+        font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+        .form-container { max-width: 100%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel form-container">
+    <h2 style="margin-bottom: 25px; font-size: 1.8rem; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--border-line); padding-bottom: 10px;">
+        {% if news %}Yangilik Tahrirlash: {{ news.title }}{% else %}Yangi Yangilik Qo'shish{% endif %}
+    </h2>
+
+    <form method="post" enctype="multipart/form-data" id="news-upload-form">
+        {% csrf_token %}
+
+        <!-- SARLAVHA -->
+        <div class="form-group">
+            <label for="news-title">Sarlavha</label>
+            <input id="news-title" type="text" name="title" class="form-control" required
+                value="{{ news.title|default:'' }}" maxlength="255" placeholder="Yangilik sarlavhasi...">
+        </div>
+
+        <!-- MAZMUN -->
+        <div class="form-group">
+            <label for="news-description">Mazmun</label>
+            <textarea id="news-description" name="description" class="form-control" rows="6"
+                required placeholder="Yangilik matni...">{{ news.description|default:'' }}</textarea>
+        </div>
+
+        <!-- HAVOLA -->
+        <div class="form-group">
+            <label for="news-link">Havola (Ixtiyoriy)</label>
+            <input id="news-link" type="url" name="link" class="form-control"
+                value="{{ news.link|default:'' }}" placeholder="https://...">
+        </div>
+
+        <!-- RASM -->
+        <div class="form-group">
+            <label for="news-image">
+                Muqova Rasmi {% if not news %}(Majburiy){% else %}(Ixtiyoriy — almashtirish uchun){% endif %}
+            </label>
+            <input id="news-image" type="file" name="image" class="form-control"
+                accept="image/*" {% if not news %}required{% endif %}>
+            {% if news and news.image %}
+            <div style="margin-top: 10px; width: 100%; aspect-ratio: 16/9; overflow: hidden; border-radius: 8px; border: 1px solid var(--border-line);">
+                <img src="{{ news.image.url }}" alt="{{ news.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- VIDEO -->
+        <div class="form-group">
+            <label for="news-video">Video (Ixtiyoriy — MP4, WebM va b.)</label>
+            <input id="news-video" type="file" name="video" class="form-control" accept="video/*">
+
+            <!-- progress bar faqat video tanlanganda chiqadi -->
+            <div class="upload-progress-wrap" id="upload-progress-wrap">
+                <div class="upload-progress-header">
+                    <strong>Video yuklanmoqda...</strong>
+                    <span id="upload-progress-percent">0%</span>
+                </div>
+                <div class="upload-progress-track">
+                    <div class="upload-progress-fill" id="upload-progress-fill"></div>
+                </div>
+                <div class="upload-progress-text" id="upload-progress-text">
+                    Yuklash boshlanishi kutilmoqda...
+                </div>
+            </div>
+
+            {% if news and news.video %}
+            <div style="margin-top: 10px; color: var(--text-dim); font-size: 0.9rem;">
+                ✓ Yuklangan: {{ news.video.name }}
+            </div>
+            <div style="margin-top: 8px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-line);">
+                <video src="{{ news.video.url }}" controls
+                    style="width: 100%; max-height: 220px; display: block; background: #000;"></video>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- META -->
+        {% if news %}
+        <div style="padding: 14px; border: 1px solid var(--border-line); border-radius: 8px; background: rgba(255,255,255,0.03); margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 10px; color: var(--text-dim); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
+                Meta ma'lumotlar
+            </label>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; color: var(--text-dim);">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Muallif:</span>
+                    <span style="color: #fff; font-weight: 600;">{{ news.author.username|default:"—" }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Yaratilgan:</span>
+                    <span style="color: #fff;">{{ news.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Yangilangan:</span>
+                    <span style="color: #fff;">{{ news.updated_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Likelar:</span>
+                    <span style="color: var(--accent); font-weight: 700;">
+                        ♥ {{ news.total_likes }}
+                        <a href="{% url 'admin_news_likes' news.pk %}"
+                            style="font-size: 0.8rem; color: var(--text-dim); margin-left: 6px;">(ko'rish)</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- SAQLASH -->
+        <button type="submit" class="btn-submit">
+            SAQLASH <i class='bx bx-save'></i>
+        </button>
+
+        <a href="{% url 'admin_news' %}"
+            style="display: block; text-align: center; margin-top: 14px; color: var(--text-dim); font-size: 0.9rem; text-decoration: none;">
+            ← Yangiliklarga qaytish
+        </a>
+    </form>
+</div>
+
+<script>
+    // Progress bar faqat video tanlanganda ishlaydi
+    const videoInput = document.getElementById('news-video');
+    const progressWrap = document.getElementById('upload-progress-wrap');
+    const progressFill = document.getElementById('upload-progress-fill');
+    const progressPercent = document.getElementById('upload-progress-percent');
+    const progressText = document.getElementById('upload-progress-text');
+    const form = document.getElementById('news-upload-form');
+
+    let hasVideo = false;
+
+    videoInput.addEventListener('change', function () {
+        hasVideo = !!this.files.length;
+    });
+
+    form.addEventListener('submit', function (e) {
+        // Video tanlanmagan bo'lsa — oddiy submit, progress yo'q
+        if (!hasVideo) return;
+
+        e.preventDefault();
+        progressWrap.style.display = 'block';
+
+        const formData = new FormData(form);
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener('progress', function (e) {
+            if (e.lengthComputable) {
+                const pct = Math.round((e.loaded / e.total) * 100);
+                progressFill.style.width = pct + '%';
+                progressPercent.textContent = pct + '%';
+                progressText.textContent = Math.round(e.loaded / 1024 / 1024) + ' MB / ' + Math.round(e.total / 1024 / 1024) + ' MB yuklandi';
+            }
+        });
+
+        xhr.addEventListener('load', function () {
+            if (xhr.status >= 200 && xhr.status < 400) {
+                progressText.textContent = 'Yuklandi! Sahifa yangilanmoqda...';
+                progressFill.style.width = '100%';
+                progressPercent.textContent = '100%';
+                // redirect kelgan URL ga
+                const redirectUrl = xhr.responseURL || '{% url "admin_news" %}';
+                setTimeout(() => { window.location.href = redirectUrl; }, 600);
+            } else {
+                progressWrap.style.display = 'none';
+                alert('Yuklashda xatolik yuz berdi. Qayta urinib ko\'ring.');
+            }
+        });
+
+        xhr.addEventListener('error', function () {
+            progressWrap.style.display = 'none';
+            alert('Tarmoq xatosi yuz berdi.');
+        });
+
+        xhr.open('POST', form.action || window.location.href);
+        xhr.send(formData);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block page_title %}{% if schedule %}Jadval Tahrirlash{% else %}Yangi Jadval Qo'shish{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container { max-width: 600px; margin: 0 auto; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--text-dim); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    
+    .form-control {
+        width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-line);
+        color: white; border-radius: 4px; font-family: 'Outfit', sans-serif; font-size: 1rem; transition: 0.3s;
+    }
+    .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+
+    .select-control { appearance: none; }
+
+    .btn-submit {
+        background: var(--accent); color: black; border: none; padding: 14px 20px; border-radius: 4px;
+        width: 100%; font-weight: 900; font-size: 1rem; cursor: pointer; transition: 0.3s;
+        text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .btn-submit:hover { background: white; box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+    .inline-row { display: flex; gap: 20px; }
+    .inline-row > div { flex: 1; }
+
+    @media (max-width: 768px) {
+        .form-container { max-width: 100%; }
+        .inline-row { display: block; }
+        .inline-row > div { margin-bottom: 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel form-container">
+    <h2 style="margin-bottom: 25px; font-size: 1.8rem; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--border-line); padding-bottom: 10px;">
+        {% if schedule %}Jadval Tahrirlash: {{ schedule.name }}{% else %}Yangi Jadval Qo'shish{% endif %}
+    </h2>
+
+    <form method="post" id="schedule-form">
+        {% csrf_token %}
+
+        <!-- ANIME NOMI -->
+        <div class="form-group">
+            <label for="schedule-name">Anime nomi</label>
+            <input
+                id="schedule-name"
+                type="text"
+                name="name"
+                class="form-control"
+                required
+                value="{{ schedule.name|default:'' }}"
+                maxlength="200"
+                placeholder="Masalan: One Piece"
+            >
+        </div>
+
+        <!-- KICHIK SARLAVHA -->
+        <div class="form-group">
+            <label for="schedule-subtitle">Kichik sarlavha (Ixtiyoriy)</label>
+            <input
+                id="schedule-subtitle"
+                type="text"
+                name="subtitle"
+                class="form-control"
+                value="{{ schedule.subtitle|default:'' }}"
+                maxlength="200"
+                placeholder="Masalan: Yangi ark boshlandi"
+            >
+        </div>
+
+        <!-- POSTER URL -->
+        <div class="form-group">
+            <label for="schedule-image-url">Poster rasmi URL</label>
+            <input
+                id="schedule-image-url"
+                type="url"
+                name="image_url"
+                class="form-control"
+                required
+                value="{{ schedule.image_url|default:'' }}"
+                placeholder="https://i.pinimg.com/..."
+            >
+            <!-- Preview -->
+            <div id="imagePreviewWrap" style="margin-top: 10px; display: {% if schedule and schedule.image_url %}block{% else %}none{% endif %};">
+                <img
+                    id="imagePreview"
+                    src="{{ schedule.image_url|default:'' }}"
+                    alt="Poster"
+                    style="width: 100%; aspect-ratio: 2/3; max-height: 220px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-line);"
+                >
+            </div>
+        </div>
+
+        <!-- KUN VA QISM RAQAMI -->
+        <div class="form-group inline-row">
+            <div>
+                <label for="schedule-day">Chiqish kuni</label>
+                <select
+                    id="schedule-day"
+                    name="day"
+                    class="form-control select-control"
+                    required
+                >
+                    {% for value, label in day_choices %}
+                    <option value="{{ value }}" {% if schedule and schedule.day == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="schedule-episode">Qism raqami</label>
+                <input
+                    id="schedule-episode"
+                    type="number"
+                    name="episode_number"
+                    class="form-control"
+                    required
+                    min="1"
+                    value="{{ schedule.episode_number|default:'1' }}"
+                >
+            </div>
+        </div>
+
+        <!-- FANDUB VA TARTIB -->
+        <div class="form-group inline-row">
+            <div>
+                <label for="schedule-fandub">Fandub nomi</label>
+                <input
+                    id="schedule-fandub"
+                    type="text"
+                    name="fandub"
+                    class="form-control"
+                    value="{{ schedule.fandub|default:'AniBest' }}"
+                    maxlength="100"
+                    placeholder="AniBest"
+                >
+            </div>
+            <div>
+                <label for="schedule-order">Ko'rsatish tartibi</label>
+                <input
+                    id="schedule-order"
+                    type="number"
+                    name="order"
+                    class="form-control"
+                    min="0"
+                    value="{{ schedule.order|default:'0' }}"
+                >
+            </div>
+        </div>
+
+        <!-- KO'RISH HAVOLASI -->
+        <div class="form-group">
+            <label for="schedule-watch-url">Ko'rish havolasi</label>
+            <input
+                id="schedule-watch-url"
+                type="url"
+                name="watch_url"
+                class="form-control"
+                required
+                value="{{ schedule.watch_url|default:'' }}"
+                placeholder="https://bestmedia-official.uz/movie/7/"
+            >
+        </div>
+
+        <!-- FAOLLIK -->
+        <div class="form-group" style="padding: 14px; border: 1px solid var(--border-line); border-radius: 8px; background: rgba(255,255,255,0.03);">
+            <label style="margin-bottom: 0;">Holat</label>
+            <label style="display: flex; align-items: center; gap: 10px; font-size: 0.95rem; color: var(--text-main); text-transform: none; letter-spacing: 0; font-weight: 600; margin-top: 10px; margin-bottom: 0;">
+                <input
+                    type="checkbox"
+                    name="is_active"
+                    {% if not schedule or schedule.is_active %}checked{% endif %}
+                >
+                Jadvalda ko'rsatilsin
+            </label>
+            <small style="color: var(--text-dim); font-size: 0.8rem; margin-top: 8px; display: block;">
+                Kichik tartib raqami avval chiqadi. Tavsiya: 0–10 oralig'ida ishlating.
+            </small>
+        </div>
+
+        <!-- META (tahrirlashda) -->
+        {% if schedule %}
+        <div style="padding: 14px; border: 1px solid var(--border-line); border-radius: 8px; background: rgba(255,255,255,0.03); margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 10px; color: var(--text-dim); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Meta ma'lumotlar</label>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; color: var(--text-dim);">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>ID:</span>
+                    <span style="color: #fff; font-weight: 700;">#{{ schedule.id }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Yaratilgan:</span>
+                    <span style="color: #fff;">{{ schedule.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Holat:</span>
+                    {% if schedule.is_active %}
+                        <span style="color: #34d399; font-weight: 700;">Faol</span>
+                    {% else %}
+                        <span style="color: #f87171; font-weight: 700;">Nofaol</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- SAQLASH -->
+        <button type="submit" class="btn-submit">
+            SAQLASH <i class='bx bx-save'></i>
+        </button>
+
+        <a href="{% url 'admin_schedule' %}" style="display: block; text-align: center; margin-top: 14px; color: var(--text-dim); font-size: 0.9rem; text-decoration: none;">
+            ← Jadvallarga qaytish
+        </a>
+    </form>
+</div>
+
+<script>
+    // Poster URL kiritilganda preview ko'rsatish
+    const imageUrlInput = document.getElementById('schedule-image-url');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePreviewWrap = document.getElementById('imagePreviewWrap');
+
+    imageUrlInput.addEventListener('input', function () {
+        const url = this.value.trim();
+        if (url) {
+            imagePreview.src = url;
+            imagePreviewWrap.style.display = 'block';
+        } else {
+            imagePreviewWrap.style.display = 'none';
+        }
+    });
+
+    imagePreview.addEventListener('error', function () {
+        imagePreviewWrap.style.display = 'none';
+    });
+</script>
+{% endblock %}
