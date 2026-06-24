@@ -3,7 +3,11 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
-from .models import CustomUser, Movie, MovieEpisode, Category, ChatMessage, SubscriptionReceipt, ProfileAvatar, VipUser, MovieComment
+from .models import (
+    CustomUser, Movie, MovieEpisode, Category, ChatMessage,
+    SubscriptionReceipt, ProfileAvatar, VipUser, MovieComment,
+    AnimeSchedule, Story, StoryView, AnimeNews, NewsLike
+)
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
@@ -388,3 +392,168 @@ def admin_comment_delete(request, pk):
     comment.delete()
     messages.success(request, "Izoh o'chirildi!")
     return redirect('admin_comments')
+
+
+
+# =======================
+# ANIME SCHEDULE
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_schedule(request):
+    schedules = AnimeSchedule.objects.all().order_by('order', '-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Anime Jadvali',
+        'items': schedules,
+        'type': 'schedule'
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_schedule_form(request, pk=None):
+    schedule = get_object_or_404(AnimeSchedule, pk=pk) if pk else None
+    if request.method == 'POST':
+        if not schedule:
+            schedule = AnimeSchedule()
+        schedule.name           = request.POST.get('name', '').strip()
+        schedule.subtitle       = request.POST.get('subtitle', '').strip()
+        schedule.image_url      = request.POST.get('image_url', '').strip()
+        schedule.day            = request.POST.get('day', '')
+        schedule.fandub         = request.POST.get('fandub', 'AniBest').strip()
+        schedule.watch_url      = request.POST.get('watch_url', '').strip()
+        schedule.is_active      = request.POST.get('is_active') == 'on'
+        try:
+            schedule.episode_number = int(request.POST.get('episode_number', 1))
+            schedule.order          = int(request.POST.get('order', 0))
+        except (TypeError, ValueError):
+            schedule.episode_number = 1
+            schedule.order = 0
+        schedule.save()
+        messages.success(request, "Jadval muvaffaqiyatli saqlandi!")
+        return redirect('admin_schedule')
+    return render(request, 'custom_admin/schedule_form.html', {
+        'schedule': schedule,
+        'day_choices': AnimeSchedule.DAY_CHOICES,
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_schedule_delete(request, pk):
+    schedule = get_object_or_404(AnimeSchedule, pk=pk)
+    schedule.delete()
+    messages.success(request, "Jadval o'chirildi!")
+    return redirect('admin_schedule')
+
+
+# =======================
+# STORY
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_stories(request):
+    stories = Story.objects.all().order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Storylar',
+        'items': stories,
+        'type': 'story'
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_story_form(request, pk=None):
+    story = get_object_or_404(Story, pk=pk) if pk else None
+    if request.method == 'POST':
+        if not story:
+            story = Story()
+        story.title       = request.POST.get('title', '').strip()
+        story.description = request.POST.get('description', '').strip()
+        story.link        = request.POST.get('link', '').strip() or None
+        story.is_active   = request.POST.get('is_active') == 'on'
+
+        expires_at = request.POST.get('expires_at', '').strip()
+        if expires_at:
+            from django.utils.dateparse import parse_datetime
+            story.expires_at = parse_datetime(expires_at)
+        else:
+            story.expires_at = None
+
+        if request.FILES.get('image'):
+            story.image = request.FILES['image']
+        if request.FILES.get('video'):
+            story.video = request.FILES['video']
+
+        story.save()
+        messages.success(request, "Story muvaffaqiyatli saqlandi!")
+        return redirect('admin_stories')
+    return render(request, 'custom_admin/story_form.html', {'story': story})
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_story_delete(request, pk):
+    story = get_object_or_404(Story, pk=pk)
+    story.delete()
+    messages.success(request, "Story o'chirildi!")
+    return redirect('admin_stories')
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_story_views(request, pk):
+    story = get_object_or_404(Story, pk=pk)
+    views = StoryView.objects.filter(story=story).select_related('user').order_by('-viewed_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': f'"{story.title}" — Ko\'rishlar',
+        'items': views,
+        'type': 'storyview'
+    })
+
+
+# =======================
+# ANIME NEWS
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_news(request):
+    news_list = AnimeNews.objects.all().order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Yangiliklar',
+        'items': news_list,
+        'type': 'news'
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_news_form(request, pk=None):
+    news = get_object_or_404(AnimeNews, pk=pk) if pk else None
+    if request.method == 'POST':
+        if not news:
+            news = AnimeNews()
+        news.title       = request.POST.get('title', '').strip()
+        news.description = request.POST.get('description', '').strip()
+        news.link        = request.POST.get('link', '').strip() or None
+        news.author      = request.user
+
+        if request.FILES.get('image'):
+            news.image = request.FILES['image']
+        if request.FILES.get('video'):
+            news.video = request.FILES['video']
+
+        news.save()
+        messages.success(request, "Yangilik muvaffaqiyatli saqlandi!")
+        return redirect('admin_news')
+    return render(request, 'custom_admin/news_form.html', {'news': news})
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_news_delete(request, pk):
+    news = get_object_or_404(AnimeNews, pk=pk)
+    news.delete()
+    messages.success(request, "Yangilik o'chirildi!")
+    return redirect('admin_news')
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_news_likes(request, pk):
+    news = get_object_or_404(AnimeNews, pk=pk)
+    likes = NewsLike.objects.filter(news=news).select_related('user').order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': f'"{news.title}" — Likelar ({likes.count()})',
+        'items': likes,
+        'type': 'newslike'
+    })
