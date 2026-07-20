@@ -12,7 +12,7 @@
         position: relative;
         width: 100%;
         aspect-ratio: 16 / 9;
-        min-height: 320px;
+        min-height: 380px;
         max-height: 90vh;
         overflow: hidden;
         border-radius: 16px;
@@ -40,7 +40,7 @@
         position: relative;
         display: flex;
         align-items: flex-end;
-        padding: 5% 5% 8% 5%;
+        padding: 5% 5% 11% 5%;
         overflow: hidden;
         flex-shrink: 0;
     }
@@ -74,8 +74,7 @@
         position: absolute;
         inset: 0;
         z-index: 2;
-        background: linear-gradient(to right, rgba(15,15,19,0.92) 0%, rgba(15,15,19,0.35) 55%, transparent 100%),
-                    linear-gradient(to top, rgba(15,15,19,1) 0%, transparent 50%);
+        background: none;
     }
 
     .slide-content {
@@ -154,21 +153,21 @@
     }
 
     .slider-controls {
-        position: absolute;
-        bottom: 22px;
-        left: 5%;
         display: flex;
+        justify-content: center;
+        align-items: center;
         gap: 8px;
+        margin: 18px auto 0;
         z-index: 20;
     }
 
     .dot {
-        width: 28px;
-        height: 3px;
-        background: rgba(255,255,255,0.18);
-        border-radius: 2px;
+        width: 10px;
+        height: 10px;
+        background: rgba(255,255,255,0.25);
+        border-radius: 50%;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
         border: none;
         padding: 0;
         outline: none;
@@ -176,7 +175,9 @@
 
     .dot[aria-pressed="true"] {
         background: var(--accent);
-        width: 46px;
+        width: 28px;
+        height: 10px;
+        border-radius: 6px;
         box-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
     }
 
@@ -318,7 +319,7 @@
         display: block;
     }
 
-    .card-wrapper:hover .anime-card img { transform: scale(1.06); }
+    .card-wrapper:hover .anime-card img { transform: none; }
 
     .card-inner-overlay {
         position: absolute;
@@ -841,7 +842,7 @@
         .slide-meta-row { display: flex; justify-content: flex-start !important; flex-wrap: wrap; gap: 10px; }
         .hero-buttons { width: 100%; display: flex; justify-content: flex-start !important; }
         .btn-main { margin-left: 0 !important; width: auto; }
-        .slider-container { aspect-ratio: 16 / 9; min-height: 220px; border-radius: 10px; }
+        .slider-container { aspect-ratio: 16 / 9; min-height: 340px; border-radius: 10px; }
         .slide { padding: 20px 14px 50px; }
         .schedule-card { flex-direction: column; align-items: flex-start; }
         .schedule-card-poster { width: 100%; height: 220px; border-radius: 12px; object-fit: cover; object-position: center top; }
@@ -853,7 +854,7 @@
 
     @media (max-width: 768px) {
         .slider-wrapper-outer { padding: 0 3%; }
-        .slider-container { aspect-ratio: 16 / 9; min-height: 200px; max-height: 56vw; border-radius: 10px; }
+        .slider-container { aspect-ratio: 16 / 9; min-height: 310px; max-height: 75vw; border-radius: 10px; }
         .slide { padding: 18px 16px 54px; align-items: flex-end; }
         .slide-content { max-width: 100%; }
         .slide-title { font-size: 2rem; }
@@ -869,11 +870,11 @@
 
     @media (max-width: 480px) {
         .slider-wrapper-outer { padding: 0; }
-        .slider-container { aspect-ratio: 16 / 9; min-height: 200px; max-height: 56vw; border-radius: 0; box-shadow: none; margin-top: 0; }
+        .slider-container { aspect-ratio: 16 / 9; min-height: 300px; max-height: 75vw; border-radius: 0; box-shadow: none; margin-top: 0; }
         .slide { padding: 30px 14px 50px; display: flex; flex-direction: column; justify-content: flex-end; }
         .tags { gap: 6px; margin-bottom: 8px; }
         .slide-title { font-size: 1.5rem; line-height: 1.2; }
-        .slider-controls { bottom: 10px; }
+        .slider-controls { margin-top: 14px; padding: 0 4%; }
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
         .anime-card { height: 200px; }
         .card-meta { font-size: 0.7rem; }
@@ -936,17 +937,6 @@
 
                     <div class="slide-overlay"></div>
 
-                    <div class="slider-controls">
-                        {% for h_anime in hero_movies %}
-                        {% if h_anime.id %}
-                        <button class="dot dot-{{ forloop.counter0 }}"
-                             aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}"
-                             onclick="goToSlide({{ forloop.counter0 }})">
-                        </button>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-
                     <div class="slide-content">
                         <div class="tags">
                             <span class="tag">YANGI</span>
@@ -993,6 +983,18 @@
                 {% endfor %}
 
             </div>
+        </div>
+
+        <!-- SLIDER INDICATOR DOTS (slider ostida, o'rtada) -->
+        <div class="slider-controls">
+            {% for h_anime in hero_movies %}
+            {% if h_anime.id %}
+            <button class="dot dot-{{ forloop.counter0 }}"
+                 aria-pressed="{% if forloop.counter0 == 0 %}true{% else %}false{% endif %}"
+                 onclick="goToSlide({{ forloop.counter0 }})">
+            </button>
+            {% endif %}
+            {% endfor %}
         </div>
     </div>
     {% endif %}
