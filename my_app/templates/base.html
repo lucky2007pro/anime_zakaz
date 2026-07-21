@@ -797,7 +797,8 @@
             .hamburger { display: flex; }
             .nav-brand-logo { width: 38px; height: 38px; border-radius: 8px; }
             .nav-brand-text { font-size: 0.98rem; }
-            .nav-actions .action-icon:not(.profile-btn) { display: none; }
+            .nav-actions .action-icon:not(.profile-btn):not(.nav-search-icon) { display: none; }
+            .nav-actions .action-icon.nav-search-icon { display: flex; }
             .nav-actions { gap: 8px; }
             .action-icon, .profile-btn { width: 38px; height: 38px; font-size: 1.1rem; }
             .profile-sidebar { width: 100%; border-left: none; border-radius: 0; }
@@ -909,7 +910,7 @@
     </div>
 
     <div class="nav-actions">
-        <a href="{% url 'search' %}" class="action-icon" aria-label="Qidirish"><i class='bx bx-search'></i></a>
+        <a href="{% url 'search' %}" class="action-icon nav-search-icon" aria-label="Qidirish"><i class='bx bx-search'></i></a>
         <a href="{% url 'chat' %}" class="action-icon" aria-label="Chat"><i class='bx bx-bell'></i></a>
         <div class="action-icon profile-btn" onclick="toggleProfileMenu()" style="overflow: hidden; padding: 0;" role="button" aria-label="Profil">
             {% if request.user.is_authenticated and request.user.avatar %}
@@ -1173,9 +1174,9 @@
         <span>Bosh</span>
     </a>
 
-    <a href="{% url 'search' %}" class="tab-item" data-tab="search">
-        <i class='bx bx-search'></i>
-        <span>Qidirish</span>
+    <a href="{% url 'anime_category' %}" class="tab-item" data-tab="category">
+        <i class='bx bx-category'></i>
+        <span>Kategoriya</span>
     </a>
 
     <a href="{% url 'profile' %}" class="tab-item tab-profile-btn" data-tab="profile">
@@ -1430,7 +1431,7 @@ function markActiveTab() {
     if (path === '/' || path.startsWith('/home')) active = 'home';
     else if (path.includes('/catalog') || path.includes('/anime')) active = 'catalog';
     else if (path.includes('/chat')) active = 'chat';
-    else if (path.includes('/search')) active = 'search';
+    else if (path.includes('/category')) active = 'category';
     else if (path.includes('/profile') || path.includes('/profil')) active = 'profile';
 
     if (active) {
