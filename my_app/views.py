@@ -18,7 +18,7 @@ from django.contrib.sessions.models import Session
 
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
-    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,UserSettings,AnimeSchedule
+    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,UserSettings,AnimeSchedule,AnimeSectionItem
 )
 
 User = get_user_model()
@@ -1108,3 +1108,28 @@ def settings_devices(request):
         'current_session':   session_key,
         'active_section':    'devices',
     })
+
+
+
+def anime_category(request):
+    from .models import AnimeSectionItem
+
+    # BARCHA ANIME — hamma card chiqadi
+    all_movies = Movie.objects.select_related('category').prefetch_related('episodes').order_by('-created_at')
+
+    # KUNLIK ANIME — faqat admin "daily" sifatida qo'shgan animelar
+    daily_movies = Movie.objects.select_related('category').prefetch_related('episodes').filter(
+        section_items__section='daily'
+    ).order_by('section_items__order', '-section_items__created_at')
+
+    # ANIME FILM — faqat admin "film" sifatida qo'shgan animelar
+    movie_films = Movie.objects.select_related('category').prefetch_related('episodes').filter(
+        section_items__section='film'
+    ).order_by('section_items__order', '-section_items__created_at')
+
+    context = {
+        'daily_movies': daily_movies,
+        'all_movies': all_movies,
+        'movie_films': movie_films,
+    }
+    return render(request, 'category.html', context)
