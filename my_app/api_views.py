@@ -66,7 +66,7 @@ class StoryListView(generics.ListAPIView):
 class MovieDetailView(generics.RetrieveAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieDetailSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         obj = super().get_object()
