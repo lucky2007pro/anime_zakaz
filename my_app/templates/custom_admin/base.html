@@ -270,6 +270,11 @@
                 <i class='bx bx-news'></i> Yangiliklar
             </a>
         </li>
+        <li>
+            <a href="{% url 'admin_sections' %}" class="{% if 'section' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-layer'></i> Kategoriya bo'limlari
+            </a>
+        </li>
     </ul>
 
     <div class="sidebar-bottom">
