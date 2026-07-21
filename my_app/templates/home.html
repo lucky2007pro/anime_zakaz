@@ -153,31 +153,70 @@
         gap: 4px;
     }
 
+    /* ----- SLIDER CONTROLS (dumaloq + aktivi uzunchoq to'luvchi bar) — slayder ostida, markazda ----- */
     .slider-controls {
-        position: absolute;
-        bottom: 22px;
-        left: 5%;
+        position: static;
         display: flex;
+        justify-content: center;
+        align-items: center;
         gap: 8px;
+        margin: 16px auto 0;
         z-index: 20;
     }
 
     .dot {
-        width: 28px;
-        height: 3px;
-        background: rgba(255,255,255,0.18);
-        border-radius: 2px;
+        position: relative;
+        flex: 0 0 auto;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.25);
+        overflow: hidden;
         cursor: pointer;
-        transition: all 0.3s;
         border: none;
         padding: 0;
         outline: none;
+        transition: width 0.35s ease, border-radius 0.35s ease, background 0.3s ease;
     }
 
-    .dot[aria-pressed="true"] {
+    .dot-fill {
+        position: absolute;
+        top: 0; left: 0;
+        height: 100%;
+        width: 0%;
         background: var(--accent);
-        width: 46px;
-        box-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        border-radius: inherit;
+        display: block;
+    }
+
+    /* O'tilgan (ko'rilgan) slidelar — dumaloq, accent rangda to'lgan */
+    .dot.viewed {
+        background: var(--accent);
+    }
+
+    /* Faol slide — uzunchoq bo'ladi va 5 soniyada chapdan o'ngga to'ladi (autoplay bilan sinxron) */
+    .dot.active {
+        width: 26px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.25);
+    }
+    .dot.active .dot-fill {
+        animation: dotFillProgress 5s linear forwards;
+    }
+
+    @keyframes dotFillProgress {
+        from { width: 0%; }
+        to { width: 100%; }
+    }
+
+    /* Bitta slide bo'lsa — har doim dumaloq, animatsiyasiz */
+    .slider-controls .dot:only-child {
+        width: 8px !important;
+        border-radius: 50% !important;
+        background: var(--accent) !important;
+    }
+    .slider-controls .dot:only-child .dot-fill {
+        display: none;
     }
 
     /* ----- MAIN CONTENT ----- */
@@ -302,23 +341,14 @@
         overflow: hidden;
         cursor: pointer;
         background: var(--bg-surface);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card-wrapper:hover .anime-card {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 32px rgba(0,0,0,0.8);
     }
 
     .anime-card img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.5s ease;
         display: block;
     }
-
-    .card-wrapper:hover .anime-card img { transform: scale(1.06); }
 
     .card-inner-overlay {
         position: absolute;
@@ -865,6 +895,10 @@
         .anime-card { height: 240px; }
         .action-btn { padding: 14px 22px; font-size: 0.9rem; }
         .scroll-top-btn { bottom: 80px; right: 14px; width: 38px; height: 38px; font-size: 1.1rem; }
+
+        /* Mobilda hover ishlamaydi — card overlay (nomi, ko'rish soni) doim ko'rinsin */
+        .card-inner-overlay { opacity: 1; }
+        .card-inner-desc { display: none; }
     }
 
     @media (max-width: 480px) {
@@ -873,7 +907,6 @@
         .slide { padding: 30px 14px 50px; display: flex; flex-direction: column; justify-content: flex-end; }
         .tags { gap: 6px; margin-bottom: 8px; }
         .slide-title { font-size: 1.5rem; line-height: 1.2; }
-        .slider-controls { bottom: 10px; }
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
         .anime-card { height: 200px; }
         .card-meta { font-size: 0.7rem; }
@@ -882,7 +915,6 @@
         .card-title { font-size: 0.88rem; }
         .card-inner-overlay { padding: 8px; }
         .card-inner-title { font-size: 0.8rem; }
-        .card-inner-desc { font-size: 0.68rem; -webkit-line-clamp: 2; }
         .action-btn { padding: 13px 20px; font-size: 0.85rem; width: 100%; justify-content: center; }
     }
 </style>
@@ -936,17 +968,6 @@
 
                     <div class="slide-overlay"></div>
 
-                    <div class="slider-controls">
-                        {% for h_anime in hero_movies %}
-                        {% if h_anime.id %}
-                        <button class="dot dot-{{ forloop.counter0 }}"
-                             aria-pressed="{% if forloop.parentloop.counter0 == forloop.counter0 %}true{% else %}false{% endif %}"
-                             onclick="goToSlide({{ forloop.counter0 }})">
-                        </button>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-
                     <div class="slide-content">
                         <div class="tags">
                             <span class="tag">YANGI</span>
@@ -993,6 +1014,19 @@
                 {% endfor %}
 
             </div>
+        </div>
+
+        <!-- SLIDER DOTS — slayder ostida, markazda -->
+        <div class="slider-controls" id="sliderControls">
+            {% for h_anime in hero_movies %}
+            {% if h_anime.id %}
+            <button class="dot dot-{{ forloop.counter0 }} {% if forloop.counter0 == 0 %}active{% endif %}"
+                 aria-pressed="{% if forloop.counter0 == 0 %}true{% else %}false{% endif %}"
+                 onclick="goToSlide({{ forloop.counter0 }})">
+                <span class="dot-fill"></span>
+            </button>
+            {% endif %}
+            {% endfor %}
         </div>
     </div>
     {% endif %}
@@ -1280,8 +1314,29 @@
     let heroMoved = 0;
 
     function updateDots() {
-        document.querySelectorAll('.dot').forEach(d => d.setAttribute('aria-pressed', 'false'));
-        document.querySelectorAll('.dot-' + currentSlide).forEach(d => d.setAttribute('aria-pressed', 'true'));
+        const dots = document.querySelectorAll('#sliderControls .dot');
+        dots.forEach(function(d, i) {
+            d.setAttribute('aria-pressed', i === currentSlide ? 'true' : 'false');
+            d.classList.remove('viewed', 'active');
+            if (i < currentSlide) {
+                d.classList.add('viewed');
+            } else if (i === currentSlide) {
+                d.classList.add('active');
+                // animatsiyani qayta boshlash uchun reflow majburlash
+                const fill = d.querySelector('.dot-fill');
+                if (fill) {
+                    fill.style.animation = 'none';
+                    void fill.offsetWidth;
+                    fill.style.animation = '';
+                }
+            }
+        });
+    }
+
+    function pauseDotFill() {
+        document.querySelectorAll('#sliderControls .dot.active .dot-fill').forEach(function(f) {
+            f.style.animationPlayState = 'paused';
+        });
     }
 
     function goToSlide(index) {
@@ -1311,6 +1366,7 @@
         heroMoved = 0;
         wrapper.style.transition = 'none';
         if (autoPlayTimer) clearInterval(autoPlayTimer);
+        pauseDotFill();
     }, { passive: true });
 
     wrapper.addEventListener('touchmove', function(e) {
@@ -1338,6 +1394,7 @@
         wrapper.classList.add('dragging');
         wrapper.style.transition = 'none';
         if (autoPlayTimer) clearInterval(autoPlayTimer);
+        pauseDotFill();
     });
 
     window.addEventListener('mousemove', function(e) {
