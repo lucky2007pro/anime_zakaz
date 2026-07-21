@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode, 
     SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
-    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule
+    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem
 )
 
 
@@ -155,7 +155,13 @@ class AnimeScheduleAdmin(admin.ModelAdmin):
     search_fields = ('name', 'fandub')
     ordering      = ('order',)
 
-
+@admin.register(AnimeSectionItem)
+class AnimeSectionItemAdmin(admin.ModelAdmin):
+    list_display = ('movie', 'section', 'order', 'created_at')
+    list_filter = ('section',)
+    search_fields = ('movie__title',)
+    autocomplete_fields = ('movie',)
+    ordering = ('section', 'order')
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
