@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% static 'images/default.svg' as default_movie_poster %}
+
+{% block title %}BESTMEDIA - Kategoriya{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-top-space { margin-top: 90px; }
+
+    /* ----- SEGMENTED TABS ----- */
+    .category-tabs-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 5%;
+    }
+
+    .category-tabs {
+        display: flex;
+        gap: 8px;
+        background: var(--bg-surface);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 6px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .category-tabs::-webkit-scrollbar { display: none; }
+
+    .category-tab-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: transparent;
+        border: none;
+        color: var(--text-dim);
+        font-weight: 800;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .category-tab-btn i { font-size: 1.15rem; }
+
+    .category-tab-btn.active {
+        background: linear-gradient(135deg, #ff003c, #ff4d6d);
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(255, 0, 60, 0.3);
+    }
+
+    .category-tab-btn:not(.active):hover {
+        background: rgba(255,255,255,0.06);
+        color: var(--text-light);
+    }
+
+    /* ----- PANELS ----- */
+    .category-panel { display: none; }
+    .category-panel.active { display: block; }
+
+    .category-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px 5% 50px;
+    }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 22px;
+    }
+
+    .card-wrapper {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .anime-card {
+        width: 100%;
+        height: 290px;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        background: var(--bg-surface);
+    }
+
+    .anime-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .top-badge-group {
+        position: absolute;
+        top: 8px; left: 8px;
+        display: flex;
+        gap: 4px;
+        z-index: 10;
+    }
+
+    .top-badge-episode {
+        background: rgba(0,0,0,0.8);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #FFC107;
+    }
+
+    .top-badge-year {
+        background: #eab308;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #000;
+    }
+
+    .card-info-bottom {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 10px 4px 0;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--text-light);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-dim);
+    }
+
+    .tag-jp {
+        background: rgba(255,255,255,0.1);
+        padding: 1px 5px;
+        border-radius: 3px;
+        color: var(--text-light);
+        font-size: 0.65rem;
+        font-weight: 800;
+    }
+
+    .category-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-dim);
+    }
+    .category-empty i {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 14px;
+        opacity: 0.4;
+    }
+
+    @media (max-width: 768px) {
+        .category-top-space { margin-top: 72px; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .anime-card { height: 240px; }
+        .category-tab-btn { font-size: 0.78rem; padding: 10px 10px; }
+    }
+
+    @media (max-width: 480px) {
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+        .anime-card { height: 200px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="category-top-space">
+
+    <div class="category-tabs-wrapper">
+        <div class="category-tabs" id="categoryTabs">
+            <button class="category-tab-btn active" data-target="panel-daily" onclick="switchCategoryTab(this)">
+                <i class='bx bx-calendar-star'></i> Kunlik anime
+            </button>
+            <button class="category-tab-btn" data-target="panel-all" onclick="switchCategoryTab(this)">
+                <i class='bx bx-collection'></i> Barcha anime
+            </button>
+            <button class="category-tab-btn" data-target="panel-film" onclick="switchCategoryTab(this)">
+                <i class='bx bx-clapperboard'></i> Anime film
+            </button>
+        </div>
+    </div>
+
+    <div class="category-container">
+
+        <!-- KUNLIK ANIME -->
+        <div class="category-panel active" id="panel-daily">
+            <div class="cards-grid">
+                {% for anime in daily_movies %}
+                {% if anime.id %}
+                <div class="card-wrapper">
+                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                        <div class="anime-card">
+                            <div class="top-badge-group">
+                                {% if anime.release_year %}<div class="top-badge-year">{{ anime.release_year }}</div>{% endif %}
+                                {% if anime.episodes.count > 0 %}
+                                    <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
+                                {% else %}
+                                    <div class="top-badge-episode">Film</div>
+                                {% endif %}
+                            </div>
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                        </div>
+                        <div class="card-info-bottom">
+                            <h4 class="card-title">{{ anime.title }}</h4>
+                            <div class="card-meta">
+                                {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                                <span>{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="category-empty" style="grid-column:1/-1;">
+                    <i class='bx bx-calendar-star'></i>
+                    Hozircha kunlik anime yo'q
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- BARCHA ANIME -->
+        <div class="category-panel" id="panel-all">
+            <div class="cards-grid">
+                {% for anime in all_movies %}
+                {% if anime.id %}
+                <div class="card-wrapper">
+                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                        <div class="anime-card">
+                            <div class="top-badge-group">
+                                {% if anime.release_year %}<div class="top-badge-year">{{ anime.release_year }}</div>{% endif %}
+                                {% if anime.episodes.count > 0 %}
+                                    <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
+                                {% else %}
+                                    <div class="top-badge-episode">Film</div>
+                                {% endif %}
+                            </div>
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                        </div>
+                        <div class="card-info-bottom">
+                            <h4 class="card-title">{{ anime.title }}</h4>
+                            <div class="card-meta">
+                                {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                                <span>{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="category-empty" style="grid-column:1/-1;">
+                    <i class='bx bx-collection'></i>
+                    Hozircha anime yo'q
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ANIME FILM -->
+        <div class="category-panel" id="panel-film">
+            <div class="cards-grid">
+                {% for anime in movie_films %}
+                {% if anime.id %}
+                <div class="card-wrapper">
+                    <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                        <div class="anime-card">
+                            <div class="top-badge-group">
+                                {% if anime.release_year %}<div class="top-badge-year">{{ anime.release_year }}</div>{% endif %}
+                                <div class="top-badge-episode">Film</div>
+                            </div>
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                        </div>
+                        <div class="card-info-bottom">
+                            <h4 class="card-title">{{ anime.title }}</h4>
+                            <div class="card-meta">
+                                {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                                <span>{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="category-empty" style="grid-column:1/-1;">
+                    <i class='bx bx-clapperboard'></i>
+                    Hozircha anime film yo'q
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function switchCategoryTab(btn) {
+    document.querySelectorAll('.category-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.category-panel').forEach(function(p) { p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+}
+</script>
+{% endblock %}
