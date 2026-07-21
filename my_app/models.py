@@ -309,7 +309,7 @@ class AnimeNews(models.Model):
     image = models.ImageField(upload_to='news/')
     description = models.TextField()
 
-    # 🎥 VIDEO (agar bo‘lsa oldingi qo‘shilgan)
+    # 🎥 VIDEO
     video = models.FileField(upload_to='news/videos/', null=True, blank=True)
 
     # 🔗 IXTIYORIY SILKA
@@ -325,6 +325,9 @@ class AnimeNews(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "yangilik"
 
     def total_likes(self):
         return self.likes.count()
