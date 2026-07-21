@@ -7,6 +7,7 @@ from .views import (
     logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,reels, aloqa, news_feed, news_detail, toggle_like,next_story_view, prev_story_view, story_view, mark_story_seen,
     reels_feed, reel_detail, toggle_reel_like, add_reel_comment, reel_comments_api, reel_share,
     settings_privacy,settings_devices,settings_premium,settings_telegram,settings_general,
+    anime_category
 
  
 )
@@ -125,8 +126,12 @@ urlpatterns = [
     path('control-panel/news/<int:pk>/edit/', admin_news_form, name='admin_news_form'),
     path('control-panel/news/<int:pk>/delete/', admin_news_delete, name='admin_news_delete'),
     path('control-panel/news/<int:pk>/likes/', admin_news_likes, name='admin_news_likes'),
+    path('kategoriya/', anime_category, name='anime_category'),
+    path('boshqaruv/sections/', admin_sections, name='admin_sections'),
+    path('boshqaruv/sections/add/', admin_section_form, name='admin_section_form'),
+    path('boshqaruv/sections/<int:pk>/edit/', admin_section_form, name='admin_section_form_edit'),
+    path('boshqaruv/sections/<int:pk>/delete/', admin_section_delete, name='admin_section_delete'),
     
-
 ]
 
 
