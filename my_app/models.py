@@ -593,5 +593,39 @@ class AnimeSchedule(models.Model):
 
 
 
+# =======================
+# KATEGORIYA BO'LIMLARI (Kunlik anime / Anime film)
+# =======================
+class AnimeSectionItem(models.Model):
+    SECTION_CHOICES = [
+        ('daily', 'Kunlik anime'),
+        ('film', 'Anime film'),
+    ]
+
+    section = models.CharField(
+        max_length=10,
+        choices=SECTION_CHOICES,
+        help_text="Qaysi bo'limga chiqishi kerak"
+    )
+    movie = models.ForeignKey(
+        Movie,
+        on_delete=models.CASCADE,
+        related_name='section_items',
+        help_text="Nomi bo'yicha animani tanlang"
+    )
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        help_text="Kichik raqam avval chiqadi"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+        unique_together = ('section', 'movie')
+        verbose_name = "Kategoriya bo'limi (Kunlik/Film)"
+        verbose_name_plural = "Kategoriya bo'limlari (Kunlik/Film)"
+
+    def __str__(self):
+        return f"{self.get_section_display()} — {self.movie.title}"
 
 
