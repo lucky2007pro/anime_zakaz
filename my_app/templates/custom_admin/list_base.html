@@ -59,6 +59,8 @@
                 <a href="{% url 'admin_story_form' %}" class="btn">+ Qo'shish</a>
             {% elif type == 'schedule' %}
                 <a href="{% url 'admin_schedule_form' %}" class="btn">+ Qo'shish</a>
+            {% elif type == 'section' %}
+                <a href="{% url 'admin_section_form' %}" class="btn">+ Qo'shish</a>
             {% else %}
                 <button class="btn" style="opacity:0.5; pointer-events:none;">+ Qo'shish</button>
             {% endif %}
@@ -95,6 +97,8 @@
                     <th>Foydalanuvchi</th><th>Ko'rilgan vaqt</th>
                 {% elif type == 'schedule' %}
                     <th>Anime nomi</th><th>Kun</th><th>Qism</th><th>Fandub</th><th>Tartib</th><th>Holat</th><th>Harakatlar</th>
+                {% elif type == 'section' %}
+                    <th>Anime nomi</th><th>Bo'lim</th><th>Tartib</th><th>Sana</th><th>Harakatlar</th>
                 {% endif %}
             </tr>
         </thead>
@@ -230,6 +234,18 @@
                         {% if item.is_active %}<span class="badge badge-green">Faol</span>
                         {% else %}<span class="badge badge-red">Nofaol</span>{% endif %}
                     </td>
+
+                {% elif type == 'section' %}
+                    <td style="font-weight:700; color:#fff;">{{ item.movie.title|truncatechars:35 }}</td>
+                    <td>
+                        {% if item.section == 'daily' %}
+                            <span class="badge badge-blue">Kunlik anime</span>
+                        {% else %}
+                            <span class="badge badge-purple">Anime film</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:var(--text-dim);">{{ item.order }}</td>
+                    <td style="color:var(--text-dim);">{{ item.created_at|date:"d.m.Y" }}</td>
                 {% endif %}
 
                 <!-- HARAKATLAR -->
@@ -299,6 +315,10 @@
                     {% elif type == 'schedule' %}
                         <a href="{% url 'admin_schedule_form' item.id %}" class="action-btn">Tahrirlash</a>
                         <a href="{% url 'admin_schedule_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
+                    {% elif type == 'section' %}
+                        <a href="{% url 'admin_section_form_edit' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_section_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
 
                     {% elif type == 'newslike' or type == 'storyview' %}
                         <span style="color:var(--text-dim); font-size:0.82rem;">—</span>
