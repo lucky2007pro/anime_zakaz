@@ -6,7 +6,7 @@ from django.urls import reverse
 from .models import (
     CustomUser, Movie, MovieEpisode, Category, ChatMessage,
     SubscriptionReceipt, ProfileAvatar, VipUser, MovieComment,
-    AnimeSchedule, Story, StoryView, AnimeNews, NewsLike
+    AnimeSchedule, Story, StoryView, AnimeNews, NewsLike,AnimeSectionItem
 )
 
 def is_admin(user):
@@ -557,3 +557,60 @@ def admin_news_likes(request, pk):
         'items': likes,
         'type': 'newslike'
     })
+
+# =======================
+# ANIME SECTION ITEM (Kunlik anime / Anime film)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_sections(request):
+    items = AnimeSectionItem.objects.select_related('movie').order_by('section', 'order')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': "Kategoriya bo'limlari (Kunlik/Film)",
+        'items': items,
+        'type': 'section'
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_section_form(request, pk=None):
+    item = get_object_or_404(AnimeSectionItem, pk=pk) if pk else None
+    movies = Movie.objects.all().order_by('title')
+    if request.method == 'POST':
+        if not item:
+            item = AnimeSectionItem()
+        item.section = request.POST.get('section', 'daily')
+        movie_id = request.POST.get('movie')
+        try:
+            item.order = int(request.POST.get('order', 0))
+        except (TypeError, ValueError):
+            item.order = 0
+
+        if movie_id:
+            item.movie = Movie.objects.get(id=movie_id)
+
+        try:
+            item.save()
+        except Exception:
+            messages.error(request, "Bu anime shu bo'limda allaqachon mavjud yoki xatolik yuz berdi.")
+            return render(request, 'custom_admin/section_form.html', {
+                'item': item,
+                'movies': movies,
+                'section_choices': AnimeSectionItem.SECTION_CHOICES,
+            })
+
+        messages.success(request, "Bo'lim muvaffaqiyatli saqlandi!")
+        return redirect('admin_sections')
+
+    return render(request, 'custom_admin/section_form.html', {
+        'item': item,
+        'movies': movies,
+        'section_choices': AnimeSectionItem.SECTION_CHOICES,
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_section_delete(request, pk):
+    item = get_object_or_404(AnimeSectionItem, pk=pk)
+    item.delete()
+    messages.success(request, "Bo'lim elementi o'chirildi!")
+    return redirect('admin_sections')
