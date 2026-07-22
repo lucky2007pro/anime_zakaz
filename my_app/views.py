@@ -13,12 +13,13 @@ from django.utils import timezone
 from django.db.models import F
 from django.db import models
 import re
+from django.db.models import Q
 from django.contrib.sessions.models import Session
 
 
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
-    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,UserSettings,AnimeSchedule,AnimeSectionItem
+    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,UserSettings,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead
 )
 
 User = get_user_model()
@@ -445,12 +446,23 @@ def chat(request):
                 pass
 
         if text:
-            ChatMessage.objects.create(
+            new_msg = ChatMessage.objects.create(
                 user=request.user,
                 message=text,
                 created_at=timezone.now(),
                 reply_to=reply_to_msg
             )
+
+            # ==== Reply bo'lsa, xabar egasiga notice yaratish ====
+            if reply_to_msg and reply_to_msg.user != request.user:
+                Notice.objects.create(
+                    notice_type='reply',
+                    created_by=request.user,
+                    target_user=reply_to_msg.user,
+                    title=f"{request.user.username} sizga javob berdi",
+                    message=text,
+                    related_chat_message=new_msg,
+                )
 
         return redirect('chat')
 
@@ -1133,3 +1145,41 @@ def anime_category(request):
         'movie_films': movie_films,
     }
     return render(request, 'category.html', context)
+
+@login_required
+def notice(request):
+    base_qs = Notice.objects.filter(is_active=True).filter(
+        Q(notice_type='admin', target_user__isnull=True) |
+        Q(notice_type='reply', target_user=request.user)
+    )
+
+    # Barchasini o'qilgan qilish
+    if request.GET.get('mark_all') == '1':
+        unread_ids = base_qs.exclude(reads__user=request.user).values_list('id', flat=True)
+        NoticeRead.objects.bulk_create(
+            [NoticeRead(user=request.user, notice_id=nid) for nid in unread_ids],
+            ignore_conflicts=True
+        )
+        return redirect('notice')
+
+    # Bitta cardga bosilganda — o'qilgan qilish
+    read_id = request.GET.get('read')
+    if read_id and read_id.isdigit():
+        notice_obj = base_qs.filter(id=read_id).first()
+        if notice_obj:
+            NoticeRead.objects.get_or_create(user=request.user, notice=notice_obj)
+            if notice_obj.notice_type == 'reply':
+                return redirect('chat')  # reply bo'lsa — chatga olib boradi
+        return redirect('notice')  # admin xabari bo'lsa — shu sahifada qoladi
+
+    read_ids = set(
+        NoticeRead.objects.filter(user=request.user).values_list('notice_id', flat=True)
+    )
+
+    notices = base_qs.select_related('created_by', 'related_chat_message').order_by('-created_at')
+    for n in notices:
+        n.is_read = n.id in read_ids
+
+    return render(request, 'notice.html', {'notices': notices})
+
+
