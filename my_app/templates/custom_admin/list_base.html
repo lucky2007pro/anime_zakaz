@@ -61,6 +61,8 @@
                 <a href="{% url 'admin_schedule_form' %}" class="btn">+ Qo'shish</a>
             {% elif type == 'section' %}
                 <a href="{% url 'admin_section_form' %}" class="btn">+ Qo'shish</a>
+            {% elif type == 'notice' %}
+                <a href="{% url 'admin_notice_form' %}" class="btn">+ Qo'shish</a>
             {% else %}
                 <button class="btn" style="opacity:0.5; pointer-events:none;">+ Qo'shish</button>
             {% endif %}
@@ -99,6 +101,8 @@
                     <th>Anime nomi</th><th>Kun</th><th>Qism</th><th>Fandub</th><th>Tartib</th><th>Holat</th><th>Harakatlar</th>
                 {% elif type == 'section' %}
                     <th>Anime nomi</th><th>Bo'lim</th><th>Tartib</th><th>Sana</th><th>Harakatlar</th>
+                {% elif type == 'notice' %}
+                    <th>Sarlavha</th><th>Matn</th><th>Turi</th><th>Holat</th><th>Sana</th><th>Harakatlar</th>
                 {% endif %}
             </tr>
         </thead>
@@ -246,6 +250,22 @@
                     </td>
                     <td style="color:var(--text-dim);">{{ item.order }}</td>
                     <td style="color:var(--text-dim);">{{ item.created_at|date:"d.m.Y" }}</td>
+
+                {% elif type == 'notice' %}
+                    <td style="font-weight:700; color:#fff;">{{ item.title|truncatechars:40 }}</td>
+                    <td style="color:var(--text-dim);">{{ item.message|truncatechars:60 }}</td>
+                    <td>
+                        {% if item.notice_type == 'admin' %}
+                            <span class="badge badge-blue">Admin xabari</span>
+                        {% else %}
+                            <span class="badge badge-purple">Chat javobi</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.is_active %}<span class="badge badge-green">Faol</span>
+                        {% else %}<span class="badge badge-red">Nofaol</span>{% endif %}
+                    </td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">{{ item.created_at|date:"d.m.Y H:i" }}</td>
                 {% endif %}
 
                 <!-- HARAKATLAR -->
@@ -319,6 +339,10 @@
                     {% elif type == 'section' %}
                         <a href="{% url 'admin_section_form_edit' item.id %}" class="action-btn">Tahrirlash</a>
                         <a href="{% url 'admin_section_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
+                    {% elif type == 'notice' %}
+                        <a href="{% url 'admin_notice_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_notice_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
 
                     {% elif type == 'newslike' or type == 'storyview' %}
                         <span style="color:var(--text-dim); font-size:0.82rem;">—</span>
