@@ -632,3 +632,50 @@ class AnimeSectionItem(models.Model):
         return f"{self.get_section_display()} — {self.movie.title}"
 
 
+# =======================
+# NOTICE (BILDIRISHNOMALAR)
+# =======================
+class Notice(models.Model):
+    TYPE_CHOICES = [
+        ('admin', 'Admin xabari'),
+        ('reply', 'Chatda javob'),
+    ]
+
+    notice_type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='admin')
+
+    title = models.CharField(max_length=200, blank=True, null=True)
+    message = models.TextField()
+
+    created_by = models.ForeignKey(
+        CustomUser, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='sent_notices', help_text="Yuborgan admin yoki javob yozgan foydalanuvchi"
+    )
+
+    # Faqat 'reply' turi uchun to'ldiriladi — kimga tegishli
+    target_user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, null=True, blank=True,
+        related_name='personal_notices',
+        help_text="Faqat shaxsiy (reply) bildirishnoma uchun. Admin xabari hammaga bo'lsa bo'sh qoldiring."
+    )
+
+    related_chat_message = models.ForeignKey(
+        'ChatMessage', on_delete=models.CASCADE, null=True, blank=True, related_name='+'
+    )
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title or self.message[:30]
+
+
+class NoticeRead(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='read_notices')
+    notice = models.ForeignKey(Notice, on_delete=models.CASCADE, related_name='reads')
+    read_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'notice')
