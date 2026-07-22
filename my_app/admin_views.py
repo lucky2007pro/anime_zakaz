@@ -6,7 +6,7 @@ from django.urls import reverse
 from .models import (
     CustomUser, Movie, MovieEpisode, Category, ChatMessage,
     SubscriptionReceipt, ProfileAvatar, VipUser, MovieComment,
-    AnimeSchedule, Story, StoryView, AnimeNews, NewsLike,AnimeSectionItem
+    AnimeSchedule, Story, StoryView, AnimeNews, NewsLike,AnimeSectionItem,Notice
 )
 
 def is_admin(user):
@@ -614,3 +614,41 @@ def admin_section_delete(request, pk):
     item.delete()
     messages.success(request, "Bo'lim elementi o'chirildi!")
     return redirect('admin_sections')
+
+
+# =======================
+# NOTICE (E'lonlar)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_notices(request):
+    notices = Notice.objects.all().order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': "E'lonlar",
+        'items': notices,
+        'type': 'notice'
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_notice_form(request, pk=None):
+    notice = get_object_or_404(Notice, pk=pk) if pk else None
+    if request.method == 'POST':
+        if not notice:
+            notice = Notice()
+        notice.title = request.POST.get('title', '').strip()
+        notice.message = request.POST.get('message', '').strip()
+        notice.notice_type = 'admin'          # <-- doim 'admin', forma orqali o'zgartirilmaydi
+        notice.target_user = None             # <-- hammaga ko'rinishi uchun bo'sh
+        notice.created_by = request.user
+        notice.is_active = request.POST.get('is_active') == 'on'
+        notice.save()
+        messages.success(request, "E'lon muvaffaqiyatli saqlandi!")
+        return redirect('admin_notices')
+    return render(request, 'custom_admin/notice_form.html', {'notice': notice})
+
+@user_passes_test(is_admin, login_url='/')
+def admin_notice_delete(request, pk):
+    notice = get_object_or_404(Notice, pk=pk)
+    notice.delete()
+    messages.success(request, "E'lon o'chirildi!")
+    return redirect('admin_notices')
