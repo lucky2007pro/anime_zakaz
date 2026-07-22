@@ -1,0 +1,72 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}{% if notice %}E'lonni tahrirlash{% else %}Yangi e'lon{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-wrap { max-width: 640px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+        display: block; font-size: 0.8rem; color: var(--text-dim);
+        text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700;
+    }
+    .form-group input[type="text"],
+    .form-group textarea,
+    .form-group select {
+        width: 100%; background: #0a0a0f; border: 1px solid var(--border-line);
+        color: white; padding: 12px 14px; border-radius: 6px; font-size: 0.95rem;
+        font-family: 'Outfit', sans-serif; transition: 0.25s;
+    }
+    .form-group textarea { min-height: 120px; resize: vertical; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+        outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(0,243,255,0.15);
+    }
+    .checkbox-row { display: flex; align-items: center; gap: 10px; }
+    .checkbox-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+    .form-actions { display: flex; gap: 12px; margin-top: 30px; }
+    .btn-save {
+        background: var(--accent); color: #000; border: none; padding: 12px 26px;
+        border-radius: 6px; font-weight: 800; cursor: pointer; text-transform: uppercase;
+        box-shadow: 0 0 10px var(--accent-glow); transition: 0.3s;
+    }
+    .btn-save:hover { background: white; }
+    .btn-cancel {
+        background: transparent; color: var(--text-dim); border: 1px solid var(--border-line);
+        padding: 12px 26px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: 0.3s;
+    }
+    .btn-cancel:hover { color: white; border-color: #444; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel form-wrap">
+    <h2 style="margin-bottom:25px; font-size:1.3rem; text-transform:uppercase;">
+        {% if notice %}E'lonni tahrirlash{% else %}Yangi e'lon qo'shish{% endif %}
+    </h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Sarlavha</label>
+            <input type="text" name="title" value="{{ notice.title|default:'' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Matn</label>
+            <textarea name="message" required>{{ notice.message|default:'' }}</textarea>
+        </div>
+
+
+        <div class="form-group checkbox-row">
+            <input type="checkbox" id="is_active" name="is_active" {% if notice.is_active or not notice %}checked{% endif %}>
+            <label for="is_active" style="margin:0; text-transform:none; letter-spacing:0;">Faol (foydalanuvchilarga ko'rinsin)</label>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Saqlash</button>
+            <a href="{% url 'admin_notices' %}" class="btn-cancel">Bekor qilish</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
