@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bildirishnomalar — BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+body {
+    background-image:
+        linear-gradient(180deg, rgba(10,10,15,0.55) 0%, rgba(10,10,15,0.65) 100%),
+        url('https://i.pinimg.com/736x/2c/63/33/2c63335735531b90b234041e991bbeb3.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.notice-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 26px;
+    flex-wrap: wrap;
+}
+
+.notice-header h1 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notice-header h1 i {
+    color: var(--accent);
+    font-size: 1.6rem;
+    text-shadow: 0 0 14px rgba(0,243,255,0.4);
+}
+
+.notice-mark-all {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+    text-decoration: none;
+}
+.notice-mark-all:hover { border-color: var(--accent); color: var(--accent); }
+
+.notice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ==== CARD (endi <a> tegi — bosilsa o'qilgan bo'ladi) ==== */
+.notice-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    border-radius: 18px;
+    padding: 18px 20px;
+    transition: background 0.2s, transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+.notice-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0,243,255,0.3);
+}
+.notice-card:active { transform: translateY(-1px) scale(0.995); }
+
+/* Kengaytirilganda karta balandligi avtomatik o'sishi uchun */
+.notice-card.expanded {
+    align-items: flex-start;
+}
+
+/* O'QILMAGAN — reply turi uchun accent fon (rasmga o'xshash, lekin sayt rangida) */
+.notice-card.unread.type-reply {
+    background: linear-gradient(135deg, rgba(0,243,255,0.14) 0%, rgba(0,102,255,0.10) 100%);
+    border-color: rgba(0,243,255,0.35);
+    box-shadow: 0 4px 22px rgba(0,243,255,0.08);
+}
+/* O'QILMAGAN — admin turi uchun oltin/amber fon */
+.notice-card.unread.type-admin {
+    background: linear-gradient(135deg, rgba(255,193,7,0.14) 0%, rgba(255,138,0,0.08) 100%);
+    border-color: rgba(255,193,7,0.35);
+    box-shadow: 0 4px 22px rgba(255,193,7,0.08);
+}
+
+.notice-card.unread::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+}
+.notice-card.unread.type-admin::before { background: #ffc107; }
+
+/* ==== ICON (chap tomon) ==== */
+.notice-icon {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+.type-reply .notice-icon {
+    background: linear-gradient(135deg, var(--accent) 0%, #0066ff 100%);
+    color: #000;
+}
+.type-admin .notice-icon {
+    background: linear-gradient(135deg, #ffc107 0%, #ff8a00 100%);
+    color: #000;
+}
+
+.notice-body { flex: 1; min-width: 0; }
+
+.notice-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+
+.notice-title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--text-light);
+}
+
+.notice-type-tag {
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+.type-admin .notice-type-tag { background: #ffc107; }
+.type-reply .notice-type-tag { background: var(--accent); }
+
+.notice-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(0,243,255,0.7);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.type-admin .notice-dot { background: #ffc107; box-shadow: 0 0 8px rgba(255,193,7,0.7); }
+
+/* ==== XABAR MATNI ==== */
+.notice-message-wrap {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+}
+
+/* Admin/foydalanuvchi yozgan bo'shliq va qator ko'chirishlar aynan saqlanadi */
+.notice-message-short,
+.notice-message-full {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.notice-message-full {
+    display: none;
+    margin-top: 4px;
+}
+
+.notice-message-wrap.expanded .notice-message-short {
+    display: none;
+}
+.notice-message-wrap.expanded .notice-message-full {
+    display: block;
+}
+
+/* ==== XABAR ICHIDAGI RASM (havola matni o'rniga, box oxirida, 16:9) ==== */
+.notice-image-box {
+    margin-top: 12px;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+    background: rgba(0,0,0,0.25);
+}
+.notice-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.notice-expand-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--accent);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.type-admin .notice-expand-btn { color: #ffc107; }
+.notice-expand-btn i {
+    font-size: 1rem;
+    transition: transform 0.2s;
+}
+.notice-message-wrap.expanded .notice-expand-btn i {
+    transform: rotate(180deg);
+}
+
+.notice-time {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    opacity: 0.7;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ==== O'NG TOMON — arrow / action hint ==== */
+.notice-action-hint {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-dim);
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    opacity: 0.75;
+}
+.notice-action-hint i { font-size: 1.4rem; color: inherit; }
+.type-reply .notice-action-hint i { color: var(--accent); }
+.type-admin .notice-action-hint i { color: #ffc107; }
+
+.notice-empty {
+    text-align: center;
+    padding: 70px 20px;
+    color: var(--text-dim);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+}
+.notice-empty i {
+    font-size: 3.2rem;
+    color: var(--glass-border);
+    display: block;
+    margin-bottom: 14px;
+}
+.notice-empty p { font-size: 0.95rem; }
+
+@media (max-width: 480px) {
+    .notice-header h1 { font-size: 1.25rem; }
+    .notice-card { padding: 14px; gap: 10px; }
+    .notice-icon { width: 42px; height: 42px; font-size: 1.2rem; }
+    .notice-action-hint { font-size: 0.6rem; }
+    .notice-action-hint i { font-size: 1.2rem; }
+}
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+
+    <div class="notice-header">
+        <h1><i class='bx bx-bell'></i> Bildirishnomalar</h1>
+
+        {% if notices %}
+        <a href="{% url 'notice' %}?mark_all=1" class="notice-mark-all">
+            <i class='bx bx-check-double'></i> Barchasini o'qilgan deb belgilash
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="notice-list">
+        {% for n in notices %}
+        <a href="{% url 'notice' %}?read={{ n.id }}"
+           class="notice-card {% if not n.is_read %}unread{% endif %} type-{{ n.notice_type }}">
+
+            <div class="notice-icon">
+                {% if n.notice_type == 'reply' %}
+                    <i class='bx bx-reply'></i>
+                {% else %}
+                    <i class='bx bxs-bell-ring'></i>
+                {% endif %}
+            </div>
+
+            <div class="notice-body">
+                <div class="notice-title-row">
+                    <span class="notice-title">
+                        {% if n.notice_type == 'reply' %}
+                            {{ n.title }}
+                        {% else %}
+                            {{ n.title|default:"Yangi bildirishnoma" }}
+                        {% endif %}
+                    </span>
+
+                    {% if n.notice_type == 'admin' %}
+                        <span class="notice-type-tag">Admin</span>
+                    {% else %}
+                        <span class="notice-type-tag">Javob</span>
+                    {% endif %}
+
+                    {% if not n.is_read %}<span class="notice-dot"></span>{% endif %}
+                </div>
+                <!-- Diqqat: admin turi uchun yuboruvchi ismi hech qachon ko'rsatilmaydi,
+                     faqat sarlavha (title) chiqadi. -->
+
+                <div class="notice-message-wrap">
+                    <div class="notice-message-short">{{ n.message|truncatechars:30 }}</div>
+                    <div class="notice-message-full" data-raw-message="{{ n.message }}">{{ n.message }}</div>
+
+                    <button type="button"
+                            class="notice-expand-btn"
+                            style="display:{% if n.message|length > 30 %}inline-flex{% else %}none{% endif %};"
+                            onclick="toggleNoticeMessage(event, this)">
+                        <span class="notice-expand-label">Batafsil</span>
+                        <i class='bx bx-chevron-down'></i>
+                    </button>
+                </div>
+
+                <div class="notice-time">
+                    <i class='bx bx-time-five'></i> {{ n.created_at|date:"d.m.Y H:i" }}
+                </div>
+            </div>
+
+            <div class="notice-action-hint">
+                {% if n.notice_type == 'reply' %}
+                    <i class='bx bx-show'></i>
+                    <span>Ko'rish</span>
+                {% else %}
+                    <i class='bx bx-chevron-right'></i>
+                    <span>Batafsil</span>
+                {% endif %}
+            </div>
+
+        </a>
+        {% empty %}
+        <div class="notice-empty">
+            <i class='bx bx-bell-off'></i>
+            <p>Hozircha bildirishnomalar yo'q.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</main>
+
+<script>
+function toggleNoticeMessage(event, btn) {
+    // Karta <a> tegi ichida bo'lgani uchun, tugma bosilganda
+    // sahifa "o'qilgan" havolasiga o'tib ketmasligi kerak.
+    event.preventDefault();
+    event.stopPropagation();
+
+    var wrap = btn.closest('.notice-message-wrap');
+    var card = btn.closest('.notice-card');
+    var label = btn.querySelector('.notice-expand-label');
+
+    var isExpanded = wrap.classList.toggle('expanded');
+    if (card) {
+        card.classList.toggle('expanded', isExpanded);
+    }
+    label.textContent = isExpanded ? "Yopish" : "Batafsil";
+}
+
+// Xabar ichida rasm havolasi bo'lsa (jpg/jpeg/png/gif/webp):
+//  1) havola matni butunlay OLIB TASHLANADI (ko'rinmaydi),
+//  2) uning o'rniga Batafsil ochilganda box oxirida 16:9 rasm chiqadi.
+// Qolgan matn (boshqa so'zlar, bo'shliq, qator ko'chirishlar) o'zgarishsiz qoladi.
+(function () {
+    var IMAGE_URL_REGEX = /(https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp))(\?\S*)?/i;
+
+    document.querySelectorAll('.notice-message-wrap').forEach(function (wrap) {
+        var shortEl = wrap.querySelector('.notice-message-short');
+        var fullEl = wrap.querySelector('.notice-message-full');
+        var btn = wrap.querySelector('.notice-expand-btn');
+        if (!fullEl) return;
+
+        var raw = fullEl.getAttribute('data-raw-message');
+        if (raw === null) raw = fullEl.textContent;
+
+        var match = raw.match(IMAGE_URL_REGEX);
+        var imageUrl = null;
+        var displayText = raw;
+
+        if (match) {
+            imageUrl = match[0];
+            // Havola matnini butunlay olib tashlaymiz
+            displayText = raw.split(match[0]).join('');
+            // Havola o'rnida qolgan ortiqcha bo'sh qatorlarni ozgina tozalaymiz
+            displayText = displayText.replace(/\n{3,}/g, '\n\n').replace(/[ \t]+\n/g, '\n').trim();
+        }
+
+        // To'liq matnni (havolasiz) qayta chizamiz
+        fullEl.textContent = displayText;
+
+        // Qisqa ko'rinishni ham (havolasiz) 30 belgigacha qayta hisoblaymiz
+        var shortText = displayText.length > 30
+            ? displayText.slice(0, 30) + '…'
+            : displayText;
+        if (shortEl) shortEl.textContent = shortText;
+
+        // Rasm mavjud bo'lsa, uni to'liq matn oxiriga (Batafsil ichiga) qo'shamiz
+        if (imageUrl) {
+            var box = document.createElement('div');
+            box.className = 'notice-image-box';
+            var img = document.createElement('img');
+            img.src = imageUrl;
+            img.loading = 'lazy';
+            img.alt = '';
+            box.appendChild(img);
+            fullEl.appendChild(box);
+        }
+
+        // Batafsil tugmasini matn uzunligi yoki rasm mavjudligiga qarab ko'rsatamiz/berkitamiz
+        if (btn) {
+            var needsExpand = displayText.length > 30 || !!imageUrl;
+            btn.style.display = needsExpand ? 'inline-flex' : 'none';
+        }
+    });
+})();
+</script>
+{% endblock %}
