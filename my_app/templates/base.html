@@ -180,6 +180,7 @@
             transition: background 0.2s ease;
             font-size: 1.4rem;
             text-decoration: none;
+            position: relative;
         }
 
         .action-icon:hover {
@@ -197,6 +198,27 @@
             border-color: var(--accent);
             transform: translateY(-2px);
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        /* ==================== NOTICE BADGE ==================== */
+        .notice-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 17px;
+            height: 17px;
+            padding: 0 4px;
+            background: #ff3b30;
+            color: #fff;
+            font-size: 0.62rem;
+            font-weight: 900;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 2px var(--bg-base);
+            line-height: 1;
+            pointer-events: none;
         }
 
         /* ==================== HAMBURGER ==================== */
@@ -406,6 +428,18 @@
         .logout-btn:hover { background: rgba(255, 59, 48, 0.1) !important; color: #ff3b30 !important; }
         .sidebar-footer { text-align: center; margin-top: 40px; color: var(--text-dim); font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; }
 
+        /* Sidebar/menu ichidagi notice badge */
+        .menu-item .notice-count-pill {
+            margin-left: auto;
+            background: #ff3b30;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-right: 10px;
+        }
+
         /* ==================== MOBILE NAV OVERLAY ==================== */
         .mobile-nav-overlay {
             position: fixed;
@@ -518,6 +552,7 @@
             transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            position: relative;
         }
 
         .mobile-menu-item i {
@@ -541,6 +576,16 @@
             margin-left: auto;
             opacity: 0.4;
             font-size: 1rem;
+        }
+
+        .mobile-menu-item .notice-count-pill {
+            margin-left: auto;
+            background: #ff3b30;
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 999px;
         }
 
         .mobile-menu-divider {
@@ -731,14 +776,6 @@
         }
 
         body.tabbar-on main.main-content {
-            padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 30px);
-        }
-
-        body.tabbar-on footer {
-            padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 30px);
-        }
-
-        body.tabbar-on main.main-content {
             padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 16px);
         }
 
@@ -749,7 +786,6 @@
         /* ==================== NETWORK TOAST — faqat mobil, tab bar ustidan ==================== */
         #networkToast {
             position: fixed;
-            /* Tab bar balandligi (64px) + pastdan masofa (20px) + biroz yuqori (10px) */
             bottom: 100px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
@@ -762,7 +798,6 @@
             z-index: 99999;
             opacity: 0;
             pointer-events: none;
-            /* Pastdan yuqoriga chiqish animatsiyasi */
             transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
                         transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
             white-space: nowrap;
@@ -775,7 +810,6 @@
             cursor: grab;
             user-select: none;
             -webkit-user-select: none;
-            /* Faqat mobilda ko'rinsin */
             display: none;
         }
 
@@ -797,8 +831,12 @@
             .hamburger { display: flex; }
             .nav-brand-logo { width: 38px; height: 38px; border-radius: 8px; }
             .nav-brand-text { font-size: 0.98rem; }
-            .nav-actions .action-icon:not(.profile-btn):not(.nav-search-icon) { display: none; }
-            .nav-actions .action-icon.nav-search-icon { display: flex; }
+
+            /* Mobil'da faqat: bildirishnoma, qidiruv, profil ko'rinadi (hamburger alohida) */
+            .nav-actions .action-icon:not(.profile-btn):not(.nav-search-icon):not(.nav-notice-icon) { display: none; }
+            .nav-actions .action-icon.nav-search-icon,
+            .nav-actions .action-icon.nav-notice-icon { display: flex; }
+
             .nav-actions { gap: 8px; }
             .action-icon, .profile-btn { width: 38px; height: 38px; font-size: 1.1rem; }
             .profile-sidebar { width: 100%; border-left: none; border-radius: 0; }
@@ -909,9 +947,29 @@
         <a href="{% url 'home' %}" class="pill-nav-item"><i class='bx bx-home-alt'></i> BOSH SAHIFA</a>
     </div>
 
+    <!--
+        NAV-ACTIONS TARTIBI (chap -> o'ng):
+        1) Bildirishnoma (notice)
+        2) Qidiruv (search)
+        3) Profil (rasm bilan)
+        4) Hamburger (sidebar)
+        Bu tartib mobil va PC uchun bir xil — CSS orqali PC'da faqat qo'shimcha
+        elementlar (search/notice/profile) ko'rinadi, hamburger esa faqat mobil'da.
+    -->
     <div class="nav-actions">
+
+        <!-- 1) BILDIRISHNOMA / NOTICE -->
+        <a href="{% url 'notice' %}" class="action-icon nav-notice-icon" aria-label="Bildirishnomalar">
+            <i class='bx bx-bell'></i>
+            {% if unread_notices_count %}
+                <span class="notice-badge">{% if unread_notices_count > 9 %}9+{% else %}{{ unread_notices_count }}{% endif %}</span>
+            {% endif %}
+        </a>
+
+        <!-- 2) QIDIRUV -->
         <a href="{% url 'search' %}" class="action-icon nav-search-icon" aria-label="Qidirish"><i class='bx bx-search'></i></a>
-        <a href="{% url 'chat' %}" class="action-icon" aria-label="Chat"><i class='bx bx-bell'></i></a>
+
+        <!-- 3) PROFIL (rasm bilan) -->
         <div class="action-icon profile-btn" onclick="toggleProfileMenu()" style="overflow: hidden; padding: 0;" role="button" aria-label="Profil">
             {% if request.user.is_authenticated and request.user.avatar %}
                 <img src="{{ request.user.avatar.image.url }}" alt="profile"
@@ -920,6 +978,8 @@
                 <i class='bx bx-user' style="margin: auto;"></i>
             {% endif %}
         </div>
+
+        <!-- 4) HAMBURGER (SIDEBAR) -->
         <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="Menyu" aria-expanded="false">
             <span></span>
             <span></span>
@@ -942,6 +1002,16 @@
         <a href="{% url 'home' %}" class="mobile-menu-item">
             <i class='bx bxs-home' style="color:#00f3ff;"></i>
             Bosh sahifa
+            <i class='bx bx-chevron-right m-arrow'></i>
+        </a>
+        <hr class="mobile-hr">
+
+        <a href="{% url 'notice' %}" class="mobile-menu-item">
+            <i class='bx bx-bell'></i>
+            Bildirishnomalar
+            {% if unread_notices_count %}
+                <span class="notice-count-pill">{% if unread_notices_count > 9 %}9+{% else %}{{ unread_notices_count }}{% endif %}</span>
+            {% endif %}
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
         <hr class="mobile-hr">
@@ -1069,6 +1139,14 @@
             <span class="value" style="color:var(--text-light); font-weight:800;">
                 {% if request.user.vip_data and request.user.vip_data.vip_active %}Faol{% else %}Yo'q{% endif %}
             </span>
+            <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'notice' %}" class="menu-item">
+            <span class="icon-left" style="color:#00f3ff;"><i class='bx bx-bell'></i></span>
+            Bildirishnomalar
+            {% if unread_notices_count %}
+                <span class="notice-count-pill">{% if unread_notices_count > 9 %}9+{% else %}{{ unread_notices_count }}{% endif %}</span>
+            {% endif %}
             <span class="arrow">›</span>
         </a>
         <a href="{% url 'favorites_page' %}" class="menu-item">
@@ -1462,10 +1540,9 @@ function markActiveTab() {
     var toast = document.getElementById('networkToast');
     if (!toast) return;
 
-    /* --- Bazaviy CSS (inline, CSS blokdagi display:none ni JS orqali boshqaramiz) --- */
     Object.assign(toast.style, {
         position:        'fixed',
-        bottom:          '96px',          /* tab bar (64px) + pastdan (20px) + bo'shliq (12px) */
+        bottom:          '96px',
         left:            '50%',
         transform:       'translateX(-50%) translateY(20px)',
         padding:         '10px 22px',
@@ -1490,14 +1567,11 @@ function markActiveTab() {
         WebkitUserSelect:'none',
     });
 
-    /* Faqat mobilda (768px va kichik) ishlatamiz */
     function isMobile() {
         return window.innerWidth <= 768;
     }
 
     var timer = null;
-
-    /* --- DRAG / SWIPE TO DISMISS --- */
     var startX = 0, startY = 0, currentX = 0, isDragging = false;
 
     function onDragStart(clientX, clientY) {
@@ -1525,7 +1599,6 @@ function markActiveTab() {
         toast.style.cursor = 'grab';
 
         if (Math.abs(currentX) > 80) {
-            /* Yetarli siljish — dismiss */
             var dir = currentX > 0 ? 1 : -1;
             toast.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
             toast.style.transform   = 'translateX(calc(-50% + ' + (dir * 300) + 'px)) translateY(0)';
@@ -1533,19 +1606,16 @@ function markActiveTab() {
             toast.style.pointerEvents = 'none';
             clearTimeout(timer);
         } else {
-            /* Qaytarish */
             toast.style.transition = 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1)';
             toast.style.transform  = 'translateX(-50%) translateY(0)';
             toast.style.opacity    = '1';
         }
     }
 
-    /* Mouse */
     toast.addEventListener('mousedown', function (e) { onDragStart(e.clientX, e.clientY); });
     document.addEventListener('mousemove', function (e) { onDragMove(e.clientX, e.clientY); });
     document.addEventListener('mouseup', function () { onDragEnd(); });
 
-    /* Touch */
     toast.addEventListener('touchstart', function (e) {
         onDragStart(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
@@ -1555,14 +1625,11 @@ function markActiveTab() {
     document.addEventListener('touchend', function () { onDragEnd(); });
 
 
-    /* --- TOAST KO'RSATISH --- */
     function showToast(isOnline) {
-        /* Faqat mobilda ishlaydi */
         if (!isMobile()) return;
 
         clearTimeout(timer);
 
-        /* Avval yashirib, keyin yuqoriga chiqaramiz (pastdan animatsiya) */
         toast.style.transition = 'none';
         toast.style.transform  = 'translateX(-50%) translateY(20px)';
         toast.style.opacity    = '0';
@@ -1580,7 +1647,6 @@ function markActiveTab() {
             toast.style.border     = '1px solid rgba(255,255,255,0.2)';
         }
 
-        /* Bir frame kutib animatsiyani boshlaymiz — pastdan yuqoriga */
         requestAnimationFrame(function () {
             requestAnimationFrame(function () {
                 toast.style.transition = 'opacity 0.45s cubic-bezier(0.22,1,0.36,1), transform 0.45s cubic-bezier(0.22,1,0.36,1)';
@@ -1589,7 +1655,6 @@ function markActiveTab() {
             });
         });
 
-        /* Online bo'lsa 3 sekunddan keyin o'chadi, offline bo'lsa qoladi */
         if (isOnline) {
             timer = setTimeout(function () {
                 toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
