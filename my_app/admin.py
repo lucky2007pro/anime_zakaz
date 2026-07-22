@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode, 
     SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
-    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem
+    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead
 )
 
 
@@ -162,6 +162,18 @@ class AnimeSectionItemAdmin(admin.ModelAdmin):
     search_fields = ('movie__title',)
     autocomplete_fields = ('movie',)
     ordering = ('section', 'order')
+
+@admin.register(Notice)
+class NoticeAdmin(admin.ModelAdmin):
+    list_display = ('title', 'created_by', 'is_active', 'created_at')
+    list_filter = ('is_active',)
+    search_fields = ('title', 'message')
+    readonly_fields = ('created_at',)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.created_by_id:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
