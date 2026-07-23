@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.template.defaultfilters import title
 from django.utils import timezone
 from zoneinfo import ZoneInfo
 
@@ -132,6 +133,16 @@ class Movie(models.Model):
         null=True,
         help_text="Telegram post linki (ixtiyoriy, agar mavjud bo'lsa saytda ko'rinadi)"
     )
+    rating = models.DecimalField(
+        max_digits=3, decimal_places=1,
+        blank=True, null=True,
+        help_text="Anime reytingi, masalan: 8.5"
+    )
+
+    intro_time = models.CharField(
+        max_length=30, blank=True, null=True,
+        help_text="Intro oralig'i (faqat qismsiz film uchun), masalan: 2:55 | 3:17"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -151,6 +162,10 @@ class MovieEpisode(models.Model):
                                   help_text="Yoki video faylni yuklang (mp4, mkv va b.)")
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    intro_time = models.CharField(
+        max_length=30, blank=True, null=True,
+        help_text="Intro oralig'i, masalan: 2:55 | 3:17"
+    )
 
     class Meta:
         ordering = ['episode_number']  # Episode raqam bo‘yicha tartiblanadi
@@ -309,7 +324,7 @@ class AnimeNews(models.Model):
     image = models.ImageField(upload_to='news/')
     description = models.TextField()
 
-    # 🎥 VIDEO
+    # 🎥 VIDEO (agar bo‘lsa oldingi qo‘shilgan)
     video = models.FileField(upload_to='news/videos/', null=True, blank=True)
 
     # 🔗 IXTIYORIY SILKA
@@ -325,9 +340,6 @@ class AnimeNews(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "yangilik"
 
     def total_likes(self):
         return self.likes.count()
@@ -399,7 +411,7 @@ class StoryView(models.Model):
         return f"{self.user.username} -> {self.story.title}"
 
 
-# qayta yoziladi bu joy 
+
 # =======================
 # REELS
 # =======================
@@ -562,6 +574,8 @@ class ActiveSession(models.Model):
     def __str__(self):
         return f"{self.user.username} — {self.device_name or 'Noma\'lum qurilma'} ({self.ip_address})"
 
+
+
 # =======================
 # ANIME SCHEDULE (Chiqish kunlari)
 # =======================
@@ -592,7 +606,6 @@ class AnimeSchedule(models.Model):
 
     def __str__(self):
         return f"{self.name} — {self.get_day_display()} ({self.episode_number}-qism)"
-
 
 
 
@@ -630,6 +643,12 @@ class AnimeSectionItem(models.Model):
 
     def __str__(self):
         return f"{self.get_section_display()} — {self.movie.title}"
+
+
+
+
+
+
 
 
 # =======================
