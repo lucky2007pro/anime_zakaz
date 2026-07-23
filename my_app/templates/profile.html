@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% static 'images/default.svg' as default_movie_poster %}
+
 {% block title %}Profil | BESTMEDIA{% endblock %}
 
 {% block extra_css %}
@@ -37,6 +39,32 @@
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 14px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+/* ===============================================
+   TIER RANGLAR (basic / premium / vip)
+   =============================================== */
+.tier-basic {
+    --tier-color: #00f3ff;
+    --tier-color-2: #00b8ff;
+    --tier-glow: rgba(0, 243, 255, 0.18);
+}
+.tier-premium {
+    --tier-color: #ffc107;
+    --tier-color-2: #ff8f00;
+    --tier-glow: rgba(255, 193, 7, 0.22);
+}
+.tier-vip {
+    --tier-color: #b45cff;
+    --tier-color-2: #ff5cd6;
+    --tier-glow: rgba(180, 92, 255, 0.25);
+}
+
+.pcard.tier-premium,
+.pcard.tier-vip {
+    border-color: color-mix(in srgb, var(--tier-color) 35%, transparent);
+    box-shadow: 0 0 26px var(--tier-glow);
 }
 
 /* ---- Hero block ---- */
@@ -66,6 +94,14 @@
     height: 100%;
     object-fit: cover;
 }
+.p-hero.tier-premium .p-avatar,
+.p-hero.tier-vip .p-avatar {
+    border: 2.5px solid var(--tier-color);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--tier-color) 15%, transparent), transparent);
+    color: var(--tier-color);
+    box-shadow: 0 0 18px var(--tier-glow);
+}
+
 .p-hero-text h2 {
     font-size: 1.25rem;
     font-weight: 800;
@@ -86,15 +122,20 @@
     font-size: 11px;
     font-weight: 800;
 }
-.p-badge.vip {
-    background: rgba(255, 193, 7, 0.12);
-    color: #d4a500;
-    border: 1px solid rgba(255, 193, 7, 0.25);
-}
 .p-badge.normal {
     background: rgba(255,255,255,0.06);
     color: var(--text-dim, rgba(255,255,255,0.5));
     border: 1px solid rgba(255,255,255,0.1);
+}
+.p-badge.premium {
+    background: rgba(255, 193, 7, 0.14);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+.p-badge.vip {
+    background: linear-gradient(90deg, rgba(180,92,255,0.18), rgba(255,92,214,0.18));
+    color: #d78bff;
+    border: 1px solid rgba(180, 92, 255, 0.35);
 }
 
 /* ---- Info grid ---- */
@@ -244,7 +285,252 @@
     text-align: center;
 }
 
-/* ---- Responsive ---- */
+/* ===============================================
+   KO'RILGAN ANIMELAR — home.html'dagi anime-card
+   dizayni bilan bir xil (kattaligi/ko'rinishi mos)
+   =============================================== */
+.p-watched-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 22px;
+}
+
+.p-watched-wrapper {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.p-watched-anime-card {
+    width: 100%;
+    height: 290px;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg-surface, rgba(255,255,255,0.04));
+}
+
+.p-watched-anime-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.p-watched-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,10,15,0.98) 0%, rgba(10,10,15,0.6) 40%, transparent 70%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12px 11px;
+    opacity: 1;
+}
+
+.p-watched-card-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+}
+
+.p-watched-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.p-watched-card-views {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.5);
+    font-weight: 700;
+}
+.p-watched-card-views i { font-size: 0.8rem; }
+
+.p-watched-top-badge-group {
+    position: absolute;
+    top: 8px; left: 8px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+}
+
+.p-watched-top-badge-year {
+    background: #eab308;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #000;
+}
+
+.p-watched-top-badge-episode {
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #FFC107;
+}
+
+.p-watched-tier-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.p-watched-tier-badge.vip {
+    background: rgba(251, 191, 36, 0.25);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+}
+.p-watched-tier-badge.premium {
+    background: rgba(244, 63, 94, 0.2);
+    color: #f43f5e;
+    border: 1px solid rgba(244, 63, 94, 0.4);
+}
+
+.p-watched-info-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 4px 0;
+}
+
+.p-watched-title-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.p-watched-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-light, #fff);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.3s ease;
+}
+.p-watched-wrapper:hover .p-watched-name { color: var(--accent, #00f3ff); }
+
+.p-watched-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-dim, rgba(255,255,255,0.5));
+}
+
+.p-watched-tag-jp {
+    background: rgba(255,255,255,0.1);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--text-light, #fff);
+    font-size: 0.65rem;
+    font-weight: 800;
+}
+
+/* ===== DARAJA (LEVEL) ===== */
+.p-level-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.p-level-info {
+    flex: 1;
+    min-width: 180px;
+}
+.p-level-info .p-section-title {
+    margin-bottom: 6px;
+}
+.p-level-desc {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.5;
+}
+.p-level-box {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(0,243,255,0.18), rgba(0,243,255,0.03));
+    border: 2px solid rgba(0,243,255,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 22px rgba(0,243,255,0.15);
+}
+.p-level-num {
+    font-size: 26px;
+    font-weight: 900;
+    color: #00f3ff;
+    line-height: 1;
+}
+.p-level-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    color: rgba(0,243,255,0.6);
+    margin-top: 3px;
+}
+
+.p-level-box.tier-premium,
+.p-level-box.tier-vip {
+    background: radial-gradient(circle at 30% 30%, var(--tier-glow), transparent);
+    border-color: var(--tier-color);
+    box-shadow: 0 0 24px var(--tier-glow);
+}
+.p-level-box.tier-premium .p-level-num,
+.p-level-box.tier-premium .p-level-label {
+    color: var(--tier-color);
+}
+.p-level-box.tier-vip .p-level-num {
+    background: linear-gradient(90deg, var(--tier-color), var(--tier-color-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.p-level-box.tier-vip .p-level-label {
+    color: var(--tier-color-2);
+}
+
+/* ---- Responsive (home.html bilan bir xil breakpointlar) ---- */
+@media (max-width: 768px) {
+    .p-watched-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .p-watched-anime-card { height: 240px; }
+    .p-watched-card-overlay { opacity: 1; }
+}
+
 @media (max-width: 560px) {
     .p-hero { flex-direction: column; text-align: center; }
     .p-info-grid { grid-template-columns: 1fr; }
@@ -254,6 +540,17 @@
     .p-info-cell:nth-last-child(-n+2) { border-bottom: 1px solid rgba(255,255,255,0.06); }
     .p-form-row { grid-template-columns: 1fr; }
     .p-av-grid { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); }
+    .p-level-card { justify-content: center; text-align: center; }
+}
+
+@media (max-width: 480px) {
+    .p-watched-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .p-watched-anime-card { height: 200px; }
+    .p-watched-top-badge-year,
+    .p-watched-top-badge-episode { font-size: 0.62rem; padding: 3px 6px; }
+    .p-watched-name { font-size: 0.88rem; }
+    .p-watched-card-overlay { padding: 8px; }
+    .p-watched-card-title { font-size: 0.8rem; }
 }
 </style>
 {% endblock %}
@@ -268,10 +565,10 @@
     </a>
 
     <!-- ===== PROFIL CARD ===== -->
-    <div class="pcard">
+    <div class="pcard tier-{{ user_tier|default:'basic' }}">
 
         <!-- Hero: avatar + name + badge -->
-        <div class="p-hero">
+        <div class="p-hero tier-{{ user_tier|default:'basic' }}">
             <div class="p-avatar">
                 {% if user.avatar %}
                     <img src="{{ user.avatar.image.url }}" alt="avatar">
@@ -282,8 +579,10 @@
             <div class="p-hero-text">
                 <h2>@{{ user.username }}</h2>
                 <p>{{ user.email }}</p>
-                {% if vip_active %}
-                    <span class="p-badge vip"><i class='bx bx-crown'></i> Premium</span>
+                {% if user_tier == 'vip' %}
+                    <span class="p-badge vip"><i class='bx bxs-crown'></i> VIP</span>
+                {% elif user_tier == 'premium' %}
+                    <span class="p-badge premium"><i class='bx bx-crown'></i> Premium</span>
                 {% else %}
                     <span class="p-badge normal"><i class='bx bx-user'></i> Oddiy</span>
                 {% endif %}
@@ -347,6 +646,75 @@
 
             <button type="submit" class="p-save-btn">O'zgarishlarni saqlash</button>
         </form>
+    </div>
+
+    <!-- ===== KO'RILGAN ANIMELAR CARD (home.html card dizayni) ===== -->
+    <div class="pcard">
+        <p class="p-section-title">Ko'rilgan animelar</p>
+
+        <div class="p-watched-grid">
+            {% for movie in last_watched_movies %}
+                <div class="p-watched-wrapper">
+                    <div class="p-watched-anime-card"
+                         onclick="window.location.href='{% url 'movie_detail' movie.id %}'">
+
+                        <div class="p-watched-top-badge-group">
+                            {% if movie.release_year %}
+                            <div class="p-watched-top-badge-year">{{ movie.release_year }}</div>
+                            {% endif %}
+                            {% if movie.episodes.count > 0 %}
+                            <div class="p-watched-top-badge-episode">{{ movie.episodes.count }} qism</div>
+                            {% else %}
+                            <div class="p-watched-top-badge-episode">Film</div>
+                            {% endif %}
+                        </div>
+
+                        {% if movie.minimum_tier == 'vip' %}
+                        <div class="p-watched-tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
+                        {% elif movie.minimum_tier == 'premium' or movie.is_premium %}
+                        <div class="p-watched-tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
+                        {% endif %}
+
+                        <img src="{% if movie.image %}{{ movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
+                             alt="{{ movie.title }}" loading="lazy">
+
+                        <div class="p-watched-card-overlay">
+                            <div class="p-watched-card-title">{{ movie.title }}</div>
+                            <div class="p-watched-card-meta">
+                                {% if movie.category %}<span class="p-watched-tag-jp">{{ movie.category.name }}</span>{% endif %}
+                                <div class="p-watched-card-views"><i class='bx bx-show'></i> {{ movie.views_count|default:"0" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-watched-info-bottom">
+                        <a href="{% url 'movie_detail' movie.id %}" class="p-watched-title-link">
+                            <h4 class="p-watched-name">{{ movie.title }}</h4>
+                        </a>
+                        <div class="p-watched-meta-row">
+                            {% if movie.category %}<span class="p-watched-tag-jp">{{ movie.category.name }}</span>{% endif %}
+                            <span style="font-weight:800;">{{ movie.release_year|default:movie.created_at|date:"Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="p-av-empty">Hali hech qanday anime ko'rilmagan.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== DARAJA (LEVEL) CARD ===== -->
+    <div class="pcard p-level-card tier-{{ user_tier|default:'basic' }}">
+        <div class="p-level-info">
+            <p class="p-section-title">Daraja</p>
+            <p class="p-level-desc">
+                Saytda faolligingiz va ko'rgan animelaringiz soniga qarab darajangiz avtomatik oshib boradi.
+            </p>
+        </div>
+        <div class="p-level-box tier-{{ user_tier|default:'basic' }}">
+            <div class="p-level-num">{{ user_level }}</div>
+            <div class="p-level-label">LEVEL</div>
+        </div>
     </div>
 
     <!-- Footer info -->
