@@ -128,6 +128,7 @@ def admin_movie_form(request, pk=None):
         is_home_featured = request.POST.get('is_home_featured') == 'on'
         minimum_tier = request.POST.get('minimum_tier', 'basic')
         release_year = request.POST.get('release_year', '').strip()
+        rating = request.POST.get('rating', '').strip()
         try:
             home_featured_order = int(request.POST.get('home_featured_order', 0) or 0)
         except (TypeError, ValueError):
@@ -145,6 +146,7 @@ def admin_movie_form(request, pk=None):
         movie.telegram_link = tg_link
         movie.release_year = release_year
         movie.is_home_featured = is_home_featured
+        movie.rating = rating or None
         movie.minimum_tier = minimum_tier
         if minimum_tier in ['premium', 'vip']:
             movie.is_premium = True
@@ -203,7 +205,9 @@ def admin_episode_form(request, pk=None):
         title = request.POST.get('title')
         vid_url = request.POST.get('video_url')
         description = request.POST.get('description')
+        intro_time = request.POST.get('intro_time')
         video_file = request.FILES.get('video_file')
+
 
         if not episode:
             episode = MovieEpisode()
@@ -213,6 +217,7 @@ def admin_episode_form(request, pk=None):
         episode.title = title
         episode.video_url = vid_url
         episode.description = description
+        episode.intro_time = intro_time
         if video_file:
             episode.video_file = video_file
         try:
@@ -614,7 +619,6 @@ def admin_section_delete(request, pk):
     item.delete()
     messages.success(request, "Bo'lim elementi o'chirildi!")
     return redirect('admin_sections')
-
 
 # =======================
 # NOTICE (E'lonlar)
