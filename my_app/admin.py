@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
-    Category, CustomUser, VipUser, Movie, MovieEpisode, 
+    Category, CustomUser, VipUser, Movie, MovieEpisode,
     SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
     Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead
+
 )
 
 
@@ -34,12 +35,12 @@ class CustomUserAdmin(UserAdmin):
 class MovieEpisodeInline(admin.TabularInline):
     model = MovieEpisode
     extra = 1
-    fields = ('episode_number', 'title', 'video_url', 'video_file', 'description')
+    fields = ('episode_number', 'title', 'video_url', 'video_file', 'description','intro_time')
     show_change_link = True
 
 
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ('title', 'is_home_featured', 'home_featured_order', 'created_at')
+    list_display = ('title', 'rating', 'is_home_featured', 'home_featured_order', 'created_at')
     search_fields = ('title',)
     list_filter = ('created_at', 'is_home_featured')
     list_editable = ('is_home_featured', 'home_featured_order')
@@ -102,7 +103,6 @@ class StoryAdmin(admin.ModelAdmin):
 
     total_views.short_description = "Ko‘rishlar"
 
-# qayta yoziladi bu joy hamm 
 @admin.register(Reel)
 class ReelAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'title', 'views_count', 'shares_count', 'total_likes', 'total_comments', 'created_at')
@@ -155,6 +155,7 @@ class AnimeScheduleAdmin(admin.ModelAdmin):
     search_fields = ('name', 'fandub')
     ordering      = ('order',)
 
+
 @admin.register(AnimeSectionItem)
 class AnimeSectionItemAdmin(admin.ModelAdmin):
     list_display = ('movie', 'section', 'order', 'created_at')
@@ -162,6 +163,7 @@ class AnimeSectionItemAdmin(admin.ModelAdmin):
     search_fields = ('movie__title',)
     autocomplete_fields = ('movie',)
     ordering = ('section', 'order')
+
 
 @admin.register(Notice)
 class NoticeAdmin(admin.ModelAdmin):
@@ -174,6 +176,8 @@ class NoticeAdmin(admin.ModelAdmin):
         if not obj.created_by_id:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
