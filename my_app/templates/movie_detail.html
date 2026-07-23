@@ -1534,6 +1534,11 @@ function initBmPlayer(){
 
   /* ================================================================
      SKIP INTRO
+     — Tugma har doim admin belgilagan vaqt oralig'ida chiqadi va
+       shu oraliqdan chiqishi bilan yo'qoladi. Toggle switch bunga
+       ta'sir qilmaydi.
+     — Toggle switch YOQILGAN bo'lsa, video shu oraliqqa kirganda
+       avtomatik oralig' oxiriga sakraydi (auto-skip).
   ================================================================ */
   function parseIntroRangeStr(raw){
     if(!raw) return null;
@@ -1549,36 +1554,35 @@ function initBmPlayer(){
 
   function refreshIntroSkipButton(){
     if(!skipIntroBtn) return;
-    var enabled = localStorage.getItem(bmIntroStorageKey(BM_CURRENT_EP_ID)) === '1';
-    var range   = parseIntroRangeStr(BM_CURRENT_INTRO);
-    skipIntroBtn._range = (enabled && range) ? range : null;
+    skipIntroBtn._range = parseIntroRangeStr(BM_CURRENT_INTRO);
     introAutoSkipped = false;
-    if(!skipIntroBtn._range) skipIntroBtn.style.display = 'none';
+    skipIntroBtn.style.display = 'none';
   }
   window.refreshIntroSkipButton = refreshIntroSkipButton;
   refreshIntroSkipButton();
 
-  /* Introni utqazib yuborish YOQILGAN bo'lsa — tugma bosilishini kutmasdan,
-     video shu oraliqqa kirishi bilan avtomatik oralig' oxiriga sakraydi.   */
   video.addEventListener('timeupdate', function(){
     if(!skipIntroBtn || !skipIntroBtn._range) return;
     var t = video.currentTime;
     var r = skipIntroBtn._range;
 
-    if(t < r.start){
+    if(t < r.start || t > r.end){
       introAutoSkipped = false;
+      skipIntroBtn.style.display = 'none';
+      return;
     }
 
-    if(t >= r.start && t <= r.end){
+    /* t admin belgilagan oraliq ichida */
+    var autoSkipEnabled = localStorage.getItem(bmIntroStorageKey(BM_CURRENT_EP_ID)) === '1';
+
+    if(autoSkipEnabled){
       if(!introAutoSkipped){
         introAutoSkipped = true;
         video.currentTime = r.end;
-        skipIntroBtn.style.display = 'none';
-        return;
       }
-      skipIntroBtn.style.display = 'flex';
-    } else {
       skipIntroBtn.style.display = 'none';
+    } else {
+      skipIntroBtn.style.display = 'flex';
     }
   }, sig);
 
