@@ -7,7 +7,7 @@ from .views import (
     logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,reels, aloqa, news_feed, news_detail, toggle_like,next_story_view, prev_story_view, story_view, mark_story_seen,
     reels_feed, reel_detail, toggle_reel_like, add_reel_comment, reel_comments_api, reel_share,
     settings_privacy,settings_devices,settings_premium,settings_telegram,settings_general,
-    anime_category,notice
+    anime_category,notice,user_mini_profile_api
 
  
 )
@@ -136,6 +136,8 @@ urlpatterns = [
     path('control-panel/notices/add/', admin_notice_form, name='admin_notice_form'),
     path('control-panel/notices/<int:pk>/edit/', admin_notice_form, name='admin_notice_form'),
     path('control-panel/notices/<int:pk>/delete/', admin_notice_delete, name='admin_notice_delete'),
+    path('chat/user-profile/<int:user_id>/', user_mini_profile_api, name='user_mini_profile_api'),
+
     
     
 ]
