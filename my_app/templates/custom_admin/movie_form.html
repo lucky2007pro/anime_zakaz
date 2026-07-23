@@ -98,10 +98,15 @@
         </div>
 
         <div class="form-group">
+            <label for="movie-rating">Anime Reytingi (Masalan: 8.5)</label>
+            <input id="movie-rating" type="number" name="rating" class="form-control" step="0.1" min="0" max="10" value="{{ movie.rating|default:'' }}" placeholder="8.5">
+        </div>
+
+        <div class="form-group">
             <label for="movie-description">Tavsifi (Ixtiyoriy)</label>
             <textarea id="movie-description" name="description" class="form-control" rows="4">{{ movie.description|default:'' }}</textarea>
         </div>
-        
+
         <div class="form-group">
             <label for="movie-video-url">Video URL (Ixtiyoriy)</label>
             <input id="movie-video-url" type="url" name="video_url" class="form-control" value="{{ movie.video_url|default:'' }}">
@@ -121,7 +126,7 @@
             <label for="movie-telegram-link">Telegram Link (Ixtiyoriy - tugma chiqarish uchun)</label>
             <input id="movie-telegram-link" type="url" name="telegram_link" class="form-control" value="{{ movie.telegram_link|default:'' }}">
         </div>
-        
+
         <div class="form-group">
             <label for="movie-category">Janr (Kategoriya)</label>
             <select id="movie-category" name="category" class="form-control select-control">
@@ -173,7 +178,7 @@
             </div>
             {% endif %}
         </div>
-        
+
         <button type="submit" class="btn-submit">SAQLASH <i class='bx bx-save'></i></button>
     </form>
 </div>
