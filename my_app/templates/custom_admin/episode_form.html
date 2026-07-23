@@ -8,15 +8,15 @@
     .form-container { max-width: 600px; margin: 0 auto; }
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; margin-bottom: 8px; color: var(--text-dim); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-    
+
     .form-control {
         width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-line);
         color: white; border-radius: 4px; font-family: 'Outfit', sans-serif; font-size: 1rem; transition: 0.3s;
     }
     .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
-    
+
     .select-control { appearance: none; }
-    
+
     .btn-submit {
         background: var(--accent); color: black; border: none; padding: 14px 20px; border-radius: 4px;
         width: 100%; font-weight: 900; font-size: 1rem; cursor: pointer; transition: 0.3s;
@@ -84,7 +84,7 @@
                 {% endfor %}
             </select>
         </div>
-        
+
         <div class="form-group inline-row" style="display:flex; gap: 20px;">
             <div style="flex:1;">
                 <label for="episode-number">Qism raqami</label>
@@ -95,7 +95,7 @@
                 <input id="episode-title" type="text" name="title" class="form-control" value="{{ episode.title|default:'' }}" placeholder="Masalan: Qahramonning uyg'onishi">
             </div>
         </div>
-        
+
         <div class="form-group">
             <label for="episode-video-url">Video URL (Bunny.net/CDN linki) - Ixtiyoriy</label>
             <input id="episode-video-url" type="url" name="video_url" class="form-control" value="{{ episode.video_url|default:'' }}" placeholder="https://...">
@@ -104,6 +104,11 @@
         <div class="form-group">
             <label for="episode-description">Qism haqida izoh (ixtiyoriy)</label>
             <textarea id="episode-description" name="description" class="form-control" rows="4" placeholder="Bu qism uchun qisqa izoh...">{{ episode.description|default:'' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="episode-intro-time">Introni utqazib yuborish oralig'i (ixtiyoriy)</label>
+            <input id="episode-intro-time" type="text" name="intro_time" class="form-control" value="{{ episode.intro_time|default:'' }}" placeholder="Masalan: 1:24 | 4:55">
         </div>
 
         <div class="form-group">
