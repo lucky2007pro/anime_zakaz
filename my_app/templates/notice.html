@@ -4,13 +4,18 @@
 {% block title %}Bildirishnomalar — BESTMEDIA{% endblock %}
 
 {% block extra_css %}
-body {
+html {
     background-image:
         linear-gradient(180deg, rgba(10,10,15,0.55) 0%, rgba(10,10,15,0.65) 100%),
         url('https://i.pinimg.com/736x/2c/63/33/2c63335735531b90b234041e991bbeb3.jpg');
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
     background-attachment: fixed;
+}
+
+body {
+    background: transparent;
 }
 
 .notice-header {
@@ -359,9 +364,6 @@ body {
                 {% if n.notice_type == 'reply' %}
                     <i class='bx bx-show'></i>
                     <span>Ko'rish</span>
-                {% else %}
-                    <i class='bx bx-chevron-right'></i>
-                    <span>Batafsil</span>
                 {% endif %}
             </div>
 
@@ -451,4 +453,6 @@ function toggleNoticeMessage(event, btn) {
     });
 })();
 </script>
+
+{% block footer %}{% endblock footer %}
 {% endblock %}
