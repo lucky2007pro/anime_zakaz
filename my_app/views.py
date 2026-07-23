@@ -309,6 +309,8 @@ def check_username(request):
 # =======================
 @login_required(login_url='login')
 def profile(request):
+    from .models import WatchHistory  # fayl boshida import bo'lsa kerak emas
+
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     avatars = ProfileAvatar.objects.all().order_by('-created_at')
 
@@ -342,12 +344,28 @@ def profile(request):
 
         return redirect('profile')
 
+    # ===== Oxirgi ko'rilgan 2 ta anime =====
+    last_watched_qs = (
+        WatchHistory.objects
+        .filter(user=request.user)
+        .select_related('movie')
+        .order_by('-last_watched')[:2]
+    )
+    last_watched_movies = [w.movie for w in last_watched_qs]
+
     context = {
         'total_users': CustomUser.objects.count(),
         'vip_active': vip_data.vip_active(),
+        'user_tier': vip_data.get_tier(),
         'avatars': avatars,
+
+        # Yangi qo'shilganlar
+        'last_watched_movies': last_watched_movies,
+        'user_level': request.user.get_level(),
+        'watched_count': request.user.watched_count(),
     }
     return render(request, 'profile.html', context)
+
 
 
 # =======================
@@ -417,7 +435,8 @@ def anime_catalog(request):
 def chat(request):
     tz = ZoneInfo('Asia/Tashkent')
 
-    # fetch all messages up to limit
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+
     messages_count = ChatMessage.objects.count()
     has_more = messages_count > 40
 
@@ -430,7 +449,6 @@ def chat(request):
         msg.local_created_at = localtime(msg.created_at, tz)
 
     if request.method == "POST":
-
         if request.user.is_banned:
             messages.error(request, "Siz yozolmaysiz")
             return redirect('chat')
@@ -452,8 +470,6 @@ def chat(request):
                 created_at=timezone.now(),
                 reply_to=reply_to_msg
             )
-
-            # ==== Reply bo'lsa, xabar egasiga notice yaratish ====
             if reply_to_msg and reply_to_msg.user != request.user:
                 Notice.objects.create(
                     notice_type='reply',
@@ -463,12 +479,13 @@ def chat(request):
                     message=text,
                     related_chat_message=new_msg,
                 )
-
         return redirect('chat')
 
     return render(request, 'chat.html', {
         'messages': messages_list,
-        'has_more': has_more
+        'has_more': has_more,
+        'user_tier': vip_data.get_tier(),          # YANGI
+        'vip_active': vip_data.vip_active(),       # YANGI
     })
 
 
@@ -508,6 +525,7 @@ def chat_messages_api(request):
             'id': msg.id,
             'message': msg.message,
             'username': msg.user.username,
+            'display_name': msg.user.display_name(),  # YANGI
             'avatar_url': avatar_url,
             'time': localtime(msg.created_at, tz).strftime('%H:%M'),
             'edited': msg.edited,
@@ -521,6 +539,52 @@ def chat_messages_api(request):
         })
 
     return JsonResponse({'messages': data})
+
+# =======================
+# CHAT: USER MINI PROFIL (avatar bosilganda)
+# =======================
+@login_required
+def user_mini_profile_api(request, user_id):
+    from .models import WatchHistory
+
+    target_user = get_object_or_404(CustomUser, id=user_id)
+    vip_data, _ = VipUser.objects.get_or_create(user=target_user)
+
+    last_watched_qs = (
+        WatchHistory.objects
+        .filter(user=target_user)
+        .select_related('movie')
+        .order_by('-last_watched')[:2]
+    )
+    last_watched = []
+    for w in last_watched_qs:
+        m = w.movie
+        last_watched.append({
+            'id': m.id,
+            'title': m.title,
+            'image_url': m.image.url if m.image else None,
+            'release_year': m.release_year,
+        })
+
+    avatar_url = None
+    if getattr(target_user, 'avatar', None) and target_user.avatar.image:
+        avatar_url = target_user.avatar.image.url
+
+    return JsonResponse({
+        'id': target_user.id,
+        'username': target_user.username,
+        'display_name': target_user.display_name(),
+        'first_name': target_user.first_name or "Kiritilmagan",
+        'last_name': target_user.last_name or "Kiritilmagan",
+        'date_joined': localtime(target_user.date_joined, ZoneInfo('Asia/Tashkent')).strftime('%d.%m.%Y'),
+        'avatar_url': avatar_url,
+        'tier': vip_data.get_tier(),
+        'is_admin': target_user.is_admin_user,
+        'level': target_user.get_level(),
+        'watched_count': target_user.watched_count(),
+        'last_watched': last_watched,
+    })
+
 
 
 # =======================
