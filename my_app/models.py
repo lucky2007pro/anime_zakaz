@@ -23,7 +23,7 @@ class Category(models.Model):
 class CustomUser(AbstractUser):
     phone = models.CharField(max_length=15, blank=True, null=True)
     is_banned = models.BooleanField(default=False)
-    is_admin_user = models.BooleanField(default=False)  # Admin panelga kirish
+    is_admin_user = models.BooleanField(default=False)
     avatar = models.ForeignKey('ProfileAvatar', on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
 
     def active_tier(self):
@@ -31,8 +31,48 @@ class CustomUser(AbstractUser):
             return 'basic'
         return self.vip_data.get_tier()
 
+    # ============================================
+    # DARAJA (LEVEL) TIZIMI
+    # ============================================
+    def days_since_joined(self):
+        """Foydalanuvchi ro'yxatdan o'tganiga necha kun bo'ldi"""
+        return (timezone.now() - self.date_joined).days
+
+    def watched_count(self):
+        """Nechta anime ko'rgan (WatchHistory bo'yicha)"""
+        return self.watch_history.count()
+
+    def _days_level(self):
+        days = self.days_since_joined()
+        if days >= 50:
+            return 20
+        elif days >= 31:
+            return 10
+        elif days >= 1:
+            return 5
+        return 0
+
+    def _watched_level(self):
+        count = self.watched_count()
+        if count >= 50:
+            return 20
+        elif count >= 20:
+            return 10
+        elif count >= 5:
+            return 5
+        return 0
+
+    def get_level(self):
+        """Umumiy daraja = kunlik daraja + ko'rilgan anime darajasi"""
+        return self._days_level() + self._watched_level()
+
+    def display_name(self):
+        """Profilda kiritilgan ismi bo'lsa o'shani, bo'lmasa username'ni qaytaradi"""
+        return self.first_name.strip() if self.first_name and self.first_name.strip() else self.username
+
     def __str__(self):
         return self.username if self.username else f"User-{self.id}"
+
 
 
 class VipUser(models.Model):
