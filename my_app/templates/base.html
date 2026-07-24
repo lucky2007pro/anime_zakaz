@@ -85,15 +85,17 @@
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
-            background: linear-gradient(to bottom, color-mix(in srgb, var(--bg-base) 90%, transparent), transparent);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: background 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(to bottom, color-mix(in srgb, var(--bg-base) 38%, transparent), color-mix(in srgb, var(--bg-base) 12%, transparent));
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
 
         .navbar.scrolled {
-            background: color-mix(in srgb, var(--bg-base) 98%, transparent);
+            background: color-mix(in srgb, var(--bg-base) 55%, transparent);
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            border-bottom-color: rgba(255, 255, 255, 0.12);
         }
 
         .nav-brand {
@@ -478,8 +480,7 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            overflow-y: hidden;
             overscroll-behavior: contain;
             scrollbar-width: none;
             box-shadow:
@@ -502,7 +503,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 12px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.07);
             border-radius: 14px;
@@ -537,6 +538,101 @@
             background: rgba(255,59,48,0.25);
             transform: scale(1.1);
         }
+
+        /* ==================== MOBILE PROFIL QISQACHA (avatar + nick) ==================== */
+        .mobile-profile-summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            text-decoration: none;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .mobile-profile-summary:hover {
+            background: rgba(0, 243, 255, 0.08);
+            border-color: rgba(0, 243, 255, 0.2);
+        }
+
+        .mobile-profile-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(0, 243, 255, 0.1);
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--accent);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .mobile-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .mobile-profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .mobile-profile-name {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mobile-profile-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ==================== MOBILE MENU BOX (bitta box, skrollanadi) ==================== */
+        .mobile-menu-box {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            scrollbar-width: none;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 10px;
+        }
+
+        .mobile-menu-box::-webkit-scrollbar { display: none; }
+
+        .mobile-menu-box .mobile-menu-item {
+            padding: 11px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+        }
+
+        .mobile-menu-box .mobile-menu-item:last-child { border-bottom: none; }
 
         /* ==================== MOBILE MENU ITEMS ==================== */
         .mobile-menu-item {
@@ -624,7 +720,8 @@
             font-weight: 800;
             font-size: 0.9rem;
             cursor: pointer;
-            margin-top: 6px;
+            margin-top: 0;
+            flex-shrink: 0;
             transition: 0.25s;
             text-decoration: none;
             -webkit-tap-highlight-color: transparent;
@@ -633,7 +730,7 @@
         .mobile-profile-action:hover { background: rgba(0, 243, 255, 0.14); }
 
         .mobile-nav-footer {
-            margin-top: auto;
+            margin-top: 12px;
             padding-top: 16px;
             border-top: 1px solid rgba(255,255,255,0.06);
             text-align: center;
@@ -999,62 +1096,83 @@
             </button>
         </div>
 
-        <a href="{% url 'home' %}" class="mobile-menu-item">
-            <i class='bx bxs-home' style="color:#00f3ff;"></i>
-            Bosh sahifa
+        <!-- Profil qisqacha: avatar (ism) -->
+        <a href="{% url 'profile' %}" class="mobile-profile-summary">
+            <div class="mobile-profile-avatar">
+                {% if request.user.is_authenticated and request.user.avatar %}
+                    <img src="{{ request.user.avatar.image.url }}" alt="avatar">
+                {% else %}
+                    <i class='bx bx-user'></i>
+                {% endif %}
+            </div>
+            <div class="mobile-profile-info">
+                <span class="mobile-profile-name">
+                    {% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Mehmon{% endif %}
+                </span>
+                <span class="mobile-profile-tag">
+                    {% if request.user.is_authenticated and request.user.vip_data and request.user.vip_data.vip_active %}
+                        VIP
+                    {% else %}
+                        Oddiy
+                    {% endif %}
+                </span>
+            </div>
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
-        <hr class="mobile-hr">
 
-        <a href="{% url 'notice' %}" class="mobile-menu-item">
-            <i class='bx bx-bell'></i>
-            Bildirishnomalar
-            {% if unread_notices_count %}
-                <span class="notice-count-pill">{% if unread_notices_count > 9 %}9+{% else %}{{ unread_notices_count }}{% endif %}</span>
-            {% endif %}
-            <i class='bx bx-chevron-right m-arrow'></i>
-        </a>
-        <hr class="mobile-hr">
+        <!-- Bitta box ichida barcha tugmalar, ixcham va skrollanadigan -->
+        <div class="mobile-menu-box">
+            <a href="{% url 'home' %}" class="mobile-menu-item">
+                <i class='bx bxs-home' style="color:#00f3ff;"></i>
+                Bosh sahifa
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
 
-        <a href="{% url 'anime_catalog' %}" class="mobile-menu-item">
-            <i class='bx bx-play-circle'></i>
-            Katalog
-            <i class='bx bx-chevron-right m-arrow'></i>
-        </a>
-        <hr class="mobile-hr">
+            <a href="{% url 'notice' %}" class="mobile-menu-item">
+                <i class='bx bx-bell'></i>
+                Bildirishnomalar
+                {% if unread_notices_count %}
+                    <span class="notice-count-pill">{% if unread_notices_count > 9 %}9+{% else %}{{ unread_notices_count }}{% endif %}</span>
+                {% endif %}
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
 
-        <a href="{% url 'chat' %}" class="mobile-menu-item">
-            <i class='bx bx-message-dots'></i>
-            Umumiy chat
-            <i class='bx bx-chevron-right m-arrow'></i>
-        </a>
-        <hr class="mobile-hr">
+            <a href="{% url 'anime_catalog' %}" class="mobile-menu-item">
+                <i class='bx bx-play-circle'></i>
+                Katalog
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
 
-        <a href="{% url 'news_feed' %}" class="mobile-menu-item">
-            <i class='bx bx-news'></i>
-            Yangiliklar
-            <i class='bx bx-chevron-right m-arrow'></i>
-        </a>
-        <hr class="mobile-hr">
+            <a href="{% url 'chat' %}" class="mobile-menu-item">
+                <i class='bx bx-message-dots'></i>
+                Umumiy chat
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
 
-        <a href="{% url 'reels' %}" class="mobile-menu-item">
-            <i class='bx bx-video'></i>
-            Reels
-            <i class='bx bx-chevron-right m-arrow'></i>
-        </a>
-        <hr class="mobile-hr">
+            <a href="{% url 'news_feed' %}" class="mobile-menu-item">
+                <i class='bx bx-news'></i>
+                Yangiliklar
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
 
-        <a href="{% url 'aloqa' %}" class="mobile-menu-item">
-            <i class='bx bx-support'></i>
-            Aloqa
-            <i class='bx bx-chevron-right m-arrow'></i>
-        </a>
-        <hr class="mobile-hr">
-        <a href="{% url 'settings_general' %}" class="menu-item">
-            <span class="icon-left"><i class='bx bx-cog'></i></span>
-            Sozlamalar <span class="arrow">›</span>
-        </a>
-        <hr class="mobile-hr">
+            <a href="{% url 'reels' %}" class="mobile-menu-item">
+                <i class='bx bx-video'></i>
+                Reels
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            <a href="{% url 'aloqa' %}" class="mobile-menu-item">
+                <i class='bx bx-support'></i>
+                Aloqa
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            <a href="{% url 'settings_general' %}" class="mobile-menu-item">
+                <i class='bx bx-cog'></i>
+                Sozlamalar
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+        </div>
 
         <a href="javascript:void(0)" class="mobile-profile-action" onclick="openProfileFromMobile()">
             <i class='bx bx-grid-alt'></i>
@@ -1062,25 +1180,8 @@
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
 
-        <h4 class="menu-title">MENING HISOBIM</h4>
-
-        <a href="{% url 'profile' %}" class="menu-item">
-            <span class="icon-left" style="color:#00f3ff;">
-                <i class='bx bx-user-circle'></i>
-            </span>
-            Mening Hisobim
-            <span class="value" style="color:var(--text-light); font-weight:800;">
-                {% if request.user.vip_data and request.user.vip_data.vip_active %}
-                    VIP
-                {% else %}
-                    Oddiy
-                {% endif %}
-            </span>
-            <span class="arrow">›</span>
-        </a>
-
         <div class="mobile-nav-footer">
-            VERSION 2.1 &nbsp;•&nbsp; ANI BEST
+            VERSION 3.4 &nbsp;•&nbsp; ANI BEST
         </div>
 
     </div>
