@@ -436,7 +436,8 @@
 .movie-info p  { font-size: .95rem; color: var(--text-dim); }
 
 /* =====================================================================
-   QUICK ACTIONS: ULASHISH / INTRONI UTQAZISH / REYTING
+   QUICK ACTIONS: ULASHISH / ANIME HAQIDA / INTRONI UTQAZISH / ANIME
+   KADRLAR / REYTING
 ===================================================================== */
 .quick-actions-section {
     background: rgba(17,17,24,.88);
@@ -445,10 +446,16 @@
     box-shadow: 0 18px 42px rgba(0,0,0,.42);
     padding: 22px 18px;
     display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.qa-icons-row {
+    display: flex;
     align-items: flex-start;
     justify-content: space-around;
     gap: 12px;
     flex-wrap: wrap;
+    width: 100%;
 }
 .qa-item {
     display: flex;
@@ -530,10 +537,83 @@
     transform: translateX(24px);
 }
 
+/* -- ANIME HAQIDA / ANIME KADRLAR — detail boxlar -- */
+.qa-detail-box {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 16px;
+}
+.qa-back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    align-self: flex-start;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    color: #fff; font-weight: 800; font-size: .85rem;
+    padding: 9px 16px; border-radius: 999px;
+    cursor: pointer; transition: .2s;
+}
+.qa-back-btn:hover {
+    background: rgba(220,38,38,.18);
+    border-color: rgba(220,38,38,.35);
+    color: #f87171;
+}
+.qa-back-btn i { font-size: 1.1rem; }
+
+.qa-about-content {
+    color: rgba(255,255,255,.82);
+    font-size: .95rem; line-height: 1.7;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.qa-frames-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+.qa-frame-item {
+    flex: 1 1 0;
+    aspect-ratio: 16/9;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: zoom-in;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    transition: transform .2s;
+}
+.qa-frame-item:hover { transform: translateY(-3px); }
+.qa-frame-item img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+}
+
+.qa-frame-lightbox {
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,.9);
+    display: none; align-items: center; justify-content: center;
+    padding: 24px;
+}
+.qa-frame-lightbox.open { display: flex; }
+.qa-frame-lightbox img {
+    max-width: 100%; max-height: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+}
+.qa-lightbox-close {
+    position: absolute; top: 18px; right: 24px;
+    color: #fff; font-size: 2rem; font-weight: 300;
+    cursor: pointer; line-height: 1;
+}
+
 @media (max-width: 520px) {
     .quick-actions-section { padding: 18px 12px; }
     .qa-circle-btn { width: 48px; height: 48px; font-size: 1.3rem; }
     .qa-label { font-size: .74rem; }
+    .qa-frames-row { flex-wrap: wrap; }
+    .qa-frame-item { flex: 1 1 calc(50% - 5px); }
 }
 
 /* =====================================================================
@@ -931,32 +1011,83 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
   </div><!-- /movie-grid -->
 
   <!-- ================= QUICK ACTIONS ================= -->
-  <section class="quick-actions-section">
-    <div class="qa-item" id="qa-share">
-      <span class="qa-label">Ulashish</span>
-      <button type="button" class="qa-circle-btn" id="qa-share-btn" title="Ulashish" aria-label="Ulashish">
-        <i class='bx bx-share-alt'></i>
-      </button>
-    </div>
+  <section class="quick-actions-section" id="quick-actions-section">
 
-    <div class="qa-item" id="qa-intro">
-      <span class="qa-label">Introni utqazib<br>yuborish</span>
-      <label class="qa-toggle-switch">
-        <input type="checkbox" id="qa-intro-toggle">
-        <span class="qa-toggle-slider"></span>
-      </label>
-    </div>
-
-    {% if movie.rating %}
-    <div class="qa-item" id="qa-rating">
-      <span class="qa-label">Anime reyteng</span>
-      <div class="qa-circle-btn qa-rating-star">
-        <i class='bx bxs-star'></i>
+    <!-- ICONS ROW: Ulashish / Anime haqida / Introni utqazib yuborish / Anime kadrlar / Anime reyteng -->
+    <div class="qa-icons-row" id="qa-icons-row">
+      <div class="qa-item" id="qa-share">
+        <span class="qa-label">Ulashish</span>
+        <button type="button" class="qa-circle-btn" id="qa-share-btn" title="Ulashish" aria-label="Ulashish">
+          <i class='bx bx-share-alt'></i>
+        </button>
       </div>
-      <span class="qa-rating-value">{{ movie.rating }}<i class='bx bxs-star' style="font-size:.7em;"></i></span>
+
+      <div class="qa-item" id="qa-about">
+        <span class="qa-label">Anime haqida</span>
+        <button type="button" class="qa-circle-btn" id="qa-about-btn" title="Anime haqida" aria-label="Anime haqida">
+          <i class='bx bx-info-circle'></i>
+        </button>
+      </div>
+
+      <div class="qa-item" id="qa-intro">
+        <span class="qa-label">Introni utqazib<br>yuborish</span>
+        <label class="qa-toggle-switch">
+          <input type="checkbox" id="qa-intro-toggle">
+          <span class="qa-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="qa-item" id="qa-frames">
+        <span class="qa-label">Anime kadrlar</span>
+        <button type="button" class="qa-circle-btn" id="qa-frames-btn" title="Anime kadrlar" aria-label="Anime kadrlar">
+          <i class='bx bx-images'></i>
+        </button>
+      </div>
+
+      {% if movie.rating %}
+      <div class="qa-item" id="qa-rating">
+        <span class="qa-label">Anime reyteng</span>
+        <div class="qa-circle-btn qa-rating-star">
+          <i class='bx bxs-star'></i>
+        </div>
+        <span class="qa-rating-value">{{ movie.rating }}<i class='bx bxs-star' style="font-size:.7em;"></i></span>
+      </div>
+      {% endif %}
+    </div><!-- /qa-icons-row -->
+
+    <!-- ANIME HAQIDA — admin qo'shgan matn shu yerda ochiladi -->
+    <div class="qa-detail-box" id="qa-about-box">
+      <button type="button" class="qa-back-btn" id="qa-about-back">
+        <i class='bx bx-arrow-back'></i> Orqaga
+      </button>
+      <div class="qa-about-content">
+        {{ movie.about_info|default:"Anime haqida ma'lumot kiritilmagan."|linebreaksbr }}
+      </div>
     </div>
-    {% endif %}
+
+    <!-- ANIME KADRLAR — admin yuklagan (maks 5 ta) rasmlar 1 qatorda 16:9 -->
+    <div class="qa-detail-box" id="qa-frames-box">
+      <button type="button" class="qa-back-btn" id="qa-frames-back">
+        <i class='bx bx-arrow-back'></i> Orqaga
+      </button>
+      <div class="qa-frames-row" id="qa-frames-row">
+        {% for frame in movie.frames.all %}
+        <div class="qa-frame-item" data-full="{{ frame.image.url }}">
+          <img src="{{ frame.image.url }}" alt="{{ movie.title }} - kadr {{ forloop.counter }}" loading="lazy">
+        </div>
+        {% empty %}
+        <p style="color:var(--text-dim);">Kadrlar hali qo'shilmagan.</p>
+        {% endfor %}
+      </div>
+    </div>
+
   </section>
+
+  <!-- ANIME KADRLAR ZOOM (lightbox) -->
+  <div class="qa-frame-lightbox" id="qa-frame-lightbox">
+    <span class="qa-lightbox-close" id="qa-lightbox-close">&times;</span>
+    <img id="qa-lightbox-img" src="" alt="">
+  </div>
 
   <!-- ================= COMMENTS ================= -->
   <section class="comments-section" id="comments">
@@ -1301,6 +1432,56 @@ updateIntroToggleUi();
     } else {
       prompt('Havolani nusxalang:', shareUrl);
     }
+  });
+})();
+
+/* ---------------------------------------------------------------
+   QUICK ACTIONS: ANIME HAQIDA / ANIME KADRLAR — box almashish
+   Bosilganda: ikonalar qatori yashiriladi, tegishli box ochiladi.
+   "Orqaga" bosilganda: box yopiladi, ikonalar qatori qaytadi.
+--------------------------------------------------------------- */
+(function(){
+  var iconsRow   = document.getElementById('qa-icons-row');
+  var aboutBtn   = document.getElementById('qa-about-btn');
+  var framesBtn  = document.getElementById('qa-frames-btn');
+  var aboutBox   = document.getElementById('qa-about-box');
+  var framesBox  = document.getElementById('qa-frames-box');
+  var aboutBack  = document.getElementById('qa-about-back');
+  var framesBack = document.getElementById('qa-frames-back');
+  if(!iconsRow) return;
+
+  function showBox(box){
+    iconsRow.style.display = 'none';
+    if(aboutBox)  aboutBox.style.display  = 'none';
+    if(framesBox) framesBox.style.display = 'none';
+    box.style.display = 'flex';
+  }
+  function showIcons(){
+    if(aboutBox)  aboutBox.style.display  = 'none';
+    if(framesBox) framesBox.style.display = 'none';
+    iconsRow.style.display = 'flex';
+  }
+
+  if(aboutBtn && aboutBox)   aboutBtn.addEventListener('click', function(){ showBox(aboutBox); });
+  if(framesBtn && framesBox) framesBtn.addEventListener('click', function(){ showBox(framesBox); });
+  if(aboutBack)  aboutBack.addEventListener('click', showIcons);
+  if(framesBack) framesBack.addEventListener('click', showIcons);
+
+  /* Kadrlarni zoom qilish (lightbox) */
+  var lightbox      = document.getElementById('qa-frame-lightbox');
+  var lightboxImg   = document.getElementById('qa-lightbox-img');
+  var lightboxClose = document.getElementById('qa-lightbox-close');
+
+  document.querySelectorAll('.qa-frame-item').forEach(function(item){
+    item.addEventListener('click', function(){
+      if(!lightbox || !lightboxImg) return;
+      lightboxImg.src = item.dataset.full;
+      lightbox.classList.add('open');
+    });
+  });
+  if(lightboxClose) lightboxClose.addEventListener('click', function(){ lightbox.classList.remove('open'); });
+  if(lightbox) lightbox.addEventListener('click', function(e){
+    if(e.target === lightbox) lightbox.classList.remove('open');
   });
 })();
 
