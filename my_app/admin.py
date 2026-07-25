@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode,
     SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
-    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead
+    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,
 
 )
 
