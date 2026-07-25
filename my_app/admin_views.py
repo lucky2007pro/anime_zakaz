@@ -656,3 +656,64 @@ def admin_notice_delete(request, pk):
     notice.delete()
     messages.success(request, "E'lon o'chirildi!")
     return redirect('admin_notices')
+
+
+# =======================
+# ANIME HAQIDA (about_info)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_animehaqida_form(request, movie_id):
+    movie = get_object_or_404(Movie, pk=movie_id)
+
+    if request.method == 'POST':
+        movie.about_info = request.POST.get('about_info', '').strip()
+        movie.save(update_fields=['about_info'])
+        messages.success(request, "Anime haqida ma'lumot saqlandi!")
+        return redirect('admin_movies')
+
+    return render(request, 'custom_admin/animehaqida_form.html', {'movie': movie})
+
+
+# =======================
+# ANIME KADRLAR (frames)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_kadrlar_form(request, movie_id):
+    movie = get_object_or_404(Movie, pk=movie_id)
+    frames = movie.frames.all().order_by('order', 'created_at')
+
+    if request.method == 'POST':
+        if frames.count() >= 5:
+            messages.error(request, "Bitta anime uchun maksimal 5 ta kadr yuklash mumkin.")
+            return redirect('admin_kadrlar_form', movie_id=movie.id)
+
+        image = request.FILES.get('image')
+        if not image:
+            messages.error(request, "Rasm tanlanmadi!")
+            return redirect('admin_kadrlar_form', movie_id=movie.id)
+
+        try:
+            order = int(request.POST.get('order', 0))
+        except (TypeError, ValueError):
+            order = 0
+
+        MovieFrame.objects.create(movie=movie, image=image, order=order)
+        messages.success(request, "Kadr muvaffaqiyatli qo'shildi!")
+        return redirect('admin_kadrlar_form', movie_id=movie.id)
+
+    return render(request, 'custom_admin/kadrlar_form.html', {
+        'movie': movie,
+        'frames': frames,
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_kadrlar_delete(request, pk):
+    frame = get_object_or_404(MovieFrame, pk=pk)
+    movie_id = frame.movie_id
+    frame.delete()
+    messages.success(request, "Kadr o'chirildi!")
+    return redirect('admin_kadrlar_form', movie_id=movie_id)
+
+
+
