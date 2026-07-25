@@ -173,8 +173,12 @@ def home(request):
 # MOVIE DETAIL
 # =======================
 @login_required
+@login_required
 def movie_detail(request, id):
-    movie = get_object_or_404(Movie, id=id)
+    movie = get_object_or_404(
+        Movie.objects.prefetch_related('episodes', 'frames'),
+        id=id
+    )
 
     if request.method == "POST":
         text = request.POST.get("comment", "").strip()
