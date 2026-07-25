@@ -137,6 +137,10 @@ urlpatterns = [
     path('control-panel/notices/<int:pk>/edit/', admin_notice_form, name='admin_notice_form'),
     path('control-panel/notices/<int:pk>/delete/', admin_notice_delete, name='admin_notice_delete'),
     path('chat/user-profile/<int:user_id>/', user_mini_profile_api, name='user_mini_profile_api'),
+    path('control-panel/movies/<int:movie_id>/haqida/', admin_animehaqida_form, name='admin_animehaqida_form'),
+    path('control-panel/movies/<int:movie_id>/kadrlar/', admin_kadrlar_form, name='admin_kadrlar_form'),
+    path('control-panel/movies/frame/<int:pk>/delete/', admin_kadrlar_delete, name='admin_kadrlar_delete'),
+
 
     
     
