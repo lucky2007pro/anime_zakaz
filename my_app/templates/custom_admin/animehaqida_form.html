@@ -1,0 +1,62 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}Anime haqida — {{ movie.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-panel { padding: 30px; max-width: 720px; }
+    .panel-header { margin-bottom: 25px; }
+    .panel-header h2 { font-size: 1.4rem; font-weight: 800; color: white; }
+    .panel-header p { color: var(--text-dim); font-size: 0.9rem; margin-top: 6px; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+        display: block; margin-bottom: 8px; font-weight: 700;
+        color: var(--text-dim); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .form-control {
+        width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border-line); color: #fff; border-radius: 8px;
+        outline: none; font-family: 'Outfit', sans-serif; font-size: 0.95rem;
+        transition: 0.25s; resize: vertical;
+    }
+    .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,243,255,0.1); }
+
+    .form-actions { display: flex; gap: 10px; margin-top: 25px; }
+    .btn-save {
+        background: var(--accent); color: #000; border: none; padding: 12px 28px;
+        border-radius: 6px; font-weight: 800; cursor: pointer; text-transform: uppercase;
+        letter-spacing: 0.5px; transition: 0.25s;
+    }
+    .btn-save:hover { background: #fff; }
+    .btn-cancel {
+        background: transparent; color: var(--text-dim); border: 1px solid var(--border-line);
+        padding: 12px 28px; border-radius: 6px; font-weight: 700; cursor: pointer;
+        text-decoration: none; display: inline-flex; align-items: center; transition: 0.25s;
+    }
+    .btn-cancel:hover { border-color: #fff; color: #fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <div class="panel-header">
+        <h2>"{{ movie.title }}" — Anime haqida</h2>
+        <p>Bu matn foydalanuvchi filmni ochganda "Anime haqida" oynasida ko'rinadi.</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="about_info">Anime haqida matn</label>
+            <textarea name="about_info" id="about_info" class="form-control" rows="10"
+                      placeholder="Anime syujeti, janri va boshqa ma'lumotlarni kiriting...">{{ movie.about_info|default:'' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Saqlash</button>
+            <a href="{% url 'admin_movies' %}" class="btn-cancel">Bekor qilish</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
