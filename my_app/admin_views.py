@@ -6,7 +6,7 @@ from django.urls import reverse
 from .models import (
     CustomUser, Movie, MovieEpisode, Category, ChatMessage,
     SubscriptionReceipt, ProfileAvatar, VipUser, MovieComment,
-    AnimeSchedule, Story, StoryView, AnimeNews, NewsLike,AnimeSectionItem,Notice
+    AnimeSchedule, Story, StoryView, AnimeNews, NewsLike,AnimeSectionItem,Notice,MovieFrame,
 )
 
 def is_admin(user):
