@@ -143,6 +143,10 @@ class Movie(models.Model):
         null=True,
         help_text="Bosh sahifa slideri uchun maxsus rasm yoki video (Ixtiyoriy)"
     )
+    about_info = models.TextField(
+        blank=True, null=True,
+        help_text="'Anime haqida' bo'limida chiqadigan matn (admin kiritadi)"
+    )
 
     views_count = models.PositiveIntegerField(default=0, help_text="Umumiy ko'rishlar soni")
     release_year = models.CharField(max_length=20, blank=True, null=True, help_text="Chiqarilgan yili, masalan: 2026")
@@ -188,7 +192,6 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.title
-
 
 # =======================
 # MOVIE EPISODES
@@ -738,3 +741,33 @@ class NoticeRead(models.Model):
 
     class Meta:
         unique_together = ('user', 'notice')
+
+class MovieFrame(models.Model):
+    movie = models.ForeignKey(
+        Movie,
+        on_delete=models.CASCADE,
+        related_name='frames'
+    )
+    image = models.ImageField(upload_to='movies/frames/')
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        help_text="Kichik raqam avval chiqadi"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "Anime kadr"
+        verbose_name_plural = "Anime kadrlar"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.movie_id:
+            qs = MovieFrame.objects.filter(movie_id=self.movie_id)
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+            if qs.count() >= 5:
+                raise ValidationError("Bitta anime uchun maksimal 5 ta kadr yuklash mumkin.")
+
+    def __str__(self):
+        return f"{self.movie.title} - kadr #{self.order}"
