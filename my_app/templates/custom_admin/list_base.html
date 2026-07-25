@@ -272,6 +272,8 @@
                 <td>
                     {% if type == 'movie' %}
                         <a href="{% url 'admin_movie_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_animehaqida_form' item.id %}" class="action-btn">Anime haqida</a>
+                        <a href="{% url 'admin_kadrlar_form' item.id %}" class="action-btn">Kadrlar</a>
                         <a href="{% url 'admin_movie_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
 
                     {% elif type == 'genre' %}
