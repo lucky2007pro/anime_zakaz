@@ -39,12 +39,37 @@ class MovieEpisodeInline(admin.TabularInline):
     show_change_link = True
 
 
+
+class MovieFrameInline(admin.TabularInline):
+    model = MovieFrame
+    extra = 1
+    max_num = 5          # admin panelda ham 5 tadan ortiq qo'sha olmaydi
+    fields = ('image', 'order')
+    ordering = ('order',)
+
+
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ('title', 'rating', 'is_home_featured', 'home_featured_order', 'created_at')
+    list_display = ('title', 'category', 'rating', 'minimum_tier', 'created_at')
     search_fields = ('title',)
-    list_filter = ('created_at', 'is_home_featured')
-    list_editable = ('is_home_featured', 'home_featured_order')
-    inlines = [MovieEpisodeInline]
+    inlines = [MovieFrameInline]
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'image', 'description', 'category', 'release_year')
+        }),
+        ("Video", {
+            'fields': ('video_url', 'video_file', 'telegram_link')
+        }),
+        ("Kirish huquqi", {
+            'fields': ('is_premium', 'minimum_tier')
+        }),
+        ("Bosh sahifa", {
+            'fields': ('is_home_featured', 'home_featured_order', 'hero_media')
+        }),
+        ("Qo'shimcha (Anime haqida / Intro / Reyting)", {
+            'fields': ('about_info', 'intro_time', 'rating')
+        }),
+    )
+
 
 
 class SiteSettingsAdmin(admin.ModelAdmin):
