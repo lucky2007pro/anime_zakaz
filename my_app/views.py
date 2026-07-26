@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.db.models import F
 from django.db import models
 import re
+from django.urls import reverse
 from django.db.models import Q
 from django.contrib.sessions.models import Session
 
@@ -173,7 +174,6 @@ def home(request):
 # MOVIE DETAIL
 # =======================
 @login_required
-@login_required
 def movie_detail(request, id):
     movie = get_object_or_404(
         Movie.objects.prefetch_related('episodes', 'frames'),
@@ -182,9 +182,31 @@ def movie_detail(request, id):
 
     if request.method == "POST":
         text = request.POST.get("comment", "").strip()
+        parent_id = request.POST.get("parent_id")
         if text:
-            from .models import MovieComment
-            MovieComment.objects.create(movie=movie, user=request.user, text=text)
+            from .models import MovieComment, Notice
+            parent_comment = None
+            if parent_id:
+                parent_comment = MovieComment.objects.filter(id=parent_id, movie=movie).first()
+                # Agar javob berilayotgan izoh o'zi ham javob bo'lsa (2-daraja),
+                # uni eng tepadagi asosiy izohga "yassilaymiz" — shu orqali
+                # barcha javoblar bitta ro'yxatda va bitta hisoblagichda chiqadi.
+                if parent_comment and parent_comment.parent_id:
+                    parent_comment = parent_comment.parent
+
+            new_comment = MovieComment.objects.create(
+                movie=movie, user=request.user, text=text, parent=parent_comment
+            )
+
+            if parent_comment and parent_comment.user != request.user:
+                Notice.objects.create(
+                    notice_type='reply',
+                    created_by=request.user,
+                    target_user=parent_comment.user,
+                    title=f"{request.user.username} sizning izohingizga javob berdi",
+                    message=text,
+                    related_movie_comment=new_comment,
+                )
         return redirect('movie_detail', id=movie.id)
 
     episodes = movie.episodes.all().order_by('episode_number')
@@ -223,10 +245,18 @@ def movie_detail(request, id):
     if tier == 'vip' or is_staff_or_admin:
         max_quality = '4K'
 
-    comments = movie.comments.select_related('user', 'user__avatar').all()
+    # Faqat asosiy (parent yo'q) izohlarni olish, javoblarni ichida tayyorlab qo'yish
     tz = ZoneInfo('Asia/Tashkent')
+    comments = (
+        movie.comments
+        .filter(parent__isnull=True)
+        .select_related('user', 'user__avatar')
+        .prefetch_related('replies__user', 'replies__user__avatar')
+    )
     for c in comments:
         c.local_created_at = localtime(c.created_at, tz)
+        for r in c.replies.all():
+            r.local_created_at = localtime(r.created_at, tz)
 
     # Izohdan keyin ko'rsatiladigan 2 ta random anime
     import random
@@ -248,6 +278,26 @@ def movie_detail(request, id):
         'comments': comments,
         'random_movies': random_movies,
     })
+
+
+# =======================
+# MOVIE COMMENT — DELETE
+# =======================
+@login_required
+def delete_comment(request, comment_id):
+    from .models import MovieComment
+    comment = get_object_or_404(MovieComment, id=comment_id)
+
+    is_owner = comment.user == request.user
+    is_admin = request.user.is_staff or request.user.is_superuser or request.user.is_admin_user
+
+    if not (is_owner or is_admin):
+        messages.error(request, "Bu izohni o'chirishga ruxsatingiz yo'q")
+        return redirect('movie_detail', id=comment.movie_id)
+
+    movie_id = comment.movie_id
+    comment.delete()
+    return redirect('movie_detail', id=movie_id)
 
 
 # =======================
@@ -1237,7 +1287,11 @@ def notice(request):
         if notice_obj:
             NoticeRead.objects.get_or_create(user=request.user, notice=notice_obj)
             if notice_obj.notice_type == 'reply':
-                return redirect('chat')  # reply bo'lsa — chatga olib boradi
+                if notice_obj.related_movie_comment_id:
+                    comment = notice_obj.related_movie_comment
+                    url = reverse('movie_detail', args=[comment.movie_id])
+                    return redirect(f"{url}#comment-{comment.id}")
+                return redirect('chat')  # chat javobi bo'lsa — chatga olib boradi
         return redirect('notice')  # admin xabari bo'lsa — shu sahifada qoladi
 
     read_ids = set(
