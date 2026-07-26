@@ -73,8 +73,6 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username if self.username else f"User-{self.id}"
 
-
-
 class VipUser(models.Model):
     TIER_CHOICES = [
         ('basic', 'Asosiy (Free)'),
@@ -192,6 +190,7 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.title
+
 
 # =======================
 # MOVIE EPISODES
@@ -340,6 +339,14 @@ class MovieComment(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='movie_comments')
     text = models.TextField()
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='replies',
+        help_text="Agar bu boshqa izohga javob bo'lsa, o'sha izoh shu yerda"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -347,7 +354,6 @@ class MovieComment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.movie.title} - {self.text[:20]}"
-
 
 # =======================
 # ACTIVE SESSIONS (DEVICE LIMITS)
@@ -702,6 +708,10 @@ class Notice(models.Model):
         ('admin', 'Admin xabari'),
         ('reply', 'Chatda javob'),
     ]
+    # YANGI — izohga (MovieComment) javob berilganda shu to'ldiriladi
+    related_movie_comment = models.ForeignKey(
+        'MovieComment', on_delete=models.CASCADE, null=True, blank=True, related_name='+'
+    )
 
     notice_type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='admin')
 
@@ -741,6 +751,7 @@ class NoticeRead(models.Model):
 
     class Meta:
         unique_together = ('user', 'notice')
+
 
 class MovieFrame(models.Model):
     movie = models.ForeignKey(
