@@ -7,7 +7,7 @@ from .views import (
     logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,reels, aloqa, news_feed, news_detail, toggle_like,next_story_view, prev_story_view, story_view, mark_story_seen,
     reels_feed, reel_detail, toggle_reel_like, add_reel_comment, reel_comments_api, reel_share,
     settings_privacy,settings_devices,settings_premium,settings_telegram,settings_general,
-    anime_category,notice,user_mini_profile_api
+    anime_category,notice,user_mini_profile_api,delete_comment
 
  
 )
@@ -140,6 +140,8 @@ urlpatterns = [
     path('control-panel/movies/<int:movie_id>/haqida/', admin_animehaqida_form, name='admin_animehaqida_form'),
     path('control-panel/movies/<int:movie_id>/kadrlar/', admin_kadrlar_form, name='admin_kadrlar_form'),
     path('control-panel/movies/frame/<int:pk>/delete/', admin_kadrlar_delete, name='admin_kadrlar_delete'),
+    path('comment/<int:comment_id>/delete/', delete_comment, name='delete_comment'),
+
 
 
     
