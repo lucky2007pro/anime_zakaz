@@ -452,33 +452,39 @@
 .qa-icons-row {
     display: flex;
     align-items: flex-start;
-    justify-content: space-around;
-    gap: 12px;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px;
+    flex-wrap: nowrap;
     width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 }
+.qa-icons-row::-webkit-scrollbar { display: none; }
 .qa-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     flex: 1 1 0;
-    min-width: 90px;
+    min-width: 0;
 }
 .qa-label {
-    font-size: .82rem;
+    font-size: .72rem;
     font-weight: 800;
     color: var(--text-light);
     text-align: center;
-    line-height: 1.3;
+    line-height: 1.25;
+    white-space: normal;
 }
 .qa-circle-btn {
-    width: 56px; height: 56px; border-radius: 50%;
+    width: 48px; height: 48px; border-radius: 50%;
     background: rgba(255,255,255,.06);
     border: 1px solid rgba(255,255,255,.12);
-    color: #fff; font-size: 1.5rem;
+    color: #fff; font-size: 1.3rem;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; transition: .2s;
+    flex-shrink: 0;
 }
 .qa-circle-btn:hover {
     background: rgba(220,38,38,.18);
@@ -505,7 +511,7 @@
 .qa-toggle-switch {
     position: relative;
     display: inline-block;
-    width: 54px; height: 30px;
+    width: 46px; height: 26px;
     flex-shrink: 0;
 }
 .qa-toggle-switch input {
@@ -522,7 +528,7 @@
 .qa-toggle-slider::before {
     content: "";
     position: absolute;
-    height: 22px; width: 22px;
+    height: 18px; width: 18px;
     left: 3px; bottom: 3px;
     background: #fff;
     border-radius: 50%;
@@ -534,7 +540,7 @@
     border-color: #dc2626;
 }
 .qa-toggle-switch input:checked + .qa-toggle-slider::before {
-    transform: translateX(24px);
+    transform: translateX(20px);
 }
 
 /* -- ANIME HAQIDA / ANIME KADRLAR — detail boxlar -- */
@@ -573,9 +579,15 @@
     display: flex;
     gap: 10px;
     width: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
 }
+.qa-frames-row::-webkit-scrollbar { display: none; }
 .qa-frame-item {
-    flex: 1 1 0;
+    flex: 0 0 32%;
     aspect-ratio: 16/9;
     border-radius: 20px;
     overflow: hidden;
@@ -583,6 +595,7 @@
     background: rgba(255,255,255,.04);
     border: 1px solid rgba(255,255,255,.08);
     transition: transform .2s;
+    scroll-snap-align: start;
 }
 .qa-frame-item:hover { transform: translateY(-3px); }
 .qa-frame-item img {
@@ -609,11 +622,11 @@
 }
 
 @media (max-width: 520px) {
-    .quick-actions-section { padding: 18px 12px; }
-    .qa-circle-btn { width: 48px; height: 48px; font-size: 1.3rem; }
-    .qa-label { font-size: .74rem; }
-    .qa-frames-row { flex-wrap: wrap; }
-    .qa-frame-item { flex: 1 1 calc(50% - 5px); }
+    .quick-actions-section { padding: 16px 10px; }
+    .qa-icons-row { gap: 4px; }
+    .qa-circle-btn { width: 40px; height: 40px; font-size: 1.1rem; }
+    .qa-label { font-size: .62rem; }
+    .qa-frame-item { flex: 0 0 78%; }
 }
 
 /* =====================================================================
@@ -793,6 +806,8 @@
     .bm-progress-wrap:active { height: 7px; }
     .bm-progress-thumb { width: 14px; height: 14px; }
     .bm-vol-slider { width: 55px; }
+
+    .qa-frame-item { flex: 0 0 62%; }
 
     .related-card-link { flex: 0 0 120px; }
     .related-card-img { width: 120px; height: 170px; }
@@ -1065,7 +1080,7 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
       </div>
     </div>
 
-    <!-- ANIME KADRLAR — admin yuklagan (maks 5 ta) rasmlar 1 qatorda 16:9 -->
+    <!-- ANIME KADRLAR — admin yuklagan (maks 5 ta) rasmlar, birin-ketin, slayder kabi -->
     <div class="qa-detail-box" id="qa-frames-box">
       <button type="button" class="qa-back-btn" id="qa-frames-back">
         <i class='bx bx-arrow-back'></i> Orqaga
@@ -1921,6 +1936,9 @@ function initBmPlayer(){
 
   /* ================================================================
      CONTROLS VISIBILITY
+     — Barcha rejimlarda (mouse yoki touch) icon/progress/qatlamlar
+       ekranda 3 soniya turadi, so'ng avtomatik yashiriladi (video
+       pauzada bo'lmasa). Touch qurilmalarda ham xuddi shu qoida.
   ================================================================ */
   var hideTimer = null;
 
@@ -1928,7 +1946,7 @@ function initBmPlayer(){
     if(isLocked) return;
     player.classList.add('show-controls');
     clearTimeout(hideTimer);
-    if(!isTouch() && !video.paused){
+    if(!video.paused){
       hideTimer = setTimeout(function(){ player.classList.remove('show-controls'); }, ms || 3000);
     }
   }
@@ -2018,16 +2036,16 @@ function initBmPlayer(){
         if(xRel < 0.36){
           video.currentTime = Math.max(0, video.currentTime - leftSkip);
           showRipple(rippleL, '−' + leftSkip + ' son');
-          player.classList.add('show-controls');
+          showControls(3000);
           leftSkip += 10;
         } else if(xRel > 0.64){
           video.currentTime = Math.min(video.duration || Infinity, video.currentTime + rightSkip);
           showRipple(rippleR, '+' + rightSkip + ' son');
-          player.classList.add('show-controls');
+          showControls(3000);
           rightSkip += 10;
         } else {
           togglePlay();
-          player.classList.add('show-controls');
+          showControls(3000);
         }
       } else {
         var showing = player.classList.contains('show-controls');
@@ -2035,7 +2053,7 @@ function initBmPlayer(){
           if(xRel >= 0.36 && xRel <= 0.64){ togglePlay(); }
           else { hideControls(); }
         } else {
-          player.classList.add('show-controls');
+          showControls(3000);
         }
         lastTap = now;
       }
@@ -2160,7 +2178,5 @@ function toggleAllComments(){
       : '📋 Batafsil (' + items.length + ' izoh)';
   }
 }
-
-
 </script>
 {% endblock %}
