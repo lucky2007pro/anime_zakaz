@@ -776,6 +776,49 @@
 }
 .comments-show-more-btn:hover { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.3); color: #f87171; }
 
+/* -- REPLY / DELETE ACTIONS -- */
+.comment-footer {
+    display: flex; align-items: center; gap: 16px;
+    margin-top: 8px; flex-wrap: wrap;
+}
+.comment-reply-btn, .comment-view-replies-btn, .comment-delete-btn {
+    background: none; border: none; color: var(--text-dim);
+    font-size: .82rem; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 0; transition: .2s;
+}
+.comment-reply-btn:hover, .comment-view-replies-btn:hover { color: #f87171; }
+.comment-delete-btn:hover { color: #ef4444; }
+.comment-delete-form { display: inline-flex; }
+
+.comment-reply-form { margin-top: 10px; display: none; }
+.comment-reply-form textarea {
+    width: 100%; background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.14); border-radius: 10px;
+    color: #fff; padding: 10px; font-family: inherit;
+    resize: none; outline: none; font-size: .92rem; transition: .2s;
+}
+.comment-reply-form textarea:focus { border-color: #ef4444; }
+.comment-cancel-btn {
+    background: rgba(255,255,255,.08); color: #e5e7eb; border: none;
+    padding: 9px 18px; border-radius: 50px; font-weight: 800;
+    cursor: pointer; transition: .2s;
+}
+.comment-cancel-btn:hover { background: rgba(255,255,255,.14); }
+
+.comment-replies {
+    display: none;               /* <-- shu qatorni qo'shing */
+    margin-top: 14px; padding-left: 20px;
+    border-left: 2px solid rgba(255,255,255,.08);
+    flex-direction: column; gap: 16px;
+}
+.comment-reply-item .comment-avatar { width: 32px; height: 32px; }
+
+@media (max-width: 520px) {
+    .comment-replies { padding-left: 14px; }
+    .comment-footer { gap: 12px; }
+}
+
 /* =====================================================================
    RESPONSIVE
 ===================================================================== */
@@ -1132,7 +1175,8 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
 
     <div class="comments-list" id="comments-list">
       {% for comment in comments %}
-      <div class="comment-item" data-comment-index="{{ forloop.counter0 }}" {% if forloop.counter > 5 %}style="display:none;"{% endif %}>
+      <div class="comment-item" data-comment-index="{{ forloop.counter0 }}" id="comment-{{ comment.id }}"
+           {% if forloop.counter > 5 %}style="display:none;"{% endif %}>
         <img src="{% if comment.user.avatar %}{{ comment.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
              alt="Avatar" class="comment-avatar">
         <div class="comment-body">
@@ -1148,6 +1192,88 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
             <span class="comment-time">{{ comment.local_created_at|date:"d M Y, H:i" }}</span>
           </div>
           <div class="comment-text">{{ comment.text|linebreaksbr }}</div>
+
+          <div class="comment-footer">
+            {% if request.user.is_authenticated %}
+            <button type="button" class="comment-reply-btn" onclick="toggleReplyForm('{{ comment.id }}')">
+              <i class='bx bx-reply'></i> Javob
+            </button>
+            {% endif %}
+
+            {% if comment.replies.count %}
+            <button type="button" class="comment-view-replies-btn" data-count="{{ comment.replies.count }}"
+                    onclick="toggleReplies('{{ comment.id }}', this)">
+              <i class='bx bx-chevron-down'></i> Javoblar ({{ comment.replies.count }})
+            </button>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+              {% if comment.user == request.user or request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
+              <form class="comment-delete-form" method="POST" action="{% url 'delete_comment' comment.id %}"
+                    onsubmit="return confirm('Izohni o\'chirishga ishonchingiz komilmi?');">
+                {% csrf_token %}
+                <button type="submit" class="comment-delete-btn">
+                  <i class='bx bx-trash'></i> O'chirish
+                </button>
+              </form>
+              {% endif %}
+            {% endif %}
+          </div>
+
+          {% if request.user.is_authenticated %}
+          <div class="comment-reply-form" id="reply-form-{{ comment.id }}">
+            <form method="POST" action="{% url 'movie_detail' movie.id %}#comment-{{ comment.id }}">
+              {% csrf_token %}
+              <input type="hidden" name="parent_id" value="{{ comment.id }}">
+              <textarea name="comment" rows="1" required
+                        placeholder="@{{ comment.user.username }} ga javob yozing..."
+                        oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
+              <div class="comment-actions" style="margin-top:8px;">
+                <button type="button" class="comment-cancel-btn" onclick="toggleReplyForm('{{ comment.id }}')">Bekor qilish</button>
+                <button type="submit" class="comment-btn">Yuborish</button>
+              </div>
+            </form>
+          </div>
+          {% endif %}
+
+          {% if comment.replies.count %}
+          <div class="comment-replies" id="replies-{{ comment.id }}">
+            {% for reply in comment.replies.all %}
+            <div class="comment-item comment-reply-item" id="comment-{{ reply.id }}">
+              <img src="{% if reply.user.avatar %}{{ reply.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
+                   alt="Avatar" class="comment-avatar">
+              <div class="comment-body">
+                <div class="comment-header">
+                  <span class="comment-username">{{ reply.user.username }}</span>
+                  {% if reply.user.is_superuser or reply.user.is_admin_user or reply.user.is_staff %}
+                    <span class="admin-badge-sm">Admin</span>
+                  {% elif reply.user.active_tier == 'vip' %}
+                    <span class="vip-badge-sm" style="color:#f43f5e;border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.15);">VIP</span>
+                  {% elif reply.user.active_tier == 'premium' %}
+                    <span class="vip-badge-sm" style="color:#fbbf24;border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.15);">Premium</span>
+                  {% endif %}
+                  <span class="comment-time">{{ reply.local_created_at|date:"d M Y, H:i" }}</span>
+                </div>
+                <div class="comment-text">{{ reply.text|linebreaksbr }}</div>
+                <div class="comment-footer">
+                  {% if request.user.is_authenticated %}
+                    {% if reply.user == request.user or request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
+                    <form class="comment-delete-form" method="POST" action="{% url 'delete_comment' reply.id %}"
+                          onsubmit="return confirm('Izohni o\'chirishga ishonchingiz komilmi?');">
+                      {% csrf_token %}
+                      <button type="submit" class="comment-delete-btn">
+                        <i class='bx bx-trash'></i> O'chirish
+                      </button>
+                    </form>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
         </div>
       </div>
       {% empty %}
@@ -2177,6 +2303,34 @@ function toggleAllComments(){
       ? '▲ Yopish'
       : '📋 Batafsil (' + items.length + ' izoh)';
   }
+}
+
+/* ---------------------------------------------------------------
+   COMMENTS: REPLY FORM TOGGLE
+--------------------------------------------------------------- */
+function toggleReplyForm(id){
+  var f = document.getElementById('reply-form-' + id);
+  if(!f) return;
+  var isOpen = f.style.display === 'block';
+  f.style.display = isOpen ? 'none' : 'block';
+  if(!isOpen){
+    var ta = f.querySelector('textarea');
+    if(ta) ta.focus();
+  }
+}
+
+/* ---------------------------------------------------------------
+   COMMENTS: JAVOBLARNI OCHISH / YASHIRISH
+--------------------------------------------------------------- */
+function toggleReplies(id, btn){
+  var r = document.getElementById('replies-' + id);
+  if(!r) return;
+  var showing = r.style.display === 'flex';
+  r.style.display = showing ? 'none' : 'flex';
+  var count = btn.dataset.count;
+  btn.innerHTML = showing
+    ? '<i class="bx bx-chevron-down"></i> Javoblar (' + count + ')'
+    : '<i class="bx bx-chevron-up"></i> Javoblarni yashirish';
 }
 </script>
 {% endblock %}
