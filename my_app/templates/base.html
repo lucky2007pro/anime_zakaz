@@ -480,7 +480,7 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            overflow-y: hidden;
+            overflow-y: auto;
             overscroll-behavior: contain;
             scrollbar-width: none;
             box-shadow:
@@ -548,7 +548,6 @@
             border-radius: 16px;
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.08);
-            text-decoration: none;
             margin-bottom: 14px;
             flex-shrink: 0;
             transition: background 0.2s ease, border-color 0.2s ease;
@@ -572,6 +571,13 @@
             color: var(--accent);
             overflow: hidden;
             flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .mobile-profile-avatar:hover {
+            transform: scale(1.06);
+            border-color: var(--accent);
         }
 
         .mobile-profile-avatar img {
@@ -579,6 +585,16 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+        }
+
+        .mobile-profile-info-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+            text-decoration: none;
+            color: inherit;
         }
 
         .mobile-profile-info {
@@ -627,7 +643,7 @@
         .mobile-menu-box::-webkit-scrollbar { display: none; }
 
         .mobile-menu-box .mobile-menu-item {
-            padding: 11px 12px;
+            padding: 12px 12px;
             border-bottom: 1px solid rgba(255,255,255,0.04);
             border-radius: 10px;
         }
@@ -639,16 +655,28 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            width: 100%;
             padding: 13px 14px;
             border-radius: 13px;
             color: #e8e8f0;
             text-decoration: none;
             font-size: 0.93rem;
             font-weight: 700;
+            font-family: 'Outfit', sans-serif;
             transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             position: relative;
+            box-sizing: border-box;
+        }
+
+        /* form ichidagi <button> larni <a> menu-item bilan bir xil qilib ko'rsatish uchun */
+        .mobile-menu-box form { width: 100%; }
+        button.mobile-menu-item {
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
         }
 
         .mobile-menu-item i {
@@ -684,10 +712,24 @@
             border-radius: 999px;
         }
 
+        /* Admin va Logout maxsus ranglari */
+        .mobile-menu-item.mobile-menu-admin { color: var(--accent); }
+        .mobile-menu-item.mobile-menu-admin i:first-child { color: var(--accent); }
+        .mobile-menu-item.mobile-menu-admin:hover { background: rgba(0, 243, 255, 0.1); }
+
+        .mobile-menu-item.mobile-menu-logout { color: #ff3b30; }
+        .mobile-menu-item.mobile-menu-logout i { color: #ff3b30; }
+        .mobile-menu-item.mobile-menu-logout:hover {
+            background: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+            transform: translateX(4px);
+        }
+        .mobile-menu-item.mobile-menu-logout:hover i { color: #ff3b30; }
+
         .mobile-menu-divider {
             height: 1px;
             background: rgba(255,255,255,0.06);
-            margin: 8px 0;
+            margin: 8px 4px;
             flex-shrink: 0;
         }
 
@@ -729,6 +771,57 @@
 
         .mobile-profile-action:hover { background: rgba(0, 243, 255, 0.14); }
 
+        /* ==================== MOBIL — SO'NGGI KO'RILGAN ANIMELAR ==================== */
+        .mobile-watched-section {
+            flex-shrink: 0;
+            margin-top: 10px;
+        }
+
+        .mobile-watched-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .mobile-watched-card {
+            position: relative;
+            display: block;
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-watched-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .mobile-watched-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10,10,15,0.96) 0%, rgba(10,10,15,0.15) 55%, transparent 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 8px;
+        }
+
+        .mobile-watched-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #fff;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.25;
+        }
+
         .mobile-nav-footer {
             margin-top: 12px;
             padding-top: 16px;
@@ -739,6 +832,101 @@
             letter-spacing: 2px;
             color: rgba(255,255,255,0.3);
             flex-shrink: 0;
+        }
+
+        /* ==================== AVATAR PICKER (MOBIL) ==================== */
+        .avatar-picker-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 2100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .avatar-picker-overlay.active { opacity: 1; visibility: visible; }
+
+        .avatar-picker-box {
+            width: 100%;
+            max-width: 380px;
+            max-height: 80vh;
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            transform: scale(0.92);
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .avatar-picker-box::-webkit-scrollbar { display: none; }
+
+        .avatar-picker-overlay.active .avatar-picker-box { transform: scale(1); }
+
+        .avatar-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .avatar-picker-header h4 {
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--text-light);
+        }
+
+        .avatar-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+            gap: 12px;
+        }
+
+        .avatar-picker-item {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-picker-item input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .avatar-picker-img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2.5px solid transparent;
+            transition: border-color 0.15s, transform 0.15s;
+        }
+
+        .avatar-picker-item input:checked ~ .avatar-picker-img {
+            border-color: var(--accent);
+            transform: scale(1.08);
+        }
+
+        .avatar-picker-item.saving .avatar-picker-img {
+            opacity: 0.5;
+        }
+
+        .avatar-picker-empty {
+            font-size: 12px;
+            color: var(--text-dim);
+            padding: 8px 0;
+            grid-column: 1 / -1;
         }
 
         /* ==================== GENERIC PAGE ==================== */
@@ -1096,29 +1284,31 @@
             </button>
         </div>
 
-        <!-- Profil qisqacha: avatar (ism) -->
-        <a href="{% url 'profile' %}" class="mobile-profile-summary">
-            <div class="mobile-profile-avatar">
+        <!-- Profil qisqacha: avatar (bosilsa — avatar tanlash oynasi) + ism (bosilsa — profilga) -->
+        <div class="mobile-profile-summary">
+            <div class="mobile-profile-avatar" onclick="toggleAvatarPicker()" role="button" aria-label="Profil rasmini tanlash">
                 {% if request.user.is_authenticated and request.user.avatar %}
                     <img src="{{ request.user.avatar.image.url }}" alt="avatar">
                 {% else %}
                     <i class='bx bx-user'></i>
                 {% endif %}
             </div>
-            <div class="mobile-profile-info">
-                <span class="mobile-profile-name">
-                    {% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Mehmon{% endif %}
-                </span>
-                <span class="mobile-profile-tag">
-                    {% if request.user.is_authenticated and request.user.vip_data and request.user.vip_data.vip_active %}
-                        VIP
-                    {% else %}
-                        Oddiy
-                    {% endif %}
-                </span>
-            </div>
-            <i class='bx bx-chevron-right m-arrow'></i>
-        </a>
+            <a href="{% url 'profile' %}" class="mobile-profile-info-link">
+                <div class="mobile-profile-info">
+                    <span class="mobile-profile-name">
+                        {% if request.user.is_authenticated %}{{ request.user.display_name }}{% else %}Mehmon{% endif %}
+                    </span>
+                    <span class="mobile-profile-tag">
+                        {% if request.user.is_authenticated and request.user.vip_data and request.user.vip_data.vip_active %}
+                            VIP
+                        {% else %}
+                            Oddiy
+                        {% endif %}
+                    </span>
+                </div>
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+        </div>
 
         <!-- Bitta box ichida barcha tugmalar, ixcham va skrollanadigan -->
         <div class="mobile-menu-box">
@@ -1172,6 +1362,26 @@
                 Sozlamalar
                 <i class='bx bx-chevron-right m-arrow'></i>
             </a>
+
+            {% if request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
+            <div class="mobile-menu-divider"></div>
+            <a href="{% url 'admin_dashboard' %}" class="mobile-menu-item mobile-menu-admin">
+                <i class='bx bx-shield-quarter'></i>
+                ⚙️ Admin dashboard
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+            <div class="mobile-menu-divider"></div>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="mobile-menu-item mobile-menu-logout">
+                    <i class='bx bx-right-arrow-circle'></i>
+                    Hisobdan chiqish
+                </button>
+            </form>
+            {% endif %}
         </div>
 
         <a href="javascript:void(0)" class="mobile-profile-action" onclick="openProfileFromMobile()">
@@ -1180,8 +1390,25 @@
             <i class='bx bx-chevron-right m-arrow'></i>
         </a>
 
+        {% if last_watched_movies %}
+        <div class="mobile-watched-section">
+            <p class="mobile-section-label">So'nggi ko'rilganlar</p>
+            <div class="mobile-watched-grid">
+                {% for movie in last_watched_movies|slice:":2" %}
+                <a href="{% url 'movie_detail' movie.id %}" class="mobile-watched-card">
+                    <img src="{% if movie.image %}{{ movie.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
+                         alt="{{ movie.title }}" loading="lazy">
+                    <div class="mobile-watched-overlay">
+                        <span class="mobile-watched-title">{{ movie.title }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="mobile-nav-footer">
-            VERSION 3.4 &nbsp;•&nbsp; ANI BEST
+            VERSION 3.5 &nbsp;•&nbsp; ANI BEST
         </div>
 
     </div>
@@ -1331,6 +1558,30 @@
     {% endif %}
 
     <div class="sidebar-footer">BESTMEDIA PLATFORM V2.7</div>
+</div>
+
+<!-- ==================== AVATAR PICKER (MOBIL PROFIL RASMI TANLASH) ==================== -->
+<div class="avatar-picker-overlay" id="avatarPickerOverlay" onclick="if(event.target===this) toggleAvatarPicker()">
+    <div class="avatar-picker-box" role="dialog" aria-modal="true" aria-label="Avatar tanlash">
+        <div class="avatar-picker-header">
+            <h4>Profil rasmini tanlang</h4>
+            <button class="close-btn" onclick="toggleAvatarPicker()" aria-label="Yopish"><i class='bx bx-x'></i></button>
+        </div>
+        <form method="POST" action="{% url 'profile' %}" id="avatarPickerForm">
+            {% csrf_token %}
+            <div class="avatar-picker-grid">
+                {% for av in avatars %}
+                <label class="avatar-picker-item" title="{{ av.name|default:'Avatar' }}">
+                    <input type="radio" name="avatar_id" value="{{ av.id }}"
+                        {% if request.user.is_authenticated and request.user.avatar and request.user.avatar.id == av.id %}checked{% endif %}>
+                    <img class="avatar-picker-img" src="{{ av.image.url }}" alt="{{ av.name|default:'avatar' }}">
+                </label>
+                {% empty %}
+                <p class="avatar-picker-empty">Admin hali profil rasmi yuklamagan.</p>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- ==================== BOTTOM TAB BAR ==================== -->
@@ -1491,6 +1742,8 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeMobileNav();
         closeProfileMenu();
+        const avPicker = document.getElementById('avatarPickerOverlay');
+        if (avPicker && avPicker.classList.contains('active')) toggleAvatarPicker();
     }
 });
 
@@ -1530,6 +1783,40 @@ function openProfileFromMobile() {
         }
     }, 300);
 }
+
+
+/* ================= AVATAR PICKER (MOBIL) ================= */
+function toggleAvatarPicker() {
+    const overlay = document.getElementById('avatarPickerOverlay');
+    if (!overlay) return;
+
+    const isOpen = overlay.classList.toggle('active');
+    if (isOpen) lockBodyScroll();
+    else unlockBodyScroll();
+}
+
+(function() {
+    const form = document.getElementById('avatarPickerForm');
+    if (!form) return;
+
+    form.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const item = this.closest('.avatar-picker-item');
+            if (item) item.classList.add('saving');
+
+            const data = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: data,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(function() {
+                location.reload();
+            }).catch(function() {
+                if (item) item.classList.remove('saving');
+            });
+        });
+    });
+})();
 
 
 /* ================= SWIPE ================= */
