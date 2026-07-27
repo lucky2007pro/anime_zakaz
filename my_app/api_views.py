@@ -37,11 +37,14 @@ class MovieListView(generics.ListAPIView):
         queryset = Movie.objects.all().order_by('-created_at')
         search_query = self.request.query_params.get('search', None)
         category_id = self.request.query_params.get('category', None)
+        section = self.request.query_params.get('section', None)
         
         if search_query:
             queryset = queryset.filter(models.Q(title__icontains=search_query) | models.Q(description__icontains=search_query))
         if category_id:
             queryset = queryset.filter(category_id=category_id)
+        if section:
+            queryset = queryset.filter(section_items__section=section).order_by('section_items__order', '-created_at')
             
         return queryset
 
