@@ -1,5 +1,5 @@
 {% load static %}
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
@@ -454,6 +454,10 @@
     .reply-sticker-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; flex-shrink: 0; vertical-align: middle; border: 1px solid var(--glass-border); }
     #replyStickerThumb { width: 38px; height: 38px; object-fit: cover; border-radius: 8px; flex-shrink: 0; display: none; border: 1px solid rgba(0,243,255,0.3); }
 
+    /* ---- Reply info: VIP foydalanuvchiga javob berilganda ---- */
+    .reply-info.reply-info-vip { border-left-color: #b45cff; background: rgba(180,92,255,0.08); }
+    .reply-info-vip .reply-icon-vip { color: #b45cff !important; opacity: 1 !important; }
+
     /* =====================================================
        EDIT FORM
        ===================================================== */
@@ -663,6 +667,41 @@
     .tier-premium .upm-badge { background: rgba(255,193,7,0.14); color:#ffc107; border-color: rgba(255,193,7,0.3); }
     .tier-vip .upm-badge { background: linear-gradient(90deg, rgba(180,92,255,0.2), rgba(255,92,214,0.2)); color:#d78bff; border-color: rgba(180,92,255,0.35); }
 
+    /* ---- VIP profil moduli — @nic gold + glass, badge gold pulse, ID/Ism gold, sana wave ---- */
+    .upm-name-vip {
+        display: inline-flex; align-items: center; gap: 4px;
+        color: #ffd700; padding: 4px 14px; border-radius: 14px;
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,215,0,0.35);
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        text-shadow: 0 0 14px rgba(255,215,0,0.45);
+        box-shadow: 0 4px 18px rgba(255,215,0,0.14), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .upm-badge-vip-pulse {
+        border-color: #ffd700 !important;
+        animation: upmVipPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes upmVipPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.45); }
+        50% { box-shadow: 0 0 14px 4px rgba(255,215,0,0.4); }
+    }
+    .upm-info-val-vip {
+        color: #ffd700; font-weight: 800; text-shadow: 0 0 8px rgba(255,215,0,0.3);
+    }
+    .upm-date-wave {
+        position: relative; display: inline-block; padding-bottom: 6px;
+    }
+    .upm-date-wave::after {
+        content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 4px;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='6'><path d='M0 3 Q5 0 10 3 T20 3' stroke='%23ffd700' stroke-width='1.5' fill='none'/></svg>");
+        background-repeat: repeat-x; background-size: 20px 6px;
+        animation: upmWaveMove 1.2s linear infinite;
+    }
+    @keyframes upmWaveMove {
+        from { background-position-x: 0; }
+        to   { background-position-x: 20px; }
+    }
+
     .upm-info-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
     .upm-info-cell { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .upm-info-cell:nth-child(odd)  { padding-right: 14px; }
@@ -829,9 +868,9 @@
 
                     {% if msg.reply_to %}
                     {% with rtype=msg.reply_to.message|slice:":11" %}
-                    <div class="reply-info">
-                        <i class='bx bx-reply' style="flex-shrink:0;font-size:1rem;opacity:0.7;"></i>
-                        <strong>{{ msg.reply_to.user.display_name }}</strong>:
+                    <div class="reply-info{% if msg.reply_to.user.vip_data.vip_active %} reply-info-vip{% endif %}">
+                        <i class='bx bx-reply{% if msg.reply_to.user.vip_data.vip_active %} reply-icon-vip{% endif %}' style="flex-shrink:0;font-size:1rem;opacity:0.7;"></i>
+                        <strong{% if msg.reply_to.user.vip_data.vip_active %} class="vip-name-glow"{% endif %}>{{ msg.reply_to.user.display_name }}</strong>:
                         {% if rtype == '__sticker__' %}
                             <img src="{{ msg.reply_to.message|slice:'11:' }}"
                                  alt="Stiker"
@@ -1466,10 +1505,11 @@ function renderUserProfileModal(data) {
     const body = document.getElementById("upmBody");
     const card = document.getElementById("userProfileModalCard");
     const tier = data.tier || "basic";
+    const isVip = tier === "vip";
     card.classList.add("tier-" + tier);
 
     let badgeHtml = '<span class="upm-badge"><i class="bx bx-user"></i> Oddiy</span>';
-    if (tier === "vip") badgeHtml = '<span class="upm-badge"><i class="bx bxs-crown"></i> VIP</span>';
+    if (tier === "vip") badgeHtml = '<span class="upm-badge upm-badge-vip-pulse"><i class="bx bxs-crown"></i> VIP</span>';
     else if (tier === "premium") badgeHtml = '<span class="upm-badge"><i class="bx bx-crown"></i> Premium</span>';
 
     const avatarHtml = data.avatar_url
@@ -1492,17 +1532,22 @@ function renderUserProfileModal(data) {
         ? `<img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" class="admin-icon-badge" style="margin-left:4px;" alt="Admin">`
         : '';
 
+    const nameClass    = isVip ? "upm-name upm-name-vip" : "upm-name";
+    const idValClass   = isVip ? "upm-info-val upm-info-val-vip" : "upm-info-val";
+    const ismValClass  = isVip ? "upm-info-val upm-info-val-vip" : "upm-info-val";
+    const dateValClass = isVip ? "upm-info-val upm-date-wave" : "upm-info-val";
+
     body.innerHTML = `
         <div class="upm-hero">
             <div class="upm-avatar">${avatarHtml}</div>
-            <div class="upm-name">@${escHtml(data.username)} ${adminIconHtml}</div>
+            <div class="${nameClass}">@${escHtml(data.username)} ${adminIconHtml}</div>
             ${badgeHtml}
         </div>
         <div class="upm-info-grid">
-            <div class="upm-info-cell"><div class="upm-info-label">ID</div><div class="upm-info-val">${escHtml(data.id)}</div></div>
-            <div class="upm-info-cell"><div class="upm-info-label">Ism</div><div class="upm-info-val">${escHtml(data.first_name)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">ID</div><div class="${idValClass}">${escHtml(data.id)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Ism</div><div class="${ismValClass}">${escHtml(data.first_name)}</div></div>
             <div class="upm-info-cell"><div class="upm-info-label">Familiya</div><div class="upm-info-val">${escHtml(data.last_name)}</div></div>
-            <div class="upm-info-cell"><div class="upm-info-label">Ro'yxatdan o'tgan</div><div class="upm-info-val">${escHtml(data.date_joined)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Ro'yxatdan o'tgan</div><div class="${dateValClass}">${escHtml(data.date_joined)}</div></div>
         </div>
         <p class="upm-section-title">Ko'rilgan animelar</p>
         <div class="upm-watched-grid">${watchedHtml}</div>
@@ -1765,10 +1810,15 @@ function buildMessageEl(msg) {
         ? (() => {
             const rm = msg.reply_to.message || "";
             const isStickerReply = rm.startsWith("__sticker__");
+            const isReplyVip = !!msg.reply_to.is_vip;
+            const replyIconClass = isReplyVip ? "bx bx-reply reply-icon-vip" : "bx bx-reply";
+            const replyNameHtml = isReplyVip
+                ? `<strong class="vip-name-glow">${escHtml(msg.reply_to.username)}</strong>`
+                : `<strong>${escHtml(msg.reply_to.username)}</strong>`;
             const replyBody = isStickerReply
                 ? `<img src="${escHtml(rm.slice(11))}" class="reply-sticker-thumb"> <span style="font-style:italic;opacity:0.7;">🖼 Stiker</span>`
                 : `"${escHtml(rm)}"`;
-            return `<div class="reply-info"><i class='bx bx-reply' style="font-size:1rem;opacity:0.7;flex-shrink:0;"></i><strong>${escHtml(msg.reply_to.username)}</strong>: ${replyBody}</div>`;
+            return `<div class="reply-info${isReplyVip ? " reply-info-vip" : ""}"><i class='${replyIconClass}' style="font-size:1rem;opacity:0.7;flex-shrink:0;"></i>${replyNameHtml}: ${replyBody}</div>`;
           })()
         : "";
     const avatarLetter = (displayName || "?")[0].toUpperCase();
