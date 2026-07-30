@@ -1,5 +1,6 @@
 import os
 import sys
+import importlib.util
 from pathlib import Path
 
 try:
@@ -29,14 +30,18 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-bestmedia-vps-key-202
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Allowed hosts (environment variable dan o'qish yoki default qo'yish)
+def module_exists(module_name):
+    return importlib.util.find_spec(module_name) is not None
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='bestmedia-official.uz,www.bestmedia-official.uz,5.189.136.95,www.anibest.uz,45.138.159.4', cast=Csv())
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='bestmedia-official.uz,www.bestmedia-official.uz,5.189.136.95,www.anibest.uz,45.138.159.4,127.0.0.1,localhost',
+    cast=Csv()
+)
 
 
 # Ilovalar ro'yxati
 INSTALLED_APPS = [
-    'jazzmin',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,10 +55,16 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-
-    'cloudinary_storage',
-    'cloudinary',
 ]
+
+if module_exists('jazzmin'):
+    INSTALLED_APPS.insert(0, 'jazzmin')
+
+if module_exists('cloudinary_storage') and module_exists('cloudinary'):
+    INSTALLED_APPS.extend([
+        'cloudinary_storage',
+        'cloudinary',
+    ])
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -164,7 +175,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Environment'dan ALLOWED_HOSTS va CSRF_TRUSTED_ORIGINS ni o'qish
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
-    default='http://bestmedia-official.uz,https://www.bestmedia-official.uz',
+    default='http://bestmedia-official.uz,https://www.bestmedia-official.uz,http://127.0.0.1:8000,http://localhost:8000',
     cast=Csv()
 )
 
