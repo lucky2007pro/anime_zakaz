@@ -998,45 +998,82 @@
             </div>
         </div>
 
-        <!-- EMOJI + STICKER PANEL (mobil overlay) -->
-        <div class="emoji-panel" id="emojiPanel">
-            <div class="emoji-tabs">
-                <button type="button" class="emoji-tab-btn active" id="tabEmoji" onclick="switchTab('emoji')">
-                    <i class='bx bx-smile'></i> Emoji
-                </button>
-                <button type="button" class="emoji-tab-btn" id="tabSticker" onclick="switchTab('sticker')">
-                    <i class='bx bx-images'></i> Stiker
-                </button>
-            </div>
-            <div class="emoji-tab-content" id="emojiTabContent">
-                <div class="emoji-grid" id="emojiGrid"></div>
-            </div>
-            <div class="emoji-tab-content" id="stickerTabContent" style="display:none;">
-                <div class="sticker-img-grid">
-                    <button type="button" class="sticker-img-item" onclick="sendSticker('https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg')">
-                        <img src="https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg" alt="stiker" loading="lazy">
-                    </button>
-                    <button type="button" class="sticker-img-item" onclick="sendSticker('https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg')">
-                        <img src="https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg" alt="stiker" loading="lazy">
-                    </button>
-                    <button type="button" class="sticker-img-item" onclick="sendSticker('https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg')">
-                        <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" alt="stiker" loading="lazy">
-                    </button>
-                    <button type="button" class="sticker-img-item" onclick="sendSticker('https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg')">
-                        <img src="https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg" alt="stiker" loading="lazy">
-                    </button>
-                    <button type="button" class="sticker-img-item" onclick="sendSticker('https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg')">
-                        <img src="https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg" alt="stiker" loading="lazy">
-                    </button>
-                    <button type="button" class="sticker-img-item" onclick="sendSticker('https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg')">
-                        <img src="https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg" alt="stiker" loading="lazy">
-                    </button>
-                    <button type="button" class="sticker-img-item" onclick="sendSticker('https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg')">
-                        <img src="https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg" alt="stiker" loading="lazy">
-                    </button>
-                </div>
-            </div>
+<!-- EMOJI + STICKER PANEL (mobil overlay) -->
+<div class="emoji-panel" id="emojiPanel">
+
+    <div class="emoji-tabs">
+        <button type="button" class="emoji-tab-btn active" id="tabEmoji" onclick="switchTab('emoji')">
+            <i class='bx bx-smile'></i> Emoji
+        </button>
+
+        <button type="button" class="emoji-tab-btn" id="tabSticker" onclick="switchTab('sticker')">
+            <i class='bx bx-images'></i> Stiker
+        </button>
+    </div>
+
+    <!-- Emoji -->
+    <div class="emoji-tab-content" id="emojiTabContent">
+        <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+
+    <!-- Sticker -->
+    <div class="emoji-tab-content" id="stickerTabContent" style="display:none;">
+        <div class="sticker-img-grid">
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg')">
+                <img src="https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg" alt="stiker" loading="lazy">
+            </button>
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg')">
+                <img src="https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg" alt="stiker" loading="lazy">
+            </button>
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg')">
+                <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" alt="stiker" loading="lazy">
+            </button>
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg')">
+                <img src="https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg" alt="stiker" loading="lazy">
+            </button>
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg')">
+                <img src="https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg" alt="stiker" loading="lazy">
+            </button>
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg')">
+                <img src="https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg" alt="stiker" loading="lazy">
+            </button>
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg')">
+                <img src="https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg" alt="stiker" loading="lazy">
+            </button>
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/1200x/b7/5e/7d/b75e7dbc78a71c0457e96af84824ae43.jpg')">
+                <img src="https://i.pinimg.com/1200x/b7/5e/7d/b75e7dbc78a71c0457e96af84824ae43.jpg" alt="stiker" loading="lazy">
+            </button>
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/736x/f7/88/2f/f7882f6c8e27568cd66843ee8bede6c4.jpg')">
+                <img src="https://i.pinimg.com/736x/f7/88/2f/f7882f6c8e27568cd66843ee8bede6c4.jpg" alt="stiker" loading="lazy">
+            </button>
+
+            <button type="button" class="sticker-img-item"
+                onclick="sendSticker('https://i.pinimg.com/1200x/fe/12/a3/fe12a36a4f8dd44542b357204a7f2a10.jpg')">
+                <img src="https://i.pinimg.com/1200x/fe/12/a3/fe12a36a4f8dd44542b357204a7f2a10.jpg" alt="stiker" loading="lazy">
+            </button>
+
         </div>
+    </div>
+
+</div>
 
         <!-- REPLY PREVIEW -->
         <div id="replyPreview" class="reply-preview">
@@ -1194,33 +1231,69 @@
         </div>
     </div>
 
-    <!-- STIKERLAR — doimiy ochiq -->
-    <div class="side-card">
-        <p class="side-section-title">Stikerlar</p>
-        <div class="side-sticker-grid">
-            <button type="button" class="side-sticker-item" onclick="sendSticker('https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg')">
-                <img src="https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg" alt="stiker" loading="lazy">
-            </button>
-            <button type="button" class="side-sticker-item" onclick="sendSticker('https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg')">
-                <img src="https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg" alt="stiker" loading="lazy">
-            </button>
-            <button type="button" class="side-sticker-item" onclick="sendSticker('https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg')">
-                <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" alt="stiker" loading="lazy">
-            </button>
-            <button type="button" class="side-sticker-item" onclick="sendSticker('https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg')">
-                <img src="https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg" alt="stiker" loading="lazy">
-            </button>
-            <button type="button" class="side-sticker-item" onclick="sendSticker('https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg')">
-                <img src="https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg" alt="stiker" loading="lazy">
-            </button>
-            <button type="button" class="side-sticker-item" onclick="sendSticker('https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg')">
-                <img src="https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg" alt="stiker" loading="lazy">
-            </button>
-            <button type="button" class="side-sticker-item" onclick="sendSticker('https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg')">
-                <img src="https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg" alt="stiker" loading="lazy">
-            </button>
-        </div>
+<!-- STIKERLAR -->
+<div class="side-card">
+    <p class="side-section-title">Stikerlar</p>
+
+    <div class="side-sticker-grid">
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg')">
+            <img src="https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg')">
+            <img src="https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg')">
+            <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg')">
+            <img src="https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg')">
+            <img src="https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg')">
+            <img src="https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg')">
+            <img src="https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/1200x/b7/5e/7d/b75e7dbc78a71c0457e96af84824ae43.jpg')">
+            <img src="https://i.pinimg.com/1200x/b7/5e/7d/b75e7dbc78a71c0457e96af84824ae43.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/736x/f7/88/2f/f7882f6c8e27568cd66843ee8bede6c4.jpg')">
+            <img src="https://i.pinimg.com/736x/f7/88/2f/f7882f6c8e27568cd66843ee8bede6c4.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/1200x/b7/5e/7d/b75e7dbc78a71c0457e96af84824ae43.jpg')">
+            <img src="https://i.pinimg.com/1200x/b7/5e/7d/b75e7dbc78a71c0457e96af84824ae43.jpg" alt="stiker" loading="lazy">
+        </button>
+
+        <button type="button" class="side-sticker-item"
+            onclick="sendSticker('https://i.pinimg.com/1200x/fe/12/a3/fe12a36a4f8dd44542b357204a7f2a10.jpg')">
+            <img src="https://i.pinimg.com/1200x/fe/12/a3/fe12a36a4f8dd44542b357204a7f2a10.jpg" alt="stiker" loading="lazy">
+        </button>
+
     </div>
+</div>
 
 </div><!-- .chat-sidebar -->
 
