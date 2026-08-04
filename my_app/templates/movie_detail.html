@@ -732,7 +732,9 @@
 .comment-avatar {
     width: 40px; height: 40px; border-radius: 50%;
     object-fit: cover; background: #333; flex-shrink: 0;
+    cursor: pointer; transition: transform .15s;
 }
+.comment-avatar:hover { transform: scale(1.06); }
 .comment-input-wrapper { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
 .comment-input {
     width: 100%; background: transparent; border: none;
@@ -741,7 +743,7 @@
     font-family: inherit;
 }
 .comment-input:focus { border-bottom-color: #ef4444; }
-.comment-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.comment-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
 .comment-btn {
     background: #dc2626; color: #fff; border: none;
     padding: 9px 22px; border-radius: 50px;
@@ -807,7 +809,7 @@
 .comment-cancel-btn:hover { background: rgba(255,255,255,.14); }
 
 .comment-replies {
-    display: none;               /* <-- shu qatorni qo'shing */
+    display: none;
     margin-top: 14px; padding-left: 20px;
     border-left: 2px solid rgba(255,255,255,.08);
     flex-direction: column; gap: 16px;
@@ -818,6 +820,174 @@
     .comment-replies { padding-left: 14px; }
     .comment-footer { gap: 12px; }
 }
+
+/* -- COMMENT STICKER PICKER -- */
+.comment-sticker-toggle {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.14);
+    color: #e5e7eb;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.15rem;
+    transition: .2s;
+    flex-shrink: 0;
+}
+.comment-sticker-toggle:hover,
+.comment-sticker-toggle.active {
+    background: rgba(220,38,38,.18);
+    border-color: rgba(220,38,38,.35);
+    color: #f87171;
+}
+.comment-sticker-panel {
+    display: none;
+    margin-top: 4px;
+    padding: 14px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+}
+.comment-sticker-panel.open { display: block; }
+.comment-sticker-grid {
+    display: flex; flex-wrap: wrap; gap: 10px;
+}
+.comment-sticker-item {
+    width: 68px; height: 68px; border-radius: 12px;
+    overflow: hidden; cursor: pointer;
+    border: 2px solid transparent;
+    background: rgba(255,255,255,.04);
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+    flex-shrink: 0; padding: 0;
+}
+.comment-sticker-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.comment-sticker-item:hover { border-color: #dc2626; transform: scale(1.05); box-shadow: 0 0 12px rgba(220,38,38,.35); }
+
+.comment-sticker-img {
+    width: 150px; height: 150px; object-fit: cover;
+    border-radius: 16px; display: block;
+}
+
+/* -- COMMENT REPLY QUOTE (kimga javob berilgani) -- */
+.comment-reply-quote {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.05);
+    border-left: 3px solid #dc2626;
+    border-radius: 0 8px 8px 0;
+    padding: 6px 10px;
+    font-size: .78rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+}
+.comment-reply-quote strong { color: #f87171; }
+.comment-reply-quote i { font-size: .95rem; opacity: .75; flex-shrink: 0; }
+
+/* =====================================================================
+   USER MINI-PROFIL MODAL (avatar bosilganda) — chat.html bilan bir xil
+===================================================================== */
+.tier-basic   { --tier-color:#f87171; --tier-color-2:#dc2626; --tier-glow: rgba(220,38,38,0.2); }
+.tier-premium { --tier-color:#ffc107; --tier-color-2:#ff8f00; --tier-glow: rgba(255,193,7,0.25); }
+.tier-vip     { --tier-color:#b45cff; --tier-color-2:#ff5cd6; --tier-glow: rgba(180,92,255,0.28); }
+
+.user-profile-overlay {
+    position: fixed; inset: 0; z-index: 500; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    padding: 20px;
+}
+.user-profile-overlay.open { display: flex; }
+.user-profile-modal {
+    width: 100%; max-width: 340px; max-height: 86vh; overflow-y: auto;
+    background: rgba(15,15,28,0.97); border: 1px solid var(--glass-border);
+    border-radius: 20px; padding: 22px; position: relative;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+}
+.user-profile-modal::-webkit-scrollbar { width: 4px; }
+.user-profile-modal::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+.upm-close {
+    position: absolute; top: 12px; right: 12px; width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--text-dim);
+    display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem;
+}
+.upm-close:hover { color: #f87171; border-color: #f87171; }
+.upm-loading { text-align: center; padding: 30px 10px; color: var(--text-dim); font-size: 0.85rem; }
+
+.upm-hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; margin-bottom: 16px; }
+.upm-avatar { width: 84px; height: 84px; border-radius: 50%; background: rgba(220,38,38,0.1); border: 2px solid rgba(220,38,38,0.3); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; color: #f87171; overflow: hidden; }
+.upm-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.tier-premium .upm-avatar, .tier-vip .upm-avatar { border-color: var(--tier-color); color: var(--tier-color); box-shadow: 0 0 18px var(--tier-glow); }
+.upm-name { font-size: 1.15rem; font-weight: 800; color: var(--text-light); }
+.upm-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; background: rgba(255,255,255,0.06); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); }
+.tier-premium .upm-badge { background: rgba(255,193,7,0.14); color:#ffc107; border-color: rgba(255,193,7,0.3); }
+.tier-vip .upm-badge { background: linear-gradient(90deg, rgba(180,92,255,0.2), rgba(255,92,214,0.2)); color:#d78bff; border-color: rgba(180,92,255,0.35); }
+
+.upm-name-vip {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: #ffd700; padding: 4px 14px; border-radius: 14px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,215,0,0.35);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    text-shadow: 0 0 14px rgba(255,215,0,0.45);
+    box-shadow: 0 4px 18px rgba(255,215,0,0.14), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.upm-badge-vip-pulse {
+    border-color: #ffd700 !important;
+    animation: upmVipPulse 1.8s ease-in-out infinite;
+}
+@keyframes upmVipPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.45); }
+    50% { box-shadow: 0 0 14px 4px rgba(255,215,0,0.4); }
+}
+.upm-info-val-vip {
+    color: #ffd700; font-weight: 800; text-shadow: 0 0 8px rgba(255,215,0,0.3);
+}
+.upm-date-wave {
+    position: relative; display: inline-block; padding-bottom: 6px;
+}
+.upm-date-wave::after {
+    content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 4px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='6'><path d='M0 3 Q5 0 10 3 T20 3' stroke='%23ffd700' stroke-width='1.5' fill='none'/></svg>");
+    background-repeat: repeat-x; background-size: 20px 6px;
+    animation: upmWaveMove 1.2s linear infinite;
+}
+@keyframes upmWaveMove {
+    from { background-position-x: 0; }
+    to   { background-position-x: 20px; }
+}
+
+.upm-info-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+.upm-info-cell { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.upm-info-cell:nth-child(odd)  { padding-right: 14px; }
+.upm-info-cell:nth-child(even) { padding-left: 14px; border-left: 1px solid rgba(255,255,255,0.06); }
+.upm-info-cell:nth-last-child(-n+2) { border-bottom: none; }
+.upm-info-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,0.35); margin-bottom: 2px; }
+.upm-info-val { font-size: 12.5px; font-weight: 600; color: var(--text-light); word-break: break-word; }
+
+.upm-section-title { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,0.35); margin-bottom: 10px; }
+.upm-watched-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.upm-watched-card { border-radius: 10px; overflow: hidden; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); }
+.upm-watched-card img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; background: rgba(255,255,255,0.05); }
+.upm-watched-title { display: block; padding: 7px 8px; font-size: 11.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-light); }
+.upm-empty { font-size: 12px; color: rgba(255,255,255,0.35); grid-column: 1/-1; }
+
+.upm-level-box {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+    border-radius: 14px; padding: 14px 16px;
+}
+.upm-level-circle {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(220,38,38,0.18), rgba(220,38,38,0.03));
+    border: 2px solid rgba(220,38,38,0.4);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.tier-premium .upm-level-circle { border-color: var(--tier-color); background: radial-gradient(circle at 30% 30%, var(--tier-glow), transparent); }
+.tier-vip .upm-level-circle { border-color: var(--tier-color); background: radial-gradient(circle at 30% 30%, var(--tier-glow), transparent); }
+.upm-level-num { font-size: 18px; font-weight: 900; color: #f87171; line-height: 1; }
+.tier-premium .upm-level-num { color: var(--tier-color); }
+.tier-vip .upm-level-num { background: linear-gradient(90deg, var(--tier-color), var(--tier-color-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.upm-level-label { font-size: 8px; font-weight: 800; letter-spacing: .1em; color: rgba(220,38,38,0.6); }
 
 /* =====================================================================
    RESPONSIVE
@@ -881,6 +1051,9 @@
     .related-card-link { flex: 0 0 110px; }
     .related-card-img { width: 110px; height: 155px; }
     .related-nav-btns { display: none; }
+
+    .comment-sticker-item { width: 58px; height: 58px; }
+    .comment-sticker-img { width: 120px; height: 120px; }
 }
 </style>
 {% endblock %}
@@ -1152,16 +1325,44 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
     <h3>Izohlar ({{ comments.count|default:"0" }})</h3>
 
     {% if request.user.is_authenticated %}
-    <form class="comment-form" method="POST" action="{% url 'movie_detail' movie.id %}#comments">
+    <form class="comment-form" method="POST" action="{% url 'movie_detail' movie.id %}#comments" id="mainCommentForm">
       {% csrf_token %}
       <img src="{% if request.user.avatar %}{{ request.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
-           alt="Avatar" class="comment-avatar">
+           alt="Avatar" class="comment-avatar" onclick="openUserProfileModal({{ request.user.id }})">
       <div class="comment-input-wrapper">
-        <textarea name="comment" class="comment-input" rows="1"
+        <textarea name="comment" class="comment-input" id="mainCommentInput" rows="1"
                   placeholder="Fikr bildiring..." required
                   oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
         <div class="comment-actions">
+          <button type="button" class="comment-sticker-toggle" id="commentStickerToggle" title="Stiker" aria-label="Stiker">
+            <i class='bx bx-images'></i>
+          </button>
           <button type="submit" class="comment-btn">Izoh qoldirish</button>
+        </div>
+        <div class="comment-sticker-panel" id="commentStickerPanel">
+          <div class="comment-sticker-grid">
+            <button type="button" class="comment-sticker-item" onclick="sendCommentSticker('https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg')">
+              <img src="https://i.pinimg.com/736x/e2/40/10/e24010330df48782572562e57bbd9da7.jpg" alt="stiker" loading="lazy">
+            </button>
+            <button type="button" class="comment-sticker-item" onclick="sendCommentSticker('https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg')">
+              <img src="https://i.pinimg.com/736x/d6/fc/e1/d6fce118b27037475f20c95e5cc7c53a.jpg" alt="stiker" loading="lazy">
+            </button>
+            <button type="button" class="comment-sticker-item" onclick="sendCommentSticker('https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg')">
+              <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" alt="stiker" loading="lazy">
+            </button>
+            <button type="button" class="comment-sticker-item" onclick="sendCommentSticker('https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg')">
+              <img src="https://i.pinimg.com/736x/6d/4a/63/6d4a634be6d8a7fbd1f4223b701dde15.jpg" alt="stiker" loading="lazy">
+            </button>
+            <button type="button" class="comment-sticker-item" onclick="sendCommentSticker('https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg')">
+              <img src="https://i.pinimg.com/736x/1e/d1/c5/1ed1c5531f329e72ba2745698da9f52c.jpg" alt="stiker" loading="lazy">
+            </button>
+            <button type="button" class="comment-sticker-item" onclick="sendCommentSticker('https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg')">
+              <img src="https://i.pinimg.com/736x/e2/9e/33/e29e33f37c655dc075dde7d366bc44be.jpg" alt="stiker" loading="lazy">
+            </button>
+            <button type="button" class="comment-sticker-item" onclick="sendCommentSticker('https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg')">
+              <img src="https://i.pinimg.com/736x/ee/90/58/ee9058c8023f006fbbe391cf8f758e31.jpg" alt="stiker" loading="lazy">
+            </button>
+          </div>
         </div>
       </div>
     </form>
@@ -1178,7 +1379,7 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
       <div class="comment-item" data-comment-index="{{ forloop.counter0 }}" id="comment-{{ comment.id }}"
            {% if forloop.counter > 5 %}style="display:none;"{% endif %}>
         <img src="{% if comment.user.avatar %}{{ comment.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
-             alt="Avatar" class="comment-avatar">
+             alt="Avatar" class="comment-avatar" onclick="openUserProfileModal({{ comment.user.id }})">
         <div class="comment-body">
           <div class="comment-header">
             <span class="comment-username">{{ comment.user.username }}</span>
@@ -1191,7 +1392,16 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
             {% endif %}
             <span class="comment-time">{{ comment.local_created_at|date:"d M Y, H:i" }}</span>
           </div>
-          <div class="comment-text">{{ comment.text|linebreaksbr }}</div>
+
+          {% with comment_sticker=comment.text|slice:":11" %}
+          <div class="comment-text">
+            {% if comment_sticker == '__sticker__' %}
+              <img src="{{ comment.text|slice:'11:' }}" alt="Stiker" class="comment-sticker-img" loading="lazy">
+            {% else %}
+              {{ comment.text|linebreaksbr }}
+            {% endif %}
+          </div>
+          {% endwith %}
 
           <div class="comment-footer">
             {% if request.user.is_authenticated %}
@@ -1241,7 +1451,7 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
             {% for reply in comment.replies.all %}
             <div class="comment-item comment-reply-item" id="comment-{{ reply.id }}">
               <img src="{% if reply.user.avatar %}{{ reply.user.avatar.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
-                   alt="Avatar" class="comment-avatar">
+                   alt="Avatar" class="comment-avatar" onclick="openUserProfileModal({{ reply.user.id }})">
               <div class="comment-body">
                 <div class="comment-header">
                   <span class="comment-username">{{ reply.user.username }}</span>
@@ -1254,8 +1464,24 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
                   {% endif %}
                   <span class="comment-time">{{ reply.local_created_at|date:"d M Y, H:i" }}</span>
                 </div>
-                <div class="comment-text">{{ reply.text|linebreaksbr }}</div>
+
+                {% with reply_sticker=reply.text|slice:":11" %}
+                <div class="comment-text">
+                  {% if reply_sticker == '__sticker__' %}
+                    <img src="{{ reply.text|slice:'11:' }}" alt="Stiker" class="comment-sticker-img" loading="lazy">
+                  {% else %}
+                    {{ reply.text|linebreaksbr }}
+                  {% endif %}
+                </div>
+                {% endwith %}
+
                 <div class="comment-footer">
+                  {% if request.user.is_authenticated %}
+                  <button type="button" class="comment-reply-btn"
+                          onclick="replyToReply('{{ comment.id }}', '{{ reply.user.username|escapejs }}')">
+                    <i class='bx bx-reply'></i> Javob
+                  </button>
+                  {% endif %}
                   {% if request.user.is_authenticated %}
                     {% if reply.user == request.user or request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
                     <form class="comment-delete-form" method="POST" action="{% url 'delete_comment' reply.id %}"
@@ -1323,6 +1549,18 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
 </div><!-- /movie-page -->
 </main>
 
+<!-- ═══════════════════════════════════════
+     USER MINI-PROFIL MODAL (avatar bosilganda) — chat.html bilan bir xil
+══════════════════════════════════════════ -->
+<div class="user-profile-overlay" id="userProfileOverlay" onclick="if(event.target===this) closeUserProfileModal()">
+  <div class="user-profile-modal" id="userProfileModalCard">
+    <button class="upm-close" onclick="closeUserProfileModal()"><i class='bx bx-x'></i></button>
+    <div id="upmBody">
+      <div class="upm-loading">Yuklanmoqda…</div>
+    </div>
+  </div>
+</div>
+
 <!-- ===============================================================
      JAVASCRIPT
 =============================================================== -->
@@ -1365,7 +1603,6 @@ const SPEED_LIST = [
 
 /* ---------------------------------------------------------------
    Build inner HTML for .bm-player
-   — sifat badge olib tashlandi (top-bar va hero dan ham)
 --------------------------------------------------------------- */
 function buildSpeedMenu(){
   let items = SPEED_LIST.map(function(s, i){
@@ -1578,8 +1815,6 @@ updateIntroToggleUi();
 
 /* ---------------------------------------------------------------
    QUICK ACTIONS: ANIME HAQIDA / ANIME KADRLAR — box almashish
-   Bosilganda: ikonalar qatori yashiriladi, tegishli box ochiladi.
-   "Orqaga" bosilganda: box yopiladi, ikonalar qatori qaytadi.
 --------------------------------------------------------------- */
 (function(){
   var iconsRow   = document.getElementById('qa-icons-row');
@@ -1690,26 +1925,16 @@ function unlockOrientation(){
 
 /* ---------------------------------------------------------------
    URL FRAGMENT / QUERY TIME SEEK
-   Google va boshqa saytlardan #t=120 yoki ?t=120 bilan kelganda
-   video o'sha vaqtdan boshlanadi.
-   Qo'llab-quvvatlanadiganlar:
-     #t=90        → 90 soniya
-     #t=1m30s     → 90 soniya
-     #t=1h2m3s    → 3723 soniya
-     ?t=90        → 90 soniya
 --------------------------------------------------------------- */
 function parseTimeParam(raw){
   if(!raw) return 0;
   raw = raw.trim();
-  /* Sof raqam */
   if(/^\d+(\.\d+)?$/.test(raw)) return parseFloat(raw);
-  /* HH:MM:SS yoki MM:SS */
   if(/^\d+:\d+(:\d+)?$/.test(raw)){
     var parts = raw.split(':').map(Number);
     if(parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
     if(parts.length === 2) return parts[0]*60 + parts[1];
   }
-  /* 1h2m3s / 2m30s / 90s */
   var h = (/(\d+)h/.exec(raw)||[0,0])[1];
   var m = (/(\d+)m/.exec(raw)||[0,0])[1];
   var s = (/(\d+)s/.exec(raw)||[0,0])[1];
@@ -1717,13 +1942,11 @@ function parseTimeParam(raw){
 }
 
 function getSeekTarget(){
-  /* 1) URL fragment: #t=... */
   var hash = window.location.hash;
   if(hash){
     var hm = hash.match(/[#&]t=([^&]+)/);
     if(hm) return parseTimeParam(hm[1]);
   }
-  /* 2) Query string: ?t=... */
   var qs = window.location.search;
   if(qs){
     var qm = qs.match(/[?&]t=([^&]+)/);
@@ -1735,12 +1958,9 @@ function getSeekTarget(){
 /* ---------------------------------------------------------------
    MAIN PLAYER INIT
 --------------------------------------------------------------- */
-/* Global event listeners ro'yxati — reinit qilganda eski listenerlar
-   qolmasligi uchun AbortController ishlatiladi                      */
 var _bmAbort = null;
 
 function initBmPlayer(){
-  /* Avvalgi listenerlarni o'chirish */
   if(_bmAbort){ _bmAbort.abort(); }
   _bmAbort = new AbortController();
   var sig  = { signal: _bmAbort.signal };
@@ -1770,28 +1990,19 @@ function initBmPlayer(){
   var lockBtn   = $id('bm-lock-btn');
   var skipIntroBtn = $id('bm-skip-intro-btn');
 
-  /* ================================================================
-     DEEP LINK — URL orqali kelgan vaqt pozitsiyasi
-     loadedmetadata yoki canplay hodisasida bir marta seek qilinadi
-  ================================================================ */
   var seekTarget = getSeekTarget();
   var _seekDone  = false;
 
   function applySeek(){
     if(_seekDone || seekTarget <= 0) return;
     if(!isFinite(video.duration) || video.duration <= 0) return;
-    /* Vaqt videoning uzunligidan oshib ketmasin */
     video.currentTime = Math.min(seekTarget, video.duration - 1);
     _seekDone = true;
   }
 
   video.addEventListener('loadedmetadata', applySeek, sig);
-  /* canplay — ba'zi brauzerlar loadedmetadata ga kech yetadi */
   video.addEventListener('canplay', applySeek, sig);
 
-  /* ================================================================
-     SPEED MENU
-  ================================================================ */
   var currentSpeedIdx = 2;
 
   function closeSpeedMenu(){ if(speedMenu) speedMenu.classList.remove('open'); }
@@ -1839,9 +2050,6 @@ function initBmPlayer(){
     if(speedMenu && !e.target.closest('#bm-speed-wrap')) closeSpeedMenu();
   }, sig);
 
-  /* ================================================================
-     LOCK BUTTON
-  ================================================================ */
   var isLocked = false;
 
   if(lockBtn){
@@ -1854,14 +2062,6 @@ function initBmPlayer(){
     }, sig);
   }
 
-  /* ================================================================
-     SKIP INTRO
-     — Tugma har doim admin belgilagan vaqt oralig'ida chiqadi va
-       shu oraliqdan chiqishi bilan yo'qoladi. Toggle switch bunga
-       ta'sir qilmaydi.
-     — Toggle switch YOQILGAN bo'lsa, video shu oraliqqa kirganda
-       avtomatik oralig' oxiriga sakraydi (auto-skip).
-  ================================================================ */
   function parseIntroRangeStr(raw){
     if(!raw) return null;
     var parts = raw.split('|');
@@ -1894,7 +2094,6 @@ function initBmPlayer(){
       return;
     }
 
-    /* t admin belgilagan oraliq ichida */
     var autoSkipEnabled = localStorage.getItem(bmIntroStorageKey(BM_CURRENT_EP_ID)) === '1';
 
     if(autoSkipEnabled){
@@ -1917,7 +2116,6 @@ function initBmPlayer(){
     skipIntroBtn.style.display = 'none';
   }, sig);
 
-  /* ---- Helpers ---- */
   function setPlayState(playing){
     if(playBtn) playBtn.innerHTML = svgIcon(playing ? SVG.pause : SVG.play);
     player.classList.toggle('paused', !playing);
@@ -1946,7 +2144,6 @@ function initBmPlayer(){
     updateProgress();
   }
 
-  /* ---- Video events ---- */
   video.addEventListener('play',           function(){ setPlayState(true); },  sig);
   video.addEventListener('pause',          function(){ setPlayState(false); }, sig);
   video.addEventListener('ended',          function(){ setPlayState(false); }, sig);
@@ -1955,7 +2152,6 @@ function initBmPlayer(){
   video.addEventListener('canplay',        function(){ player.classList.remove('loading'); }, sig);
   video.addEventListener('loadedmetadata', updateProgress, sig);
 
-  /* ---- Play / skip buttons ---- */
   if(playBtn) playBtn.addEventListener('click', function(e){ e.stopPropagation(); togglePlay(); }, sig);
   if(back10)  back10.addEventListener('click',  function(e){
     e.stopPropagation();
@@ -1968,9 +2164,7 @@ function initBmPlayer(){
     showRipple(rippleR, '+10 son');
   }, sig);
 
-  /* ---- Progress: mouse ---- */
   var seeking = false;
-  var _seekScrollLeft = 0; /* related scroll bilan konflikt bo'lmasin */
 
   function seekFromMouse(e){
     var r = progress.getBoundingClientRect();
@@ -1997,11 +2191,9 @@ function initBmPlayer(){
     }, { passive: true, signal: _bmAbort.signal });
   }
 
-  /* window-level mouse listeners — signal bilan olib tashlanadi */
   window.addEventListener('mousemove', function(e){ if(seeking) seekFromMouse(e); }, sig);
   window.addEventListener('mouseup',   function(){ seeking = false; }, sig);
 
-  /* ---- Volume ---- */
   if(volSlider) volSlider.addEventListener('input', function(){
     video.volume = parseFloat(volSlider.value);
     video.muted  = video.volume === 0;
@@ -2015,7 +2207,6 @@ function initBmPlayer(){
     volBtn.innerHTML = svgIcon(video.muted ? SVG.mute : SVG.vol);
   }, sig);
 
-  /* ---- Fullscreen ---- */
   function enterFullscreen(){
     if(video.webkitEnterFullscreen && !document.fullscreenEnabled && !document.webkitFullscreenEnabled){
       try{ video.webkitEnterFullscreen(); }catch(e){}
@@ -2060,12 +2251,6 @@ function initBmPlayer(){
     unlockOrientation();
   }, sig);
 
-  /* ================================================================
-     CONTROLS VISIBILITY
-     — Barcha rejimlarda (mouse yoki touch) icon/progress/qatlamlar
-       ekranda 3 soniya turadi, so'ng avtomatik yashiriladi (video
-       pauzada bo'lmasa). Touch qurilmalarda ham xuddi shu qoida.
-  ================================================================ */
   var hideTimer = null;
 
   function showControls(ms){
@@ -2096,9 +2281,6 @@ function initBmPlayer(){
     }, sig);
   }
 
-  /* ================================================================
-     MOBILE TOUCH LOGIC
-  ================================================================ */
   if(isTouch()){
     var lastTap    = 0;
     var DTAP       = 300;
@@ -2149,7 +2331,6 @@ function initBmPlayer(){
         return;
       }
 
-      /* Normal rejim */
       if(e.target.closest('.bm-progress-wrap') ||
          e.target.closest('.bm-btn') ||
          e.target.closest('.bm-back-link') ||
@@ -2189,9 +2370,6 @@ function initBmPlayer(){
   video.addEventListener('pause', function(){ clearTimeout(hideTimer); if(!isLocked) player.classList.add('show-controls'); }, sig);
   video.addEventListener('ended', function(){ clearTimeout(hideTimer); if(!isLocked) player.classList.add('show-controls'); }, sig);
 
-  /* ================================================================
-     KEYBOARD SHORTCUTS (desktop only)
-  ================================================================ */
   document.addEventListener('keydown', function(e){
     if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
     if(isLocked) return;
@@ -2306,7 +2484,7 @@ function toggleAllComments(){
 }
 
 /* ---------------------------------------------------------------
-   COMMENTS: REPLY FORM TOGGLE
+   COMMENTS: REPLY FORM TOGGLE (top-level comment uchun)
 --------------------------------------------------------------- */
 function toggleReplyForm(id){
   var f = document.getElementById('reply-form-' + id);
@@ -2317,6 +2495,39 @@ function toggleReplyForm(id){
     var ta = f.querySelector('textarea');
     if(ta) ta.focus();
   }
+}
+
+/* ---------------------------------------------------------------
+   COMMENTS: JAVOBGA JAVOB QAYTARISH (reply ichidan)
+   — parent comment'ning reply-formasini ochib, "@username " bilan
+     to'ldiradi, shunday qilib kimga javob yozilayotgani aniq bo'ladi
+     va forma xuddi shu izohga (parent_id) yuboriladi.
+--------------------------------------------------------------- */
+function replyToReply(commentId, username){
+  var form = document.getElementById('reply-form-' + commentId);
+  if(!form) return;
+
+  form.style.display = 'block';
+
+  var ta = form.querySelector('textarea');
+  if(ta){
+    var mention = '@' + username + ' ';
+    var current = ta.value.replace(/^@\S+\s*/, '');
+    ta.value = mention + current;
+    ta.style.height = '';
+    ta.style.height = ta.scrollHeight + 'px';
+    ta.focus();
+    var len = ta.value.length;
+    try { ta.setSelectionRange(len, len); } catch(e){}
+  }
+
+  var repliesBox = document.getElementById('replies-' + commentId);
+  if(repliesBox && repliesBox.style.display !== 'flex'){
+    var viewBtn = document.querySelector('.comment-view-replies-btn[onclick*="' + commentId + '"]');
+    if(viewBtn) toggleReplies(commentId, viewBtn);
+  }
+
+  form.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 /* ---------------------------------------------------------------
@@ -2331,6 +2542,150 @@ function toggleReplies(id, btn){
   btn.innerHTML = showing
     ? '<i class="bx bx-chevron-down"></i> Javoblar (' + count + ')'
     : '<i class="bx bx-chevron-up"></i> Javoblarni yashirish';
+}
+
+/* ---------------------------------------------------------------
+   COMMENTS: "kimga javob" belgisi — reply matni "@username " bilan
+   boshlansa, uni chat.html'dagi reply-info kabi ajratib ko'rsatadi
+--------------------------------------------------------------- */
+function enhanceReplyMentions(){
+  document.querySelectorAll('.comment-reply-item .comment-text').forEach(function(el){
+    if(el.dataset.enhanced || el.querySelector('img')) return;
+    var raw = el.textContent || '';
+    var m = raw.match(/^@(\S+)\s([\s\S]*)$/);
+    if(m){
+      el.dataset.enhanced = '1';
+      var quote = document.createElement('div');
+      quote.className = 'comment-reply-quote';
+      quote.innerHTML = '<i class="bx bx-reply"></i> <strong>@' + escHtml(m[1]) + '</strong> ga javob';
+      el.parentNode.insertBefore(quote, el);
+      el.textContent = m[2];
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', enhanceReplyMentions);
+
+/* ---------------------------------------------------------------
+   COMMENTS: STIKER PANELI (fikr bildirish input oxiridagi tugma)
+--------------------------------------------------------------- */
+(function(){
+  var toggle = document.getElementById('commentStickerToggle');
+  var panel  = document.getElementById('commentStickerPanel');
+  if(!toggle || !panel) return;
+  toggle.addEventListener('click', function(e){
+    e.stopPropagation();
+    var isOpen = panel.classList.toggle('open');
+    toggle.classList.toggle('active', isOpen);
+  });
+  document.addEventListener('click', function(e){
+    if(!panel.contains(e.target) && !toggle.contains(e.target)){
+      panel.classList.remove('open');
+      toggle.classList.remove('active');
+    }
+  });
+})();
+
+function sendCommentSticker(url){
+  var inp  = document.getElementById('mainCommentInput');
+  var form = document.getElementById('mainCommentForm');
+  if(!inp || !form) return;
+  inp.value = '__sticker__' + url;
+  form.requestSubmit();
+}
+
+/* ---------------------------------------------------------------
+   USER MINI-PROFIL MODAL (avatar bosilganda) — chat.html bilan bir xil
+--------------------------------------------------------------- */
+function userProfileUrl(id) {
+    return "{% url 'user_mini_profile_api' 0 %}".replace('/0/', '/' + id + '/');
+}
+
+function openUserProfileModal(userId) {
+    const overlay = document.getElementById("userProfileOverlay");
+    const body = document.getElementById("upmBody");
+    const card = document.getElementById("userProfileModalCard");
+    if (!overlay || !body) return;
+    overlay.classList.add("open");
+    body.innerHTML = '<div class="upm-loading">Yuklanmoqda…</div>';
+    card.className = "user-profile-modal";
+
+    fetch(userProfileUrl(userId), { headers: { "X-Requested-With": "XMLHttpRequest" } })
+        .then(r => r.json())
+        .then(data => renderUserProfileModal(data))
+        .catch(() => { body.innerHTML = '<div class="upm-loading">Profilni yuklab bo\'lmadi.</div>'; });
+}
+
+function closeUserProfileModal() {
+    const overlay = document.getElementById("userProfileOverlay");
+    if (overlay) overlay.classList.remove("open");
+}
+
+function renderUserProfileModal(data) {
+    const body = document.getElementById("upmBody");
+    const card = document.getElementById("userProfileModalCard");
+    const tier = data.tier || "basic";
+    const isVip = tier === "vip";
+    card.classList.add("tier-" + tier);
+
+    let badgeHtml = '<span class="upm-badge"><i class="bx bx-user"></i> Oddiy</span>';
+    if (tier === "vip") badgeHtml = '<span class="upm-badge upm-badge-vip-pulse"><i class="bx bxs-crown"></i> VIP</span>';
+    else if (tier === "premium") badgeHtml = '<span class="upm-badge"><i class="bx bx-crown"></i> Premium</span>';
+
+    const avatarHtml = data.avatar_url
+        ? `<img src="${escHtml(data.avatar_url)}" alt="avatar">`
+        : escHtml((data.display_name || "?")[0].toUpperCase());
+
+    let watchedHtml = '';
+    if (data.last_watched && data.last_watched.length) {
+        watchedHtml = data.last_watched.map(m => `
+            <div class="upm-watched-card">
+                ${m.image_url ? `<img src="${escHtml(m.image_url)}" alt="${escHtml(m.title)}">` : ''}
+                <span class="upm-watched-title">${escHtml(m.title)}</span>
+            </div>
+        `).join('');
+    } else {
+        watchedHtml = '<div class="upm-empty">Hali hech qanday anime ko\'rilmagan.</div>';
+    }
+
+    const adminIconHtml = data.is_admin
+        ? `<img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" class="admin-icon-badge" style="margin-left:4px;width:14px;height:14px;border-radius:50%;object-fit:cover;" alt="Admin">`
+        : '';
+
+    const nameClass    = isVip ? "upm-name upm-name-vip" : "upm-name";
+    const idValClass   = isVip ? "upm-info-val upm-info-val-vip" : "upm-info-val";
+    const ismValClass  = isVip ? "upm-info-val upm-info-val-vip" : "upm-info-val";
+    const dateValClass = isVip ? "upm-info-val upm-date-wave" : "upm-info-val";
+
+    body.innerHTML = `
+        <div class="upm-hero">
+            <div class="upm-avatar">${avatarHtml}</div>
+            <div class="${nameClass}">@${escHtml(data.username)} ${adminIconHtml}</div>
+            ${badgeHtml}
+        </div>
+        <div class="upm-info-grid">
+            <div class="upm-info-cell"><div class="upm-info-label">ID</div><div class="${idValClass}">${escHtml(data.id)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Ism</div><div class="${ismValClass}">${escHtml(data.first_name)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Familiya</div><div class="upm-info-val">${escHtml(data.last_name)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Ro'yxatdan o'tgan</div><div class="${dateValClass}">${escHtml(data.date_joined)}</div></div>
+        </div>
+        <p class="upm-section-title">Ko'rilgan animelar</p>
+        <div class="upm-watched-grid">${watchedHtml}</div>
+        <p class="upm-section-title">Daraja</p>
+        <div class="upm-level-box">
+            <div>
+                <div style="font-size:12px;color:var(--text-dim);">Saytdagi faollik va ko'rilgan animelar soniga qarab daraja oshadi.</div>
+            </div>
+            <div class="upm-level-circle">
+                <div class="upm-level-num">${escHtml(data.level)}</div>
+                <div class="upm-level-label">LEVEL</div>
+            </div>
+        </div>
+    `;
+}
+
+function escHtml(str) {
+    if (str === null || str === undefined) return "";
+    return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 </script>
 {% endblock %}
