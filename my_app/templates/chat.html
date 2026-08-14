@@ -311,23 +311,25 @@
     #chatBgLayer.dark-mode { filter: brightness(0.22) blur(7px); }
 
     /* =====================================================
-       NAVBAR
+       NAVBAR — oddiy shisha (glass)
        ===================================================== */
     .chat-nav {
-        flex-shrink: 0; display: flex; align-items: center; padding: 0 6px; height: 58px;
-        background: linear-gradient(135deg, rgba(0,6,24,0.97) 0%, rgba(0,18,55,0.95) 60%, rgba(0,10,35,0.97) 100%);
-        border-bottom: 1px solid rgba(0,243,255,0.18);
-        backdrop-filter: blur(28px) saturate(1.6); -webkit-backdrop-filter: blur(28px) saturate(1.6);
-        position: relative; z-index: 50; border-radius: inherit;
-        border-bottom-left-radius: 0; border-bottom-right-radius: 0;
-        padding-top: env(safe-area-inset-top, 0px); box-sizing: content-box;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.55), 0 1px 0 rgba(0,243,255,0.14);
-    }
-    .chat-nav::after {
-        content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
-        width: 60%; height: 2px;
-        background: linear-gradient(90deg, transparent, rgba(0,243,255,0.55), transparent);
-        border-radius: 2px; pointer-events: none;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        height: 58px;
+        margin: 10px 12px 0;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid var(--glass-border);
+        border-radius: 18px;
+        backdrop-filter: blur(22px) saturate(1.4);
+        -webkit-backdrop-filter: blur(22px) saturate(1.4);
+        position: relative;
+        z-index: 50;
+        padding-top: env(safe-area-inset-top, 0px);
+        box-sizing: content-box;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     }
     .chat-nav-back {
         display: flex; align-items: center; gap: 2px; background: transparent; border: none;
@@ -375,6 +377,30 @@
     #loadMoreBtn:hover { border-color: var(--accent); color: var(--accent); }
     #loadMoreBtn.loading { opacity: 0.45; pointer-events: none; }
     #topSentinel { height: 1px; flex-shrink: 0; }
+
+    /* =====================================================
+       SANA AJRATGICH (date separator)
+       ===================================================== */
+    .date-separator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 12px 0 8px;
+        flex-shrink: 0;
+    }
+    .date-separator span {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid var(--glass-border);
+        color: var(--text-dim);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 4px 14px;
+        border-radius: 20px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
 
     /* =====================================================
        MESSAGE WRAPPERS
@@ -560,10 +586,22 @@
        INPUT PANEL
        ===================================================== */
     .chat-form {
-        flex-shrink: 0; display: flex; align-items: flex-end; padding: 8px 12px;
-        background: rgba(0,0,0,0.4); border-top: 1px solid var(--glass-border); gap: 8px;
-        position: relative; z-index: 10; padding-bottom: calc(8px + max(0px, env(safe-area-inset-bottom)));
-        min-height: 54px; border-radius: inherit; border-top-left-radius: 0; border-top-right-radius: 0;
+        flex-shrink: 0;
+        display: flex;
+        align-items: flex-end;
+        padding: 9px 10px;
+        margin: 8px 12px 10px;
+        background: rgba(8,18,38,0.46);
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 18px;
+        gap: 8px;
+        position: relative;
+        z-index: 10;
+        padding-bottom: calc(9px + max(0px, env(safe-area-inset-bottom)));
+        min-height: 54px;
+        backdrop-filter: blur(24px) saturate(1.5);
+        -webkit-backdrop-filter: blur(24px) saturate(1.5);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.07);
     }
     .emoji-toggle {
         flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--glass-border);
@@ -735,18 +773,53 @@
     .tier-vip .upm-level-num { background: linear-gradient(90deg, var(--tier-color), var(--tier-color-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .upm-level-label { font-size: 8px; font-weight: 800; letter-spacing: .1em; color: rgba(0,243,255,0.6); }
 
-    /* Mobile */
+    /* =====================================================
+       DESKTOP — chat-nav / chat-form spacing
+       ===================================================== */
+    @media (min-width: 769px) {
+        .chat-nav {
+            margin: 12px 14px 0;
+        }
+
+        .chat-form {
+            margin: 10px 14px 12px;
+        }
+    }
+
+    /* =====================================================
+       MOBILE — NAVBAR / INPUT
+       ===================================================== */
     @media (max-width: 768px) {
         .chat-box { padding: 10px 8px 6px; }
         .message { max-width: 88%; }
         .message-wrapper[data-own="true"] .msg-avatar { display: none; }
         .chat-sticker-img { width: 130px; height: 130px; }
         .sticker-img-item { width: 68px; height: 68px; }
-        .chat-form { padding: 6px 8px; padding-bottom: calc(6px + max(0px, env(safe-area-inset-bottom))); background: rgba(0,4,18,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0,243,255,0.12); gap: 6px; }
+        .chat-form {
+            padding: 7px 8px;
+            margin: 7px 8px calc(8px + env(safe-area-inset-bottom));
+            padding-bottom: 7px;
+            background: rgba(8,18,38,0.46);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 18px;
+            backdrop-filter: blur(24px) saturate(1.6);
+            -webkit-backdrop-filter: blur(24px) saturate(1.6);
+            box-shadow: 0 10px 26px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.07);
+            gap: 6px;
+        }
         .chat-form textarea { font-size: 0.95rem; padding: 9px 12px; border-radius: 20px; }
         .emoji-toggle { width: 38px; height: 38px; }
         .send-btn { width: 38px; height: 38px; }
-        .chat-nav { height: 52px; background: rgba(0, 5, 20, 0.48); backdrop-filter: blur(36px) saturate(2.2); -webkit-backdrop-filter: blur(36px) saturate(2.2); border-bottom: 1px solid rgba(0, 243, 255, 0.22); box-shadow: 0 4px 28px rgba(0,0,0,0.35), 0 1px 0 rgba(0,243,255,0.18); }
+        .chat-nav {
+            height: 52px;
+            margin: 8px 8px 0;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            backdrop-filter: blur(22px) saturate(1.4);
+            -webkit-backdrop-filter: blur(22px) saturate(1.4);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+        }
         .chat-nav-title { font-size: 0.9rem; letter-spacing: 1px; }
         .chat-nav-subtitle { display: none; }
         .chat-nav-back { padding: 6px 8px; font-size: 0.85rem; }
@@ -814,6 +887,11 @@
             </div>
 
             {% for msg in messages %}
+            {% ifchanged msg.local_created_at|date:"d.m.Y" %}
+            <div class="date-separator" data-date="{{ msg.local_created_at|date:'d.m.Y' }}">
+                <span>{{ msg.local_created_at|date:"d.m.Y" }}</span>
+            </div>
+            {% endifchanged %}
             {% with is_sticker=msg.message|slice:":11" %}
             <div class="message-wrapper"
                  data-msg-id="{{ msg.id }}"
@@ -1826,6 +1904,12 @@ function getOldestMsgId() {
     return wrappers.length ? wrappers[0].getAttribute("data-msg-id") : null;
 }
 
+/* Chatda hozir ko'rinib turgan eng eski sana (ajratgichlarni takrorlamaslik uchun) */
+function getTopVisibleDate() {
+    const el = chatBox ? chatBox.querySelector(".date-separator[data-date]") : null;
+    return el ? el.getAttribute("data-date") : null;
+}
+
 let isLoadingMore   = false;
 let hasMoreMessages = {{ has_more|default:"false"|lower }};
 const loadMoreBtn   = document.getElementById("loadMoreBtn");
@@ -1853,7 +1937,25 @@ function loadOlderMessages() {
         if (!hasMoreMessages && loadMoreBtn) loadMoreBtn.style.display = "none";
         const sentinel = document.getElementById("topSentinel");
         const wrapper  = loadMoreBtn ? loadMoreBtn.closest(".load-more-wrapper") : null;
-        data.messages.forEach(msg => (wrapper || sentinel).insertAdjacentElement("afterend", buildMessageEl(msg)));
+        let anchor = wrapper || sentinel;
+        let runningDate = getTopVisibleDate();
+        // Eski xabarlar server tomonidan eng yangisidan eng eskisiga qarab keladi,
+        // shuning uchun teskari tartibda joylab, sana ajratgichlarni to'g'ri joyga qo'yamiz.
+        const msgs = data.messages.slice().reverse();
+        msgs.forEach(msg => {
+            if (msg.date && msg.date !== runningDate) {
+                const sep = document.createElement("div");
+                sep.className = "date-separator";
+                sep.setAttribute("data-date", msg.date);
+                sep.innerHTML = `<span>${escHtml(msg.date)}</span>`;
+                anchor.insertAdjacentElement("afterend", sep);
+                anchor = sep;
+                runningDate = msg.date;
+            }
+            const el = buildMessageEl(msg);
+            anchor.insertAdjacentElement("afterend", el);
+            anchor = el;
+        });
         chatBox.style.scrollBehavior = "auto";
         chatBox.scrollTop = chatBox.scrollHeight - prevScrollHeight;
         chatBox.style.scrollBehavior = "";
