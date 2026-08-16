@@ -153,13 +153,13 @@
     }
 
     .side-card {
-        background: rgba(13,13,26,0.82);
+        background: rgba(255,255,255,0.055);
         border: 1px solid var(--glass-border);
         border-radius: 18px;
         padding: 18px;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 12px 34px rgba(0,0,0,0.45);
+        backdrop-filter: blur(26px) saturate(1.5);
+        -webkit-backdrop-filter: blur(26px) saturate(1.5);
+        box-shadow: 0 12px 34px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
     }
 
     /* ---- Tier ranglar (sidebar va modal uchun umumiy) ---- */
@@ -424,7 +424,10 @@
         max-width: 70%; background: rgba(255,255,255,0.09); padding: 8px 12px 6px;
         border-radius: 18px 18px 18px 4px; border: 1px solid var(--glass-border); position: relative;
         word-break: break-word; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        transition: box-shadow 0.4s ease;
     }
+
+
     .message-wrapper[data-own="true"] .message { background: rgba(0,243,255,0.14); border-color: rgba(0,243,255,0.22); border-radius: 18px 18px 4px 18px; }
 
     .message.is-sticker { background: transparent !important; border-color: transparent !important; backdrop-filter: none !important; padding: 0; }
@@ -455,6 +458,11 @@
     .message-time { font-size: 0.64rem; color: var(--text-dim); opacity: 0.75; }
     .edited-badge { font-size: 0.62rem; color: var(--text-dim); opacity: 0.6; }
 
+    /* Boshqa xabarga o'tilganda vaqtincha yoritish (reply bosilganda) */
+    .message-wrapper.highlight-flash .message {
+        box-shadow: 0 0 0 2px var(--accent), 0 0 22px rgba(0,243,255,0.45);
+    }
+
     /* =====================================================
        ACTION BUTTONS
        ===================================================== */
@@ -476,12 +484,20 @@
         background: rgba(0,0,0,0.3); padding: 5px 9px; border-left: 3px solid var(--accent);
         border-radius: 0 6px 6px 0; font-size: 0.78rem; margin-bottom: 5px; color: var(--text-dim);
         word-break: break-word; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+        cursor: pointer; transition: background 0.15s;
+        max-height: 40px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
     }
+    .reply-info:hover { background: rgba(0,0,0,0.42); }
     .reply-sticker-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; flex-shrink: 0; vertical-align: middle; border: 1px solid var(--glass-border); }
     #replyStickerThumb { width: 38px; height: 38px; object-fit: cover; border-radius: 8px; flex-shrink: 0; display: none; border: 1px solid rgba(0,243,255,0.3); }
 
     /* ---- Reply info: VIP foydalanuvchiga javob berilganda ---- */
     .reply-info.reply-info-vip { border-left-color: #b45cff; background: rgba(180,92,255,0.08); }
+    .reply-info-vip:hover { background: rgba(180,92,255,0.14); }
     .reply-info-vip .reply-icon-vip { color: #b45cff !important; opacity: 1 !important; }
 
     /* =====================================================
@@ -495,19 +511,42 @@
     .edit-form button[type="submit"] { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
 
     /* =====================================================
-       SETTINGS PANEL (mobil overlay)
+       SETTINGS PANEL (mobil overlay) — GLASS
        ===================================================== */
     .settings-panel {
         position: absolute; bottom: 0; left: 0; right: 0; max-height: 0; overflow: hidden;
-        background: rgba(10,10,22,0.97); border-top: 1px solid var(--glass-border);
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        background: rgba(255,255,255,0.07);
+        border-top: 1px solid var(--glass-border);
+        backdrop-filter: blur(28px) saturate(1.6);
+        -webkit-backdrop-filter: blur(28px) saturate(1.6);
         transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1); z-index: 35;
+        box-shadow: 0 -10px 34px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.09);
     }
     .settings-panel.open { max-height: 420px; overflow-y: auto; }
     .settings-panel::-webkit-scrollbar { width: 4px; }
     .settings-panel::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
 
-    .settings-buttons { display: flex; gap: 12px; padding: 14px 16px 10px; border-bottom: 1px solid var(--glass-border); }
+    /* ---- Sozlamalar ichidagi "sahifalar" (asosiy / ovoz / tungi / fon) ---- */
+    .settings-view { display: none; }
+    .settings-view.active { display: block; animation: settingsViewIn 0.22s ease; }
+    @keyframes settingsViewIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
+
+    .settings-subview-header {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 16px 10px; border-bottom: 1px solid var(--glass-border);
+    }
+    .settings-subview-header span { font-size: 0.82rem; font-weight: 800; color: var(--text-light); letter-spacing: 0.2px; }
+    .settings-back-btn {
+        display: flex; align-items: center; gap: 1px;
+        background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border);
+        color: var(--accent); border-radius: 10px; padding: 5px 8px 5px 4px;
+        font-size: 0.76rem; font-weight: 700; cursor: pointer; font-family: inherit;
+        transition: background 0.15s, border-color 0.15s; flex-shrink: 0;
+    }
+    .settings-back-btn:hover { background: rgba(0,243,255,0.12); border-color: var(--accent); }
+    .settings-back-btn i { font-size: 1.25rem; }
+
+    .settings-buttons { display: flex; gap: 12px; padding: 14px 16px; }
     .settings-action-btn {
         display: flex; flex-direction: column; align-items: center; gap: 6px;
         background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px;
@@ -517,9 +556,7 @@
     .settings-action-btn i { font-size: 1.35rem; color: var(--accent); }
     .settings-action-btn:hover, .settings-action-btn.active { background: rgba(0,243,255,0.1); border-color: var(--accent); color: var(--accent); }
 
-    .bg-picker { display: none; flex-direction: column; padding: 12px 16px 14px; gap: 10px; }
-    .bg-picker.open { display: flex; }
-    .bg-picker-label { font-size: 0.73rem; color: var(--text-dim); }
+    .bg-picker { display: flex; flex-direction: column; padding: 12px 16px 16px; gap: 10px; }
     .bg-images-row { display: flex; gap: 12px; flex-wrap: wrap; }
     .bg-img-btn { width: 64px; height: 64px; border-radius: 50%; border: 3px solid transparent; padding: 0; cursor: pointer; overflow: hidden; background: none; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; flex-shrink: 0; }
     .bg-img-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
@@ -529,17 +566,13 @@
     .bg-remove-btn i { font-size: 1rem; }
     .bg-remove-btn:hover { border-color: #ef4444; color: #ef4444; }
 
-    .sound-picker { display: none; flex-direction: column; padding: 12px 16px 14px; gap: 10px; }
-    .sound-picker.open { display: flex; }
-    .sound-picker-label { font-size: 0.73rem; color: var(--text-dim); }
+    .sound-picker { display: flex; flex-direction: column; padding: 14px 16px 18px; gap: 10px; }
     .sound-options-row { display: flex; gap: 10px; flex-wrap: wrap; }
     .sound-option-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(255,255,255,0.05); border: 2px solid var(--glass-border); border-radius: 12px; padding: 10px 20px; cursor: pointer; color: var(--text-dim); font-size: 0.76rem; font-family: inherit; transition: background 0.2s, border-color 0.2s, color 0.2s; min-width: 90px; }
     .sound-option-btn i { font-size: 1.4rem; }
     .sound-option-btn.active { background: rgba(0,243,255,0.1); border-color: var(--accent); color: var(--accent); }
 
-    .dark-mode-picker { display: none; flex-direction: column; padding: 12px 16px 14px; gap: 10px; }
-    .dark-mode-picker.open { display: flex; }
-    .dark-mode-picker-label { font-size: 0.73rem; color: var(--text-dim); }
+    .dark-mode-picker { display: flex; flex-direction: column; padding: 14px 16px 18px; gap: 10px; }
     .dark-mode-row { display: flex; gap: 10px; }
     .dark-mode-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(255,255,255,0.05); border: 2px solid var(--glass-border); border-radius: 12px; padding: 10px 24px; cursor: pointer; color: var(--text-dim); font-size: 0.76rem; font-family: inherit; transition: background 0.2s, border-color 0.2s, color 0.2s; min-width: 90px; }
     .dark-mode-btn i { font-size: 1.4rem; }
@@ -551,9 +584,11 @@
        ===================================================== */
     .emoji-panel {
         position: absolute; bottom: 0; left: 0; right: 0; height: 0; overflow: hidden;
-        background: rgba(10,10,22,0.97); border-top: 1px solid var(--glass-border);
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        background: rgba(255,255,255,0.07);
+        border-top: 1px solid var(--glass-border);
+        backdrop-filter: blur(28px) saturate(1.6); -webkit-backdrop-filter: blur(28px) saturate(1.6);
         transition: height 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 34; display: flex; flex-direction: column;
+        box-shadow: 0 -10px 34px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.09);
     }
     .emoji-panel.open { height: 260px; }
     .emoji-tabs { display: flex; border-bottom: 1px solid var(--glass-border); flex-shrink: 0; }
@@ -790,8 +825,8 @@
        MOBILE — NAVBAR / INPUT
        ===================================================== */
     @media (max-width: 768px) {
-        .chat-box { padding: 10px 8px 6px; }
-        .message { max-width: 88%; }
+        .chat-box { padding: 9px 13px 7px; }
+        .message { max-width: 78%; }
         .message-wrapper[data-own="true"] .msg-avatar { display: none; }
         .chat-sticker-img { width: 130px; height: 130px; }
         .sticker-img-item { width: 68px; height: 68px; }
@@ -842,7 +877,7 @@
 </head>
 <body>
 
-<div class="page-shell">
+<div class="page-shell" id="pageShell">
 <div class="layout-row">
 
 <div class="chat-page">
@@ -946,7 +981,10 @@
 
                     {% if msg.reply_to %}
                     {% with rtype=msg.reply_to.message|slice:":11" %}
-                    <div class="reply-info{% if msg.reply_to.user.vip_data.vip_active %} reply-info-vip{% endif %}">
+                    <div class="reply-info{% if msg.reply_to.user.vip_data.vip_active %} reply-info-vip{% endif %}"
+                         data-reply-id="{{ msg.reply_to.id }}"
+                         onclick="scrollToMessage(this.dataset.replyId)"
+                         title="Asl xabarga o'tish">
                         <i class='bx bx-reply{% if msg.reply_to.user.vip_data.vip_active %} reply-icon-vip{% endif %}' style="flex-shrink:0;font-size:1rem;opacity:0.7;"></i>
                         <strong{% if msg.reply_to.user.vip_data.vip_active %} class="vip-name-glow"{% endif %}>{{ msg.reply_to.user.display_name }}</strong>:
                         {% if rtype == '__sticker__' %}
@@ -955,7 +993,7 @@
                                  class="reply-sticker-thumb">
                             <span style="font-style:italic;opacity:0.7;">Stiker</span>
                         {% else %}
-                            "{{ msg.reply_to.message|truncatechars:60 }}"
+                            "{{ msg.reply_to.message|truncatechars:40 }}"
                         {% endif %}
                     </div>
                     {% endwith %}
@@ -1003,77 +1041,105 @@
 
         </div><!-- .chat-box -->
 
-        <!-- SETTINGS PANEL (mobil overlay) -->
+        <!-- SETTINGS PANEL (mobil overlay) — icon ichida sahifalar: asosiy / fon / ovoz / tungi -->
         <div class="settings-panel" id="settingsPanel">
-            <div class="settings-buttons">
-                <button type="button" class="settings-action-btn" id="bgSettingBtn" onclick="toggleBgPicker()">
-                    <i class='bx bx-image-alt'></i>
-                    <span>Fon</span>
-                </button>
-                <button type="button" class="settings-action-btn" id="soundSettingBtn" onclick="toggleSoundPicker()">
-                    <i class='bx bx-volume-full' id="soundNavIcon"></i>
-                    <span>Ovoz</span>
-                </button>
-                <button type="button" class="settings-action-btn" id="darkSettingBtn" onclick="toggleDarkModePicker()">
-                    <i class='bx bx-moon' id="darkNavIcon"></i>
-                    <span>Tungi</span>
-                </button>
-            </div>
-            <div class="bg-picker" id="bgPicker">
-                <div class="bg-picker-label">Fon rasmini tanlang:</div>
-                <div class="bg-images-row">
-                    <button type="button" class="bg-img-btn" id="bgBtn0"
-                            onclick="setBgImage('https://i.pinimg.com/736x/e0/c5/f7/e0c5f736c37a1153bef186a984a2fc74.jpg','bgBtn0')">
-                        <img src="https://i.pinimg.com/736x/e0/c5/f7/e0c5f736c37a1153bef186a984a2fc74.jpg" alt="Default fon" loading="lazy">
+
+            <!-- ASOSIY: Fon / Ovoz / Tungi -->
+            <div class="settings-view active" id="settingsMainView">
+                <div class="settings-buttons">
+                    <button type="button" class="settings-action-btn" id="bgSettingBtn" onclick="openSettingsSub('bg')">
+                        <i class='bx bx-image-alt'></i>
+                        <span>Fon</span>
                     </button>
-                    <button type="button" class="bg-img-btn" id="bgBtn1"
-                            onclick="setBgImage('https://i.pinimg.com/736x/49/26/85/492685785b09d8ef14a4ca36c1b7fabc.jpg','bgBtn1')">
-                        <img src="https://i.pinimg.com/736x/49/26/85/492685785b09d8ef14a4ca36c1b7fabc.jpg" alt="Fon 1" loading="lazy">
+                    <button type="button" class="settings-action-btn" id="soundSettingBtn" onclick="openSettingsSub('sound')">
+                        <i class='bx bx-volume-full' id="soundNavIcon"></i>
+                        <span>Ovoz</span>
                     </button>
-                    <button type="button" class="bg-img-btn" id="bgBtn2"
-                            onclick="setBgImage('https://i.pinimg.com/736x/96/43/0a/96430a62debd30f8e8e2d2074dc9729e.jpg','bgBtn2')">
-                        <img src="https://i.pinimg.com/736x/96/43/0a/96430a62debd30f8e8e2d2074dc9729e.jpg" alt="Fon 2" loading="lazy">
-                    </button>
-                    <button type="button" class="bg-img-btn" id="bgBtn3"
-                            onclick="setBgImage('https://i.pinimg.com/736x/db/d1/e8/dbd1e8c885246d27c3a00b40935d4b0f.jpg','bgBtn3')">
-                        <img src="https://i.pinimg.com/736x/db/d1/e8/dbd1e8c885246d27c3a00b40935d4b0f.jpg" alt="Fon 3" loading="lazy">
-                    </button>
-                    <button type="button" class="bg-remove-btn" onclick="removeBgImage()">
-                        <i class='bx bx-x-circle'></i>
-                        <span>Default</span>
+                    <button type="button" class="settings-action-btn" id="darkSettingBtn" onclick="openSettingsSub('dark')">
+                        <i class='bx bx-moon' id="darkNavIcon"></i>
+                        <span>Tungi</span>
                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- SOUND PICKER -->
-        <div class="sound-picker" id="soundPicker">
-            <div class="sound-picker-label">Xabar ovozi:</div>
-            <div class="sound-options-row">
-                <button type="button" class="sound-option-btn" id="soundOnBtn" onclick="setSoundMode('on')">
-                    <i class='bx bx-volume-full'></i>
-                    <span>Ovoz yoqiq</span>
-                </button>
-                <button type="button" class="sound-option-btn" id="soundMuteBtn" onclick="setSoundMode('mute')">
-                    <i class='bx bx-volume-mute'></i>
-                    <span>Sukut qilish</span>
-                </button>
+            <!-- FON TANLASH -->
+            <div class="settings-view" id="settingsBgView">
+                <div class="settings-subview-header">
+                    <button type="button" class="settings-back-btn" onclick="openSettingsSub('main')">
+                        <i class='bx bx-chevron-left'></i> Orqaga
+                    </button>
+                    <span>Fon rasmini tanlang</span>
+                </div>
+                <div class="bg-picker" id="bgPicker">
+                    <div class="bg-images-row">
+                        <button type="button" class="bg-img-btn" id="bgBtn0"
+                                onclick="setBgImage('https://i.pinimg.com/736x/e0/c5/f7/e0c5f736c37a1153bef186a984a2fc74.jpg','bgBtn0')">
+                            <img src="https://i.pinimg.com/736x/e0/c5/f7/e0c5f736c37a1153bef186a984a2fc74.jpg" alt="Default fon" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn1"
+                                onclick="setBgImage('https://i.pinimg.com/736x/49/26/85/492685785b09d8ef14a4ca36c1b7fabc.jpg','bgBtn1')">
+                            <img src="https://i.pinimg.com/736x/49/26/85/492685785b09d8ef14a4ca36c1b7fabc.jpg" alt="Fon 1" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn2"
+                                onclick="setBgImage('https://i.pinimg.com/736x/96/43/0a/96430a62debd30f8e8e2d2074dc9729e.jpg','bgBtn2')">
+                            <img src="https://i.pinimg.com/736x/96/43/0a/96430a62debd30f8e8e2d2074dc9729e.jpg" alt="Fon 2" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn3"
+                                onclick="setBgImage('https://i.pinimg.com/736x/db/d1/e8/dbd1e8c885246d27c3a00b40935d4b0f.jpg','bgBtn3')">
+                            <img src="https://i.pinimg.com/736x/db/d1/e8/dbd1e8c885246d27c3a00b40935d4b0f.jpg" alt="Fon 3" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-remove-btn" onclick="removeBgImage()">
+                            <i class='bx bx-x-circle'></i>
+                            <span>Default</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- DARK MODE PICKER -->
-        <div class="dark-mode-picker" id="darkModePicker">
-            <div class="dark-mode-picker-label">Tungi rejim (fon rasmi):</div>
-            <div class="dark-mode-row">
-                <button type="button" class="dark-mode-btn on-btn" id="darkModeOnBtn" onclick="setDarkMode(true)">
-                    <i class='bx bx-moon'></i>
-                    <span>Yoqish</span>
-                </button>
-                <button type="button" class="dark-mode-btn off-btn" id="darkModeOffBtn" onclick="setDarkMode(false)">
-                    <i class='bx bx-sun'></i>
-                    <span>O'chirish</span>
-                </button>
+            <!-- OVOZ REJIMI -->
+            <div class="settings-view" id="settingsSoundView">
+                <div class="settings-subview-header">
+                    <button type="button" class="settings-back-btn" onclick="openSettingsSub('main')">
+                        <i class='bx bx-chevron-left'></i> Orqaga
+                    </button>
+                    <span>Ovoz rejimini tanlang</span>
+                </div>
+                <div class="sound-picker" id="soundPicker">
+                    <div class="sound-options-row">
+                        <button type="button" class="sound-option-btn" id="soundOnBtn" onclick="setSoundMode('on')">
+                            <i class='bx bx-volume-full'></i>
+                            <span>Ovoz yoqish</span>
+                        </button>
+                        <button type="button" class="sound-option-btn" id="soundMuteBtn" onclick="setSoundMode('mute')">
+                            <i class='bx bx-volume-mute'></i>
+                            <span>Sukut qilish</span>
+                        </button>
+                    </div>
+                </div>
             </div>
+
+            <!-- TUNGI REJIM -->
+            <div class="settings-view" id="settingsDarkView">
+                <div class="settings-subview-header">
+                    <button type="button" class="settings-back-btn" onclick="openSettingsSub('main')">
+                        <i class='bx bx-chevron-left'></i> Orqaga
+                    </button>
+                    <span>Tungi rejim</span>
+                </div>
+                <div class="dark-mode-picker" id="darkModePicker">
+                    <div class="dark-mode-row">
+                        <button type="button" class="dark-mode-btn on-btn" id="darkModeOnBtn" onclick="setDarkMode(true)">
+                            <i class='bx bx-moon'></i>
+                            <span>Yoqish</span>
+                        </button>
+                        <button type="button" class="dark-mode-btn off-btn" id="darkModeOffBtn" onclick="setDarkMode(false)">
+                            <i class='bx bx-sun'></i>
+                            <span>O'chirish</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
 <!-- EMOJI + STICKER PANEL (mobil overlay) -->
@@ -1184,7 +1250,6 @@
                           {% if request.user.is_banned %}disabled{% endif %}
                           autocomplete="off"></textarea>
                 <span class="char-counter" id="charCounter"></span>
-                <div class="input-hint">Enter — yuborish · Shift+Enter — yangi qator</div>
             </div>
 
             <button type="submit"
@@ -1394,17 +1459,36 @@
 /* =========================================================
    MOBIL UCHUN HAQIQIY VIEWPORT BALANDLIGI (--app-vh)
    iOS/Android manzil panelidan qat'iy nazar to'liq ekranni
-   ta'minlaydi. dvh qo'llab-quvvatlanmasa ham ishlaydi.
+   ta'minlaydi va klaviatura ochilganda sahifa "sakramasligi"
+   uchun visualViewport'ga qarab page-shell balandligi va
+   yuqori chetini (offsetTop) real vaqtda moslaydi.
    ========================================================= */
+const pageShellEl = document.getElementById("pageShell");
+
 function setAppVh() {
-    const vh = window.innerHeight * 0.01;
+    const vv = window.visualViewport;
+    const h  = vv ? vv.height : window.innerHeight;
+    const vh = h * 0.01;
     document.documentElement.style.setProperty('--app-vh', vh + 'px');
+
+    if (pageShellEl) {
+        pageShellEl.style.height = h + 'px';
+        if (vv) {
+            pageShellEl.style.top = vv.offsetTop + 'px';
+        }
+    }
 }
 setAppVh();
 window.addEventListener('resize', setAppVh);
 window.addEventListener('orientationchange', setAppVh);
 if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', setAppVh);
+    /* Klaviatura ochilganda/yopilganda brauzer sahifani o'zi
+       aylantirib yuborishi mumkin — buni bekor qilamiz,
+       shu bois chat "tepaga sakrab" ketmaydi. */
+    window.visualViewport.addEventListener('scroll', function() {
+        window.scrollTo(0, 0);
+    });
 }
 
 /* =========================================================
@@ -1520,9 +1604,28 @@ if (emojiToggle && emojiPanel) {
 
 /* =========================================================
    SETTINGS PANEL TOGGLE (mobil overlay)
+   Sozlamalar ichida sahifalar: asosiy (fon/ovoz/tungi) →
+   ovoz yoki tungi bosilsa, shu ikonka ICHIDA pastki
+   sahifaga o'tadi, "Orqaga" bosilsa asosiy sahifaga qaytadi.
    ========================================================= */
 const settingsToggle = document.getElementById("settingsToggle");
 const settingsPanel  = document.getElementById("settingsPanel");
+
+function openSettingsSub(which) {
+    document.querySelectorAll("#settingsPanel .settings-view").forEach(v => v.classList.remove("active"));
+    const map = {
+        main:  "settingsMainView",
+        bg:    "settingsBgView",
+        sound: "settingsSoundView",
+        dark:  "settingsDarkView"
+    };
+    const target = document.getElementById(map[which] || map.main);
+    if (target) target.classList.add("active");
+
+    document.getElementById("bgSettingBtn")    && document.getElementById("bgSettingBtn").classList.toggle("active", which === "bg");
+    document.getElementById("soundSettingBtn") && document.getElementById("soundSettingBtn").classList.toggle("active", which === "sound");
+    document.getElementById("darkSettingBtn")  && document.getElementById("darkSettingBtn").classList.toggle("active", which === "dark");
+}
 
 function closeSettingsPanel() {
     if (settingsPanel)  settingsPanel.classList.remove("open");
@@ -1534,6 +1637,7 @@ if (settingsToggle && settingsPanel) {
         e.stopPropagation();
         const isOpen = settingsPanel.classList.toggle("open");
         settingsToggle.classList.toggle("active", isOpen);
+        if (isOpen) openSettingsSub("main");
         closeEmojiPanel();
     });
 }
@@ -1548,14 +1652,6 @@ document.addEventListener("click", function(e) {
 /* =========================================================
    BACKGROUND SETTINGS (mobil + sidebar umumiy)
    ========================================================= */
-function toggleBgPicker() {
-    const picker = document.getElementById("bgPicker");
-    const btn    = document.getElementById("bgSettingBtn");
-    if (!picker) return;
-    const isOpen = picker.classList.toggle("open");
-    if (btn) btn.classList.toggle("active", isOpen);
-}
-
 function setBgImage(url) {
     if (!chatBgLayer) return;
     chatBgLayer.style.backgroundImage = `url('${url}')`;
@@ -1596,6 +1692,16 @@ function closeEdit(id) {
 }
 
 /* =========================================================
+   SO'ZLAR BO'YICHA QISQARTIRISH (reply uchun, 6 tagacha so'z)
+   ========================================================= */
+function truncateWords(str, n) {
+    if (!str) return "";
+    const words = str.trim().split(/\s+/);
+    if (words.length <= n) return str;
+    return words.slice(0, n).join(" ") + "…";
+}
+
+/* =========================================================
    REPLY
    ========================================================= */
 function replyMessage(messageId, username, message) {
@@ -1612,7 +1718,7 @@ function replyMessage(messageId, username, message) {
         msgEl.innerText = "🖼 Stiker";
     } else {
         if (thumbEl) { thumbEl.src = ""; thumbEl.style.display = "none"; }
-        msgEl.innerText = message.length > 60 ? message.slice(0, 60) + "…" : message;
+        msgEl.innerText = truncateWords(message, 6);
     }
     document.getElementById("replyToInput").value = messageId;
     document.getElementById("messageInput").focus();
@@ -1623,6 +1729,16 @@ function cancelReply() {
     document.getElementById("replyToInput").value = "";
     const thumbEl = document.getElementById("replyStickerThumb");
     if (thumbEl) { thumbEl.src = ""; thumbEl.style.display = "none"; }
+}
+
+/* Reply qutisi bosilganda — asl xabarga o'tish */
+function scrollToMessage(id) {
+    if (!id) return;
+    const target = document.querySelector('.message-wrapper[data-msg-id="' + id + '"]');
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    target.classList.add("highlight-flash");
+    setTimeout(function() { target.classList.remove("highlight-flash"); }, 1200);
 }
 
 /* =========================================================
@@ -1716,7 +1832,8 @@ function renderUserProfileModal(data) {
 }
 
 /* =========================================================
-   MOBILE KEYBOARD FIX
+   MOBILE KEYBOARD FIX — chat pastga tayanadi, "tepaga
+   sakrash" oldini oladi (input fokus bo'lganda pastga tortadi)
    ========================================================= */
 (function() {
     const chatBox = document.getElementById("chatBox");
@@ -1724,10 +1841,25 @@ function renderUserProfileModal(data) {
         if (!window.visualViewport || !chatBox) return;
         const ae = document.activeElement;
         if (ae && (ae.tagName === "TEXTAREA" || ae.tagName === "INPUT")) {
-            chatBox.scrollTop = chatBox.scrollHeight;
+            requestAnimationFrame(function() { chatBox.scrollTop = chatBox.scrollHeight; });
         }
     }
     if (window.visualViewport) window.visualViewport.addEventListener("resize", applyVV);
+
+    const mi = document.getElementById("messageInput");
+    if (mi) {
+        mi.addEventListener("focus", function() {
+            window.scrollTo(0, 0);
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 60);
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 320);
+        });
+    }
 })();
 
 /* =========================================================
@@ -1992,8 +2124,9 @@ function buildMessageEl(msg) {
                 : `<strong>${escHtml(msg.reply_to.username)}</strong>`;
             const replyBody = isStickerReply
                 ? `<img src="${escHtml(rm.slice(11))}" class="reply-sticker-thumb"> <span style="font-style:italic;opacity:0.7;">🖼 Stiker</span>`
-                : `"${escHtml(rm)}"`;
-            return `<div class="reply-info${isReplyVip ? " reply-info-vip" : ""}"><i class='${replyIconClass}' style="font-size:1rem;opacity:0.7;flex-shrink:0;"></i>${replyNameHtml}: ${replyBody}</div>`;
+                : `"${escHtml(truncateWords(rm, 6))}"`;
+            const replyTargetId = msg.reply_to.id != null ? msg.reply_to.id : "";
+            return `<div class="reply-info${isReplyVip ? " reply-info-vip" : ""}" data-reply-id="${escHtml(replyTargetId)}" onclick="scrollToMessage(this.dataset.replyId)" title="Asl xabarga o'tish"><i class='${replyIconClass}' style="font-size:1rem;opacity:0.7;flex-shrink:0;"></i>${replyNameHtml}: ${replyBody}</div>`;
           })()
         : "";
     const avatarLetter = (displayName || "?")[0].toUpperCase();
@@ -2065,23 +2198,6 @@ function setSoundMode(mode) {
     }
     const icon = document.getElementById("soundNavIcon");
     if (icon) icon.className = mode === "mute" ? "bx bx-volume-mute" : "bx bx-volume-full";
-    const btn = document.getElementById("soundSettingBtn");
-    if (btn) btn.classList.toggle("active", mode === "mute");
-}
-
-function toggleSoundPicker() {
-    const picker = document.getElementById("soundPicker");
-    const bgP = document.getElementById("bgPicker");
-    const dmP = document.getElementById("darkModePicker");
-    if (!picker) return;
-    const isOpen = picker.classList.toggle("open");
-    if (isOpen) {
-        if (bgP) bgP.classList.remove("open");
-        if (dmP) dmP.classList.remove("open");
-        document.getElementById("bgSettingBtn") && document.getElementById("bgSettingBtn").classList.remove("active");
-        document.getElementById("darkSettingBtn") && document.getElementById("darkSettingBtn").classList.remove("active");
-    }
-    document.getElementById("soundSettingBtn") && document.getElementById("soundSettingBtn").classList.toggle("active", isOpen);
 }
 
 /* =========================================================
@@ -2098,21 +2214,6 @@ function setDarkMode(enabled) {
     document.getElementById("sideDarkOffBtn") && document.getElementById("sideDarkOffBtn").classList.toggle("active", !enabled);
     const icon = document.getElementById("darkNavIcon");
     if (icon) icon.className = enabled ? "bx bx-moon" : "bx bx-sun";
-}
-
-function toggleDarkModePicker() {
-    const picker = document.getElementById("darkModePicker");
-    const bgP = document.getElementById("bgPicker");
-    const sP = document.getElementById("soundPicker");
-    if (!picker) return;
-    const isOpen = picker.classList.toggle("open");
-    if (isOpen) {
-        if (bgP) bgP.classList.remove("open");
-        if (sP) sP.classList.remove("open");
-        document.getElementById("bgSettingBtn") && document.getElementById("bgSettingBtn").classList.remove("active");
-        document.getElementById("soundSettingBtn") && document.getElementById("soundSettingBtn").classList.remove("active");
-    }
-    document.getElementById("darkSettingBtn") && document.getElementById("darkSettingBtn").classList.toggle("active", isOpen);
 }
 
 /* =========================================================
