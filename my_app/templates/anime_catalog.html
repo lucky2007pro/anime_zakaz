@@ -43,6 +43,7 @@
     color: var(--text-light, #f0f0f0);
 }
 
+
 .catalog-title span {
     color: var(--accent, #ff3366);
 }
@@ -390,14 +391,14 @@
 }
 
 @media (max-width: 768px) {
-    .catalog-wrap { padding: 0 4% 40px; }
+    .catalog-wrap { padding: 14px 4% 40px; }
 
     .catalog-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 14px;
-        padding: 24px 0 24px;
-        margin-bottom: 24px;
+        padding: 18px 0 22px;
+        margin-bottom: 20px;
     }
 
     .catalog-actions { width: 100%; }
@@ -413,6 +414,16 @@
     .tag-category { font-size: 0.62rem; max-width: 80px; }
     .card-year { font-size: 0.7rem; }
     .card-views { font-size: 0.7rem; }
+    }
+
+    /* badge'lar torroq kartalarda bir-biriga sig'ishi uchun */
+    .top-badge-group { gap: 3px; top: 7px; left: 7px; }
+    .badge { font-size: 0.62rem; padding: 2px 6px; }
+    .fav-badge { top: 7px; right: 7px; width: 30px; height: 30px; font-size: 0.95rem; }
+
+    /* pagination tugmalari uchun qulayroq touch target */
+    .page-btn { min-width: 40px; height: 40px; font-size: 0.82rem; }
+    .pagination-wrap { gap: 6px; margin-top: 32px; }
 }
 
 @media (max-width: 480px) {
@@ -430,7 +441,21 @@
     .tier-badge { font-size: 0.62rem; padding: 2px 6px; }
 
     .fav-badge { width: 30px; height: 30px; font-size: 0.95rem; }
-}
+    }
+    .catalog-wrap { padding: 12px 4% 36px; }
+
+    .catalog-title { font-size: 1.3rem; }
+    .catalog-sub { font-size: 0.8rem; }
+
+    .catalog-search-link { padding: 10px 14px; font-size: 0.82rem; }
+
+    .tag-category { max-width: 64px; font-size: 0.6rem; }
+    .card-views { font-size: 0.68rem; }
+
+    .top-badge-group { flex-wrap: wrap; max-width: 70%; }
+
+    .page-btn { min-width: 36px; height: 36px; font-size: 0.78rem; border-radius: 9px; }
+
 
 @media (min-width: 1200px) {
     .cards-grid {
