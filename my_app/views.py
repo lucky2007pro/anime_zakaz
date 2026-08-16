@@ -16,6 +16,8 @@ import re
 from django.urls import reverse
 from django.db.models import Q
 from django.contrib.sessions.models import Session
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 
 
 from .models import (
@@ -1303,5 +1305,29 @@ def notice(request):
         n.is_read = n.id in read_ids
 
     return render(request, 'notice.html', {'notices': notices})
+
+# =======================
+# SERVICE WORKER / MANIFEST / OFFLINE
+# =======================
+def service_worker_view(request):
+    content = render_to_string('service-worker.js')
+    response = HttpResponse(content, content_type='application/javascript')
+    # MUHIM: brauzer bu faylni keshlamasin — aks holda yangi versiya
+    # chiqarganda foydalanuvchilarda eski SW ishlab qolaveradi
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Service-Worker-Allowed'] = '/'
+    return response
+
+
+def manifest_view(request):
+    content = render_to_string('manifest.json')
+    return HttpResponse(content, content_type='application/manifest+json')
+
+
+def offline_view(request):
+    return render(request, 'offline.html')
+
+
+
 
 
