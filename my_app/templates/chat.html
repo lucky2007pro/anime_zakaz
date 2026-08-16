@@ -310,6 +310,19 @@
     #chatBgLayer.user-selected { opacity: 1; }
     #chatBgLayer.dark-mode { filter: brightness(0.22) blur(7px); }
 
+    #chatBgLayer::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg,
+            rgba(0,0,0,0.45) 0%,
+            rgba(0,0,0,0.30) 30%,
+            rgba(0,0,0,0.35) 70%,
+            rgba(0,0,0,0.55) 100%);
+        pointer-events: none;
+        border-radius: inherit;
+    }
+
     /* =====================================================
        NAVBAR — oddiy shisha (glass)
        ===================================================== */
@@ -1088,6 +1101,38 @@
                                 onclick="setBgImage('https://i.pinimg.com/736x/db/d1/e8/dbd1e8c885246d27c3a00b40935d4b0f.jpg','bgBtn3')">
                             <img src="https://i.pinimg.com/736x/db/d1/e8/dbd1e8c885246d27c3a00b40935d4b0f.jpg" alt="Fon 3" loading="lazy">
                         </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn4"
+                                onclick="setBgImage('https://i.pinimg.com/1200x/2b/6f/6e/2b6f6e73a76dd8964e05ce2ecf0899b0.jpg','bgBtn4')">
+                            <img src="https://i.pinimg.com/1200x/2b/6f/6e/2b6f6e73a76dd8964e05ce2ecf0899b0.jpg" alt="Fon 4" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn5"
+                                onclick="setBgImage('https://i.pinimg.com/736x/c0/bd/d6/c0bdd66ca51634c1dae4bcda996b5237.jpg','bgBtn5')">
+                            <img src="https://i.pinimg.com/736x/c0/bd/d6/c0bdd66ca51634c1dae4bcda996b5237.jpg" alt="Fon 5" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn6"
+                                onclick="setBgImage('https://i.pinimg.com/736x/f6/ee/25/f6ee259a7b0b3d56c05346e5b25cb0ed.jpg','bgBtn6')">
+                            <img src="https://i.pinimg.com/736x/f6/ee/25/f6ee259a7b0b3d56c05346e5b25cb0ed.jpg" alt="Fon 6" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn7"
+                                onclick="setBgImage('https://i.pinimg.com/736x/cb/ea/b0/cbeab0a70db0e861af6408f9ca0ee566.jpg','bgBtn7')">
+                            <img src="https://i.pinimg.com/736x/cb/ea/b0/cbeab0a70db0e861af6408f9ca0ee566.jpg" alt="Fon 7" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn8"
+                                onclick="setBgImage('https://i.pinimg.com/736x/af/5a/03/af5a03a460b457abaa06cea8d99b5fa0.jpg','bgBtn8')">
+                            <img src="https://i.pinimg.com/736x/af/5a/03/af5a03a460b457abaa06cea8d99b5fa0.jpg" alt="Fon 8" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn9"
+                                onclick="setBgImage('https://i.pinimg.com/1200x/64/1a/21/641a211e36ef662c2ccd6c5fb5ea0a15.jpg','bgBtn9')">
+                            <img src="https://i.pinimg.com/1200x/64/1a/21/641a211e36ef662c2ccd6c5fb5ea0a15.jpg" alt="Fon 9" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn10"
+                                onclick="setBgImage('https://i.pinimg.com/736x/f7/2e/70/f72e708b089f95a8fcc088a3c209abc5.jpg','bgBtn10')">
+                            <img src="https://i.pinimg.com/736x/f7/2e/70/f72e708b089f95a8fcc088a3c209abc5.jpg" alt="Fon 10" loading="lazy">
+                        </button>
+                        <button type="button" class="bg-img-btn" id="bgBtn11"
+                                onclick="setBgImage('https://i.pinimg.com/736x/00/c9/ab/00c9ab4bd9476dcf973adf0cd0a64e34.jpg','bgBtn11')">
+                            <img src="https://i.pinimg.com/736x/00/c9/ab/00c9ab4bd9476dcf973adf0cd0a64e34.jpg" alt="Fon 11" loading="lazy">
+                        </button>
                         <button type="button" class="bg-remove-btn" onclick="removeBgImage()">
                             <i class='bx bx-x-circle'></i>
                             <span>Default</span>
@@ -1341,9 +1386,56 @@
                             onclick="setBgImage('https://i.pinimg.com/736x/db/d1/e8/dbd1e8c885246d27c3a00b40935d4b0f.jpg','sideBgBtn3')">
                         <img src="https://i.pinimg.com/736x/db/d1/e8/dbd1e8c885246d27c3a00b40935d4b0f.jpg" alt="Fon" loading="lazy">
                     </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn4"
+                            onclick="setBgImage('https://i.pinimg.com/1200x/2b/6f/6e/2b6f6e73a76dd8964e05ce2ecf0899b0.jpg','sideBgBtn4')">
+                        <img src="https://i.pinimg.com/1200x/2b/6f/6e/2b6f6e73a76dd8964e05ce2ecf0899b0.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn5"
+                            onclick="setBgImage('https://i.pinimg.com/736x/c0/bd/d6/c0bdd66ca51634c1dae4bcda996b5237.jpg','sideBgBtn5')">
+                        <img src="https://i.pinimg.com/736x/c0/bd/d6/c0bdd66ca51634c1dae4bcda996b5237.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn6"
+                            onclick="setBgImage('https://i.pinimg.com/736x/f6/ee/25/f6ee259a7b0b3d56c05346e5b25cb0ed.jpg','sideBgBtn6')">
+                        <img src="https://i.pinimg.com/736x/f6/ee/25/f6ee259a7b0b3d56c05346e5b25cb0ed.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn7"
+                            onclick="setBgImage('https://i.pinimg.com/736x/cb/ea/b0/cbeab0a70db0e861af6408f9ca0ee566.jpg','sideBgBtn7')">
+                        <img src="https://i.pinimg.com/736x/cb/ea/b0/cbeab0a70db0e861af6408f9ca0ee566.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn8"
+                            onclick="setBgImage('https://i.pinimg.com/736x/af/5a/03/af5a03a460b457abaa06cea8d99b5fa0.jpg','sideBgBtn8')">
+                        <img src="https://i.pinimg.com/736x/af/5a/03/af5a03a460b457abaa06cea8d99b5fa0.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn9"
+                            onclick="setBgImage('https://i.pinimg.com/1200x/64/1a/21/641a211e36ef662c2ccd6c5fb5ea0a15.jpg','sideBgBtn9')">
+                        <img src="https://i.pinimg.com/1200x/64/1a/21/641a211e36ef662c2ccd6c5fb5ea0a15.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn10"
+                            onclick="setBgImage('https://i.pinimg.com/736x/f7/2e/70/f72e708b089f95a8fcc088a3c209abc5.jpg','sideBgBtn10')">
+                        <img src="https://i.pinimg.com/736x/f7/2e/70/f72e708b089f95a8fcc088a3c209abc5.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn11"
+                            onclick="setBgImage('https://i.pinimg.com/736x/00/c9/ab/00c9ab4bd9476dcf973adf0cd0a64e34.jpg','sideBgBtn11')">
+                        <img src="https://i.pinimg.com/736x/00/c9/ab/00c9ab4bd9476dcf973adf0cd0a64e34.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn11"
+                            onclick="setBgImage('https://i.pinimg.com/1200x/84/13/90/841390c50fc0b8410f14cb33e8a52917.jpg','sideBgBtn11')">
+                        <img src="https://i.pinimg.com/1200x/84/13/90/841390c50fc0b8410f14cb33e8a52917.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn11"
+                            onclick="setBgImage('https://i.pinimg.com/736x/6a/69/27/6a6927e3890bdadab4684fa72ea415a7.jpg','sideBgBtn11')">
+                        <img src="https://i.pinimg.com/736x/6a/69/27/6a6927e3890bdadab4684fa72ea415a7.jpg" alt="Fon" loading="lazy">
+                    </button>
+                    <button type="button" class="side-bg-btn" id="sideBgBtn11"
+                            onclick="setBgImage('https://i.pinimg.com/736x/50/99/d9/5099d9a7c65fe3f032abebe9c458ab4c.jpg','sideBgBtn11')">
+                        <img src="https://i.pinimg.com/736x/50/99/d9/5099d9a7c65fe3f032abebe9c458ab4c.jpg" alt="Fon" loading="lazy">
+                    </button>
+
+
                     <button type="button" class="side-bg-remove" onclick="removeBgImage()">
                         <i class='bx bx-x-circle'></i>
                     </button>
+
                 </div>
             </div>
 
