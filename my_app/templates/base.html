@@ -57,3 +57,2174 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <style>
+        :root {
+            --bg-base: #0a0a0f;
+            --bg-surface: #111118;
+            --accent: #00f3ff;
+            --accent-hover: #00d2dd;
+            --text-light: #ffffff;
+            --text-dim: #8a8a9d;
+            --glass-bg: rgba(17, 17, 24, 0.6);
+            --glass-border: rgba(0, 243, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        body.nav-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+
+        img, video, iframe {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* ==================== NAVBAR ==================== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(to bottom, color-mix(in srgb, var(--bg-base) 38%, transparent), color-mix(in srgb, var(--bg-base) 12%, transparent));
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: color-mix(in srgb, var(--bg-base) 55%, transparent);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            border-bottom-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .nav-brand {
+            color: var(--text-light);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .nav-brand-logo {
+            width: 46px;
+            height: 46px;
+            display: none;
+        }
+
+        .nav-brand-text {
+            font-size: 1.16rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+        }
+
+        .nav-brand-text span {
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .pill-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: color-mix(in srgb, var(--bg-surface) 100%, transparent);
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .pill-nav-item i {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .pill-nav-item:hover {
+            background: rgba(0, 243, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .pill-nav-item:hover i {
+            color: var(--accent);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .action-icon {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 1.4rem;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .action-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-btn {
+            background: color-mix(in srgb, var(--bg-surface) 100%, transparent);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        .profile-btn:hover {
+            background: rgba(0, 243, 255, 0.15);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        /* ==================== NOTICE BADGE ==================== */
+        .notice-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 17px;
+            height: 17px;
+            padding: 0 4px;
+            background: #ff3b30;
+            color: #fff;
+            font-size: 0.62rem;
+            font-weight: 900;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 2px var(--bg-base);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        /* ==================== HAMBURGER ==================== */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            padding: 6px;
+            width: 38px;
+            height: 38px;
+            z-index: 10001;
+            position: relative;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.25s ease,
+                        width 0.3s ease;
+            transform-origin: center;
+        }
+
+        .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* ==================== PROFIL SIDEBAR ==================== */
+        .profile-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .profile-overlay.active { opacity: 1; visibility: visible; }
+
+        .profile-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 350px;
+            height: 100%;
+            height: 100dvh;
+            background: var(--bg-surface);
+            border-left: 1px solid var(--glass-border);
+            z-index: 2000;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            transform: translateX(110%);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+
+        .profile-sidebar::-webkit-scrollbar { display: none; }
+        .profile-sidebar { scrollbar-width: none; }
+        .profile-sidebar.active { transform: translateX(0); }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .premium-btn-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 87, 34, 0.1);
+            border: 1px solid rgba(255, 87, 34, 0.2);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 30px;
+        }
+
+        .premium-btn {
+            color: white;
+            border: none;
+            background: transparent;
+            font-weight: 900;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .premium-btn i { color: #ff5722; font-size: 1.2rem; }
+
+        .close-btn {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .close-btn:hover { background: rgba(255,255,255,0.1); color: var(--accent); }
+
+        .user-info-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        .avatar-large {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin: 0 auto 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .user-name-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px 25px;
+            display: inline-block;
+            border-bottom: 2px solid rgba(0,0,0,0.5);
+        }
+
+        .user-name {
+            font-size: 1.3rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-handle { color: #ff5722; font-size: 0.95rem; font-weight: 800; }
+
+        .menu-section { margin-bottom: 25px; }
+
+        .menu-title {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            text-decoration: none;
+            color: #fff;
+            transition: 0.25s;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 10px;
+        }
+
+        .menu-item:hover {
+            color: var(--accent);
+            transform: translateX(4px);
+            background: rgba(255,255,255,0.04);
+            border-bottom-color: rgba(0, 243, 255, 0.2);
+        }
+
+        .menu-item span.icon-left {
+            font-size: 1.15rem;
+            margin-right: 12px;
+            color: var(--text-dim);
+            transition: 0.25s;
+        }
+
+        .menu-item:hover span.icon-left { color: var(--accent); }
+        .menu-item .arrow { margin-left: auto; color: var(--text-dim); font-size: 1.2rem; }
+        .menu-item .value { margin-left: auto; color: var(--text-dim); font-size: 0.85rem; margin-right: 10px; }
+        .ai-badge { background: linear-gradient(90deg, #00f3ff, #0051ff); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 900; margin-left: auto; margin-right: 10px; }
+        .logout-btn { color: #ff3b30; margin-top: 10px; }
+        .logout-btn:hover { background: rgba(255, 59, 48, 0.1) !important; color: #ff3b30 !important; }
+        .sidebar-footer { text-align: center; margin-top: 40px; color: var(--text-dim); font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; }
+
+        /* Sidebar/menu ichidagi notice badge */
+        .menu-item .notice-count-pill {
+            margin-left: auto;
+            background: #ff3b30;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-right: 10px;
+        }
+
+        /* ==================== MOBILE NAV OVERLAY ==================== */
+        .mobile-nav-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .mobile-nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* ==================== MOBILE NAV SIDEBAR ==================== */
+        .mobile-nav-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 82%;
+            max-width: 320px;
+            height: 100%;
+            height: 100dvh;
+            background: color-mix(in srgb, var(--bg-base) 96%, transparent);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top-left-radius: 28px;
+            border-bottom-left-radius: 28px;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: none;
+            box-shadow:
+                -8px 0 32px rgba(0, 0, 0, 0.5),
+                -1px 0 20px rgba(0, 212, 255, 0.15);
+            transform: translateX(110%);
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+
+        .mobile-nav-container::-webkit-scrollbar { display: none; }
+
+        .mobile-nav-overlay.active .mobile-nav-container {
+            transform: translateX(0);
+        }
+
+        /* ==================== MOBILE NAV HEADER ==================== */
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            flex-shrink: 0;
+        }
+
+        .mobile-nav-header .brand-name {
+            font-size: 0.85rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: var(--accent);
+            animation: breathe 2.5s ease-in-out infinite;
+        }
+
+        .mobile-close-btn {
+            background: rgba(255,59,48,0.12);
+            border: none;
+            color: #ff3b30;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.4rem;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .mobile-close-btn:hover {
+            background: rgba(255,59,48,0.25);
+            transform: scale(1.1);
+        }
+
+        /* ==================== MOBILE PROFIL QISQACHA (avatar + nick) ==================== */
+        .mobile-profile-summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .mobile-profile-summary:hover {
+            background: rgba(0, 243, 255, 0.08);
+            border-color: rgba(0, 243, 255, 0.2);
+        }
+
+        .mobile-profile-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(0, 243, 255, 0.1);
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--accent);
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+            position: relative;
+            overflow: visible;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .avatar-edit-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 22px;
+            height: 22px;
+            background: transparent;
+            color: #000;
+            border: 2px solid var(--text-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,243,255,0.25);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .mobile-profile-avatar:hover {
+            transform: scale(1.06);
+            border-color: var(--accent);
+        }
+
+        .mobile-profile-avatar.picker-open {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,243,255,0.15);
+        }
+
+        .mobile-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .mobile-profile-info-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .mobile-profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .mobile-profile-name {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mobile-profile-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ==================== AVATAR PICKER (SIDEBAR ICHIDA, INLINE BOX) ==================== */
+        .inline-avatar-picker {
+            flex-shrink: 0;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: max-height 0.35s cubic-bezier(0.22,1,0.36,1),
+                        opacity 0.25s ease,
+                        transform 0.3s ease,
+                        margin 0.35s ease;
+            margin-top: 0;
+        }
+
+        .inline-avatar-picker.open {
+            max-height: 260px;
+            opacity: 1;
+            transform: translateY(0);
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        .inline-avatar-picker-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(0,243,255,0.15);
+            border-radius: 16px;
+            padding: 14px;
+            max-height: 250px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .inline-avatar-picker-box::-webkit-scrollbar { display: none; }
+
+        .inline-avatar-picker-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .inline-avatar-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 48px);
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .inline-avatar-picker-item {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .inline-avatar-picker-item input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .inline-avatar-picker-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .inline-avatar-picker-item input:checked ~ .inline-avatar-picker-img {
+            border-color: var(--accent);
+            transform: scale(1.08);
+        }
+
+        .inline-avatar-picker-item.saving .inline-avatar-picker-img {
+            opacity: 0.5;
+        }
+
+        .inline-avatar-picker-empty {
+            font-size: 12px;
+            color: var(--text-dim);
+            padding: 4px 0;
+            grid-column: 1 / -1;
+        }
+
+        /* ==================== MOBILE MENU BOX (bitta box, skrollanadi) ==================== */
+        .mobile-menu-box {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            scrollbar-width: none;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 14px;
+            margin-bottom: 10px;
+        }
+
+        .mobile-menu-box::-webkit-scrollbar { display: none; }
+
+        .mobile-menu-box .mobile-menu-item {
+            padding: 12px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+        }
+
+        .mobile-menu-box .mobile-menu-item:last-child { border-bottom: none; }
+
+        /* ==================== MOBILE MENU ITEMS ==================== */
+        .mobile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 13px;
+            color: #e8e8f0;
+            text-decoration: none;
+            font-size: 0.93rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* form ichidagi <button> larni <a> menu-item bilan bir xil qilib ko'rsatish uchun */
+        .mobile-menu-box form { width: 100%; }
+        button.mobile-menu-item {
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .mobile-menu-item i {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            flex-shrink: 0;
+            transition: color 0.2s ease;
+        }
+
+        .mobile-menu-item:hover,
+        .mobile-menu-item:active {
+            background: rgba(0, 243, 255, 0.08);
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .mobile-menu-item:hover i,
+        .mobile-menu-item:active i { color: var(--accent); }
+
+        .mobile-menu-item .m-arrow {
+            margin-left: auto;
+            opacity: 0.4;
+            font-size: 1rem;
+        }
+
+        .mobile-menu-item .notice-count-pill {
+            margin-left: auto;
+            background: #ff3b30;
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 999px;
+        }
+
+        /* Admin va Logout maxsus ranglari */
+        .mobile-menu-item.mobile-menu-admin { color: var(--accent); }
+        .mobile-menu-item.mobile-menu-admin i:first-child { color: var(--accent); }
+        .mobile-menu-item.mobile-menu-admin:hover { background: rgba(0, 243, 255, 0.1); }
+
+        .mobile-menu-item.mobile-menu-logout { color: #ff3b30; }
+        .mobile-menu-item.mobile-menu-logout i { color: #ff3b30; }
+        .mobile-menu-item.mobile-menu-logout:hover {
+            background: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+            transform: translateX(4px);
+        }
+        .mobile-menu-item.mobile-menu-logout:hover i { color: #ff3b30; }
+
+        .mobile-menu-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin: 8px 4px;
+            flex-shrink: 0;
+        }
+
+        .mobile-section-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            padding: 4px 14px;
+            flex-shrink: 0;
+        }
+
+        .mobile-hr {
+            border: none;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            margin: 2px 0;
+        }
+
+        .mobile-profile-action {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 14px;
+            background: rgba(0, 243, 255, 0.07);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 0;
+            flex-shrink: 0;
+            transition: 0.25s;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-profile-action:hover { background: rgba(0, 243, 255, 0.14); }
+
+        /* ==================== MOBIL — SO'NGGI KO'RILGAN ANIMELAR ==================== */
+        .mobile-watched-section {
+            flex-shrink: 0;
+            margin-top: 10px;
+        }
+
+        .mobile-watched-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .mobile-watched-card {
+            position: relative;
+            display: block;
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-watched-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .mobile-watched-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10,10,15,0.96) 0%, rgba(10,10,15,0.15) 55%, transparent 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 8px;
+        }
+
+        .mobile-watched-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #fff;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.25;
+        }
+
+        .mobile-nav-footer {
+            margin-top: 12px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.3);
+            flex-shrink: 0;
+        }
+
+        /* ==================== GENERIC PAGE ==================== */
+        main.main-content {
+            flex: 1;
+            width: min(1400px, 100%);
+            margin: 80px auto 0;
+            padding: 30px 5%;
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes breathe {
+            0%, 100% { opacity: 0.7; text-shadow: 0 0 5px rgba(0,243,255,0.3); }
+            50%       { opacity: 1;   text-shadow: 0 0 18px rgba(0,243,255,0.8); }
+        }
+
+        /* ==================== AUTH ==================== */
+        .auth-container { max-width: 400px; margin: 50px auto; background: var(--bg-surface); padding: 30px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-container h2 { margin-bottom: 20px; text-align: center; font-weight: 800; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: var(--text-dim); font-weight: 600; font-size: 0.9rem; }
+        .form-control { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: #fff; border-radius: 8px; outline: none; transition: 0.3s; font-family: 'Outfit'; }
+        .form-control:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+        .btn-submit { width: 100%; padding: 14px; background: var(--accent); color: black; border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.3s; font-family: 'Outfit'; box-shadow: 0 8px 25px rgba(0, 243, 255, 0.3); }
+        .btn-submit:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255, 255, 255, 0.5); }
+
+        /* ==================== BOTTOM TAB BAR ==================== */
+        .bottom-tab-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 64px;
+            background: rgba(20, 20, 30, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 12px;
+            z-index: 998;
+            border-radius: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+            width: auto;
+            min-width: 320px;
+            max-width: 90vw;
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease, bottom 0.4s ease;
+        }
+
+        .bottom-tab-bar.tab-hidden {
+            transform: translateX(-50%) translateY(120px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border-radius: 40px;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            min-width: 56px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            white-space: nowrap;
+        }
+
+        .tab-item i {
+            font-size: 1.4rem;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            line-height: 1;
+        }
+
+        .tab-item:active {
+            transform: scale(0.88);
+        }
+
+        .tab-item.tab-active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .tab-item.tab-active i {
+            color: #fff;
+        }
+
+        .tab-item.tab-active::after {
+            display: none;
+        }
+
+        .tab-item.tab-profile-btn {
+            background: transparent;
+            border: none;
+            border-radius: 40px;
+        }
+
+        .tab-item.tab-profile-btn i {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .tab-item.tab-profile-btn.tab-active {
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+        }
+
+        .tab-item.tab-profile-btn.tab-active i {
+            color: #fff;
+            filter: none;
+        }
+
+        .tab-item.tab-profile-btn.tab-active::after {
+            display: none;
+        }
+
+        /* Faqat mobil qurilmalarda ko'rsatish */
+        @media (min-width: 769px) {
+            .bottom-tab-bar { display: none; }
+        }
+
+        body.tabbar-on main.main-content {
+            padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 16px);
+        }
+
+        body.tabbar-on footer {
+            padding-bottom: calc(68px + env(safe-area-inset-bottom, 10px) + 16px);
+        }
+
+        /* ==================== NETWORK TOAST — faqat mobil, tab bar ustidan ==================== */
+        #networkToast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            #networkToast {
+                display: flex;
+            }
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1024px) {
+            .nav-menu { gap: 10px; }
+            .pill-nav-item { padding: 7px 14px; font-size: 0.78rem; }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                top: 12px;
+                left: 3%;
+                width: 94%;
+                padding: 10px 4%;
+                border-radius: 24px;
+                background: rgba(17, 17, 24, 0.55);
+                backdrop-filter: blur(24px) saturate(180%);
+                -webkit-backdrop-filter: blur(24px) saturate(180%);
+                border: 1px solid rgba(255,255,255,0.1);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07);
+                transition: top 0.35s ease, background 0.35s ease, box-shadow 0.35s ease, border-radius 0.35s ease;
+            }
+
+            .navbar.scrolled {
+                top: 8px;
+                background: rgba(10,10,15,0.78);
+                box-shadow: 0 10px 36px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+                border-color: rgba(0,243,255,0.18);
+            }
+
+            .nav-menu { display: none; }
+            .hamburger { display: flex; }
+            .nav-brand-logo { width: 36px; height: 36px; border-radius: 8px; }
+            .nav-brand-text { font-size: 0.95rem; }
+
+            .nav-actions .action-icon:not(.profile-btn):not(.nav-search-icon):not(.nav-notice-icon) { display: none; }
+            .nav-actions .action-icon.nav-search-icon,
+            .nav-actions .action-icon.nav-notice-icon { display: flex; }
+
+            .nav-actions { gap: 6px; }
+            .action-icon, .profile-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1.05rem;
+                background: rgba(255,255,255,0.04);
+                border-radius: 12px;
+            }
+            .action-icon:hover { background: rgba(0,243,255,0.12); }
+
+            .profile-sidebar { width: 100%; border-left: none; border-radius: 0; }
+
+            main.main-content { margin-top: 94px; padding: 22px 4%; }
+        }
+
+        @media (max-width: 480px) {
+            .navbar { top: 10px; width: 94%; padding: 9px 4%; border-radius: 20px; }
+            .nav-brand-logo { width: 32px; height: 32px; border-radius: 7px; }
+            .nav-brand-text { font-size: 0.85rem; letter-spacing: 0.05em; }
+            .hamburger span { width: 22px; }
+            .mobile-nav-container { max-width: 300px; }
+            main.main-content { margin-top: 88px; }
+        }
+
+        .footer-social {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 1.15rem;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+        .footer-social:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 6px 18px rgba(0,243,255,0.15);
+        }
+        .footer-heading {
+            position: relative;
+            display: inline-block;
+        }
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 28px;
+            height: 3px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        .footer-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+            display: inline-block;
+        }
+        .footer-link:hover { color: var(--accent); transform: translateX(3px); }
+
+
+
+        {% block extra_css %}{% endblock %}
+    </style>
+
+    {# ===== USER THEME/BG SETTINGS ===== #}
+    {% if request.user.is_authenticated %}
+    {% with s=request.user.settings %}
+    {% if s %}
+    <style id="userThemeVars">
+        {% if s.theme == 'white' %}
+        :root {
+            --bg-base:    #f0f0f8;
+            --bg-surface: #e8ecf5;
+            --accent:     #3b82f6;
+            --accent-hover: #2563eb;
+            --text-light: #111118;
+            --text-dim:   #555570;
+            --glass-border: rgba(59,130,246,0.15);
+        }
+        {% elif s.theme == 'rose' %}
+        :root {
+            --bg-base:    #120a0f;
+            --bg-surface: #1a0a12;
+            --accent:     #ff3366;
+            --accent-hover: #e02255;
+            --text-light: #ffffff;
+            --text-dim:   #8a7a7d;
+            --glass-border: rgba(255,51,102,0.15);
+        }
+        {% elif s.theme == 'pink' %}
+        :root {
+            --bg-base:    #1a0818;
+            --bg-surface: #280a22;
+            --accent:     #e879f9;
+            --accent-hover: #d066e0;
+            --text-light: #ffffff;
+            --text-dim:   #8a7a8a;
+            --glass-border: rgba(232,121,249,0.15);
+        }
+        {% elif s.theme == 'premium' %}
+        :root {
+            --bg-base:    #0a0818;
+            --bg-surface: #100820;
+            --accent:     #a78bfa;
+            --accent-hover: #8b6fe0;
+            --text-light: #ffffff;
+            --text-dim:   #7a7a9d;
+            --glass-border: rgba(167,139,250,0.15);
+        }
+        {% elif s.theme == 'ocean' %}
+        :root {
+            --bg-base:    #050d1a;
+            --bg-surface: #081528;
+            --accent:     #38bdf8;
+            --accent-hover: #22a8e0;
+            --text-light: #ffffff;
+            --text-dim:   #7a8a9d;
+            --glass-border: rgba(56,189,248,0.15);
+        }
+        {% elif s.theme == 'forest' %}
+        :root {
+            --bg-base:    #060f0a;
+            --bg-surface: #091a0f;
+            --accent:     #4ade80;
+            --accent-hover: #36c468;
+            --text-light: #ffffff;
+            --text-dim:   #7a9a7d;
+            --glass-border: rgba(74,222,128,0.15);
+        }
+        {% else %}
+        {# dark default — hech narsa o'zgartirmaymiz #}
+        {% endif %}
+
+        {% if s.bg_color and s.bg_color != '#0a0a0f' %}
+        :root { --bg-base: {{ s.bg_color }}; }
+        body  { background-color: {{ s.bg_color }}; }
+        {% endif %}
+
+    </style>
+    {% endif %}
+    {% endwith %}
+    {% endif %}
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav class="navbar" id="navbar">
+    <a href="{% url 'home' %}" class="nav-brand" aria-label="BESTMEDIA bosh sahifa">
+        <span class="nav-brand-text">ANI <span>BEST</span></span>
+    </a>
+
+    <div class="nav-menu">
+        <a href="{% url 'anime_catalog' %}" class="pill-nav-item"><i class='bx bx-play-circle'></i> KATALOG</a>
+        <a href="{% url 'chat' %}" class="pill-nav-item"><i class='bx bx-message-dots'></i> CHAT</a>
+        <a href="javascript:void(0)" class="pill-nav-item" onclick="toggleProfileMenu()"><i class='bx bx-user'></i> PROFIL</a>
+        <a href="{% url 'home' %}" class="pill-nav-item"><i class='bx bx-home-alt'></i> BOSH SAHIFA</a>
+    </div>
+
+    <div class="nav-actions">
+
+        <!-- 1) BILDIRISHNOMA / NOTICE -->
+        <a href="{% url 'notice' %}" class="action-icon nav-notice-icon" aria-label="Bildirishnomalar">
+            <i class='bx bx-bell'></i>
+            {% if unread_notices_count %}
+                <span class="notice-badge">{% if unread_notices_count > 9 %}9+{% else %}{{ unread_notices_count }}{% endif %}</span>
+            {% endif %}
+        </a>
+
+        <!-- 2) QIDIRUV -->
+        <a href="{% url 'search' %}" class="action-icon nav-search-icon" aria-label="Qidirish"><i class='bx bx-search'></i></a>
+
+        <!-- 3) PROFIL (rasm bilan) -->
+        <div class="action-icon profile-btn" onclick="toggleProfileMenu()" style="overflow: hidden; padding: 0;" role="button" aria-label="Profil">
+            {% if request.user.is_authenticated and request.user.avatar %}
+                <img src="{{ request.user.avatar.image.url }}" alt="profile"
+                     style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+            {% else %}
+                <i class='bx bx-user' style="margin: auto;"></i>
+            {% endif %}
+        </div>
+
+        <!-- 4) HAMBURGER (SIDEBAR) -->
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="Menyu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ==================== MOBILE NAV ==================== -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay">
+    <div class="mobile-nav-container" id="mobileNav" role="dialog" aria-modal="true" aria-label="Mobil menyu">
+
+        <div class="mobile-nav-header">
+            <span class="brand-name">ANI•BEST</span>
+            <button class="mobile-close-btn" onclick="toggleMobileNav()" aria-label="Yopish">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+
+        <div class="mobile-profile-summary">
+            <div class="mobile-profile-avatar" id="mobileProfileAvatarBtn" onclick="toggleAvatarPicker()" role="button" aria-label="Profil rasmini tanlash">
+                {% if request.user.is_authenticated and request.user.avatar %}
+                    <img src="{{ request.user.avatar.image.url }}" alt="avatar">
+                {% else %}
+                    <i class='bx bx-user'></i>
+                {% endif %}
+                <span class="avatar-edit-badge"><i class='bx bx-pencil'></i></span>
+            </div>
+            <a href="{% url 'profile' %}" class="mobile-profile-info-link">
+                <div class="mobile-profile-info">
+                    <span class="mobile-profile-name">
+                        {% if request.user.is_authenticated %}{{ request.user.display_name }}{% else %}Mehmon{% endif %}
+                    </span>
+                    <span class="mobile-profile-tag">
+                        {% if request.user.is_authenticated and request.user.vip_data and request.user.vip_data.vip_active %}
+                            VIP
+                        {% else %}
+                            Oddiy
+                        {% endif %}
+                    </span>
+                </div>
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+        </div>
+
+        <div class="inline-avatar-picker" id="inlineAvatarPicker">
+            <div class="inline-avatar-picker-box">
+                <p class="inline-avatar-picker-title"><i class='bx bx-image-add'></i> Profil rasmini tanlang</p>
+                <form method="POST" action="{% url 'profile' %}" id="avatarPickerForm">
+                    {% csrf_token %}
+                    <div class="inline-avatar-picker-grid">
+                        {% for av in avatars %}
+                        <label class="inline-avatar-picker-item" title="{{ av.name|default:'Avatar' }}">
+                            <input type="radio" name="avatar_id" value="{{ av.id }}"
+                                {% if request.user.is_authenticated and request.user.avatar and request.user.avatar.id == av.id %}checked{% endif %}>
+                            <img class="inline-avatar-picker-img" src="{{ av.image.url }}" alt="{{ av.name|default:'avatar' }}">
+                        </label>
+                        {% empty %}
+                        <p class="inline-avatar-picker-empty">Admin hali profil rasmi yuklamagan.</p>
+                        {% endfor %}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mobile-menu-box">
+            <a href="{% url 'home' %}" class="mobile-menu-item">
+                <i class='bx bxs-home' style="color:#00f3ff;"></i>
+                Bosh sahifa
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            <a href="{% url 'notice' %}" class="mobile-menu-item">
+                <i class='bx bx-bell'></i>
+                Bildirishnomalar
+                {% if unread_notices_count %}
+                    <span class="notice-count-pill">{% if unread_notices_count > 9 %}9+{% else %}{{ unread_notices_count }}{% endif %}</span>
+                {% endif %}
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            <a href="{% url 'anime_catalog' %}" class="mobile-menu-item">
+                <i class='bx bx-play-circle'></i>
+                Katalog
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            <a href="{% url 'chat' %}" class="mobile-menu-item">
+                <i class='bx bx-message-dots'></i>
+                Umumiy chat
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            <a href="{% url 'news_feed' %}" class="mobile-menu-item">
+                <i class='bx bx-news'></i>
+                Yangiliklar
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            <a href="{% url 'reels' %}" class="mobile-menu-item">
+                <i class='bx bx-video'></i>
+                Reels
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            <a href="{% url 'aloqa' %}" class="mobile-menu-item">
+                <i class='bx bx-support'></i>
+                Aloqa
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            <a href="{% url 'settings_general' %}" class="mobile-menu-item">
+                <i class='bx bx-cog'></i>
+                Sozlamalar
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+
+            {% if request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
+            <div class="mobile-menu-divider"></div>
+            <a href="{% url 'admin_dashboard' %}" class="mobile-menu-item mobile-menu-admin">
+                <i class='bx bx-shield-quarter'></i>
+                ⚙️ Admin dashboard
+                <i class='bx bx-chevron-right m-arrow'></i>
+            </a>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+            <div class="mobile-menu-divider"></div>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="mobile-menu-item mobile-menu-logout">
+                    <i class='bx bx-right-arrow-circle'></i>
+                    Hisobdan chiqish
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        <a href="javascript:void(0)" class="mobile-profile-action" onclick="openProfileFromMobile()">
+            <i class='bx bx-grid-alt'></i>
+            Qo'shimcha Bo'limlar
+            <i class='bx bx-chevron-right m-arrow'></i>
+        </a>
+
+        {% if last_watched_movies %}
+        <div class="mobile-watched-section">
+            <p class="mobile-section-label">So'nggi ko'rilganlar</p>
+            <div class="mobile-watched-grid">
+                {% for movie in last_watched_movies|slice:":2" %}
+                <a href="{% url 'movie_detail' movie.id %}" class="mobile-watched-card">
+                    <img src="{% if movie.image %}{{ movie.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
+                         alt="{{ movie.title }}" loading="lazy">
+                    <div class="mobile-watched-overlay">
+                        <span class="mobile-watched-title">{{ movie.title }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="mobile-nav-footer">
+            VERSION 3.5 &nbsp;•&nbsp; ANI BEST
+        </div>
+
+    </div>
+</div>
+
+{% block content %}
+{% endblock %}
+
+<!-- ==================== PROFIL SIDEBAR ==================== -->
+<div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this) toggleProfileMenu()"></div>
+
+<div class="profile-sidebar" id="profileSidebar" role="dialog" aria-modal="true" aria-label="Profil menyusi">
+    <div class="premium-btn-container">
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'premium_page' %}" class="premium-btn"><i class='bx bxs-bolt'></i> PREMIUM OBUNA</a>
+        {% else %}
+            <a href="{% url 'register' %}" class="premium-btn"><i class='bx bxs-bolt'></i> RO'YXATDAN O'TING</a>
+        {% endif %}
+        <button class="close-btn" onclick="toggleProfileMenu()" aria-label="Yopish"><i class='bx bx-x'></i></button>
+    </div>
+
+    {% if request.user.is_authenticated %}
+    <div class="user-info-section">
+        <div class="avatar-large" style="overflow: hidden;">
+            {% if request.user.avatar %}
+                <img src="{{ request.user.avatar.image.url }}" alt="avatar"
+                     style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+            {% else %}
+                <i class='bx bx-user'></i>
+            {% endif %}
+        </div>
+        <div class="user-name-card">
+            <div class="user-name">{{ request.user.username }}</div>
+            <div class="user-handle">@{{ request.user.username|lower }}</div>
+        </div>
+        {% if request.user.vip_data and request.user.vip_data.vip_active %}
+        <p style="color:#fbbf24; font-weight:800; font-size:0.85rem; margin-top:15px;">
+            <i class='bx bxs-crown'></i> VIP PROFILE
+        </p>
+        {% endif %}
+    </div>
+
+    <div class="menu-section">
+        <h4 class="menu-title">MENING HISOBIM</h4>
+        <a href="{% url 'profile' %}" class="menu-item">
+            <span class="icon-left" style="color:#00f3ff;"><i class='bx bx-user-circle'></i></span>
+            Mening Hisobim
+            <span class="value" style="color:var(--text-light); font-weight:800;">
+                {% if request.user.vip_data and request.user.vip_data.vip_active %}VIP{% else %}Oddiy{% endif %}
+            </span>
+            <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'premium_page' %}" class="menu-item">
+            <span class="icon-left" style="color:#fbbf24;"><i class='bx bxs-crown'></i></span>
+            Premium Obuna
+            <span class="value" style="color:var(--text-light); font-weight:800;">
+                {% if request.user.vip_data and request.user.vip_data.vip_active %}Faol{% else %}Yo'q{% endif %}
+            </span>
+            <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'notice' %}" class="menu-item">
+            <span class="icon-left" style="color:#00f3ff;"><i class='bx bx-bell'></i></span>
+            Bildirishnomalar
+            {% if unread_notices_count %}
+                <span class="notice-count-pill">{% if unread_notices_count > 9 %}9+{% else %}{{ unread_notices_count }}{% endif %}</span>
+            {% endif %}
+            <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'favorites_page' %}" class="menu-item">
+            <span class="icon-left" style="color:#ff3366;"><i class='bx bxs-bookmark-star'></i></span>
+            Saqlanganlar <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'watch_history_page' %}" class="menu-item">
+            <span class="icon-left" style="color:#a855f7;"><i class='bx bx-history'></i></span>
+            Ko'rishlar tarixi <span class="arrow">›</span>
+        </a>
+    </div>
+
+    <div class="menu-section">
+        <h4 class="menu-title">ASOSIY</h4>
+        <a href="{% url 'chat' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-message-dots'></i></span>
+            Umumiy chat <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'anime_catalog' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-play-circle'></i></span>
+            Katalog <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'home' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-home-alt'></i></span>
+            Bosh sahifa <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'news_feed' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-news'></i></span>
+            Yangiliklar <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'reels' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-play-circle'></i></span>
+            Reels <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'aloqa' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-support'></i></span>
+            Aloqa <span class="arrow">›</span>
+        </a>
+        <a href="{% url 'settings_general' %}" class="menu-item">
+            <span class="icon-left"><i class='bx bx-cog'></i></span>
+            Sozlamalar <span class="arrow">›</span>
+        </a>
+    </div>
+
+    {% if request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
+    <div class="menu-section">
+        <h4 class="menu-title">ADMIN PANEL</h4>
+        <a href="{% url 'admin_dashboard' %}" class="menu-item"
+           style="background: rgba(0,243,255,0.1); border: 1px solid var(--accent); border-radius: 12px; justify-content: center; color: var(--accent);">
+            ⚙️ Admin dashboard
+        </a>
+    </div>
+    {% endif %}
+
+    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="menu-item logout-btn"
+                style="background:none; border:none; width:100%; text-align:left; cursor:pointer;">
+            <span class="icon-left"><i class='bx bx-right-arrow-circle'></i></span> Hisobdan chiqish
+        </button>
+    </form>
+
+    {% else %}
+    <div class="user-info-section" style="padding-top: 20px;">
+        <div class="avatar-large" style="background: #333;">?</div>
+        <h3 class="user-name" style="margin-top: 10px;">Mehmon</h3>
+        <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 10px;">
+            Sayt imkoniyatlaridan to'liq foydalanish uchun tizimga kiring.
+        </p>
+    </div>
+    <div class="menu-section" style="margin-top: 30px;">
+        <a href="{% url 'login' %}" class="menu-item"
+           style="justify-content: center; background: var(--accent); color: black; font-weight: 800; border-radius: 12px; margin-bottom: 10px;">
+            <i class='bx bx-log-in' style="margin-right: 8px; font-size: 1.2rem;"></i> TIZIMGA KIRISH
+        </a>
+        <a href="{% url 'register' %}" class="menu-item"
+           style="justify-content: center; background: rgba(0,243,255,0.1); color: var(--accent); border: 1px solid var(--accent); font-weight: 800; border-radius: 12px;">
+            <i class='bx bx-user-plus' style="margin-right: 8px; font-size: 1.2rem;"></i> RO'YXATDAN O'TISH
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="sidebar-footer">BESTMEDIA PLATFORM V2.7</div>
+</div>
+
+<!-- ==================== BOTTOM TAB BAR ==================== -->
+<nav class="bottom-tab-bar{% if request.user.is_authenticated and request.user.settings and not request.user.settings.tabbar_on %} tab-hidden{% endif %}"
+     id="bottomTabBar"
+     aria-label="Pastki navigatsiya">
+
+    <a href="{% url 'aloqa' %}" class="tab-item" data-tab="aloqa">
+        <i class='bx bx-support'></i>
+        <span>Aloqa</span>
+    </a>
+
+    <a href="{% url 'chat' %}" class="tab-item" data-tab="chat">
+        <i class='bx bx-message-dots'></i>
+        <span>Chat</span>
+    </a>
+
+    <a href="{% url 'home' %}" class="tab-item" data-tab="home">
+        <i class='bx bxs-home'></i>
+        <span>Bosh</span>
+    </a>
+
+    <a href="{% url 'anime_category' %}" class="tab-item" data-tab="category">
+        <i class='bx bx-category'></i>
+        <span>katalog</span>
+    </a>
+
+    <a href="{% url 'profile' %}" class="tab-item tab-profile-btn" data-tab="profile">
+        <i class='bx bx-user'></i>
+        <span>Profil</span>
+    </a>
+
+</nav>
+
+<!-- ==================== NETWORK TOAST — tab bar ustidan chiqadi ==================== -->
+<div id="networkToast"></div>
+
+{% block footer %}
+<footer style="
+    position: relative;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--bg-surface) 40%, transparent));
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 60px 5% 30px;
+    margin-top: 60px;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    overflow: hidden;
+">
+    <div style="position:absolute; top:0; left:50%; transform:translateX(-50%); width:60%; height:1px; background: linear-gradient(90deg, transparent, rgba(0,243,255,0.4), transparent);"></div>
+
+    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-bottom: 40px;">
+        <div>
+            <a href="{% url 'home' %}"
+               style="display:inline-flex; align-items:center; text-decoration:none; gap:10px; margin-bottom:15px;">
+                <img src="{% static 'images/anibest-logo.svg' %}" alt="BESTMEDIA" width="40" height="40" style="object-fit:contain;">
+                <span style="font-weight:900; font-size:1.4rem; color:var(--text-light); letter-spacing:1px;">BESTMEDIA</span>
+            </a>
+            <p style="line-height:1.7; max-width:300px; margin-bottom:22px;">
+                Sifatli tarjima va qulay interfeys orqali sevimli animelaringizdan zavqlaning.
+            </p>
+            <div style="display:flex; gap:10px;">
+                <a href="https://t.me/ani_best_uzb_anime" target="_blank" class="footer-social" aria-label="Telegram"><i class='bx bxl-telegram'></i></a>
+                <a href="#" class="footer-social" aria-label="Instagram"><i class='bx bxl-instagram'></i></a>
+                <a href="mailto:admin@bestmedia.uz" class="footer-social" aria-label="Email"><i class='bx bx-envelope'></i></a>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="footer-heading" style="color:var(--text-light); font-weight:800; font-size:1.1rem; margin-bottom:26px;">Sahifalar</h4>
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:14px;">
+                <li><a href="{% url 'home' %}" class="footer-link">Bosh sahifa</a></li>
+                <li><a href="{% url 'anime_catalog' %}" class="footer-link">Animelar katalogi</a></li>
+                <li><a href="{% url 'premium_page' %}" class="footer-link">Premium sotib olish</a></li>
+                <li><a href="{% url 'chat' %}" class="footer-link">Jonli Chat</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h4 class="footer-heading" style="color:var(--text-light); font-weight:800; font-size:1.1rem; margin-bottom:26px;">Biz bilan aloqa</h4>
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:14px;">
+                <li style="display:flex; align-items:center; gap:10px;">
+                    <i class='bx bxl-telegram' style="font-size:1.15rem; color:var(--accent);"></i>
+                    <a href="https://t.me/ani_best_uzb_anime" target="_blank" class="footer-link">Telegram kanalimiz</a>
+                </li>
+                <li style="display:flex; align-items:center; gap:10px;">
+                    <i class='bx bxl-instagram' style="font-size:1.15rem; color:#E1306C;"></i>
+                    <a href="#" class="footer-link">Instagram sahifamiz</a>
+                </li>
+                <li style="display:flex; align-items:center; gap:10px;">
+                    <i class='bx bx-envelope' style="font-size:1.15rem; color:var(--text-dim);"></i>
+                    @ani_best_uzb_anime
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="max-width:1280px; margin:0 auto; padding-top:24px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+        <p style="margin:0;">&copy; {% now "Y" %} BESTMEDIA. Barcha huquqlar himoyalangan.</p>
+        <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700; color:var(--accent); opacity:0.8;">ANI BEST JAMOASI TOMONIDAN YARATILGAN</p>
+    </div>
+</footer>
+{% endblock footer %}
+
+{% if request.session.mp3_played == False and mp3_file and request.user.is_authenticated %}
+<audio preload="auto" autoplay>
+    <source src="{{ mp3_file }}" type="audio/mpeg">
+</audio>
+{% endif %}
+
+<script>
+/* ================= SCROLL ================= */
+window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+}, { passive: true });
+
+
+/* ================= iOS BODY SCROLL LOCK ================= */
+let _scrollY = 0;
+
+function lockBodyScroll() {
+    _scrollY = window.scrollY;
+    document.body.style.top = `-${_scrollY}px`;
+    document.body.classList.add('nav-open');
+}
+
+function unlockBodyScroll() {
+    document.body.classList.remove('nav-open');
+    document.body.style.top = '';
+    window.scrollTo(0, _scrollY);
+}
+
+
+/* ================= MOBILE NAV ================= */
+function toggleMobileNav() {
+    const overlay = document.getElementById('mobileNavOverlay');
+    const btn = document.getElementById('hamburgerBtn');
+    if (!overlay) return;
+
+    const isOpen = overlay.classList.toggle('active');
+    if (btn) {
+        btn.classList.toggle('active', isOpen);
+        btn.setAttribute('aria-expanded', isOpen);
+    }
+
+    if (isOpen) lockBodyScroll();
+    else {
+        unlockBodyScroll();
+        closeAvatarPicker();
+    }
+}
+
+function closeMobileNav() {
+    const overlay = document.getElementById('mobileNavOverlay');
+    const btn = document.getElementById('hamburgerBtn');
+    if (!overlay || !overlay.classList.contains('active')) return;
+
+    overlay.classList.remove('active');
+    if (btn) {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-expanded', 'false');
+    }
+    unlockBodyScroll();
+    closeAvatarPicker();
+}
+
+document.getElementById('mobileNavOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeMobileNav();
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeMobileNav();
+        closeProfileMenu();
+    }
+});
+
+
+/* ================= PROFIL SIDEBAR ================= */
+function toggleProfileMenu() {
+    const sidebar = document.getElementById('profileSidebar');
+    const overlay = document.getElementById('profileOverlay');
+    if (!sidebar || !overlay) return;
+
+    const isOpen = sidebar.classList.toggle('active');
+    overlay.classList.toggle('active', isOpen);
+
+    if (isOpen) lockBodyScroll();
+    else unlockBodyScroll();
+}
+
+function closeProfileMenu() {
+    const sidebar = document.getElementById('profileSidebar');
+    const overlay = document.getElementById('profileOverlay');
+    if (!sidebar || !sidebar.classList.contains('active')) return;
+
+    sidebar.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+    unlockBodyScroll();
+}
+
+function openProfileFromMobile() {
+    closeMobileNav();
+    setTimeout(() => {
+        const sidebar = document.getElementById('profileSidebar');
+        const overlay = document.getElementById('profileOverlay');
+        if (sidebar && overlay) {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            lockBodyScroll();
+        }
+    }, 300);
+}
+
+
+/* ================= AVATAR PICKER — SIDEBAR ICHIDA INLINE BOX ================= */
+function toggleAvatarPicker() {
+    const picker = document.getElementById('inlineAvatarPicker');
+    const btn = document.getElementById('mobileProfileAvatarBtn');
+    if (!picker) return;
+
+    const isOpen = picker.classList.toggle('open');
+    if (btn) btn.classList.toggle('picker-open', isOpen);
+}
+
+function closeAvatarPicker() {
+    const picker = document.getElementById('inlineAvatarPicker');
+    const btn = document.getElementById('mobileProfileAvatarBtn');
+    if (!picker) return;
+
+    picker.classList.remove('open');
+    if (btn) btn.classList.remove('picker-open');
+}
+
+(function() {
+    const form = document.getElementById('avatarPickerForm');
+    if (!form) return;
+
+    form.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const item = this.closest('.inline-avatar-picker-item');
+            if (item) item.classList.add('saving');
+
+            const data = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: data,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(function() {
+                location.reload();
+            }).catch(function() {
+                if (item) item.classList.remove('saving');
+            });
+        });
+    });
+})();
+
+
+/* ================= SWIPE ================= */
+(function() {
+    let startX = 0, startY = 0, isSwipe = false;
+
+    document.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isSwipe = false;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+        const dx = Math.abs(e.touches[0].clientX - startX);
+        const dy = Math.abs(e.touches[0].clientY - startY);
+        if (dx > dy && dx > 10) isSwipe = true;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+        if (!isSwipe) return;
+        const endX = e.changedTouches[0].clientX;
+        const diff = startX - endX;
+        const overlay = document.getElementById('mobileNavOverlay');
+        if (!overlay) return;
+        if (diff > 70 && startX < 30) { if (!overlay.classList.contains('active')) toggleMobileNav(); }
+        if (diff < -70) { if (overlay.classList.contains('active')) closeMobileNav(); }
+    }, { passive: true });
+})();
+
+
+/* ================= FAVORITE ================= */
+function toggleFavorite(e, movieId) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    fetch(`/toggle-favorite/${movieId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Avval tizimga kiring!");
+        return response.json();
+    })
+    .then(data => {
+        const icon = document.getElementById(`fav-icon-${movieId}`);
+        if (!icon) return;
+        icon.className = data.is_favorited ? "bx bxs-star" : "bx bx-star";
+    })
+    .catch(err => alert(err.message));
+}
+
+
+/* ================= BOTTOM TAB BAR ================= */
+const TAB_KEY = 'anibest_tabbar_on';
+
+function setTabBarUI(isOn) {
+    const bar = document.getElementById('bottomTabBar');
+    if (!bar) return;
+
+    if (isOn) {
+        bar.classList.remove('tab-hidden');
+        document.body.classList.add('tabbar-on');
+    } else {
+        bar.classList.add('tab-hidden');
+        document.body.classList.remove('tabbar-on');
+    }
+}
+
+/* ================= AKTIV TABNI ANIQLASH — HREF ASOSIDA, TAXMIN QILMASDAN ================= */
+function markActiveTab() {
+    const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+    const tabs = document.querySelectorAll('.tab-item[data-tab]');
+
+    tabs.forEach(function(el) {
+        el.classList.remove('tab-active');
+    });
+
+    let bestMatch = null;
+    let bestMatchLength = -1;
+
+    tabs.forEach(function(el) {
+        const href = el.getAttribute('href');
+        if (!href || href === 'javascript:void(0)') return;
+
+        let tabPath;
+        try {
+            tabPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '') || '/';
+        } catch (e) {
+            tabPath = href.replace(/\/+$/, '') || '/';
+        }
+
+        if (tabPath === '/') {
+            if (currentPath === '/' && bestMatchLength < 0) {
+                bestMatch = el;
+                bestMatchLength = 0;
+            }
+            return;
+        }
+
+        if (currentPath === tabPath || currentPath.startsWith(tabPath + '/')) {
+            if (tabPath.length > bestMatchLength) {
+                bestMatch = el;
+                bestMatchLength = tabPath.length;
+            }
+        }
+    });
+
+    if (bestMatch) {
+        bestMatch.classList.add('tab-active');
+    }
+}
+
+(function() {
+    const bar = document.getElementById('bottomTabBar');
+    if (!bar) return;
+
+    const serverIsOn = !bar.classList.contains('tab-hidden');
+    localStorage.setItem(TAB_KEY, serverIsOn ? '1' : '0');
+
+    if (serverIsOn) {
+        document.body.classList.add('tabbar-on');
+    } else {
+        document.body.classList.remove('tabbar-on');
+    }
+
+    markActiveTab();
+})();
+
+
+/* ================= NETWORK TOAST — tab bar ustidan, faqat mobil ================= */
+(function () {
+    var toast = document.getElementById('networkToast');
+    if (!toast) return;
+
+    Object.assign(toast.style, {
+        position:        'fixed',
+        bottom:          '96px',
+        left:            '50%',
+        transform:       'translateX(-50%) translateY(20px)',
+        padding:         '10px 22px',
+        borderRadius:    '30px',
+        fontFamily:      "'Outfit', sans-serif",
+        fontSize:        '0.82rem',
+        fontWeight:      '700',
+        letterSpacing:   '0.5px',
+        zIndex:          '99999',
+        opacity:         '0',
+        pointerEvents:   'none',
+        transition:      'opacity 0.45s cubic-bezier(0.22,1,0.36,1), transform 0.45s cubic-bezier(0.22,1,0.36,1)',
+        whiteSpace:      'nowrap',
+        display:         'flex',
+        alignItems:      'center',
+        gap:             '8px',
+        boxShadow:       '0 4px 24px rgba(0,0,0,0.5)',
+        backdropFilter:  'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        cursor:          'grab',
+        userSelect:      'none',
+        WebkitUserSelect:'none',
+    });
+
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+
+    var timer = null;
+    var startX = 0, startY = 0, currentX = 0, isDragging = false;
+
+    function onDragStart(clientX, clientY) {
+        if (!isMobile()) return;
+        isDragging = true;
+        startX = clientX;
+        startY = clientY;
+        currentX = 0;
+        toast.style.transition = 'none';
+        toast.style.cursor = 'grabbing';
+    }
+
+    function onDragMove(clientX, clientY) {
+        if (!isDragging) return;
+        currentX = clientX - startX;
+        var dy = clientY - startY;
+        var opacity = Math.max(0, 1 - Math.abs(currentX) / 120);
+        toast.style.transform = 'translateX(calc(-50% + ' + currentX + 'px)) translateY(' + (dy * 0.3) + 'px)';
+        toast.style.opacity = opacity;
+    }
+
+    function onDragEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        toast.style.cursor = 'grab';
+
+        if (Math.abs(currentX) > 80) {
+            var dir = currentX > 0 ? 1 : -1;
+            toast.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+            toast.style.transform   = 'translateX(calc(-50% + ' + (dir * 300) + 'px)) translateY(0)';
+            toast.style.opacity     = '0';
+            toast.style.pointerEvents = 'none';
+            clearTimeout(timer);
+        } else {
+            toast.style.transition = 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1)';
+            toast.style.transform  = 'translateX(-50%) translateY(0)';
+            toast.style.opacity    = '1';
+        }
+    }
+
+    toast.addEventListener('mousedown', function (e) { onDragStart(e.clientX, e.clientY); });
+    document.addEventListener('mousemove', function (e) { onDragMove(e.clientX, e.clientY); });
+    document.addEventListener('mouseup', function () { onDragEnd(); });
+
+    toast.addEventListener('touchstart', function (e) {
+        onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    document.addEventListener('touchmove', function (e) {
+        onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    document.addEventListener('touchend', function () { onDragEnd(); });
+
+
+    function showToast(isOnline) {
+        if (!isMobile()) return;
+
+        clearTimeout(timer);
+
+        toast.style.transition = 'none';
+        toast.style.transform  = 'translateX(-50%) translateY(20px)';
+        toast.style.opacity    = '0';
+        toast.style.pointerEvents = 'auto';
+
+        if (isOnline) {
+            toast.innerHTML        = "<i class='bx bx-wifi'></i> Online siz";
+            toast.style.background = 'rgba(16, 185, 129, 0.92)';
+            toast.style.color      = '#fff';
+            toast.style.border     = '1px solid rgba(255,255,255,0.2)';
+        } else {
+            toast.innerHTML        = "<i class='bx bx-wifi-off'></i> Offline siz";
+            toast.style.background = 'rgba(239, 68, 68, 0.92)';
+            toast.style.color      = '#fff';
+            toast.style.border     = '1px solid rgba(255,255,255,0.2)';
+        }
+
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                toast.style.transition = 'opacity 0.45s cubic-bezier(0.22,1,0.36,1), transform 0.45s cubic-bezier(0.22,1,0.36,1)';
+                toast.style.transform  = 'translateX(-50%) translateY(0)';
+                toast.style.opacity    = '1';
+            });
+        });
+
+        if (isOnline) {
+            timer = setTimeout(function () {
+                toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                toast.style.opacity    = '0';
+                toast.style.transform  = 'translateX(-50%) translateY(20px)';
+                toast.style.pointerEvents = 'none';
+            }, 3000);
+        }
+    }
+
+    window.addEventListener('offline', function () { showToast(false); });
+    window.addEventListener('online',  function () { showToast(true);  });
+
+})();
+
+/* ================= SERVICE WORKER — OFFLINE ================= */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(function (reg) {
+                console.log('SW ro\'yxatdan o\'tdi:', reg.scope);
+            })
+            .catch(function (err) {
+                console.warn('SW xatosi:', err);
+            });
+    });
+}
+
+</script>
+
+</body>
+</html>
