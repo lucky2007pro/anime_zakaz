@@ -14,13 +14,30 @@
     <meta name="author" content="BESTMEDIA">
     <meta name="robots" content="index, follow">
 
+    <!-- ============================================================
+         OPEN GRAPH / GOOGLE va IJTIMOIY TARMOQLAR UCHUN RASM
+         MUHIM: content="..." ichidagi domenni o'zingizning haqiqiy
+         domeningizga almashtiring. Rasm albatta TO'LIQ (absolute)
+         URL bo'lishi kerak — static tegi yolg'iz o'zi YETARLI EMAS,
+         chunki u faqat "/static/..." kabi nisbiy yo'l chiqaradi.
+    ============================================================ -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bestmedia-official.uz/">
     <meta property="og:title" content="BESTMEDIA - O'zbekistondagi Eng Yaxshi Media Sayti">
     <meta property="og:description"
           content="Eng sara va yangi anime seriallarni yuqori sifatda o'zbek tilida bepul tomosha qiling.">
-    <meta property="og:image" content="{% static 'images/default.svg' %}">
-    <meta property="og:image" content="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg">
+    <meta property="og:image" content="https://bestmedia-official.uz{% static 'images/default.svg' %}">
+    <meta property="og:image:secure_url" content="https://bestmedia-official.uz{% static 'images/default.svg' %}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="BESTMEDIA">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BESTMEDIA - O'zbekistondagi Eng Yaxshi Media Sayti">
+    <meta name="twitter:description"
+          content="Eng sara va yangi anime seriallarni yuqori sifatda o'zbek tilida bepul tomosha qiling.">
+    <meta name="twitter:image" content="https://bestmedia-official.uz{% static 'images/default.svg' %}">
+
     <meta name="theme-color" content="#ff3366">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1327,15 +1344,6 @@
         <a href="{% url 'home' %}" class="pill-nav-item"><i class='bx bx-home-alt'></i> BOSH SAHIFA</a>
     </div>
 
-    <!--
-        NAV-ACTIONS TARTIBI (chap -> o'ng):
-        1) Bildirishnoma (notice)
-        2) Qidiruv (search)
-        3) Profil (rasm bilan)
-        4) Hamburger (sidebar)
-        Bu tartib mobil va PC uchun bir xil — CSS orqali PC'da faqat qo'shimcha
-        elementlar (search/notice/profile) ko'rinadi, hamburger esa faqat mobil'da.
-    -->
     <div class="nav-actions">
 
         <!-- 1) BILDIRISHNOMA / NOTICE -->
@@ -1379,7 +1387,6 @@
             </button>
         </div>
 
-        <!-- Profil qisqacha: avatar (bosilsa — sidebar ichida avatar tanlash box'i ochiladi) + ism (bosilsa — profilga) -->
         <div class="mobile-profile-summary">
             <div class="mobile-profile-avatar" id="mobileProfileAvatarBtn" onclick="toggleAvatarPicker()" role="button" aria-label="Profil rasmini tanlash">
                 {% if request.user.is_authenticated and request.user.avatar %}
@@ -1406,7 +1413,6 @@
             </a>
         </div>
 
-        <!-- ============ AVATAR PICKER — SIDEBAR ICHIDA, PROFIL QISMIDAN KEYIN ============ -->
         <div class="inline-avatar-picker" id="inlineAvatarPicker">
             <div class="inline-avatar-picker-box">
                 <p class="inline-avatar-picker-title"><i class='bx bx-image-add'></i> Profil rasmini tanlang</p>
@@ -1427,7 +1433,6 @@
             </div>
         </div>
 
-        <!-- Bitta box ichida barcha tugmalar, ixcham va skrollanadigan -->
         <div class="mobile-menu-box">
             <a href="{% url 'home' %}" class="mobile-menu-item">
                 <i class='bx bxs-home' style="color:#00f3ff;"></i>
@@ -2018,7 +2023,6 @@ function markActiveTab() {
         const href = el.getAttribute('href');
         if (!href || href === 'javascript:void(0)') return;
 
-        // href to'liq URL bo'lsa ham, faqat pathname qismini olamiz
         let tabPath;
         try {
             tabPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '') || '/';
@@ -2026,7 +2030,6 @@ function markActiveTab() {
             tabPath = href.replace(/\/+$/, '') || '/';
         }
 
-        // Bosh sahifa uchun faqat aniq moslik hisoblanadi
         if (tabPath === '/') {
             if (currentPath === '/' && bestMatchLength < 0) {
                 bestMatch = el;
@@ -2035,7 +2038,6 @@ function markActiveTab() {
             return;
         }
 
-        // Aniq moslik yoki ichki sahifa (masalan /chat/room/5 -> /chat tab'i)
         if (currentPath === tabPath || currentPath.startsWith(tabPath + '/')) {
             if (tabPath.length > bestMatchLength) {
                 bestMatch = el;
