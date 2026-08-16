@@ -55,7 +55,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
+    
     <style>
         :root {
             --bg-base: #0a0a0f;
@@ -1526,7 +1526,7 @@
             <div class="mobile-watched-grid">
                 {% for movie in last_watched_movies|slice:":2" %}
                 <a href="{% url 'movie_detail' movie.id %}" class="mobile-watched-card">
-                    <img src="{% if movie.image %}{{ movie.image.url }}{% else %}{% static 'images/favicon.svg' %}{% endif %}"
+                    <img src="{% if movie.image %}{{ movie.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
                          alt="{{ movie.title }}" loading="lazy">
                     <div class="mobile-watched-overlay">
                         <span class="mobile-watched-title">{{ movie.title }}</span>
