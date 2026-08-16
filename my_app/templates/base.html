@@ -1526,7 +1526,7 @@
             <div class="mobile-watched-grid">
                 {% for movie in last_watched_movies|slice:":2" %}
                 <a href="{% url 'movie_detail' movie.id %}" class="mobile-watched-card">
-                    <img src="{% if movie.image %}{{ movie.image.url }}{% else %}{% static 'images/default.svg' %}{% endif %}"
+                    <img src="{% if movie.image %}{{ movie.image.url }}{% else %}{% static 'images/favicon.svg' %}{% endif %}"
                          alt="{{ movie.title }}" loading="lazy">
                     <div class="mobile-watched-overlay">
                         <span class="mobile-watched-title">{{ movie.title }}</span>
