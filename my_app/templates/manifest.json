@@ -1,0 +1,26 @@
+{
+  "name": "BESTMEDIA - Anime Streaming",
+  "short_name": "BESTMEDIA",
+  "description": "O'zbekistondagi eng yaxshi anime streaming platformasi",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0f",
+  "theme_color": "#ff3366",
+  "lang": "uz",
+  "icons": [
+    {
+      "src": "/static/images/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/images/anibest-logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
