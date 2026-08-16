@@ -571,7 +571,28 @@
             overflow: hidden;
             flex-shrink: 0;
             cursor: pointer;
+            position: relative;
+            overflow: visible;
             transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .avatar-edit-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 22px;
+            height: 22px;
+            background: transparent;
+            color: #000;
+            border: 2px solid var(--text-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,243,255,0.25);
+            pointer-events: none;
+            z-index: 2;
         }
 
         .mobile-profile-avatar:hover {
@@ -1109,30 +1130,104 @@
         }
 
         @media (max-width: 768px) {
-            .navbar { padding: 12px 4%; }
+            .navbar {
+                top: 12px;
+                left: 3%;
+                width: 94%;
+                padding: 10px 4%;
+                border-radius: 24px;
+                background: rgba(17, 17, 24, 0.55);
+                backdrop-filter: blur(24px) saturate(180%);
+                -webkit-backdrop-filter: blur(24px) saturate(180%);
+                border: 1px solid rgba(255,255,255,0.1);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07);
+                transition: top 0.35s ease, background 0.35s ease, box-shadow 0.35s ease, border-radius 0.35s ease;
+            }
+
+            .navbar.scrolled {
+                top: 8px;
+                background: rgba(10,10,15,0.78);
+                box-shadow: 0 10px 36px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+                border-color: rgba(0,243,255,0.18);
+            }
+
             .nav-menu { display: none; }
             .hamburger { display: flex; }
-            .nav-brand-logo { width: 38px; height: 38px; border-radius: 8px; }
-            .nav-brand-text { font-size: 0.98rem; }
+            .nav-brand-logo { width: 36px; height: 36px; border-radius: 8px; }
+            .nav-brand-text { font-size: 0.95rem; }
 
-            /* Mobil'da faqat: bildirishnoma, qidiruv, profil ko'rinadi (hamburger alohida) */
             .nav-actions .action-icon:not(.profile-btn):not(.nav-search-icon):not(.nav-notice-icon) { display: none; }
             .nav-actions .action-icon.nav-search-icon,
             .nav-actions .action-icon.nav-notice-icon { display: flex; }
 
-            .nav-actions { gap: 8px; }
-            .action-icon, .profile-btn { width: 38px; height: 38px; font-size: 1.1rem; }
+            .nav-actions { gap: 6px; }
+            .action-icon, .profile-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1.05rem;
+                background: rgba(255,255,255,0.04);
+                border-radius: 12px;
+            }
+            .action-icon:hover { background: rgba(0,243,255,0.12); }
+
             .profile-sidebar { width: 100%; border-left: none; border-radius: 0; }
-            main.main-content { margin-top: 72px; padding: 22px 4%; }
+
+            main.main-content { margin-top: 94px; padding: 22px 4%; }
         }
 
         @media (max-width: 480px) {
-            .navbar { padding: 10px 3.5%; }
-            .nav-brand-logo { width: 34px; height: 34px; border-radius: 8px; }
-            .nav-brand-text { font-size: 0.88rem; letter-spacing: 0.05em; }
+            .navbar { top: 10px; width: 94%; padding: 9px 4%; border-radius: 20px; }
+            .nav-brand-logo { width: 32px; height: 32px; border-radius: 7px; }
+            .nav-brand-text { font-size: 0.85rem; letter-spacing: 0.05em; }
             .hamburger span { width: 22px; }
             .mobile-nav-container { max-width: 300px; }
+            main.main-content { margin-top: 88px; }
         }
+
+        .footer-social {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 1.15rem;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+        .footer-social:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 6px 18px rgba(0,243,255,0.15);
+        }
+        .footer-heading {
+            position: relative;
+            display: inline-block;
+        }
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 28px;
+            height: 3px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        .footer-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+            display: inline-block;
+        }
+        .footer-link:hover { color: var(--accent); transform: translateX(3px); }
+
+
 
         {% block extra_css %}{% endblock %}
     </style>
@@ -1210,6 +1305,7 @@
         :root { --bg-base: {{ s.bg_color }}; }
         body  { background-color: {{ s.bg_color }}; }
         {% endif %}
+
     </style>
     {% endif %}
     {% endwith %}
@@ -1290,6 +1386,7 @@
                 {% else %}
                     <i class='bx bx-user'></i>
                 {% endif %}
+                <span class="avatar-edit-badge"><i class='bx bx-pencil'></i></span>
             </div>
             <a href="{% url 'profile' %}" class="mobile-profile-info-link">
                 <div class="mobile-profile-info">
@@ -1576,7 +1673,7 @@
     </div>
     {% endif %}
 
-    <div class="sidebar-footer">BESTMEDIA PLATFORM V3.7</div>
+    <div class="sidebar-footer">BESTMEDIA PLATFORM V2.7</div>
 </div>
 
 <!-- ==================== BOTTOM TAB BAR ==================== -->
@@ -1601,7 +1698,7 @@
 
     <a href="{% url 'anime_category' %}" class="tab-item" data-tab="category">
         <i class='bx bx-category'></i>
-        <span>Kategoriya</span>
+        <span>katalog</span>
     </a>
 
     <a href="{% url 'profile' %}" class="tab-item tab-profile-btn" data-tab="profile">
@@ -1616,13 +1713,17 @@
 
 {% block footer %}
 <footer style="
-    background: color-mix(in srgb, var(--bg-base) 95%, transparent);
-    border-top: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--bg-surface) 40%, transparent));
+    border-top: 1px solid rgba(255,255,255,0.06);
     padding: 60px 5% 30px;
     margin-top: 60px;
     color: var(--text-dim);
     font-size: 0.9rem;
+    overflow: hidden;
 ">
+    <div style="position:absolute; top:0; left:50%; transform:translateX(-50%); width:60%; height:1px; background: linear-gradient(90deg, transparent, rgba(0,243,255,0.4), transparent);"></div>
+
     <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-bottom: 40px;">
         <div>
             <a href="{% url 'home' %}"
@@ -1630,43 +1731,49 @@
                 <img src="{% static 'images/anibest-logo.svg' %}" alt="BESTMEDIA" width="40" height="40" style="object-fit:contain;">
                 <span style="font-weight:900; font-size:1.4rem; color:var(--text-light); letter-spacing:1px;">BESTMEDIA</span>
             </a>
-            <p style="line-height:1.7; max-width:300px; margin-bottom:20px;">
+            <p style="line-height:1.7; max-width:300px; margin-bottom:22px;">
                 Sifatli tarjima va qulay interfeys orqali sevimli animelaringizdan zavqlaning.
             </p>
+            <div style="display:flex; gap:10px;">
+                <a href="https://t.me/ani_best_uzb_anime" target="_blank" class="footer-social" aria-label="Telegram"><i class='bx bxl-telegram'></i></a>
+                <a href="#" class="footer-social" aria-label="Instagram"><i class='bx bxl-instagram'></i></a>
+                <a href="mailto:admin@bestmedia.uz" class="footer-social" aria-label="Email"><i class='bx bx-envelope'></i></a>
+            </div>
         </div>
+
         <div>
-            <h4 style="color:var(--text-light); font-weight:800; font-size:1.1rem; margin-bottom:20px;">Sahifalar</h4>
-            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                <li><a href="{% url 'home' %}" style="color:var(--text-dim); text-decoration:none;">Bosh sahifa</a></li>
-                <li><a href="{% url 'anime_catalog' %}" style="color:var(--text-dim); text-decoration:none;">Animelar katalogi</a></li>
-                <li><a href="{% url 'premium_page' %}" style="color:var(--text-dim); text-decoration:none;">Premium sotib olish</a></li>
-                <li><a href="{% url 'chat' %}" style="color:var(--text-dim); text-decoration:none;">Jonli Chat</a></li>
+            <h4 class="footer-heading" style="color:var(--text-light); font-weight:800; font-size:1.1rem; margin-bottom:26px;">Sahifalar</h4>
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:14px;">
+                <li><a href="{% url 'home' %}" class="footer-link">Bosh sahifa</a></li>
+                <li><a href="{% url 'anime_catalog' %}" class="footer-link">Animelar katalogi</a></li>
+                <li><a href="{% url 'premium_page' %}" class="footer-link">Premium sotib olish</a></li>
+                <li><a href="{% url 'chat' %}" class="footer-link">Jonli Chat</a></li>
             </ul>
         </div>
+
         <div>
-            <h4 style="color:var(--text-light); font-weight:800; font-size:1.1rem; margin-bottom:20px;">Biz bilan aloqa</h4>
-            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                <li style="display:flex; align-items:center; gap:8px;">
-                    <i class='bx bxl-telegram' style="font-size:1.2rem; color:var(--accent);"></i>
-                    <a href="https://t.me/ani_best_uzb_anime" target="_blank" style="color:var(--text-dim); text-decoration:none;">Telegram kanalimiz</a>
+            <h4 class="footer-heading" style="color:var(--text-light); font-weight:800; font-size:1.1rem; margin-bottom:26px;">Biz bilan aloqa</h4>
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:14px;">
+                <li style="display:flex; align-items:center; gap:10px;">
+                    <i class='bx bxl-telegram' style="font-size:1.15rem; color:var(--accent);"></i>
+                    <a href="https://t.me/ani_best_uzb_anime" target="_blank" class="footer-link">Telegram kanalimiz</a>
                 </li>
-                <li style="display:flex; align-items:center; gap:8px;">
-                    <i class='bx bxl-instagram' style="font-size:1.2rem; color:#E1306C;"></i>
-                    <a href="#" style="color:var(--text-dim); text-decoration:none;">Instagram sahifamiz</a>
+                <li style="display:flex; align-items:center; gap:10px;">
+                    <i class='bx bxl-instagram' style="font-size:1.15rem; color:#E1306C;"></i>
+                    <a href="#" class="footer-link">Instagram sahifamiz</a>
                 </li>
-                <li style="display:flex; align-items:center; gap:8px;">
-                    <i class='bx bx-envelope' style="font-size:1.2rem;"></i>
-                    admin@bestmedia.uz
+                <li style="display:flex; align-items:center; gap:10px;">
+                    <i class='bx bx-envelope' style="font-size:1.15rem; color:var(--text-dim);"></i>
+                    @ani_best_uzb_anime
                 </li>
             </ul>
         </div>
     </div>
 
-    <div style="max-width:1280px; margin:0 auto; padding-top:30px; border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+    <div style="max-width:1280px; margin:0 auto; padding-top:24px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
         <p style="margin:0;">&copy; {% now "Y" %} BESTMEDIA. Barcha huquqlar himoyalangan.</p>
-        <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700;">ANI BEST JAMOASI TOMONIDAN YARATILGAN</p>
+        <p style="margin:0; font-size:0.8rem; letter-spacing:1px; font-weight:700; color:var(--accent); opacity:0.8;">ANI BEST JAMOASI TOMONIDAN YARATILGAN</p>
     </div>
-
 </footer>
 {% endblock footer %}
 
@@ -1894,21 +2001,50 @@ function setTabBarUI(isOn) {
     }
 }
 
+/* ================= AKTIV TABNI ANIQLASH — HREF ASOSIDA, TAXMIN QILMASDAN ================= */
 function markActiveTab() {
-    const path = window.location.pathname;
-    document.querySelectorAll('.tab-item[data-tab]').forEach(function(el) {
+    const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+    const tabs = document.querySelectorAll('.tab-item[data-tab]');
+
+    tabs.forEach(function(el) {
         el.classList.remove('tab-active');
     });
-    let active = null;
-    if (path === '/' || path.startsWith('/home')) active = 'home';
-    else if (path.includes('/catalog') || path.includes('/anime')) active = 'catalog';
-    else if (path.includes('/chat')) active = 'chat';
-    else if (path.includes('/category')) active = 'category';
-    else if (path.includes('/profile') || path.includes('/profil')) active = 'profile';
 
-    if (active) {
-        const el = document.querySelector('.tab-item[data-tab="' + active + '"]');
-        if (el) el.classList.add('tab-active');
+    let bestMatch = null;
+    let bestMatchLength = -1;
+
+    tabs.forEach(function(el) {
+        const href = el.getAttribute('href');
+        if (!href || href === 'javascript:void(0)') return;
+
+        // href to'liq URL bo'lsa ham, faqat pathname qismini olamiz
+        let tabPath;
+        try {
+            tabPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '') || '/';
+        } catch (e) {
+            tabPath = href.replace(/\/+$/, '') || '/';
+        }
+
+        // Bosh sahifa uchun faqat aniq moslik hisoblanadi
+        if (tabPath === '/') {
+            if (currentPath === '/' && bestMatchLength < 0) {
+                bestMatch = el;
+                bestMatchLength = 0;
+            }
+            return;
+        }
+
+        // Aniq moslik yoki ichki sahifa (masalan /chat/room/5 -> /chat tab'i)
+        if (currentPath === tabPath || currentPath.startsWith(tabPath + '/')) {
+            if (tabPath.length > bestMatchLength) {
+                bestMatch = el;
+                bestMatchLength = tabPath.length;
+            }
+        }
+    });
+
+    if (bestMatch) {
+        bestMatch.classList.add('tab-active');
     }
 }
 
