@@ -409,6 +409,12 @@
         gap: 14px 12px;
     }
 
+    .anime-card {
+        height: 220px;
+        aspect-ratio: unset;
+        border-radius: 12px;
+    }
+
     .card-title { font-size: 0.85rem; }
     .card-meta-row { gap: 4px; }
     .tag-category { font-size: 0.62rem; max-width: 80px; }
@@ -436,6 +442,12 @@
         gap: 12px 10px;
     }
 
+    .anime-card {
+        height: 185px;
+        aspect-ratio: unset;
+        border-radius: 10px;
+    }
+
     .card-info { padding-top: 8px; gap: 4px; }
     .card-title { font-size: 0.82rem; }
 
@@ -445,9 +457,15 @@
     .card-views { font-size: 0.68rem; }
 
     .top-badge-group { flex-wrap: wrap; max-width: 70%; }
-    .fav-badge { width: 30px; height: 30px; font-size: 0.95rem; }
+    .fav-badge { width: 28px; height: 28px; font-size: 0.9rem; }
 
     .page-btn { min-width: 36px; height: 36px; font-size: 0.78rem; border-radius: 9px; }
+}
+
+@media (max-width: 360px) {
+    .anime-card {
+        height: 165px;
+    }
 }
 
 
