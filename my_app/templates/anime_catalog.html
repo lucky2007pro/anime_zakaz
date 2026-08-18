@@ -139,6 +139,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center top;
     display: block;
     transition: transform 0.35s ease;
 }
@@ -410,8 +411,7 @@
     }
 
     .anime-card {
-        height: 220px;
-        aspect-ratio: unset;
+        aspect-ratio: 2 / 2.85;
         border-radius: 12px;
     }
 
@@ -443,8 +443,7 @@
     }
 
     .anime-card {
-        height: 185px;
-        aspect-ratio: unset;
+        aspect-ratio: 2 / 2.85;
         border-radius: 10px;
     }
 
@@ -460,12 +459,6 @@
     .fav-badge { width: 28px; height: 28px; font-size: 0.9rem; }
 
     .page-btn { min-width: 36px; height: 36px; font-size: 0.78rem; border-radius: 9px; }
-}
-
-@media (max-width: 360px) {
-    .anime-card {
-        height: 165px;
-    }
 }
 
 
