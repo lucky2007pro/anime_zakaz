@@ -122,6 +122,7 @@
     position: relative;
     background: var(--bg-surface, #111);
     border: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                 border-color 0.2s;
@@ -136,6 +137,9 @@
 }
 
 .anime-card img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -392,7 +396,7 @@
 }
 
 @media (max-width: 768px) {
-    .catalog-wrap { padding: 14px 4% 40px; }
+    .catalog-wrap { padding: 14px 4% 85px; }
 
     .catalog-header {
         flex-direction: column;
@@ -406,12 +410,18 @@
     .catalog-search-link { flex: 1; justify-content: center; }
 
     .cards-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 14px 12px;
+        align-items: start;
+    }
+
+    .card-wrapper {
+        min-width: 0;
     }
 
     .anime-card {
         aspect-ratio: 2 / 2.85;
+        max-height: 225px;
         border-radius: 12px;
     }
 
@@ -430,7 +440,7 @@
 }
 
 @media (max-width: 480px) {
-    .catalog-wrap { padding: 12px 4% 36px; }
+    .catalog-wrap { padding: 12px 4% 90px; }
 
     .catalog-title { font-size: 1.3rem; }
     .catalog-sub { font-size: 0.8rem; }
@@ -438,12 +448,14 @@
     .catalog-search-link { padding: 10px 14px; font-size: 0.82rem; }
 
     .cards-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px 10px;
+        align-items: start;
     }
 
     .anime-card {
         aspect-ratio: 2 / 2.85;
+        max-height: 195px;
         border-radius: 10px;
     }
 
