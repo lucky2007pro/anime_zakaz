@@ -17,10 +17,10 @@
       "purpose": "any"
     },
     {
-      "src": "/static/images/anibest-logo.svg",
+      "src": "/static/images/favicon.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
+      "type": "image/png",
+      "purpose": "maskable any"
     }
   ]
 }
