@@ -20,7 +20,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+from django.views.generic import RedirectView
+
 urlpatterns = [
+    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'images/favicon.ico', permanent=True)),
     path('root/', admin.site.urls),
     path('api/', include('my_app.api_urls')),
     path('', include('my_app.urls'))
