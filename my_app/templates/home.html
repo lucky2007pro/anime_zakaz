@@ -859,103 +859,6 @@
         opacity: 0.4;
     }
 
-    /* ==================================================================
-       PC SPLIT LAYOUT — faqat DESKTOP (min-width: 1025px) uchun.
-       Mobil va planshetda (max-width: 1024px) bu bloklar oddiy DIV
-       sifatida ishlaydi — grid emas, chiziq yo'q, DOM tartibi bir xil
-       qoladi, ya'ni mobil struktura HECH QANDAY o'zgarmaydi.
-    ================================================================== */
-    .pc-split-grid {
-        display: block;
-    }
-    .pc-left-col,
-    .pc-right-col {
-        display: block;
-        min-width: 0;
-    }
-
-    @media (min-width: 1025px) {
-        .pc-split-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            column-gap: 60px;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 5%;
-            position: relative;
-            align-items: start;
-        }
-
-        /* O'RTADAN TORTILGAN AJRATUVCHI CHIZIQ */
-        .pc-split-grid::before {
-            content: '';
-            position: absolute;
-            top: 4px;
-            bottom: 30px;
-            left: 50%;
-            width: 1px;
-            background: linear-gradient(to bottom,
-                transparent 0%,
-                rgba(0, 243, 255, 0.4) 10%,
-                rgba(255, 255, 255, 0.1) 50%,
-                rgba(0, 243, 255, 0.4) 90%,
-                transparent 100%);
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
-
-        .pc-left-col {
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-
-
-        .pc-left-col .slider-wrapper-outer {
-            width: 100%;
-            box-sizing: border-box;
-            padding-right: 6px; /* qo'shimcha xavfsizlik bo'shlig'i */
-        }
-        .pc-left-col .slider-container {
-            /* porlashni ustun ichida saqlash uchun spread'ni kamaytiramiz */
-            box-shadow: 0 0 0 2px rgba(0, 243, 255, 0.25),
-                        0 0 18px rgba(0, 243, 255, 0.12);
-        }
-
-        /* Ustunlar allaqachon grid padding oladi — ichki elementlarning
-           o'zining qo'shimcha 5% padding/max-width'ini bekor qilamiz */
-        .pc-split-grid .container,
-        .pc-split-grid .slider-wrapper-outer {
-            max-width: 100% !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            margin-left: 0;
-            margin-right: 0;
-        }
-        .pc-split-grid .story-container {
-            padding-left: 0;
-            padding-right: 0;
-        }
-        .pc-split-grid .section-header {
-            padding-left: 0;
-            padding-right: 0;
-        }
-        .pc-split-grid .schedule-days,
-        .pc-split-grid .schedule-cards-wrapper {
-            padding-left: 0;
-            padding-right: 0;
-        }
-        .pc-split-grid .action-buttons-inner {
-            padding-left: 0;
-            padding-right: 0;
-            justify-content: flex-start;
-        }
-
-        /* O'ng ustunda kartalar ustun kengligiga moslashadi */
-        .pc-right-col .cards-grid {
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        }
-    }
-
     /* ----- MOBILE ----- */
     @media (max-width: 600px) {
         .story-container { padding: 10px 4%; }
@@ -1020,9 +923,6 @@
 {% block content %}
 
 <div class="story-top-space">
-
-<div class="pc-split-grid">
-<div class="pc-left-col">
 
     <!-- ANIME HIKOYALAR -->
     <div class="story-container">
@@ -1303,9 +1203,6 @@
         </div>
     </div>
 
-</div><!-- /pc-left-col -->
-<div class="pc-right-col">
-
     <!-- YANGI QO'SHILGANLAR -->
     <div class="container" id="new-releases">
         <div class="section-header" style="padding:0;">
@@ -1392,9 +1289,6 @@
             {% endfor %}
         </div>
     </div>
-
-</div><!-- /pc-right-col -->
-</div><!-- /pc-split-grid -->
 
 </div><!-- /story-top-space -->
 
