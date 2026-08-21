@@ -1300,11 +1300,29 @@ def notice(request):
         NoticeRead.objects.filter(user=request.user).values_list('notice_id', flat=True)
     )
 
-    notices = base_qs.select_related('created_by', 'related_chat_message').order_by('-created_at')
+    notices = list(
+        base_qs.select_related('created_by', 'related_chat_message', 'related_movie_comment')
+        .order_by('-created_at')
+    )
     for n in notices:
         n.is_read = n.id in read_ids
+        # Chat javobimi yoki Anime izohiga javobmi — belgilab qo'yamiz (ixtiyoriy, UI uchun)
+        n.source = 'movie' if n.related_movie_comment_id else ('chat' if n.related_chat_message_id else None)
 
-    return render(request, 'notice.html', {'notices': notices})
+    # ===== IKKI BO'LIMGA AJRATISH =====
+    admin_notices = [n for n in notices if n.notice_type == 'admin']
+    reply_notices = [n for n in notices if n.notice_type == 'reply']
+
+    admin_unread_count = sum(1 for n in admin_notices if not n.is_read)
+    reply_unread_count = sum(1 for n in reply_notices if not n.is_read)
+
+    return render(request, 'notice.html', {
+        'admin_notices': admin_notices,
+        'reply_notices': reply_notices,
+        'admin_unread_count': admin_unread_count,
+        'reply_unread_count': reply_unread_count,
+    })
+
 
 # =======================
 # SERVICE WORKER / MANIFEST / OFFLINE
