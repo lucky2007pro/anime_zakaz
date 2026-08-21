@@ -35,7 +35,7 @@ body::before {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 26px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
 }
 
@@ -71,13 +71,265 @@ body::before {
 }
 .notice-mark-all:hover { border-color: var(--accent); color: var(--accent); }
 
+/* ==================================================================
+   TABS — Ommaviy / Chat xabarlari
+================================================================== */
+.notice-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 20px;
+
+    padding: 6px;
+
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border-radius: 18px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 8px 30px rgba(0, 0, 0, 0.18);
+}
+
+.notice-tab-btn {
+    position: relative;
+
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 44px;
+    padding: 10px 16px;
+
+    border: 1px solid transparent;
+    border-radius: 13px;
+
+    background: transparent;
+
+    color: var(--text-dim);
+
+    font-size: 0.85rem;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        color 0.25s ease,
+        background 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.2s ease;
+}
+
+/* HOVER */
+
+.notice-tab-btn:hover {
+    color: #fff;
+
+    background: rgba(255, 255, 255, 0.055);
+
+    border-color: rgba(255, 255, 255, 0.07);
+}
+
+.notice-tab-btn:hover i {
+    transform: translateY(-1px);
+}
+
+
+.notice-tab-btn.active[data-tab="admin"] {
+    color: #fff;
+
+    background: rgba(139, 92, 246, 0.16);
+
+    border-color: rgba(139, 92, 246, 0.30);
+
+    box-shadow:
+        0 0 20px rgba(139, 92, 246, 0.12),
+        inset 0 0 20px rgba(139, 92, 246, 0.06);
+}
+
+/* =========================================================
+   OMMAVIY — GLASS MEGAPHONE
+========================================================= */
+
+.notice-tab-btn[data-tab="admin"] i {
+    width: 36px;
+    height: 36px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.15rem;
+
+    color: #c4b5fd;
+
+    background: rgba(139, 92, 246, 0.12);
+
+    border: 1px solid rgba(167, 139, 250, 0.25);
+
+    border-radius: 12px;
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        0 4px 18px rgba(139,92,246,0.15);
+
+    text-shadow:
+        0 0 10px rgba(167,139,250,0.55);
+
+    transition: all 0.25s ease;
+}
+
+
+/* Hover */
+.notice-tab-btn[data-tab="admin"]:hover i {
+    color: #ddd6fe;
+
+    background: rgba(139, 92, 246, 0.20);
+
+    border-color: rgba(167, 139, 250, 0.40);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.15),
+        0 0 22px rgba(139,92,246,0.25);
+
+    transform: translateY(-2px);
+}
+
+
+/* Active */
+.notice-tab-btn.active[data-tab="admin"] i {
+    color: #ddd6fe;
+
+    background: rgba(139, 92, 246, 0.22);
+
+    border-color: rgba(167, 139, 250, 0.45);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.15),
+        0 0 24px rgba(139,92,246,0.28);
+
+    text-shadow:
+        0 0 12px rgba(196,181,253,0.75);
+}
+
+
+/* Bosilganda */
+.notice-tab-btn[data-tab="admin"]:active i {
+    transform: scale(0.94);
+}
+
+
+
+/* OMMAVIY BADGE */
+.notice-tab-btn.active[data-tab="admin"] .tab-badge {
+    background: rgba(139, 92, 246, 0.22);
+    border-color: rgba(139, 92, 246, 0.32);
+
+    box-shadow:
+        0 0 10px rgba(139, 92, 246, 0.18);
+}
+
+
+.notice-tab-btn.active[data-tab="chat"] .tab-badge {
+    background: rgba(139, 92, 246, 0.18);
+    border-color: rgba(139, 92, 246, 0.25);
+
+    box-shadow:
+        0 0 10px rgba(139, 92, 246, 0.15);
+}
+
+.notice-tab-btn:active {
+    transform: scale(0.98);
+}
+
+.notice-tab-btn.active[data-tab="chat"] {
+    color: #fff;
+
+    background: rgba(139, 92, 246, 0.10);
+
+    border-color: rgba(139, 92, 246, 0.22);
+
+    box-shadow:
+        0 0 18px rgba(139, 92, 246, 0.08),
+        inset 0 0 18px rgba(139, 92, 246, 0.04);
+}
+
+.notice-tab-btn.active[data-tab="chat"] i {
+    color: #a78bfa;
+
+    text-shadow:
+        0 0 10px rgba(139, 92, 246, 0.55);
+}
+
+.notice-tab-btn .tab-badge {
+    min-width: 19px;
+    height: 19px;
+
+    padding: 0 5px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    color: #fff;
+
+    font-size: 0.62rem;
+    font-weight: 900;
+
+    line-height: 1;
+
+    transition:
+        background 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+/* ==================================================================
+   BO'LIM (SECTION) — har biri alohida glass panel
+================================================================== */
+.notice-section {
+    display: none;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 22px;
+    padding: 16px;
+}
+.notice-section.active { display: block; }
+
+.notice-section.section-admin {
+    background: linear-gradient(135deg, rgba(255,193,7,0.06) 0%, rgba(17,17,24,0.55) 60%);
+    border-color: rgba(255,193,7,0.18);
+}
+.notice-section.section-chat {
+    background: linear-gradient(135deg, rgba(0,243,255,0.06) 0%, rgba(17,17,24,0.55) 60%);
+    border-color: rgba(0,243,255,0.18);
+}
+
 .notice-list {
     display: flex;
     flex-direction: column;
     gap: 14px;
 }
 
-/* ==== CARD (endi <a> tegi — bosilsa o'qilgan bo'ladi) ==== */
+/* ==== CARD (<a> tegi — bosilsa o'qilgan bo'ladi) ==== */
 .notice-card {
     position: relative;
     display: flex;
@@ -90,7 +342,7 @@ body::before {
     cursor: pointer;
     overflow: hidden;
     border: 1px solid var(--glass-border);
-    background: var(--glass-bg);
+    background: rgba(255,255,255,0.04);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
@@ -100,12 +352,11 @@ body::before {
 }
 .notice-card:active { transform: translateY(-1px) scale(0.995); }
 
-/* Kengaytirilganda karta balandligi avtomatik o'sishi uchun */
 .notice-card.expanded {
     align-items: flex-start;
 }
 
-/* O'QILMAGAN — reply turi uchun accent fon (rasmga o'xshash, lekin sayt rangida) */
+/* O'QILMAGAN — reply turi uchun accent fon */
 .notice-card.unread.type-reply {
     background: linear-gradient(135deg, rgba(0,243,255,0.14) 0%, rgba(0,102,255,0.10) 100%);
     border-color: rgba(0,243,255,0.35);
@@ -128,7 +379,6 @@ body::before {
 }
 .notice-card.unread.type-admin::before { background: #ffc107; }
 
-/* ==== ICON (chap tomon) ==== */
 .notice-icon {
     flex-shrink: 0;
     width: 50px;
@@ -177,6 +427,24 @@ body::before {
 .type-admin .notice-type-tag { background: #ffc107; }
 .type-reply .notice-type-tag { background: var(--accent); }
 
+/* Chat javobi manbasi (chat / anime izohi) — kichik yorliq */
+.notice-source-tag {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+.notice-source-tag i { font-size: 0.85rem; }
+
 .notice-dot {
     width: 8px; height: 8px;
     border-radius: 50%;
@@ -187,14 +455,12 @@ body::before {
 }
 .type-admin .notice-dot { background: #ffc107; box-shadow: 0 0 8px rgba(255,193,7,0.7); }
 
-/* ==== XABAR MATNI ==== */
 .notice-message-wrap {
     font-size: 0.9rem;
     color: var(--text-dim);
     line-height: 1.55;
 }
 
-/* Admin/foydalanuvchi yozgan bo'shliq va qator ko'chirishlar aynan saqlanadi */
 .notice-message-short,
 .notice-message-full {
     white-space: pre-wrap;
@@ -213,7 +479,6 @@ body::before {
     display: block;
 }
 
-/* ==== XABAR ICHIDAGI RASM (havola matni o'rniga, box oxirida, 16:9) ==== */
 .notice-image-box {
     margin-top: 12px;
     width: 100%;
@@ -264,7 +529,6 @@ body::before {
     gap: 5px;
 }
 
-/* ==== O'NG TOMON — arrow / action hint ==== */
 .notice-action-hint {
     flex-shrink: 0;
     display: flex;
@@ -284,27 +548,487 @@ body::before {
 
 .notice-empty {
     text-align: center;
-    padding: 70px 20px;
+    padding: 60px 20px;
     color: var(--text-dim);
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 18px;
 }
 .notice-empty i {
-    font-size: 3.2rem;
+    font-size: 3rem;
     color: var(--glass-border);
     display: block;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
-.notice-empty p { font-size: 0.95rem; }
+.notice-empty p { font-size: 0.92rem; }
 
 @media (max-width: 480px) {
-    .notice-header h1 { font-size: 1.25rem; }
-    .notice-card { padding: 14px; gap: 10px; }
-    .notice-icon { width: 42px; height: 42px; font-size: 1.2rem; }
-    .notice-action-hint { font-size: 0.6rem; }
-    .notice-action-hint i { font-size: 1.2rem; }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .notice-header {
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .notice-header h1 {
+        font-size: 1.15rem;
+        gap: 7px;
+    }
+
+    .notice-header h1 i {
+        font-size: 1.3rem;
+    }
+
+    .notice-mark-all {
+        padding: 7px 11px;
+        font-size: 0.68rem;
+        border-radius: 16px;
+    }
+
+
+    /* =========================================================
+       TABS — OMMAVIY / CHAT
+    ========================================================= */
+
+    .notice-tabs {
+        width: 100%;
+        padding: 5px;
+        gap: 5px;
+        margin-bottom: 14px;
+        border-radius: 18px;
+    }
+
+    .notice-tab-btn {
+        min-height: 48px;
+        padding: 7px 8px;
+
+        border-radius: 14px;
+
+        gap: 7px;
+
+        font-size: 0.72rem;
+        font-weight: 800;
+    }
+
+    /* Tab icon */
+    .notice-tab-btn i {
+        width: 32px;
+        height: 32px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 1rem;
+        border-radius: 10px;
+    }
+
+    /* Active tab */
+    .notice-tab-btn.active {
+        background: rgba(139, 92, 246, 0.14);
+        border-color: rgba(167, 139, 250, 0.25);
+
+        box-shadow:
+            0 0 15px rgba(139, 92, 246, 0.08),
+            inset 0 0 12px rgba(139, 92, 246, 0.04);
+    }
+
+    /* Badge */
+    .notice-tab-btn .tab-badge {
+        min-width: 17px;
+        height: 17px;
+
+        padding: 0 4px;
+
+        font-size: 0.58rem;
+        border-radius: 999px;
+    }
+
+
+    /* =========================================================
+       NOTICE SECTION
+    ========================================================= */
+
+    .notice-section {
+        padding: 10px;
+        border-radius: 18px;
+    }
+
+    .notice-list {
+        gap: 10px;
+    }
+
+
+    /* =========================================================
+       NOTIFICATION CARD
+    ========================================================= */
+
+    .notice-card {
+        gap: 11px;
+
+        padding: 13px;
+
+        border-radius: 16px;
+
+        min-height: 66px;
+    }
+
+    /* Card icon */
+    .notice-icon {
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
+
+        font-size: 1.2rem;
+        border-radius: 50%;
+    }
+
+
+    /* =========================================================
+       TITLE
+    ========================================================= */
+
+    .notice-title {
+        font-size: 0.86rem;
+        line-height: 1.25;
+    }
+
+    .notice-title-row {
+        gap: 5px;
+        margin-bottom: 3px;
+    }
+
+    .notice-type-tag {
+        font-size: 0.55rem;
+        padding: 2px 6px;
+    }
+
+    .notice-source-tag {
+        font-size: 0.53rem;
+        padding: 2px 6px;
+    }
+
+
+    /* =========================================================
+       MESSAGE
+    ========================================================= */
+
+    .notice-message-wrap {
+        font-size: 0.78rem;
+        line-height: 1.45;
+    }
+
+    .notice-expand-btn {
+        margin-top: 5px;
+        font-size: 0.68rem;
+    }
+
+    .notice-expand-btn i {
+        font-size: 0.9rem;
+    }
+
+
+    /* =========================================================
+       TIME
+    ========================================================= */
+
+    .notice-time {
+        font-size: 0.65rem;
+        margin-top: 6px;
+        gap: 4px;
+    }
+
+
+    /* =========================================================
+       RIGHT ACTION
+       "Batafsil" yozuvi yashiriladi,
+       faqat icon qoladi.
+    ========================================================= */
+
+    .notice-action-hint {
+        gap: 0;
+        opacity: 0.8;
+    }
+
+    .notice-action-hint span {
+        display: none;
+    }
+
+    .notice-action-hint i {
+        font-size: 1.2rem;
+    }
+
+
+    /* =========================================================
+       UNREAD CARD
+    ========================================================= */
+
+    .notice-card.unread::before {
+        width: 3px;
+    }
+
+
+    /* =========================================================
+       IMAGE
+    ========================================================= */
+
+    .notice-image-box {
+        margin-top: 9px;
+        border-radius: 12px;
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    .notice-empty {
+        padding: 45px 15px;
+    }
+
+    .notice-empty i {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .notice-empty p {
+        font-size: 0.8rem;
+    }
+
+
+    /* =========================================================
+       GLASS SHINE EFFECT
+    ========================================================= */
+
+    .notice-card::after {
+        content: '';
+
+        position: absolute;
+
+        top: 0;
+        left: -120%;
+
+        width: 60%;
+        height: 100%;
+
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.06),
+            transparent
+        );
+
+        transform: skewX(-20deg);
+
+        transition: left 0.6s ease;
+
+        pointer-events: none;
+    }
+
+    .notice-card:hover::after {
+        left: 140%;
+    }
+
+
+    /* =========================================================
+       TOUCH EFFECT
+    ========================================================= */
+
+    .notice-card:active {
+        transform: scale(0.985);
+    }
+
+    .notice-tab-btn:active {
+        transform: scale(0.97);
+    }
+
+
+    /* =========================================================
+       MOBILE — OMMAVIY MEGAPHONE GLASS
+    ========================================================= */
+
+    .notice-tab-btn[data-tab="admin"] i {
+        width: 32px;
+        height: 32px;
+
+        background: rgba(139, 92, 246, 0.12);
+
+        border: 1px solid rgba(167, 139, 250, 0.25);
+
+        border-radius: 10px;
+
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.10),
+            0 3px 12px rgba(139,92,246,0.12);
+
+        color: #c4b5fd;
+
+        text-shadow:
+            0 0 8px rgba(167,139,250,0.55);
+    }
+
+    .notice-tab-btn.active[data-tab="admin"] i {
+        background: rgba(139, 92, 246, 0.20);
+
+        border-color: rgba(167, 139, 250, 0.38);
+
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.12),
+            0 0 16px rgba(139,92,246,0.20);
+
+        color: #ddd6fe;
+    }
+
+
+    /* =========================================================
+       MOBILE — CHAT ICON
+    ========================================================= */
+
+    .notice-tab-btn[data-tab="chat"] i {
+        width: 32px;
+        height: 32px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: rgba(255,255,255,0.06);
+
+        border: 1px solid rgba(255,255,255,0.10);
+
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .notice-tab-btn.active[data-tab="chat"] i {
+        background: rgba(139,92,246,0.16);
+
+        border-color: rgba(167,139,250,0.30);
+
+        color: #c4b5fd;
+
+        box-shadow:
+            0 0 14px rgba(139,92,246,0.16);
+    }
+
 }
+@media (min-width: 769px) {
+
+    .notice-section {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .notice-card {
+        padding: 18px 22px;
+        min-height: 82px;
+    }
+
+    .notice-icon {
+        width: 52px;
+        height: 52px;
+        font-size: 1.45rem;
+    }
+    .notice-card {
+        transition:
+            transform 0.25s ease,
+            border-color 0.25s ease,
+            box-shadow 0.25s ease,
+            background 0.25s ease;
+    }
+
+    .notice-card:hover {
+        transform: translateY(-4px);
+
+        border-color: rgba(167, 139, 250, 0.32);
+
+        background: rgba(255, 255, 255, 0.055);
+
+        box-shadow:
+            0 12px 35px rgba(0, 0, 0, 0.22),
+            0 0 25px rgba(139, 92, 246, 0.07);
+    }
+    .notice-tabs {
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+
+        padding: 7px;
+        border-radius: 20px;
+    }
+
+    .notice-tab-btn {
+        min-height: 52px;
+        border-radius: 15px;
+
+        font-size: 0.88rem;
+    }
+
+    .notice-tab-btn i {
+        font-size: 1.15rem;
+    }
+    .notice-card.unread.type-admin {
+        box-shadow:
+            0 6px 25px rgba(255, 193, 7, 0.08),
+            inset 0 0 25px rgba(255, 193, 7, 0.025);
+    }
+
+    .notice-card.unread.type-reply {
+        box-shadow:
+            0 6px 25px rgba(0, 243, 255, 0.08),
+            inset 0 0 25px rgba(0, 243, 255, 0.025);
+    }
+
+    .notice-tab-btn[data-tab="admin"] i {
+        background: rgba(139, 92, 246, 0.12);
+        border: 1px solid rgba(167, 139, 250, 0.25);
+
+        border-radius: 11px;
+
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.10),
+            0 0 15px rgba(139,92,246,0.10);
+
+        color: #c4b5fd;
+    }
+
+    .notice-tab-btn[data-tab="chat"] i {
+        background: rgba(0, 243, 255, 0.08);
+        border: 1px solid rgba(0, 243, 255, 0.18);
+
+        border-radius: 11px;
+
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.10),
+            0 0 15px rgba(0,243,255,0.08);
+
+        color: #67e8f9;
+    }
+    .notice-action-hint {
+        padding: 8px 11px;
+
+        border-radius: 12px;
+
+        background: rgba(255,255,255,0.04);
+
+        border: 1px solid rgba(255,255,255,0.08);
+
+        transition: 0.25s ease;
+    }
+
+    .notice-card:hover .notice-action-hint {
+        background: rgba(139,92,246,0.10);
+        border-color: rgba(167,139,250,0.20);
+    }
+}
+
+
 {% endblock %}
 
 {% block content %}
@@ -313,90 +1037,173 @@ body::before {
     <div class="notice-header">
         <h1><i class='bx bx-bell'></i> Bildirishnomalar</h1>
 
-        {% if notices %}
+        {% if admin_notices or reply_notices %}
         <a href="{% url 'notice' %}?mark_all=1" class="notice-mark-all">
             <i class='bx bx-check-double'></i> Barchasini o'qilgan deb belgilash
         </a>
         {% endif %}
     </div>
 
-    <div class="notice-list">
-        {% for n in notices %}
-        <a href="{% url 'notice' %}?read={{ n.id }}"
-           class="notice-card {% if not n.is_read %}unread{% endif %} type-{{ n.notice_type }}">
+    <!-- ================= TABS ================= -->
+    <div class="notice-tabs">
+        <button type="button"
+                class="notice-tab-btn active"
+                data-tab="admin"
+                onclick="switchNoticeTab('admin', this)">
 
-            <div class="notice-icon">
-                {% if n.notice_type == 'reply' %}
-                    <i class='bx bx-reply'></i>
-                {% else %}
-                    <i class='bx bxs-bell-ring'></i>
-                {% endif %}
-            </div>
+            <i class='bx bxs-megaphone'></i>
 
-            <div class="notice-body">
-                <div class="notice-title-row">
-                    <span class="notice-title">
-                        {% if n.notice_type == 'reply' %}
-                            {{ n.title }}
-                        {% else %}
-                            {{ n.title|default:"Yangi bildirishnoma" }}
-                        {% endif %}
-                    </span>
+            <span>Ommaviy</span>
 
-                    {% if n.notice_type == 'admin' %}
-                        <span class="notice-type-tag">Admin</span>
+            {% if admin_unread_count %}
+                <span class="tab-badge">
+                    {% if admin_unread_count > 9 %}
+                        9+
                     {% else %}
-                        <span class="notice-type-tag">Javob</span>
+                        {{ admin_unread_count }}
                     {% endif %}
+                </span>
+            {% endif %}
+        </button>
+        <button type="button" class="notice-tab-btn" data-tab="chat" onclick="switchNoticeTab('chat', this)">
+            <i class='bx bx-message-dots'></i>
+            <span>Chat xabarlari</span>
+            {% if reply_unread_count %}
+                <span class="tab-badge">{% if reply_unread_count > 9 %}9+{% else %}{{ reply_unread_count }}{% endif %}</span>
+            {% endif %}
+        </button>
+    </div>
 
-                    {% if not n.is_read %}<span class="notice-dot"></span>{% endif %}
+    <!-- ================= OMMAVIY (ADMIN) ================= -->
+    <section class="notice-section section-admin active" id="notice-section-admin">
+        <div class="notice-list">
+            {% for n in admin_notices %}
+            <a href="{% url 'notice' %}?read={{ n.id }}"
+               class="notice-card {% if not n.is_read %}unread{% endif %} type-admin">
+
+                <div class="notice-icon">
+                    <i class='bx bxs-bell-ring'></i>
                 </div>
-                <!-- Diqqat: admin turi uchun yuboruvchi ismi hech qachon ko'rsatilmaydi,
-                     faqat sarlavha (title) chiqadi. -->
 
-                <div class="notice-message-wrap">
-                    <div class="notice-message-short">{{ n.message|truncatechars:30 }}</div>
-                    <div class="notice-message-full" data-raw-message="{{ n.message }}">{{ n.message }}</div>
+                <div class="notice-body">
+                    <div class="notice-title-row">
+                        <span class="notice-title">{{ n.title|default:"Yangi bildirishnoma" }}</span>
+                        <span class="notice-type-tag">Admin</span>
+                        {% if not n.is_read %}<span class="notice-dot"></span>{% endif %}
+                    </div>
 
-                    <button type="button"
-                            class="notice-expand-btn"
-                            style="display:{% if n.message|length > 30 %}inline-flex{% else %}none{% endif %};"
-                            onclick="toggleNoticeMessage(event, this)">
-                        <span class="notice-expand-label">Batafsil</span>
-                        <i class='bx bx-chevron-down'></i>
-                    </button>
+                    <div class="notice-message-wrap">
+                        <div class="notice-message-short">{{ n.message|truncatechars:30 }}</div>
+                        <div class="notice-message-full" data-raw-message="{{ n.message }}">{{ n.message }}</div>
+
+                        <button type="button"
+                                class="notice-expand-btn"
+                                style="display:{% if n.message|length > 30 %}inline-flex{% else %}none{% endif %};"
+                                onclick="toggleNoticeMessage(event, this)">
+                            <span class="notice-expand-label">Batafsil</span>
+                            <i class='bx bx-chevron-down'></i>
+                        </button>
+                    </div>
+
+                    <div class="notice-time">
+                        <i class='bx bx-time-five'></i> {{ n.created_at|date:"d.m.Y H:i" }}
+                    </div>
                 </div>
 
-                <div class="notice-time">
-                    <i class='bx bx-time-five'></i> {{ n.created_at|date:"d.m.Y H:i" }}
-                </div>
-            </div>
-
-            <div class="notice-action-hint">
-                {% if n.notice_type == 'reply' %}
-                    <i class='bx bx-show'></i>
-                    <span>Ko'rish</span>
-                {% else %}
+                <div class="notice-action-hint">
                     <i class='bx bx-chevron-right'></i>
                     <span>Batafsil</span>
-                {% endif %}
-            </div>
+                </div>
 
-        </a>
-        {% empty %}
-        <div class="notice-empty">
-            <i class='bx bx-bell-off'></i>
-            <p>Hozircha bildirishnomalar yo'q.</p>
+            </a>
+            {% empty %}
+            <div class="notice-empty">
+                <i class='bx bx-bell-off'></i>
+                <p>Hozircha ommaviy bildirishnomalar yo'q.</p>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+    </section>
+
+    <!-- ================= CHAT XABARLARI (REPLY) ================= -->
+    <section class="notice-section section-chat" id="notice-section-chat">
+        <div class="notice-list">
+            {% for n in reply_notices %}
+            <a href="{% url 'notice' %}?read={{ n.id }}"
+               class="notice-card {% if not n.is_read %}unread{% endif %} type-reply">
+
+                <div class="notice-icon">
+                    <i class='bx bx-reply'></i>
+                </div>
+
+                <div class="notice-body">
+                    <div class="notice-title-row">
+                        <span class="notice-title">{{ n.title }}</span>
+                        <span class="notice-type-tag">Javob</span>
+                        {% if n.source == 'movie' %}
+                            <span class="notice-source-tag"><i class='bx bx-movie-play'></i> Anime izohi</span>
+                        {% elif n.source == 'chat' %}
+                            <span class="notice-source-tag"><i class='bx bx-message-dots'></i> Umumiy chat</span>
+                        {% endif %}
+                        {% if not n.is_read %}<span class="notice-dot"></span>{% endif %}
+                    </div>
+
+                    <div class="notice-message-wrap">
+                        <div class="notice-message-short">{{ n.message|truncatechars:30 }}</div>
+                        <div class="notice-message-full" data-raw-message="{{ n.message }}">{{ n.message }}</div>
+
+                        <button type="button"
+                                class="notice-expand-btn"
+                                style="display:{% if n.message|length > 30 %}inline-flex{% else %}none{% endif %};"
+                                onclick="toggleNoticeMessage(event, this)">
+                            <span class="notice-expand-label">Batafsil</span>
+                            <i class='bx bx-chevron-down'></i>
+                        </button>
+                    </div>
+
+                    <div class="notice-time">
+                        <i class='bx bx-time-five'></i> {{ n.created_at|date:"d.m.Y H:i" }}
+                    </div>
+                </div>
+
+                <div class="notice-action-hint">
+                    <i class='bx bx-show'></i>
+                    <span>Ko'rish</span>
+                </div>
+
+            </a>
+            {% empty %}
+            <div class="notice-empty">
+                <i class='bx bx-message-x'></i>
+                <p>Hozircha chatdan yoki izohlardan javoblar yo'q.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
 
 </main>
 
 <script>
+function switchNoticeTab(tab, btn) {
+    document.querySelectorAll('.notice-tab-btn').forEach(function(b) {
+        b.classList.toggle('active', b === btn);
+    });
+    document.querySelectorAll('.notice-section').forEach(function(s) {
+        s.classList.toggle('active', s.id === 'notice-section-' + tab);
+    });
+    try { localStorage.setItem('notice_active_tab', tab); } catch (e) {}
+}
+
+(function () {
+    var saved = null;
+    try { saved = localStorage.getItem('notice_active_tab'); } catch (e) {}
+    if (saved === 'chat') {
+        var chatBtn = document.querySelector('.notice-tab-btn[data-tab="chat"]');
+        if (chatBtn) switchNoticeTab('chat', chatBtn);
+    }
+})();
+
 function toggleNoticeMessage(event, btn) {
-    // Karta <a> tegi ichida bo'lgani uchun, tugma bosilganda
-    // sahifa "o'qilgan" havolasiga o'tib ketmasligi kerak.
     event.preventDefault();
     event.stopPropagation();
 
@@ -411,10 +1218,6 @@ function toggleNoticeMessage(event, btn) {
     label.textContent = isExpanded ? "Yopish" : "Batafsil";
 }
 
-// Xabar ichida rasm havolasi bo'lsa (jpg/jpeg/png/gif/webp):
-//  1) havola matni butunlay OLIB TASHLANADI (ko'rinmaydi),
-//  2) uning o'rniga Batafsil ochilganda box oxirida 16:9 rasm chiqadi.
-// Qolgan matn (boshqa so'zlar, bo'shliq, qator ko'chirishlar) o'zgarishsiz qoladi.
 (function () {
     var IMAGE_URL_REGEX = /(https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp))(\?\S*)?/i;
 
@@ -433,22 +1236,17 @@ function toggleNoticeMessage(event, btn) {
 
         if (match) {
             imageUrl = match[0];
-            // Havola matnini butunlay olib tashlaymiz
             displayText = raw.split(match[0]).join('');
-            // Havola o'rnida qolgan ortiqcha bo'sh qatorlarni ozgina tozalaymiz
             displayText = displayText.replace(/\n{3,}/g, '\n\n').replace(/[ \t]+\n/g, '\n').trim();
         }
 
-        // To'liq matnni (havolasiz) qayta chizamiz
         fullEl.textContent = displayText;
 
-        // Qisqa ko'rinishni ham (havolasiz) 30 belgigacha qayta hisoblaymiz
         var shortText = displayText.length > 30
             ? displayText.slice(0, 30) + '…'
             : displayText;
         if (shortEl) shortEl.textContent = shortText;
 
-        // Rasm mavjud bo'lsa, uni to'liq matn oxiriga (Batafsil ichiga) qo'shamiz
         if (imageUrl) {
             var box = document.createElement('div');
             box.className = 'notice-image-box';
@@ -460,7 +1258,6 @@ function toggleNoticeMessage(event, btn) {
             fullEl.appendChild(box);
         }
 
-        // Batafsil tugmasini matn uzunligi yoki rasm mavjudligiga qarab ko'rsatamiz/berkitamiz
         if (btn) {
             var needsExpand = displayText.length > 30 || !!imageUrl;
             btn.style.display = needsExpand ? 'inline-flex' : 'none';
