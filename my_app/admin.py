@@ -4,6 +4,8 @@ from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode,
     SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
     Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,
+    PremiumBackground, AnimeVoteRequest, AnimeVote, AnimeRequestSuggestion,
+
 
 )
 
@@ -202,6 +204,56 @@ class NoticeAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
+
+
+# =======================
+# PREMIUM FON
+# =======================
+@admin.register(PremiumBackground)
+class PremiumBackgroundAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'order', 'created_at')
+    list_editable = ('order',)
+    ordering = ('order', '-created_at')
+    search_fields = ('name',)
+
+
+# =======================
+# ANIME SO'ROVNOMA (VIP OVOZ BERISH)
+# =======================
+class AnimeVoteInline(admin.TabularInline):
+    model = AnimeVote
+    extra = 0
+    readonly_fields = ('user', 'created_at')
+    can_delete = True
+
+
+@admin.register(AnimeVoteRequest)
+class AnimeVoteRequestAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'created_by', 'total_votes_display', 'created_at')
+    search_fields = ('name', 'created_by__username')
+    readonly_fields = ('created_by', 'created_at')
+    inlines = [AnimeVoteInline]
+
+    def total_votes_display(self, obj):
+        return obj.total_votes()
+    total_votes_display.short_description = "Ovozlar soni"
+
+
+@admin.register(AnimeVote)
+class AnimeVoteAdmin(admin.ModelAdmin):
+    list_display = ('id', 'request', 'user', 'created_at')
+    search_fields = ('request__name', 'user__username')
+    readonly_fields = ('created_at',)
+
+
+# =======================
+# OLDINDAN ANIME SO'RASH
+# =======================
+@admin.register(AnimeRequestSuggestion)
+class AnimeRequestSuggestionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'name', 'created_at')
+    search_fields = ('name', 'user__username')
+    readonly_fields = ('created_at',)
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
