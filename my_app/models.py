@@ -579,6 +579,13 @@ class UserSettings(models.Model):
     # Tab bar (mobil pastki panel)
     tabbar_on = models.BooleanField(default=True)
 
+    # PREMIUM IMKONIYATLAR
+    premium_bg_on = models.BooleanField(default=False)
+    premium_bg = models.ForeignKey(
+        'PremiumBackground', on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
+    )
+    telegram_download_on = models.BooleanField(default=False)
+
     # Telegram sozlamalari
     telegram_username  = models.CharField(max_length=100, blank=True, null=True)
     telegram_chat_id   = models.CharField(max_length=50,  blank=True, null=True)
@@ -786,6 +793,8 @@ class MovieFrame(models.Model):
 
 
 
+
+
 class WatchHistory(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='watch_history')
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='watched_by')
@@ -864,6 +873,4 @@ class AnimeRequestSuggestion(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.name}"
-
-
 
