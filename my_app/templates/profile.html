@@ -7,721 +7,1716 @@
 
 {% block extra_css %}
 <style>
-/* ===== PROFILE PAGE ===== */
+
+/* =========================================================
+   PROFILE PAGE
+   ========================================================= */
+
 .profile-wrap {
-    max-width: 720px;
-    margin: 32px auto;
-    padding: 0 16px 48px;
+    max-width: 680px;
+    margin: 20px auto;
+    padding: 0 14px 36px;
 }
 
-/* Back button */
-.back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 16px;
-    border-radius: 8px;
-    background: rgba(0, 243, 255, 0.08);
-    border: 1px solid rgba(0, 243, 255, 0.2);
-    color: #00f3ff;
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: none;
-    margin-bottom: 20px;
-    transition: background 0.2s;
-}
-.back-btn:hover { background: rgba(0, 243, 255, 0.15); }
 
-/* Cards */
+/* =========================================================
+   PAGE TITLE
+   ========================================================= */
+
+.pv-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-light, #fff);
+    margin: 0 0 10px 2px;
+}
+
+
+/* =========================================================
+   GENERAL CARDS
+   ========================================================= */
+
 .pcard {
-    background: var(--bg-surface, rgba(255,255,255,0.04));
-    border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.055),
+            rgba(255,255,255,0.025)
+        );
+
+    border: 1px solid rgba(255,255,255,0.085);
+
     border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 14px;
-    transition: border-color 0.25s, box-shadow 0.25s;
+    padding: 16px;
+    margin-bottom: 10px;
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.035),
+        0 10px 35px rgba(0,0,0,0.12);
 }
 
-/* ===============================================
-   TIER RANGLAR (basic / premium / vip)
-   =============================================== */
+
+/* =========================================================
+   TIER RANGLAR
+   ========================================================= */
+
 .tier-basic {
     --tier-color: #00f3ff;
     --tier-color-2: #00b8ff;
-    --tier-glow: rgba(0, 243, 255, 0.18);
+    --tier-glow: rgba(0,243,255,0.18);
 }
+
 .tier-premium {
     --tier-color: #ffc107;
     --tier-color-2: #ff8f00;
-    --tier-glow: rgba(255, 193, 7, 0.22);
+    --tier-glow: rgba(255,193,7,0.22);
 }
+
 .tier-vip {
     --tier-color: #b45cff;
     --tier-color-2: #ff5cd6;
-    --tier-glow: rgba(180, 92, 255, 0.25);
+    --tier-glow: rgba(180,92,255,0.25);
 }
 
-.pcard.tier-premium,
-.pcard.tier-vip {
-    border-color: color-mix(in srgb, var(--tier-color) 35%, transparent);
-    box-shadow: 0 0 26px var(--tier-glow);
-}
 
-/* ---- Hero block ---- */
-.p-hero {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 24px;
-}
-.p-avatar {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: rgba(0, 243, 255, 0.1);
-    border: 2px solid rgba(0, 243, 255, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    font-weight: 900;
-    color: #00f3ff;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-.p-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.p-hero.tier-premium .p-avatar,
-.p-hero.tier-vip .p-avatar {
-    border: 2.5px solid var(--tier-color);
-    background: linear-gradient(135deg, color-mix(in srgb, var(--tier-color) 15%, transparent), transparent);
-    color: var(--tier-color);
-    box-shadow: 0 0 18px var(--tier-glow);
-}
+/* =========================================================
+   PROFILE CARD
+   ========================================================= */
 
-.p-hero-text h2 {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--text-light, #fff);
-    margin-bottom: 2px;
-}
-.p-hero-text p {
-    font-size: 13px;
-    color: var(--text-dim, rgba(255,255,255,0.5));
-    margin-bottom: 6px;
-}
-.p-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 800;
-}
-.p-badge.normal {
-    background: rgba(255,255,255,0.06);
-    color: var(--text-dim, rgba(255,255,255,0.5));
-    border: 1px solid rgba(255,255,255,0.1);
-}
-.p-badge.premium {
-    background: rgba(255, 193, 7, 0.14);
-    color: #ffc107;
-    border: 1px solid rgba(255, 193, 7, 0.3);
-}
-.p-badge.vip {
-    background: linear-gradient(90deg, rgba(180,92,255,0.18), rgba(255,92,214,0.18));
-    color: #d78bff;
-    border: 1px solid rgba(180, 92, 255, 0.35);
-}
-
-/* ---- Info grid ---- */
-.p-info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border-top: 1px solid rgba(255,255,255,0.06);
-}
-.p-info-cell {
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.p-info-cell:nth-child(odd)  { padding-right: 24px; }
-.p-info-cell:nth-child(even) {
-    padding-left: 24px;
-    border-left: 1px solid rgba(255,255,255,0.06);
-}
-.p-info-cell:nth-last-child(-n+2) { border-bottom: none; }
-.p-info-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 3px;
-}
-.p-info-val {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-light, #fff);
-}
-
-/* ---- Section title ---- */
-.p-section-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 16px;
-}
-
-/* ---- Form fields ---- */
-.p-form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 4px;
-}
-.p-field {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 14px;
-}
-.p-field label {
-    font-size: 12px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.45);
-}
-.p-field input {
-    padding: 10px 13px;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #fff;
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: 'Outfit', sans-serif;
-    outline: none;
-    transition: border-color 0.2s;
-}
-.p-field input:focus { border-color: rgba(0,243,255,0.5); }
-
-/* ---- Avatar picker ---- */
-.p-av-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.45);
-    margin: 6px 0 12px;
-}
-.p-av-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
-    gap: 10px;
-    margin-bottom: 6px;
-}
-.p-av-item {
-    position: relative;
-    cursor: pointer;
-}
-.p-av-item input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-.p-av-img {
-    display: block;
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2.5px solid transparent;
-    transition: border-color 0.15s, transform 0.15s;
-}
-.p-av-item input:checked ~ .p-av-img {
-    border-color: #00f3ff;
-    transform: scale(1.1);
-}
-.p-av-item:hover .p-av-img {
-    border-color: rgba(0,243,255,0.4);
-    transform: scale(1.05);
-}
-.p-av-empty {
-    font-size: 12px;
-    color: rgba(255,255,255,0.3);
-    padding: 8px 0;
-}
-
-/* ---- Save button ---- */
-.p-save-btn {
-    width: 100%;
-    padding: 13px;
-    margin-top: 14px;
-    border-radius: 10px;
-    background: #00f3ff;
-    color: #000;
-    border: none;
-    font-weight: 800;
-    font-size: 14px;
-    font-family: 'Outfit', sans-serif;
-    cursor: pointer;
-    letter-spacing: .02em;
-    transition: opacity 0.2s;
-}
-.p-save-btn:hover { opacity: 0.88; }
-
-/* ---- Footer info ---- */
-.p-footer {
-    background: rgba(0,243,255,0.07);
-    border: 1px solid rgba(0,243,255,0.18);
-    border-radius: 10px;
-    padding: 13px 18px;
-    color: #00f3ff;
-    font-weight: 700;
-    font-size: 13px;
-    text-align: center;
-}
-
-/* ===============================================
-   KO'RILGAN ANIMELAR — home.html'dagi anime-card
-   dizayni bilan bir xil (kattaligi/ko'rinishi mos)
-   =============================================== */
-.p-watched-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 22px;
-}
-
-.p-watched-wrapper {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.p-watched-anime-card {
-    width: 100%;
-    height: 290px;
-    border-radius: 12px;
+.pv-card {
     position: relative;
     overflow: hidden;
-    cursor: pointer;
-    background: var(--bg-surface, rgba(255,255,255,0.04));
+
+    background:
+        radial-gradient(
+            circle at 90% 5%,
+            rgba(180,92,255,0.15),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 5% 100%,
+            rgba(0,243,255,0.06),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.065),
+            rgba(255,255,255,0.025)
+        );
+
+    border: 1px solid rgba(255,255,255,0.09);
+
+    border-radius: 18px;
+    padding: 17px;
+    margin-bottom: 10px;
+
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.045),
+        0 12px 40px rgba(0,0,0,0.16);
 }
 
-.p-watched-anime-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+
+/* VIP CARD */
+
+.pv-card.tier-vip {
+    border-color: rgba(180,92,255,0.28);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 12px 45px rgba(180,92,255,0.08);
 }
 
-.p-watched-card-overlay {
+
+/* VIP light */
+
+.pv-card.tier-vip::before {
+    content: "";
     position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(10,10,15,0.98) 0%, rgba(10,10,15,0.6) 40%, transparent 70%);
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 12px 11px;
-    opacity: 1;
+
+    width: 220px;
+    height: 220px;
+
+    right: -100px;
+    top: -120px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(180,92,255,0.20),
+            transparent 70%
+        );
+
+    pointer-events: none;
 }
 
-.p-watched-card-title {
-    font-size: 0.88rem;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 4px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.3;
-}
 
-.p-watched-card-meta {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
+/* =========================================================
+   PROFILE TOP — avatar chapda, ID o'ngda
+   ========================================================= */
 
-.p-watched-card-views {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.5);
-    font-weight: 700;
-}
-.p-watched-card-views i { font-size: 0.8rem; }
+.pv-top-row {
+    position: relative;
+    z-index: 2;
 
-.p-watched-top-badge-group {
-    position: absolute;
-    top: 8px; left: 8px;
-    display: flex;
-    gap: 4px;
-    z-index: 10;
-}
-
-.p-watched-top-badge-year {
-    background: #eab308;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: #000;
-}
-
-.p-watched-top-badge-episode {
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: #FFC107;
-}
-
-.p-watched-tier-badge {
-    position: absolute;
-    top: 8px; right: 8px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 0.72rem;
-    font-weight: 900;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    letter-spacing: 0.5px;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-}
-.p-watched-tier-badge.vip {
-    background: rgba(251, 191, 36, 0.25);
-    color: #fbbf24;
-    border: 1px solid rgba(251, 191, 36, 0.5);
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
-}
-.p-watched-tier-badge.premium {
-    background: rgba(244, 63, 94, 0.2);
-    color: #f43f5e;
-    border: 1px solid rgba(244, 63, 94, 0.4);
-}
-
-.p-watched-info-bottom {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 10px 4px 0;
-}
-
-.p-watched-title-link {
-    text-decoration: none;
-    color: inherit;
-}
-
-.p-watched-name {
-    font-size: 1rem;
-    font-weight: 800;
-    color: var(--text-light, #fff);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: color 0.3s ease;
-}
-.p-watched-wrapper:hover .p-watched-name { color: var(--accent, #00f3ff); }
-
-.p-watched-meta-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-dim, rgba(255,255,255,0.5));
-}
-
-.p-watched-tag-jp {
-    background: rgba(255,255,255,0.1);
-    padding: 1px 5px;
-    border-radius: 3px;
-    color: var(--text-light, #fff);
-    font-size: 0.65rem;
-    font-weight: 800;
-}
-
-/* ===== DARAJA (LEVEL) ===== */
-.p-level-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
+
+    gap: 14px;
+
+    margin-bottom: 14px;
 }
-.p-level-info {
-    flex: 1;
-    min-width: 180px;
-}
-.p-level-info .p-section-title {
-    margin-bottom: 6px;
-}
-.p-level-desc {
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    line-height: 1.5;
-}
-.p-level-box {
-    width: 92px;
-    height: 92px;
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.pv-avatar {
+    width: 68px;
+    height: 68px;
+
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(0,243,255,0.18), rgba(0,243,255,0.03));
-    border: 2px solid rgba(0,243,255,0.4);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(180,92,255,0.15),
+            rgba(255,255,255,0.04)
+        );
+
+    border: 3px solid var(--tier-color, #b45cff);
+
+    box-shadow:
+        0 0 18px var(--tier-glow, rgba(180,92,255,0.25)),
+        0 0 35px rgba(180,92,255,0.08);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    font-weight: 900;
+
+    color: var(--tier-color, #b45cff);
+
+    overflow: hidden;
+    flex-shrink: 0;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.pv-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* =========================================================
+   ID (o'ng tomonda)
+   ========================================================= */
+
+.pv-id-value-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    text-align: right;
+
+    min-width: 0;
+}
+
+.pv-id-label {
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .06em;
+
+    color: rgba(255,255,255,0.40);
+
+    margin-bottom: 5px;
+}
+
+.pv-id-value {
+    font-size: 21px;
+    font-weight: 900;
+    line-height: 1;
+
+    color: #fff;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   BADGE — o'rtada
+   ========================================================= */
+
+.pv-badge-center {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    justify-content: center;
+
+    margin-bottom: 14px;
+}
+
+.pv-tier-badge {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 4px 14px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.pv-tier-badge.normal {
+    background: rgba(255,255,255,0.055);
+    color: var(--text-dim, rgba(255,255,255,0.5));
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+.pv-tier-badge.premium {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,193,7,0.16),
+            rgba(255,143,0,0.10)
+        );
+
+    color: #ffc107;
+
+    border: 1px solid rgba(255,193,7,0.30);
+}
+
+.pv-tier-badge.vip {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(180,92,255,0.20),
+            rgba(255,92,214,0.15)
+        );
+
+    color: #d99aff;
+
+    border: 1px solid rgba(180,92,255,0.38);
+
+    box-shadow:
+        0 0 14px rgba(180,92,255,0.10);
+}
+
+
+/* =========================================================
+   LEVEL
+   ========================================================= */
+
+.pv-level-row {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.pv-level-title {
+    font-size: 13px;
+    font-weight: 700;
+
+    color: rgba(255,255,255,0.55);
+}
+
+.pv-level-circle {
+    width: 58px;
+    height: 58px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 30% 30%,
+            var(--tier-glow, rgba(180,92,255,0.25)),
+            transparent
+        );
+
+    border: 2px solid var(--tier-color, #b45cff);
+
+    box-shadow:
+        0 0 15px var(--tier-glow, rgba(180,92,255,0.25)),
+        inset 0 0 15px rgba(255,255,255,0.025);
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     flex-shrink: 0;
-    box-shadow: 0 0 22px rgba(0,243,255,0.15);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
-.p-level-num {
-    font-size: 26px;
+
+.pv-level-num {
+    font-size: 17px;
     font-weight: 900;
-    color: #00f3ff;
     line-height: 1;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--tier-color, #b45cff),
+            var(--tier-color-2, #ff5cd6)
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
 }
-.p-level-label {
-    font-size: 9px;
+
+.pv-level-label {
+    font-size: 7px;
     font-weight: 800;
-    letter-spacing: .12em;
-    color: rgba(0,243,255,0.6);
+
+    letter-spacing: .1em;
+
+    color: var(--tier-color-2, #ff5cd6);
+
     margin-top: 3px;
 }
 
-.p-level-box.tier-premium,
-.p-level-box.tier-vip {
-    background: radial-gradient(circle at 30% 30%, var(--tier-glow), transparent);
-    border-color: var(--tier-color);
-    box-shadow: 0 0 24px var(--tier-glow);
-}
-.p-level-box.tier-premium .p-level-num,
-.p-level-box.tier-premium .p-level-label {
-    color: var(--tier-color);
-}
-.p-level-box.tier-vip .p-level-num {
-    background: linear-gradient(90deg, var(--tier-color), var(--tier-color-2));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-.p-level-box.tier-vip .p-level-label {
-    color: var(--tier-color-2);
+
+/* =========================================================
+   TOTAL USERS
+   ========================================================= */
+
+.p-footer {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,243,255,0.075),
+            rgba(255,255,255,0.025)
+        );
+
+    border: 1px solid rgba(0,243,255,0.17);
+
+    border-radius: 12px;
+
+    padding: 10px 14px;
+
+    color: #00eaff;
+
+    font-weight: 700;
+    font-size: 12px;
+
+    text-align: center;
+
+    margin-bottom: 4px;
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.03);
 }
 
-/* ---- Responsive (home.html bilan bir xil breakpointlar) ---- */
-@media (max-width: 768px) {
-    .p-watched-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-    .p-watched-anime-card { height: 240px; }
-    .p-watched-card-overlay { opacity: 1; }
+
+/* =========================================================
+   MENU
+   ========================================================= */
+
+.pv-menu-title {
+    font-size: 12.5px;
+    font-weight: 700;
+
+    color: var(--text-dim, rgba(255,255,255,0.55));
+
+    margin: 16px 2px 8px;
 }
+
+.pv-menu-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.pv-menu-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-width: 0;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.055),
+            rgba(255,255,255,0.025)
+        );
+
+    border: 1px solid rgba(255,255,255,0.075);
+
+    border-radius: 13px;
+
+    padding: 13px 15px;
+
+    color: var(--text-light, #fff);
+
+    font-weight: 700;
+    font-size: 14px;
+
+    text-decoration: none;
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.025);
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
+}
+
+.pv-menu-box:hover {
+    transform: translateX(3px);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(180,92,255,0.09),
+            rgba(255,255,255,0.035)
+        );
+
+    border-color: rgba(180,92,255,0.30);
+}
+
+.pv-menu-left {
+    display: flex;
+    align-items: center;
+
+    gap: 11px;
+
+    min-width: 0;
+}
+
+.pv-menu-left span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pv-menu-left i {
+    width: 31px;
+    height: 31px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(180,92,255,0.13),
+            rgba(255,255,255,0.035)
+        );
+
+    color: #b45cff;
+
+    font-size: 17px;
+
+    border: 1px solid rgba(180,92,255,0.10);
+}
+
+.pv-menu-right {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    flex-shrink: 0;
+}
+
+.pv-menu-right i,
+.pv-menu-arrow {
+    color: rgba(255,255,255,0.28);
+
+    font-size: 18px;
+
+    transition:
+        color .2s ease,
+        transform .2s ease;
+}
+
+.pv-menu-box:hover .pv-menu-arrow {
+    color: #b45cff;
+    transform: translateX(2px);
+}
+
+.pv-menu-amount {
+    color: #b45cff;
+
+    font-weight: 900;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+
+.p-section-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    font-size: 10.5px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .06em;
+
+    color: rgba(255,255,255,0.35);
+
+    margin-bottom: 12px;
+}
+
+.p-section-title::before {
+    content: "👤";
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.p-form-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 10px;
+
+    margin-bottom: 2px;
+}
+
+.p-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    margin-bottom: 10px;
+
+    min-width: 0;
+}
+
+.p-field label {
+    font-size: 11px;
+    font-weight: 600;
+
+    color: rgba(255,255,255,0.45);
+}
+
+.p-field input {
+    width: 100%;
+    max-width: 100%;
+
+    box-sizing: border-box;
+
+    height: 42px;
+
+    padding: 0 12px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0,0,0,0.25),
+            rgba(255,255,255,0.025)
+        );
+
+    border: 1px solid rgba(255,255,255,0.085);
+
+    color: #fff;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-family: 'Outfit', sans-serif;
+
+    outline: none;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+.p-field input:hover {
+    border-color: rgba(180,92,255,0.22);
+}
+
+.p-field input:focus {
+    border-color: rgba(180,92,255,0.55);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(180,92,255,0.045),
+            rgba(255,255,255,0.025)
+        );
+
+    box-shadow:
+        0 0 0 3px rgba(180,92,255,0.07),
+        inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+
+/* =========================================================
+   AVATAR PICKER
+   ========================================================= */
+
+.p-av-label {
+    font-size: 11px;
+    font-weight: 600;
+
+    color: rgba(255,255,255,0.45);
+
+    margin: 4px 0 10px;
+}
+
+.p-av-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(52px, 1fr));
+
+    gap: 10px;
+
+    margin-bottom: 4px;
+}
+
+.p-av-item {
+    position: relative;
+    cursor: pointer;
+
+    min-width: 0;
+}
+
+.p-av-item input[type="radio"] {
+    position: absolute;
+
+    opacity: 0;
+
+    width: 0;
+    height: 0;
+}
+
+.p-av-img {
+    display: block;
+
+    width: 100%;
+
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 2px solid transparent;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.20);
+
+    transition:
+        border-color .15s,
+        transform .15s,
+        box-shadow .15s;
+}
+
+.p-av-item input:checked ~ .p-av-img {
+    border-color: #b45cff;
+
+    transform: scale(1.08);
+
+    box-shadow:
+        0 0 0 3px rgba(180,92,255,0.10),
+        0 0 18px rgba(180,92,255,0.25);
+}
+
+.p-av-item:hover .p-av-img {
+    border-color: rgba(180,92,255,0.4);
+
+    box-shadow:
+        0 0 14px rgba(180,92,255,0.12);
+}
+
+.p-av-empty {
+    font-size: 11px;
+
+    color: rgba(255,255,255,0.3);
+
+    padding: 6px 0;
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+   ========================================================= */
+
+.p-save-btn {
+    width: 100%;
+
+    height: 43px;
+
+    padding: 0;
+
+    margin-top: 10px;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #b45cff,
+            #9c4cff
+        );
+
+    color: #fff;
+
+    border: 1px solid rgba(255,255,255,0.10);
+
+    font-weight: 800;
+
+    font-size: 13px;
+
+    font-family: 'Outfit', sans-serif;
+
+    cursor: pointer;
+
+    letter-spacing: .02em;
+
+    box-shadow:
+        0 8px 22px rgba(180,92,255,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.p-save-btn:hover {
+    opacity: 1;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 11px 28px rgba(180,92,255,0.27),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.p-save-btn:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   WATCHED HISTORY
+   ========================================================= */
+
+.p-watched-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.p-watched-row {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 2px;
+
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+
+    text-decoration: none;
+
+    color: inherit;
+
+    min-width: 0;
+}
+
+.p-watched-row:last-child {
+    border-bottom: none;
+}
+
+.p-watched-row-img {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 9px;
+
+    overflow: hidden;
+
+    flex-shrink: 0;
+
+    background: rgba(255,255,255,0.04);
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.18);
+}
+
+.p-watched-row-img img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+}
+
+.p-watched-row-info {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.p-watched-row-title {
+    font-size: 13px;
+    font-weight: 800;
+
+    color: var(--text-light, #fff);
+
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    margin-bottom: 2px;
+}
+
+.p-watched-row:hover .p-watched-row-title {
+    color: #b45cff;
+}
+
+.p-watched-row-meta {
+    display: flex;
+    align-items: center;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    color: var(--text-dim, rgba(255,255,255,0.5));
+
+    white-space: nowrap;
+}
+
+.p-watched-row-meta span:not(:last-child)::after {
+    content: '•';
+
+    margin: 0 6px;
+
+    color: rgba(255,255,255,0.25);
+}
+
+.p-watched-row-btn {
+    flex-shrink: 0;
+
+    padding: 6px 11px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(180,92,255,0.10);
+
+    border: 1px solid rgba(180,92,255,0.25);
+
+    color: #b45cff;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
 @media (max-width: 560px) {
-    .p-hero { flex-direction: column; text-align: center; }
-    .p-info-grid { grid-template-columns: 1fr; }
-    .p-info-cell:nth-child(even) { padding-left: 0; border-left: none; }
-    .p-info-cell { border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .p-info-cell:last-child { border-bottom: none; }
-    .p-info-cell:nth-last-child(-n+2) { border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .p-form-row { grid-template-columns: 1fr; }
-    .p-av-grid { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); }
-    .p-level-card { justify-content: center; text-align: center; }
+
+    .profile-wrap {
+        width: 100%;
+
+        max-width: 100%;
+
+        box-sizing: border-box;
+
+        padding: 0 10px 24px;
+
+        margin: 14px auto;
+    }
+
+    .pv-card,
+    .pcard {
+        padding: 13px;
+
+        border-radius: 14px;
+    }
+
+
+    /* Top row: avatar chapda / ID o'ngda */
+
+    .pv-top-row {
+        gap: 10px;
+
+        margin-bottom: 12px;
+    }
+
+    .pv-avatar {
+        width: 52px;
+        height: 52px;
+
+        border-width: 2.5px;
+
+        font-size: 17px;
+    }
+
+    .pv-id-label {
+        font-size: 10px;
+
+        margin-bottom: 3px;
+    }
+
+    .pv-id-value {
+        font-size: 17px;
+    }
+
+    .pv-badge-center {
+        margin-bottom: 12px;
+    }
+
+    .pv-tier-badge {
+        font-size: 10px;
+
+        padding: 3px 11px;
+    }
+
+
+    /* Level */
+
+    .pv-level-row {
+        padding-top: 12px;
+    }
+
+    .pv-level-circle {
+        width: 48px;
+        height: 48px;
+    }
+
+    .pv-level-num {
+        font-size: 14px;
+    }
+
+
+    /* Total users */
+
+    .p-footer {
+        font-size: 11px;
+
+        padding: 9px 10px;
+    }
+
+
+    /* Menu */
+
+    .pv-menu-box {
+        padding: 11px 12px;
+
+        font-size: 13px;
+
+        border-radius: 11px;
+    }
+
+    .pv-menu-left {
+        gap: 9px;
+    }
+
+    .pv-menu-left i {
+        width: 28px;
+        height: 28px;
+
+        font-size: 15px;
+
+        border-radius: 8px;
+    }
+
+    .pv-menu-right i,
+    .pv-menu-arrow {
+        font-size: 17px;
+    }
+
+    .pv-menu-amount {
+        font-size: 12px;
+    }
+
+
+    /* =====================================================
+       FORM MOBILE FIX
+       ===================================================== */
+
+    .p-form-row {
+        width: 100%;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr);
+
+        gap: 8px;
+    }
+
+    .p-field {
+        min-width: 0;
+
+        width: 100%;
+    }
+
+    .p-field input {
+        width: 100%;
+
+        max-width: 100%;
+
+        min-width: 0;
+
+        height: 39px;
+
+        box-sizing: border-box;
+
+        padding: 0 9px;
+
+        font-size: 12px;
+
+        border-radius: 9px;
+    }
+
+    .p-field label {
+        font-size: 10px;
+    }
+
+
+    /* Avatar mobile */
+
+    .p-av-grid {
+        grid-template-columns:
+            repeat(auto-fill, minmax(45px, 1fr));
+
+        gap: 8px;
+    }
+
+    .p-av-img {
+        width: 100%;
+    }
+
+
+    /* Save */
+
+    .p-save-btn {
+        height: 41px;
+
+        font-size: 12px;
+
+        border-radius: 10px;
+    }
+
+
+    /* Watched */
+
+    .p-watched-row {
+        gap: 8px;
+
+        padding: 8px 1px;
+    }
+
+    .p-watched-row-img {
+        width: 40px;
+        height: 40px;
+
+        border-radius: 8px;
+    }
+
+    .p-watched-row-title {
+        font-size: 12px;
+    }
+
+    .p-watched-row-meta {
+        font-size: 10px;
+    }
+
+    .p-watched-row-btn {
+        padding: 5px 8px;
+
+        font-size: 10px;
+    }
 }
 
-@media (max-width: 480px) {
-    .p-watched-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .p-watched-anime-card { height: 200px; }
-    .p-watched-top-badge-year,
-    .p-watched-top-badge-episode { font-size: 0.62rem; padding: 3px 6px; }
-    .p-watched-name { font-size: 0.88rem; }
-    .p-watched-card-overlay { padding: 8px; }
-    .p-watched-card-title { font-size: 0.8rem; }
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .profile-wrap {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .pv-card,
+    .pcard {
+        padding: 11px;
+    }
+
+    .pv-avatar {
+        width: 46px;
+        height: 46px;
+
+        font-size: 15px;
+    }
+
+    .pv-id-label {
+        font-size: 9px;
+    }
+
+    .pv-id-value {
+        font-size: 15px;
+    }
+
+    .pv-tier-badge {
+        font-size: 9px;
+
+        padding: 3px 9px;
+    }
+
+    .p-form-row {
+        gap: 6px;
+    }
+
+    .p-field input {
+        height: 37px;
+
+        padding-left: 8px;
+        padding-right: 8px;
+
+        font-size: 11px;
+    }
+
+    .p-av-grid {
+        grid-template-columns:
+            repeat(auto-fill, minmax(41px, 1fr));
+
+        gap: 7px;
+    }
+
+    .pv-menu-box {
+        padding: 10px;
+    }
+
+    .pv-menu-left i {
+        width: 27px;
+        height: 27px;
+    }
 }
+
 </style>
 {% endblock %}
 
+
 {% block content %}
+
 <main class="main-content">
+
 <div class="profile-wrap">
 
-    <!-- Back -->
-    <a href="javascript:history.back()" class="back-btn">
-        <i class='bx bx-arrow-back'></i> Orqaga
-    </a>
 
-    <!-- ===== PROFIL CARD ===== -->
-    <div class="pcard tier-{{ user_tier|default:'basic' }}">
+    <h2 class="pv-title">Profil</h2>
 
-        <!-- Hero: avatar + name + badge -->
-        <div class="p-hero tier-{{ user_tier|default:'basic' }}">
-            <div class="p-avatar">
+
+    <!-- =====================================================
+         PROFILE CARD — avatar chapda, ID o'ngda, badge o'rtada
+         ===================================================== -->
+
+    <div class="pv-card tier-{{ user_tier|default:'basic' }}">
+
+        <div class="pv-top-row">
+
+            <div class="pv-avatar">
+
                 {% if user.avatar %}
-                    <img src="{{ user.avatar.image.url }}" alt="avatar">
+
+                    <img
+                        src="{{ user.avatar.image.url }}"
+                        alt="avatar"
+                    >
+
                 {% else %}
+
                     {{ user.username|make_list|first|upper }}
+
                 {% endif %}
+
             </div>
-            <div class="p-hero-text">
-                <h2>@{{ user.username }}</h2>
-                <p>{{ user.email }}</p>
-                {% if user_tier == 'vip' %}
-                    <span class="p-badge vip"><i class='bx bxs-crown'></i> VIP</span>
-                {% elif user_tier == 'premium' %}
-                    <span class="p-badge premium"><i class='bx bx-crown'></i> Premium</span>
-                {% else %}
-                    <span class="p-badge normal"><i class='bx bx-user'></i> Oddiy</span>
-                {% endif %}
+
+
+            <div class="pv-id-value-block">
+
+                <span class="pv-id-label">
+                    ID
+                </span>
+
+                <span class="pv-id-value">
+                    {{ user.id }}
+                </span>
+
             </div>
+
         </div>
 
-        <!-- Info grid -->
-        <div class="p-info-grid">
-            <div class="p-info-cell">
-                <div class="p-info-label">ID</div>
-                <div class="p-info-val">{{ user.id }}</div>
-            </div>
-            <div class="p-info-cell">
-                <div class="p-info-label">Ism</div>
-                <div class="p-info-val">{{ user.first_name|default:"Kiritilmagan" }}</div>
-            </div>
-            <div class="p-info-cell">
-                <div class="p-info-label">Familiya</div>
-                <div class="p-info-val">{{ user.last_name|default:"Kiritilmagan" }}</div>
-            </div>
-            <div class="p-info-cell">
-                <div class="p-info-label">Ro'yxatdan o'tgan</div>
-                <div class="p-info-val">{{ date_joined_uz }}</div>
-            </div>
+
+        <!-- =================================================
+             BADGE — o'rtada
+             ================================================= -->
+
+        <div class="pv-badge-center">
+
+            {% if user_tier == 'vip' %}
+
+                <span class="pv-tier-badge vip">
+                    <i class='bx bxs-crown'></i>
+                    VIP
+                </span>
+
+            {% elif user_tier == 'premium' %}
+
+                <span class="pv-tier-badge premium">
+                    <i class='bx bx-crown'></i>
+                    Premium
+                </span>
+
+            {% else %}
+
+                <span class="pv-tier-badge normal">
+                    <i class='bx bx-user'></i>
+                    Oddiy
+                </span>
+
+            {% endif %}
+
         </div>
-    </div>
 
-    <!-- ===== TAHRIRLASH CARD ===== -->
-    <div class="pcard">
-        <p class="p-section-title">Profilni tahrirlash</p>
 
-        <form method="POST" action="{% url 'profile' %}">
-            {% csrf_token %}
+        <!-- =================================================
+             LEVEL
+             ================================================= -->
 
-            <div class="p-form-row">
-                <div class="p-field">
-                    <label for="id_first_name">Ism</label>
-                    <input type="text" id="id_first_name" name="first_name"
-                           value="{{ user.first_name }}" placeholder="Ismingiz">
+        <div class="pv-level-row">
+
+            <div class="pv-level-title">
+                Daraja
+            </div>
+
+            <div class="pv-level-circle tier-{{ user_tier|default:'basic' }}">
+
+                <div class="pv-level-num">
+                    {{ user_level }}
                 </div>
-                <div class="p-field">
-                    <label for="id_last_name">Familiya</label>
-                    <input type="text" id="id_last_name" name="last_name"
-                           value="{{ user.last_name }}" placeholder="Familiyangiz">
+
+                <div class="pv-level-label">
+                    LEVEL
                 </div>
+
             </div>
 
-            <!-- Avatar tanlash -->
-            <p class="p-av-label">Profil rasmi</p>
-            <div class="p-av-grid">
-                {% for av in avatars %}
-                    <label class="p-av-item" title="{{ av.name|default:'Avatar' }}">
-                        <input type="radio" name="avatar_id" value="{{ av.id }}"
-                            {% if user.avatar and user.avatar.id == av.id %}checked{% endif %}>
-                        <img class="p-av-img" src="{{ av.image.url }}" alt="{{ av.name|default:'avatar' }}">
-                    </label>
-                {% empty %}
-                    <p class="p-av-empty">Admin hali profil rasmi yuklamagan.</p>
-                {% endfor %}
-            </div>
+        </div>
 
-            <button type="submit" class="p-save-btn">O'zgarishlarni saqlash</button>
-        </form>
     </div>
 
-    <!-- ===== KO'RILGAN ANIMELAR CARD (home.html card dizayni) ===== -->
-    <div class="pcard">
-        <p class="p-section-title">Ko'rilgan animelar</p>
 
-        <div class="p-watched-grid">
-            {% for movie in last_watched_movies %}
-                <div class="p-watched-wrapper">
-                    <div class="p-watched-anime-card"
-                         onclick="window.location.href='{% url 'movie_detail' movie.id %}'">
+    <!-- =====================================================
+         TOTAL USERS
+         ===================================================== -->
 
-                        <div class="p-watched-top-badge-group">
-                            {% if movie.release_year %}
-                            <div class="p-watched-top-badge-year">{{ movie.release_year }}</div>
-                            {% endif %}
-                            {% if movie.episodes.count > 0 %}
-                            <div class="p-watched-top-badge-episode">{{ movie.episodes.count }} qism</div>
-                            {% else %}
-                            <div class="p-watched-top-badge-episode">Film</div>
-                            {% endif %}
-                        </div>
-
-                        {% if movie.minimum_tier == 'vip' %}
-                        <div class="p-watched-tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
-                        {% elif movie.minimum_tier == 'premium' or movie.is_premium %}
-                        <div class="p-watched-tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
-                        {% endif %}
-
-                        <img src="{% if movie.image %}{{ movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
-                             alt="{{ movie.title }}" loading="lazy">
-
-                        <div class="p-watched-card-overlay">
-                            <div class="p-watched-card-title">{{ movie.title }}</div>
-                            <div class="p-watched-card-meta">
-                                {% if movie.category %}<span class="p-watched-tag-jp">{{ movie.category.name }}</span>{% endif %}
-                                <div class="p-watched-card-views"><i class='bx bx-show'></i> {{ movie.views_count|default:"0" }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="p-watched-info-bottom">
-                        <a href="{% url 'movie_detail' movie.id %}" class="p-watched-title-link">
-                            <h4 class="p-watched-name">{{ movie.title }}</h4>
-                        </a>
-                        <div class="p-watched-meta-row">
-                            {% if movie.category %}<span class="p-watched-tag-jp">{{ movie.category.name }}</span>{% endif %}
-                            <span style="font-weight:800;">{{ movie.release_year|default:movie.created_at|date:"Y" }}</span>
-                        </div>
-                    </div>
-                </div>
-            {% empty %}
-                <p class="p-av-empty">Hali hech qanday anime ko'rilmagan.</p>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- ===== DARAJA (LEVEL) CARD ===== -->
-    <div class="pcard p-level-card tier-{{ user_tier|default:'basic' }}">
-        <div class="p-level-info">
-            <p class="p-section-title">Daraja</p>
-            <p class="p-level-desc">
-                Saytda faolligingiz va ko'rgan animelaringiz soniga qarab darajangiz avtomatik oshib boradi.
-            </p>
-        </div>
-        <div class="p-level-box tier-{{ user_tier|default:'basic' }}">
-            <div class="p-level-num">{{ user_level }}</div>
-            <div class="p-level-label">LEVEL</div>
-        </div>
-    </div>
-
-    <!-- Footer info -->
     <div class="p-footer">
         Saytdagi jami foydalanuvchilar: {{ total_users }}
     </div>
 
+
+    <!-- =====================================================
+         MENU
+         ===================================================== -->
+
+    <p class="pv-menu-title">
+        Menyu
+    </p>
+
+    <div class="pv-menu-list">
+
+
+        <a
+            href="{% url 'hisobim_page' %}"
+            class="pv-menu-box pv-menu-hisobim"
+        >
+
+            <span class="pv-menu-left">
+
+                <i class='bx bx-wallet'></i>
+
+                <span>
+                    Hisobim
+                </span>
+
+            </span>
+
+
+            <span class="pv-menu-right">
+
+                <span class="pv-menu-amount">
+                    {{ balance.amount }}
+                </span>
+
+                <i class='bx bx-chevron-right'></i>
+
+            </span>
+
+        </a>
+
+
+        <a
+            href="{% url 'favorites_page' %}"
+            class="pv-menu-box"
+        >
+
+            <span class="pv-menu-left">
+
+                <i class='bx bx-heart'></i>
+
+                <span>
+                    Saqlanganlar
+                </span>
+
+            </span>
+
+            <i class='bx bx-chevron-right pv-menu-arrow'></i>
+
+        </a>
+
+
+        <a
+            href="{% url 'statistika_page' %}"
+            class="pv-menu-box"
+        >
+
+            <span class="pv-menu-left">
+
+                <i class='bx bx-bar-chart-alt-2'></i>
+
+                <span>
+                    Statistika
+                </span>
+
+            </span>
+
+            <i class='bx bx-chevron-right pv-menu-arrow'></i>
+
+        </a>
+
+
+        <a
+            href="{% url 'imkon_page' %}"
+            class="pv-menu-box"
+        >
+
+            <span class="pv-menu-left">
+
+                <i class='bx bxs-crown'></i>
+
+                <span>
+                    Premium imkonlar
+                </span>
+
+            </span>
+
+            <i class='bx bx-chevron-right pv-menu-arrow'></i>
+
+        </a>
+
+
+        <a
+            href="{% url 'settings_general' %}"
+            class="pv-menu-box"
+        >
+
+            <span class="pv-menu-left">
+
+                <i class='bx bx-cog'></i>
+
+                <span>
+                    Sozlamalar
+                </span>
+
+            </span>
+
+            <i class='bx bx-chevron-right pv-menu-arrow'></i>
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         PROFILE EDIT
+         ===================================================== -->
+
+    <div
+        class="pcard"
+        style="margin-top:16px;"
+    >
+
+        <p class="p-section-title">
+            Profilni tahrirlash
+        </p>
+
+
+        <form
+            method="POST"
+            action="{% url 'profile' %}"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- =============================================
+                 NAME / LAST NAME
+                 ============================================= -->
+
+            <div class="p-form-row">
+
+
+                <div class="p-field">
+
+                    <label for="id_first_name">
+                        Ism
+                    </label>
+
+                    <input
+                        type="text"
+                        id="id_first_name"
+                        name="first_name"
+                        value="{{ user.first_name }}"
+                        placeholder="Ismingiz"
+                    >
+
+                </div>
+
+
+                <div class="p-field">
+
+                    <label for="id_last_name">
+                        Familiya
+                    </label>
+
+                    <input
+                        type="text"
+                        id="id_last_name"
+                        name="last_name"
+                        value="{{ user.last_name }}"
+                        placeholder="Familiyangiz"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =============================================
+                 AVATAR
+                 ============================================= -->
+
+            <p class="p-av-label">
+                Profil rasmi
+            </p>
+
+
+            <div class="p-av-grid">
+
+                {% for av in avatars %}
+
+                    <label
+                        class="p-av-item"
+                        title="{{ av.name|default:'Avatar' }}"
+                    >
+
+                        <input
+                            type="radio"
+                            name="avatar_id"
+                            value="{{ av.id }}"
+
+                            {% if user.avatar and user.avatar.id == av.id %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <img
+                            class="p-av-img"
+                            src="{{ av.image.url }}"
+                            alt="{{ av.name|default:'avatar' }}"
+                        >
+
+                    </label>
+
+                {% empty %}
+
+                    <p class="p-av-empty">
+                        Admin hali profil rasmi yuklamagan.
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =============================================
+                 SAVE
+                 ============================================= -->
+
+            <button
+                type="submit"
+                class="p-save-btn"
+            >
+                O'zgarishlarni saqlash
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         LAST WATCHED
+         ===================================================== -->
+
+    <p
+        class="p-section-title"
+        style="margin:16px 0 8px 4px;"
+    >
+        Oxirgi ko'rilganlar
+    </p>
+
+
+    <div class="pcard p-watched-list">
+
+        {% for w in last_watched_history %}
+
+            <a
+                href="{% url 'movie_detail' w.movie.id %}"
+                class="p-watched-row"
+            >
+
+
+                <div class="p-watched-row-img">
+
+                    <img
+                        src="{% if w.movie.image %}{{ w.movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
+                        alt="{{ w.movie.title }}"
+                        loading="lazy"
+                    >
+
+                </div>
+
+
+                <div class="p-watched-row-info">
+
+                    <div class="p-watched-row-title">
+                        {{ w.movie.title }}
+                    </div>
+
+
+                    <div class="p-watched-row-meta">
+
+                        <span>
+                            {{ w.local_time|time:"H:i" }}
+                        </span>
+
+                        {% if w.last_episode %}
+
+                            <span>
+                                {{ w.last_episode.episode_number }}-qism
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="p-watched-row-btn">
+                    Ko'rish
+                </div>
+
+
+            </a>
+
+        {% empty %}
+
+            <p class="p-av-empty">
+                Hali hech qanday anime ko'rilmagan.
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+
 </div>
 </main>
+
 {% endblock %}
