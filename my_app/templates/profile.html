@@ -55,6 +55,10 @@
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.035),
         0 10px 35px rgba(0,0,0,0.12);
+
+    /* perf: har bir kartani alohida layer sifatida izolyatsiya qilish,
+       skroll paytida boshqa elementlarni qayta chizishga majburlamaydi */
+    contain: content;
 }
 
 
@@ -118,6 +122,8 @@
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.045),
         0 12px 40px rgba(0,0,0,0.16);
+
+    contain: content;
 }
 
 
@@ -156,7 +162,7 @@
 
 
 /* =========================================================
-   PROFILE TOP — avatar chapda, ID o'ngda
+   PROFILE TOP — avatar / ism / ID bir qatorda
    ========================================================= */
 
 .pv-top-row {
@@ -165,9 +171,8 @@
 
     display: flex;
     align-items: center;
-    justify-content: space-between;
 
-    gap: 14px;
+    gap: 12px;
 
     margin-bottom: 14px;
 }
@@ -207,15 +212,50 @@
 
     overflow: hidden;
     flex-shrink: 0;
-
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
 }
 
 .pv-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+
+/* =========================================================
+   ISM (avatar yonida, o'rtada)
+   ========================================================= */
+
+.pv-name-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.pv-name-label {
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .06em;
+
+    color: rgba(255,255,255,0.40);
+
+    margin-bottom: 5px;
+}
+
+.pv-name-value {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    color: #fff;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 
@@ -230,6 +270,7 @@
 
     text-align: right;
 
+    flex-shrink: 0;
     min-width: 0;
 }
 
@@ -284,9 +325,6 @@
 
     font-size: 11px;
     font-weight: 800;
-
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 }
 
 .pv-tier-badge.normal {
@@ -375,9 +413,6 @@
     justify-content: center;
 
     flex-shrink: 0;
-
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 }
 
 .pv-level-num {
@@ -437,9 +472,6 @@
 
     margin-bottom: 4px;
 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.03);
 }
@@ -492,21 +524,17 @@
 
     text-decoration: none;
 
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.025);
 
     transition:
-        transform .2s ease,
         border-color .2s ease,
         background .2s ease;
+
+    contain: content;
 }
 
 .pv-menu-box:hover {
-    transform: translateX(3px);
-
     background:
         linear-gradient(
             145deg,
@@ -574,13 +602,11 @@
     font-size: 18px;
 
     transition:
-        color .2s ease,
-        transform .2s ease;
+        color .2s ease;
 }
 
 .pv-menu-box:hover .pv-menu-arrow {
     color: #b45cff;
-    transform: translateX(2px);
 }
 
 .pv-menu-amount {
@@ -664,8 +690,8 @@
     background:
         linear-gradient(
             145deg,
-            rgba(0,0,0,0.25),
-            rgba(255,255,255,0.025)
+            rgba(20,20,25,0.55),
+            rgba(255,255,255,0.03)
         );
 
     border: 1px solid rgba(255,255,255,0.085);
@@ -678,9 +704,6 @@
     font-family: 'Outfit', sans-serif;
 
     outline: none;
-
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
 
     transition:
         border-color .2s ease,
@@ -698,8 +721,8 @@
     background:
         linear-gradient(
             145deg,
-            rgba(180,92,255,0.045),
-            rgba(255,255,255,0.025)
+            rgba(180,92,255,0.09),
+            rgba(20,20,25,0.55)
         );
 
     box-shadow:
@@ -838,22 +861,11 @@
 
     transition:
         opacity .2s ease,
-        transform .2s ease,
         box-shadow .2s ease;
 }
 
-.p-save-btn:hover {
-    opacity: 1;
-
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 11px 28px rgba(180,92,255,0.27),
-        inset 0 1px 0 rgba(255,255,255,0.15);
-}
-
 .p-save-btn:active {
-    transform: translateY(0);
+    opacity: 0.9;
 }
 
 
@@ -881,6 +893,11 @@
     color: inherit;
 
     min-width: 0;
+
+    /* perf: uzun ro'yxatda skroll paytida ekrandan tashqaridagi
+       qatorlarni render qilishni brauzerga optimallashtirish uchun belgi */
+    content-visibility: auto;
+    contain-intrinsic-size: 64px;
 }
 
 .p-watched-row:last-child {
@@ -978,7 +995,7 @@
 
 
 /* =========================================================
-   MOBILE
+   MOBILE — LAYOUT MOSLASHTIRISH
    ========================================================= */
 
 @media (max-width: 560px) {
@@ -1003,10 +1020,10 @@
     }
 
 
-    /* Top row: avatar chapda / ID o'ngda */
+    /* Top row: avatar / ism / ID */
 
     .pv-top-row {
-        gap: 10px;
+        gap: 8px;
 
         margin-bottom: 12px;
     }
@@ -1020,14 +1037,19 @@
         font-size: 17px;
     }
 
+    .pv-name-label,
     .pv-id-label {
         font-size: 10px;
 
         margin-bottom: 3px;
     }
 
+    .pv-name-value {
+        font-size: 14px;
+    }
+
     .pv-id-value {
-        font-size: 17px;
+        font-size: 16px;
     }
 
     .pv-badge-center {
@@ -1099,9 +1121,7 @@
     }
 
 
-    /* =====================================================
-       FORM MOBILE FIX
-       ===================================================== */
+    /* Form */
 
     .p-form-row {
         width: 100%;
@@ -1195,6 +1215,74 @@
 
         font-size: 10px;
     }
+
+
+    /* =====================================================
+       PERFORMANCE FIX — SKROLL OG'IRLIGINI YO'QOTISH
+       Sabab: backdrop-filter (blur) mobil GPU uchun juda
+       og'ir — har freymda qayta hisoblanadi va skroll
+       paytida "qotish"/lag hissi beradi. Mobilda uni butunlay
+       o'chiramiz va o'rniga quyuqroq fon bilan xuddi shunday
+       ko'rinishni saqlaymiz.
+       ===================================================== */
+
+    .pcard,
+    .pv-card,
+    .pv-menu-box,
+    .p-footer,
+    .pv-tier-badge,
+    .p-field input {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    .pcard,
+    .pv-menu-box {
+        background: rgba(26, 22, 34, 0.65);
+    }
+
+    .pv-card {
+        background:
+            radial-gradient(
+                circle at 90% 5%,
+                rgba(180,92,255,0.14),
+                transparent 32%
+            ),
+            rgba(26, 22, 34, 0.7);
+    }
+
+    .p-footer {
+        background: rgba(0, 40, 45, 0.55);
+    }
+
+    /* Og'ir ko'p qatlamli soyalarni yengillashtirish */
+
+    .pcard,
+    .pv-card {
+        box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    }
+
+    .pv-menu-box {
+        box-shadow: none;
+    }
+
+    .pv-avatar,
+    .pv-level-circle {
+        box-shadow: 0 0 10px var(--tier-glow, rgba(180,92,255,0.2));
+    }
+
+    /* Hover-only effektlarni mobilda o'chirish (touch'da yopishib qolmasin) */
+
+    .pv-menu-box:hover {
+        transform: none;
+        background:
+            linear-gradient(
+                145deg,
+                rgba(255,255,255,0.055),
+                rgba(255,255,255,0.025)
+            );
+        border-color: rgba(255,255,255,0.075);
+    }
 }
 
 
@@ -1221,12 +1309,17 @@
         font-size: 15px;
     }
 
+    .pv-name-label,
     .pv-id-label {
         font-size: 9px;
     }
 
+    .pv-name-value {
+        font-size: 12.5px;
+    }
+
     .pv-id-value {
-        font-size: 15px;
+        font-size: 14px;
     }
 
     .pv-tier-badge {
@@ -1265,6 +1358,18 @@
     }
 }
 
+
+/* =========================================================
+   REDUCED MOTION — animatsiyaga sezgir foydalanuvchilar uchun
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+
 </style>
 {% endblock %}
 
@@ -1280,7 +1385,7 @@
 
 
     <!-- =====================================================
-         PROFILE CARD — avatar chapda, ID o'ngda, badge o'rtada
+         PROFILE CARD — avatar / ism / ID bitta qatorda, badge o'rtada
          ===================================================== -->
 
     <div class="pv-card tier-{{ user_tier|default:'basic' }}">
@@ -1294,6 +1399,7 @@
                     <img
                         src="{{ user.avatar.image.url }}"
                         alt="avatar"
+                        loading="lazy"
                     >
 
                 {% else %}
@@ -1301,6 +1407,23 @@
                     {{ user.username|make_list|first|upper }}
 
                 {% endif %}
+
+            </div>
+
+
+            <div class="pv-name-block">
+
+                <span class="pv-name-label">
+                    Ism
+                </span>
+
+                <span class="pv-name-value">
+                    {% if user.first_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </span>
 
             </div>
 
@@ -1608,6 +1731,7 @@
                             class="p-av-img"
                             src="{{ av.image.url }}"
                             alt="{{ av.name|default:'avatar' }}"
+                            loading="lazy"
                         >
 
                     </label>
