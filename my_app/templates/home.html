@@ -331,6 +331,9 @@
         display: flex;
         flex-direction: column;
         gap: 0;
+        /* Ekrandan tashqaridagi kartalarni brauzer hisoblamasin — scroll yengillashadi */
+        content-visibility: auto;
+        contain-intrinsic-size: 290px 360px;
     }
 
     .anime-card {
@@ -899,6 +902,30 @@
         /* Mobilda hover ishlamaydi — card overlay (nomi, ko'rish soni) doim ko'rinsin */
         .card-inner-overlay { opacity: 1; }
         .card-inner-desc { display: none; }
+
+        /* --- SCROLL OG'IRLIGINI YO'QOTISH: mobilda backdrop-filter (blur) juda qimmat, olib tashlaymiz --- */
+        .top-badge-episode,
+        .tier-badge,
+        .fav-badge {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        .top-badge-episode { background: rgba(0,0,0,0.85); }
+        .tier-badge.vip { background: rgba(251, 191, 36, 0.35); }
+        .tier-badge.premium { background: rgba(244, 63, 94, 0.3); }
+        .fav-badge { background: rgba(0,0,0,0.6); }
+
+        /* Faqat autoplay/drag paytida kerak bo'lgan will-change'ni doimiy ushlab turmaymiz */
+        .slides-wrapper { will-change: auto; }
+        .marquee-container { will-change: auto; }
+
+        /* Hover-transition'lar mobilda ishlatilmaydi, lekin brauzer baribir tayyorlab turadi — olib tashlaymiz */
+        .action-btn,
+        .schedule-card,
+        .btn-main,
+        .card-title {
+            transition: none !important;
+        }
     }
 
     @media (max-width: 480px) {
@@ -930,9 +957,9 @@
         <a href="{% url 'story_view' story.id %}" class="story-item">
             <div class="story-ring {% if story.id in seen_stories %}seen{% endif %}">
                 {% if story.image %}
-                    <img src="{{ story.image.url }}" alt="{{ story.title }}" loading="lazy">
+                    <img src="{{ story.image.url }}" alt="{{ story.title }}" loading="lazy" decoding="async">
                 {% else %}
-                    <img src="https://via.placeholder.com/150" alt="story">
+                    <img src="https://via.placeholder.com/150" alt="story" loading="lazy" decoding="async">
                 {% endif %}
             </div>
             <span>{{ story.title }}</span>
@@ -958,11 +985,11 @@
                         </video>
                     {% elif anime.hero_media %}
                         <div class="slide-bg">
-                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}" loading="eager">
+                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}" loading="eager" decoding="async">
                         </div>
                     {% else %}
                         <div class="slide-bg">
-                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="eager">
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="eager" decoding="async">
                         </div>
                     {% endif %}
 
@@ -1052,7 +1079,7 @@
                                 <i class='bx bx-trending-up'></i> TOP
                             </div>
                         </div>
-                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" decoding="async">
                     </div>
                     <div class="card-info-bottom">
                         <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
@@ -1076,7 +1103,7 @@
                                 <i class='bx bx-trending-up'></i> TOP
                             </div>
                         </div>
-                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy">
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" decoding="async">
                     </div>
                     <div class="card-info-bottom">
                         <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;" class="marquee-link">
@@ -1153,6 +1180,7 @@
                 <img class="schedule-card-poster"
                      src="{{ item.image_url }}"
                      alt="{{ item.name }}"
+                     loading="lazy" decoding="async"
                      onerror="this.src='{{ default_movie_poster }}'">
 
                 <div class="schedule-card-info">
@@ -1237,7 +1265,7 @@
                     {% endif %}
 
                     <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
-                         alt="{{ anime.title }}" loading="lazy">
+                         alt="{{ anime.title }}" loading="lazy" decoding="async">
 
                     <div class="card-inner-overlay">
                         <div class="card-inner-title">{{ anime.title }}</div>
@@ -1360,6 +1388,21 @@
     updateDots();
     resetAutoPlay();
 
+    // Hero slider ekrandan chiqib ketganda autoplay'ni to'xtatamiz — scroll paytida ortiqcha ish yo'q
+    if ('IntersectionObserver' in window) {
+        const heroObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    resetAutoPlay();
+                } else if (autoPlayTimer) {
+                    clearInterval(autoPlayTimer);
+                    autoPlayTimer = null;
+                }
+            });
+        }, { threshold: 0.1 });
+        heroObserver.observe(wrapper);
+    }
+
     wrapper.addEventListener('touchstart', function(e) {
         heroStartX = e.touches[0].clientX;
         heroDragging = true;
@@ -1434,6 +1477,9 @@
     let dragStartOffset = 0;
     let dragMoved = 0;
     const DRAG_THRESHOLD = 5;
+    // Marquee ekranda ko'rinmasa (masalan pastga scroll qilib ketilganda) animatsiyani to'xtatamiz —
+    // shu narsa scroll paytidagi "og'irlik" hissini eng ko'p keltirib chiqaruvchi sabab edi.
+    let isInView = true;
 
     function getHalf() { return container.scrollWidth / 2; }
 
@@ -1442,7 +1488,7 @@
     }
 
     function animate() {
-        if (!isDragging && !isPaused) {
+        if (!isDragging && !isPaused && isInView) {
             offset -= SPEED;
             const half = getHalf();
             if (Math.abs(offset) >= half) offset += half;
@@ -1452,6 +1498,15 @@
     }
 
     rafId = requestAnimationFrame(animate);
+
+    if ('IntersectionObserver' in window) {
+        const marqueeObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                isInView = entry.isIntersecting;
+            });
+        }, { threshold: 0 });
+        marqueeObserver.observe(outer);
+    }
 
     outer.addEventListener('mouseenter', function() { isPaused = true; });
     outer.addEventListener('mouseleave', function() { isPaused = false; });
@@ -1582,11 +1637,16 @@
 
 
 var scrollTopBtn = document.getElementById('scrollTopBtn');
+var scrollTicking = false;
 
 window.addEventListener('scroll', function() {
-    if (!scrollTopBtn) return;
-    if (window.scrollY > 400) scrollTopBtn.classList.add('visible');
-    else scrollTopBtn.classList.remove('visible');
+    if (!scrollTopBtn || scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(function() {
+        if (window.scrollY > 400) scrollTopBtn.classList.add('visible');
+        else scrollTopBtn.classList.remove('visible');
+        scrollTicking = false;
+    });
 }, { passive: true });
 
 function scrollToTop() {
