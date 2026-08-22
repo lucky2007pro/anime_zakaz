@@ -6,10 +6,11 @@ from .views import (
     chat, chat_messages_api, edit_message, delete_message, ban_user,
     logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,reels, aloqa, news_feed, news_detail, toggle_like,next_story_view, prev_story_view, story_view, mark_story_seen,
     reels_feed, reel_detail, toggle_reel_like, add_reel_comment, reel_comments_api, reel_share,
-    settings_privacy,settings_devices,settings_premium,settings_telegram,settings_general,
-    anime_category,notice,user_mini_profile_api,delete_comment,service_worker_view,offline_view,manifest_view
+    settings_privacy,settings_devices,settings_premium,settings_telegram,settings_general,user_mini_profile_api,
+    anime_category,notice,delete_comment,service_worker_view,offline_view,manifest_view,
+    hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
+    imkon_vote_request_add, imkon_vote, imkon_anime_request_add,
 
- 
 )
 from .admin_views import *
 from django.conf import settings
@@ -101,7 +102,6 @@ urlpatterns = [
     path('reels/<int:reel_id>/comments/', reel_comments_api, name='reel_comments_api'),
     path('reels/<int:reel_id>/share/', reel_share, name='reel_share'),
 
-    
     path('settings/', settings_general, name='settings_general'),
     path('settings/telegram/', settings_telegram, name='settings_telegram'),
     path('settings/premium/', settings_premium, name='settings_premium'),
@@ -109,7 +109,8 @@ urlpatterns = [
     path('settings/privacy/', settings_privacy, name='settings_privacy'),
 
 
-    # admin uchun:
+
+    # urlpatterns ga qo'shing:
     path('control-panel/schedule/', admin_schedule, name='admin_schedule'),
     path('control-panel/schedule/add/', admin_schedule_form, name='admin_schedule_form'),
     path('control-panel/schedule/<int:pk>/edit/', admin_schedule_form, name='admin_schedule_form'),
@@ -131,6 +132,7 @@ urlpatterns = [
     path('boshqaruv/sections/add/', admin_section_form, name='admin_section_form'),
     path('boshqaruv/sections/<int:pk>/edit/', admin_section_form, name='admin_section_form_edit'),
     path('boshqaruv/sections/<int:pk>/delete/', admin_section_delete, name='admin_section_delete'),
+
     path('notice/', notice, name='notice'),
     path('control-panel/notices/', admin_notices, name='admin_notices'),
     path('control-panel/notices/add/', admin_notice_form, name='admin_notice_form'),
@@ -141,18 +143,22 @@ urlpatterns = [
     path('control-panel/movies/<int:movie_id>/kadrlar/', admin_kadrlar_form, name='admin_kadrlar_form'),
     path('control-panel/movies/frame/<int:pk>/delete/', admin_kadrlar_delete, name='admin_kadrlar_delete'),
     path('comment/<int:comment_id>/delete/', delete_comment, name='delete_comment'),
-
     path('service-worker.js', service_worker_view, name='service_worker'),
     path('manifest.json', manifest_view, name='manifest'),
     path('offline/', offline_view, name='offline_page'),
+    path('hisobim/', hisobim_page, name='hisobim_page'),
+    path('statistika/', statistika_page, name='statistika_page'),
+    path('imkon/', imkon_page, name='imkon_page'),
+
+    path('imkon/premium-fon/toggle/', imkon_toggle_bg, name='imkon_toggle_bg'),
+    path('imkon/premium-fon/<int:pk>/tanlash/', imkon_select_bg, name='imkon_select_bg'),
+    path('imkon/telegram-yuklab-olish/toggle/', imkon_toggle_telegram_download, name='imkon_toggle_telegram_download'),
+    path('imkon/sorovnoma/qoshish/', imkon_vote_request_add, name='imkon_vote_request_add'),
+    path('imkon/sorovnoma/<int:pk>/ovoz/', imkon_vote, name='imkon_vote'),
+    path('imkon/anime-sorash/qoshish/', imkon_anime_request_add, name='imkon_anime_request_add'),
 
 
-    
-    
 ]
-
-
-
 
 
 if settings.DEBUG:
