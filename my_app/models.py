@@ -782,3 +782,88 @@ class MovieFrame(models.Model):
 
     def __str__(self):
         return f"{self.movie.title} - kadr #{self.order}"
+
+
+
+
+class WatchHistory(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='watch_history')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='watched_by')
+    last_watched = models.DateTimeField(auto_now=True)
+    # YANGI — oxirgi ko'rilgan qism (profilda "9-qism" deb chiqarish uchun)
+    last_episode = models.ForeignKey(
+        'MovieEpisode', on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
+    )
+
+    class Meta:
+        unique_together = ('user', 'movie')
+
+
+# =======================
+# HISOBIM (BALANS)
+# =======================
+class UserBalance(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='balance')
+    amount = models.PositiveIntegerField(default=0, help_text="Hisobdagi mablag' / ball")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username} — {self.amount}"
+# =======================
+# PREMIUM FON
+# =======================
+class PremiumBackground(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
+    image = models.ImageField(upload_to='premium_backgrounds/')
+    order = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = "Premium fon"
+        verbose_name_plural = "Premium fonlar"
+
+    def __str__(self):
+        return self.name or f"Fon #{self.id}"
+
+
+# =======================
+# ANIME SO'ROVNOMA (VIP OVOZ BERISH)
+# =======================
+class AnimeVoteRequest(models.Model):
+    name = models.CharField(max_length=200)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='anime_vote_requests')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def total_votes(self):
+        return self.votes.count()
+
+    def __str__(self):
+        return self.name
+
+
+class AnimeVote(models.Model):
+    request = models.ForeignKey(AnimeVoteRequest, on_delete=models.CASCADE, related_name='votes')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='anime_votes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('request', 'user')
+
+
+# =======================
+# OLDINDAN ANIME SO'RASH
+# =======================
+class AnimeRequestSuggestion(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='anime_request_suggestion')
+    name = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.name}"
+
+
+
