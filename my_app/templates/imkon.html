@@ -1,0 +1,592 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Imkoniyatlar - BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+    .imkon-wrap {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .imkon-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .imkon-header h1 {
+        font-size: 1.6rem;
+        font-weight: 900;
+        margin-bottom: 8px;
+    }
+
+    .imkon-header p {
+        color: var(--text-dim);
+        font-size: 0.9rem;
+    }
+
+    .imkon-locked {
+        text-align: center;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 50px 20px;
+    }
+
+    .imkon-locked i {
+        font-size: 3rem;
+        color: #fbbf24;
+        margin-bottom: 15px;
+    }
+
+    .imkon-locked h3 {
+        font-weight: 900;
+        margin-bottom: 10px;
+    }
+
+    .imkon-locked p {
+        color: var(--text-dim);
+        margin-bottom: 20px;
+    }
+
+    .imkon-locked a {
+        display: inline-block;
+        padding: 12px 28px;
+        background: var(--accent);
+        color: #000;
+        border-radius: 30px;
+        font-weight: 900;
+        text-decoration: none;
+    }
+
+    .imkon-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 22px;
+    }
+
+    .imkon-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .imkon-card-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 900;
+        font-size: 1.02rem;
+    }
+
+    .imkon-card-title i {
+        font-size: 1.3rem;
+        color: var(--accent);
+    }
+
+    .imkon-card-desc {
+        color: var(--text-dim);
+        font-size: 0.83rem;
+        margin-top: 6px;
+        line-height: 1.5;
+    }
+
+    /* ===== TOGGLE ICON ===== */
+    .imkon-toggle {
+        width: 52px;
+        height: 30px;
+        border-radius: 30px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid var(--glass-border);
+        position: relative;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: background 0.25s ease;
+    }
+
+    .imkon-toggle::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .imkon-toggle.on {
+        background: var(--accent);
+    }
+
+    .imkon-toggle.on::after {
+        transform: translateX(22px);
+    }
+
+    /* ===== FON PICKER ===== */
+    .imkon-bg-box {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease, margin 0.4s ease;
+        margin-top: 0;
+    }
+
+    .imkon-bg-box.open {
+        max-height: 500px;
+        opacity: 1;
+        margin-top: 16px;
+    }
+
+    .imkon-bg-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px;
+    }
+
+    .imkon-bg-item {
+        position: relative;
+        aspect-ratio: 3/4;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .imkon-bg-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .imkon-bg-item.active {
+        border-color: var(--accent);
+    }
+
+    .imkon-bg-item.active::after {
+        content: '\ea41';
+        font-family: 'boxicons';
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 22px;
+        height: 22px;
+        background: var(--accent);
+        color: #000;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    .imkon-bg-empty {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    /* ===== SO'ROVNOMA ===== */
+    .imkon-vote-input-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .imkon-vote-input-row input {
+        flex: 1;
+        padding: 12px 16px;
+        background: rgba(0,0,0,0.25);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        color: #fff;
+        outline: none;
+        font-family: 'Outfit';
+    }
+
+    .imkon-vote-input-row input:focus {
+        border-color: var(--accent);
+    }
+
+    .imkon-btn {
+        padding: 12px 20px;
+        background: var(--accent);
+        color: #000;
+        border: none;
+        border-radius: 12px;
+        font-weight: 900;
+        cursor: pointer;
+        font-family: 'Outfit';
+        white-space: nowrap;
+        transition: 0.2s;
+    }
+
+    .imkon-btn:hover { background: #fff; }
+    .imkon-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .imkon-vote-list {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .imkon-vote-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 14px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 14px;
+    }
+
+    .imkon-vote-name {
+        font-weight: 800;
+        font-size: 0.92rem;
+    }
+
+    .imkon-vote-approved {
+        display: block;
+        font-size: 0.72rem;
+        color: #4ade80;
+        font-weight: 700;
+        margin-top: 3px;
+    }
+
+    .imkon-vote-count {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        margin-right: 8px;
+        white-space: nowrap;
+    }
+
+    .imkon-vote-btn {
+        padding: 8px 16px;
+        border-radius: 30px;
+        border: 1px solid var(--glass-border);
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: 0.2s;
+    }
+
+    .imkon-vote-btn.voted {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+    }
+
+    .imkon-vote-empty {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    /* ===== OBUNACHILAR SONI ===== */
+    .imkon-stat-value {
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: var(--accent);
+    }
+
+    /* ===== ANIME SO'RASH ===== */
+    .imkon-req-list {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .imkon-req-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.06);
+        font-size: 0.88rem;
+    }
+
+    .imkon-req-row span.count {
+        color: var(--accent);
+        font-weight: 800;
+    }
+
+    .imkon-note {
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        margin-top: 8px;
+    }
+
+    .imkon-msg {
+        font-size: 0.8rem;
+        margin-top: 10px;
+        display: none;
+    }
+
+    .imkon-msg.show { display: block; }
+    .imkon-msg.err { color: #ff5b5b; }
+    .imkon-msg.ok { color: #4ade80; }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+<div class="imkon-wrap">
+
+    <div class="imkon-header">
+        <h1><i class='bx bxs-crown' style="color:#fbbf24;"></i> Premium Imkoniyatlar</h1>
+        <p>VIP va Premium azolar uchun maxsus funksiyalar</p>
+    </div>
+
+    {% if not is_premium %}
+
+    <div class="imkon-locked">
+        <i class='bx bxs-lock-alt'></i>
+        <h3>Bu bo'lim faqat Premium/VIP azolar uchun</h3>
+        <p>Barcha maxsus imkoniyatlardan foydalanish uchun obuna bo'ling.</p>
+        <a href="{% url 'premium_page' %}">Premium olish</a>
+    </div>
+
+    {% else %}
+
+    <!-- ================= 1) PREMIUM FON ================= -->
+    <div class="imkon-card">
+        <div class="imkon-card-head">
+            <div>
+                <div class="imkon-card-title"><i class='bx bxs-image'></i> Premium fon</div>
+                <div class="imkon-card-desc">Butun sayt uchun maxsus fon rasmini o'rnating</div>
+            </div>
+            <div class="imkon-toggle {% if settings.premium_bg_on %}on{% endif %}" id="bgToggle" onclick="toggleBg()"></div>
+        </div>
+
+        <div class="imkon-bg-box {% if settings.premium_bg_on %}open{% endif %}" id="bgBox">
+            <div class="imkon-bg-grid">
+                {% for bg in backgrounds %}
+                <div class="imkon-bg-item {% if settings.premium_bg_id == bg.id %}active{% endif %}"
+                     data-id="{{ bg.id }}" onclick="selectBg({{ bg.id }}, this)">
+                    <img src="{{ bg.image.url }}" alt="{{ bg.name|default:'fon' }}">
+                </div>
+                {% empty %}
+                <p class="imkon-bg-empty">Admin hali premium fon yuklamagan.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 2) SO'ROVNOMA ================= -->
+    <div class="imkon-card">
+        <div class="imkon-card-title"><i class='bx bxs-conversation'></i> Premium so'rovnoma</div>
+        <div class="imkon-card-desc">Faqat 1 ta anime nomi taklif qiling. 10 ovoz yig'sa — ANI BEST tomonidan ovozlashtiriladi.</div>
+
+        {% if not my_vote_request %}
+        <div class="imkon-vote-input-row">
+            <input type="text" id="voteNameInput" placeholder="Anime nom kiriting...">
+            <button class="imkon-btn" onclick="submitVoteRequest()">Taklif qilish</button>
+        </div>
+        <p class="imkon-msg" id="voteMsg"></p>
+        {% else %}
+        <p class="imkon-note" style="margin-top:14px;">Siz allaqachon taklif qilgansiz: <b>{{ my_vote_request.name }}</b></p>
+        {% endif %}
+
+        <div class="imkon-vote-list" id="voteList">
+            {% for vr in vote_requests %}
+            <div class="imkon-vote-row" data-req-id="{{ vr.id }}">
+                <div>
+                    <span class="imkon-vote-name">{{ vr.name }}</span>
+                    {% if vr.votes_count >= 10 %}
+                    <span class="imkon-vote-approved"><i class='bx bx-check-circle'></i> ANI BEST tomonidan ovozlashtiriladi</span>
+                    {% endif %}
+                </div>
+                <div style="display:flex; align-items:center;">
+                    <span class="imkon-vote-count"><span class="vote-count-num">{{ vr.votes_count }}</span> ovoz</span>
+                    <button class="imkon-vote-btn {% if vr.id in voted_ids %}voted{% endif %}"
+                            onclick="voteFor({{ vr.id }}, this)">
+                        {% if vr.id in voted_ids %}Ovoz berildi{% else %}Ovoz berish{% endif %}
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <p class="imkon-vote-empty">Hali hech kim taklif qilmagan.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ================= 3) OBUNACHILAR SONI ================= -->
+    <div class="imkon-card">
+        <div class="imkon-card-title"><i class='bx bxs-group'></i> Premium obunachilar soni</div>
+        <p class="imkon-stat-value">{{ premium_count }}</p>
+    </div>
+
+    <!-- ================= 4) TELEGRAM YUKLAB OLISH ================= -->
+    <div class="imkon-card">
+        <div class="imkon-card-head">
+            <div>
+                <div class="imkon-card-title"><i class='bx bxl-telegram'></i> Telegram orqali yuklab olish</div>
+                <div class="imkon-card-desc">Premium/VIP animelarni Telegram orqali yuklab olish (tez orada)</div>
+            </div>
+            <div class="imkon-toggle {% if settings.telegram_download_on %}on{% endif %}" id="tgToggle" onclick="toggleTelegramDownload()"></div>
+        </div>
+    </div>
+
+    <!-- ================= 5) OLDINDAN ANIME SO'RASH ================= -->
+    <div class="imkon-card">
+        <div class="imkon-card-title"><i class='bx bxs-search-alt'></i> Oldindan anime surash</div>
+        <div class="imkon-card-desc">To'xtab qolgan yoki ANI BEST'da hali chiqmagan animeni so'rang (1 marta)</div>
+
+        {% if not my_request %}
+        <div class="imkon-vote-input-row">
+            <input type="text" id="reqNameInput" placeholder="Anime nomini so'rash...">
+            <button class="imkon-btn" onclick="submitAnimeRequest()">So'rash</button>
+        </div>
+        <p class="imkon-msg" id="reqMsg"></p>
+        {% else %}
+        <p class="imkon-note" style="margin-top:14px;">Siz so'ragan anime: <b>{{ my_request.name }}</b></p>
+        {% endif %}
+
+        <div class="imkon-req-list">
+            {% for r in requested_names %}
+            <div class="imkon-req-row">
+                <span>{{ r.name }}</span>
+                <span class="count">{{ r.total }} chiqarilar</span>
+            </div>
+            {% empty %}
+            <p class="imkon-vote-empty">Hali hech kim so'ramagan.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+</main>
+
+<script>
+const CSRF = '{{ csrf_token }}';
+
+function toggleBg() {
+    fetch("{% url 'imkon_toggle_bg' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+        document.getElementById('bgToggle').classList.toggle('on', data.premium_bg_on);
+        document.getElementById('bgBox').classList.toggle('open', data.premium_bg_on);
+        if (data.premium_bg_on) location.reload();
+        else location.reload();
+    });
+}
+
+function selectBg(id, el) {
+    fetch(`/imkon/premium-fon/${id}/tanlash/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (!data.ok) return;
+        document.querySelectorAll('.imkon-bg-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        location.reload();
+    });
+}
+
+function toggleTelegramDownload() {
+    fetch("{% url 'imkon_toggle_telegram_download' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        document.getElementById('tgToggle').classList.toggle('on', data.telegram_download_on);
+    });
+}
+
+function submitVoteRequest() {
+    const input = document.getElementById('voteNameInput');
+    const msg = document.getElementById('voteMsg');
+    const name = input.value.trim();
+    if (!name) return;
+
+    const data = new FormData();
+    data.append('name', name);
+
+    fetch("{% url 'imkon_vote_request_add' %}", {
+        method: 'POST',
+        body: data,
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(res => {
+        if (res.error) {
+            msg.textContent = res.error;
+            msg.className = 'imkon-msg show err';
+            return;
+        }
+        location.reload();
+    });
+}
+
+function voteFor(id, btn) {
+    fetch(`/imkon/sorovnoma/${id}/ovoz/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.need_vip) {
+            if (confirm("Ovoz berish uchun Premium/VIP obuna kerak. Premium sahifasiga o'tasizmi?")) {
+                window.location.href = "{% url 'premium_page' %}";
+            }
+            return;
+        }
+        if (data.error) { alert(data.error); return; }
+
+        const row = btn.closest('.imkon-vote-row');
+        row.querySelector('.vote-count-num').textContent = data.total_votes;
+        btn.classList.toggle('voted', data.voted);
+        btn.textContent = data.voted ? 'Ovoz berildi' : 'Ovoz berish';
+
+        let approvedEl = row.querySelector('.imkon-vote-approved');
+        if (data.approved && !approvedEl) {
+            const nameSpan = row.querySelector('.imkon-vote-name');
+            const span = document.createElement('span');
+            span.className = 'imkon-vote-approved';
+            span.innerHTML = "<i class='bx bx-check-circle'></i> ANI BEST tomonidan ovozlashtiriladi";
+            nameSpan.parentElement.appendChild(span);
+        }
+    });
+}
+
+function submitAnimeRequest() {
+    const input = document.getElementById('reqNameInput');
+    const msg = document.getElementById('reqMsg');
+    const name = input.value.trim();
+    if (!name) return;
+
+    const data = new FormData();
+    data.append('name', name);
+
+    fetch("{% url 'imkon_anime_request_add' %}", {
+        method: 'POST',
+        body: data,
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(res => {
+        if (res.error) {
+            msg.textContent = res.error;
+            msg.className = 'imkon-msg show err';
+            return;
+        }
+        location.reload();
+    });
+}
+</script>
+{% endblock %}
