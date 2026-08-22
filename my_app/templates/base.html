@@ -1155,6 +1155,46 @@
             #networkToast {
                 display: flex;
             }
+
+            .navbar {
+                backdrop-filter: blur(10px) saturate(120%);
+                -webkit-backdrop-filter: blur(10px) saturate(120%);
+            }
+            .navbar.scrolled {
+                backdrop-filter: blur(14px) saturate(130%);
+                -webkit-backdrop-filter: blur(14px) saturate(130%);
+            }
+
+            .mobile-nav-overlay {
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+            }
+
+            .mobile-nav-container {
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+
+            .bottom-tab-bar {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+
+            #networkToast {
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+            }
+
+            .profile-overlay {
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+            }
+
+            /* Premium fon — scroll paytida qotishning asosiy manbasi */
+            .premium-bg-layer {
+                will-change: auto;
+                contain: strict;
+            }
         }
 
         /* ==================== RESPONSIVE ==================== */
@@ -1267,8 +1307,9 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;      /* eski brauzerlar uchun fallback */
+            height: 100dvh;      /* MUHIM — dynamic viewport height */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -1284,6 +1325,9 @@
         .premium-bg-overlay {
             position: fixed;
             inset: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;      /* shu yerga ham qo'shing */
             background: rgba(10, 10, 15, 0.55);
             z-index: -1;
             pointer-events: none;
