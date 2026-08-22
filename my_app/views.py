@@ -12,17 +12,19 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import F
 from django.db import models
-import re
-from django.urls import reverse
 from django.db.models import Q
+from django.urls import reverse
+import re
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
 
+
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
-    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,UserSettings,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead
+    Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,
+    UserSettings,AnimeSchedule,AnimeSectionItem, Notice, NoticeRead,WatchHistory, FavoriteAnime
 )
 
 User = get_user_model()
@@ -73,13 +75,13 @@ def login(request):
         if user:
             auth_login(request, user)
             request.session['mp3_played'] = False
+            request.session['show_welcome'] = True   # <-- shu qator qo'shildi
             return redirect('home')
         else:
             messages.error(request, "Login yoki parol noto‘g‘ri")
             return redirect('login')
 
     return render(request, 'login.html', context)
-
 
 # =======================
 # LOGOUT
@@ -128,6 +130,9 @@ def home(request):
     mp3_to_play = None
     fav_ids = []
 
+    # ================= WELCOME TOAST =================
+    show_welcome = False
+
     if request.user.is_authenticated:
         from .models import FavoriteAnime
 
@@ -144,6 +149,9 @@ def home(request):
 
         mp3_to_play = mp3_file if not request.session.get('mp3_played', False) else None
         request.session['mp3_played'] = True
+
+        show_welcome = request.session.get('show_welcome', False)
+        request.session['show_welcome'] = False
 
     # ================= SCHEDULE =================
     schedule_list = list(AnimeSchedule.objects.filter(is_active=True))
@@ -165,11 +173,10 @@ def home(request):
         'user_id': request.user.id if request.user.is_authenticated else None,
         'fav_ids': fav_ids,
         'schedule_list': schedule_list,
+        'show_welcome': show_welcome,
     }
 
     return render(request, 'home.html', context)
-
-
 
 
 # =======================
@@ -219,7 +226,18 @@ def movie_detail(request, id):
 
     # Add to watch history
     from .models import WatchHistory, FavoriteAnime
-    WatchHistory.objects.update_or_create(user=request.user, movie=movie, defaults={'last_watched': timezone.now()})
+
+    episode_id = request.GET.get('episode')
+    selected_episode = None
+    if episode_id:
+        selected_episode = episodes.filter(id=episode_id).first()
+    if not selected_episode:
+        selected_episode = episodes.last()
+
+    WatchHistory.objects.update_or_create(
+        user=request.user, movie=movie,
+        defaults={'last_watched': timezone.now(), 'last_episode': selected_episode}
+    )
 
     # Check if favorited
     is_favorited = FavoriteAnime.objects.filter(user=request.user, movie=movie).exists()
@@ -365,9 +383,10 @@ def check_username(request):
 # =======================
 @login_required(login_url='login')
 def profile(request):
-    from .models import WatchHistory  # fayl boshida import bo'lsa kerak emas
+    from .models import WatchHistory, UserBalance  # fayl boshida import bo'lsa kerak emas
 
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    balance, _ = UserBalance.objects.get_or_create(user=request.user)
     avatars = ProfileAvatar.objects.all().order_by('-created_at')
 
     if request.method == 'POST':
@@ -400,28 +419,29 @@ def profile(request):
 
         return redirect('profile')
 
-    # ===== Oxirgi ko'rilgan 2 ta anime =====
-    last_watched_qs = (
+    # ===== Oxirgi ko'rilgan 3 ta anime (qism va vaqt bilan) =====
+    tz = ZoneInfo('Asia/Tashkent')
+    last_watched_history = (
         WatchHistory.objects
         .filter(user=request.user)
-        .select_related('movie')
-        .order_by('-last_watched')[:2]
+        .select_related('movie', 'last_episode')
+        .order_by('-last_watched')[:3]
     )
-    last_watched_movies = [w.movie for w in last_watched_qs]
+    for w in last_watched_history:
+        w.local_time = localtime(w.last_watched, tz)
 
     context = {
         'total_users': CustomUser.objects.count(),
         'vip_active': vip_data.vip_active(),
         'user_tier': vip_data.get_tier(),
         'avatars': avatars,
+        'balance': balance,
 
-        # Yangi qo'shilganlar
-        'last_watched_movies': last_watched_movies,
+        'last_watched_history': last_watched_history,
         'user_level': request.user.get_level(),
         'watched_count': request.user.watched_count(),
     }
     return render(request, 'profile.html', context)
-
 
 
 # =======================
@@ -640,7 +660,6 @@ def user_mini_profile_api(request, user_id):
         'watched_count': target_user.watched_count(),
         'last_watched': last_watched,
     })
-
 
 
 # =======================
@@ -1011,8 +1030,17 @@ def reel_detail(request, reel_id):
 
 
 
+def sifat(request):
+    return redirect('sifat.html')
 
-# confikuchun viev qismi
+
+
+
+# ========================
+# views.py ga QO'SHING
+# ========================
+# Import qatoriga qo'shing:
+#   from .models import UserSettings
 
 BG_COLORS = [
     {'name': 'Qora',           'value': '#0a0a0f',   'css': '#0a0a0f'},
@@ -1096,8 +1124,6 @@ def settings_privacy(request):
     return render(request, 'boshqaruv/privacy.html', {
         'active_section': 'privacy',
     })
-
-
 
 
 
@@ -1241,8 +1267,6 @@ def settings_devices(request):
         'active_section':    'devices',
     })
 
-
-
 def anime_category(request):
     from .models import AnimeSectionItem
 
@@ -1265,6 +1289,7 @@ def anime_category(request):
         'movie_films': movie_films,
     }
     return render(request, 'category.html', context)
+
 
 @login_required
 def notice(request):
@@ -1323,7 +1348,6 @@ def notice(request):
         'reply_unread_count': reply_unread_count,
     })
 
-
 # =======================
 # SERVICE WORKER / MANIFEST / OFFLINE
 # =======================
@@ -1345,7 +1369,165 @@ def manifest_view(request):
 def offline_view(request):
     return render(request, 'offline.html')
 
+@login_required
+def hisobim_page(request):
+    from .models import UserBalance
+    balance, _ = UserBalance.objects.get_or_create(user=request.user)
+    return render(request, 'hisobim.html', {'balance': balance})
 
 
+@login_required
+def statistika_page(request):
+    return render(request, 'statistika.html', {})
+
+@login_required
+def imkon_page(request):
+    from .models import (
+        UserSettings, PremiumBackground, AnimeVoteRequest, AnimeVote,
+        AnimeRequestSuggestion, VipUser
+    )
+
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    tier = vip_data.get_tier()
+    is_premium = tier in ['premium', 'vip'] or request.user.is_staff or request.user.is_admin_user
+
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    backgrounds = PremiumBackground.objects.all()
+
+    vote_requests = (
+        AnimeVoteRequest.objects
+        .annotate(votes_count=models.Count('votes'))
+        .order_by('-votes_count', '-created_at')
+    )
+    voted_ids = set(
+        AnimeVote.objects.filter(user=request.user).values_list('request_id', flat=True)
+    )
+
+    premium_count = VipUser.objects.filter(is_vip=True).count()
+
+    my_vote_request = AnimeVoteRequest.objects.filter(created_by=request.user).first()
+    my_request = AnimeRequestSuggestion.objects.filter(user=request.user).first()
+
+    requested_names = (
+        AnimeRequestSuggestion.objects
+        .values('name')
+        .annotate(total=models.Count('id'))
+        .order_by('-total')
+    )
+
+    context = {
+        'is_premium': is_premium,
+        'user_tier': tier,
+        'settings': settings_obj,
+        'backgrounds': backgrounds,
+        'vote_requests': vote_requests,
+        'voted_ids': voted_ids,
+        'premium_count': premium_count,
+        'my_vote_request': my_vote_request,
+        'my_request': my_request,
+        'requested_names': requested_names,
+    }
+    return render(request, 'imkon.html', context)
 
 
+@login_required
+def imkon_toggle_bg(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import UserSettings, VipUser
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    if vip_data.get_tier() not in ['premium', 'vip'] and not (request.user.is_staff or request.user.is_admin_user):
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.premium_bg_on = not settings_obj.premium_bg_on
+    settings_obj.save()
+    return JsonResponse({'premium_bg_on': settings_obj.premium_bg_on})
+
+
+@login_required
+def imkon_select_bg(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import UserSettings, PremiumBackground
+    bg = get_object_or_404(PremiumBackground, pk=pk)
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.premium_bg = bg
+    settings_obj.premium_bg_on = True
+    settings_obj.save()
+    return JsonResponse({'ok': True, 'bg_id': bg.id, 'bg_url': bg.image.url})
+
+
+@login_required
+def imkon_toggle_telegram_download(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import UserSettings
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.telegram_download_on = not settings_obj.telegram_download_on
+    settings_obj.save()
+    return JsonResponse({'telegram_download_on': settings_obj.telegram_download_on})
+
+
+@login_required
+def imkon_vote_request_add(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import VipUser, AnimeVoteRequest
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    if vip_data.get_tier() not in ['premium', 'vip']:
+        return JsonResponse({'error': "Faqat VIP azolar anime taklif qila oladi"}, status=403)
+
+    if AnimeVoteRequest.objects.filter(created_by=request.user).exists():
+        return JsonResponse({'error': "Siz allaqachon 1 ta anime taklif qilgansiz"}, status=400)
+
+    name = request.POST.get('name', '').strip()
+    if not name:
+        return JsonResponse({'error': "Anime nomini kiriting"}, status=400)
+
+    req = AnimeVoteRequest.objects.create(name=name, created_by=request.user)
+    return JsonResponse({'ok': True, 'id': req.id, 'name': req.name})
+
+
+@login_required
+def imkon_vote(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import VipUser, AnimeVoteRequest, AnimeVote
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    if vip_data.get_tier() not in ['premium', 'vip']:
+        return JsonResponse({'need_vip': True, 'error': "Ovoz berish uchun Premium/VIP obuna kerak"}, status=403)
+
+    req = get_object_or_404(AnimeVoteRequest, pk=pk)
+    vote, created = AnimeVote.objects.get_or_create(request=req, user=request.user)
+    if not created:
+        vote.delete()
+        voted = False
+    else:
+        voted = True
+
+    return JsonResponse({
+        'voted': voted,
+        'total_votes': req.total_votes(),
+        'approved': req.total_votes() >= 10,
+    })
+
+
+@login_required
+def imkon_anime_request_add(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import VipUser, AnimeRequestSuggestion
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    if vip_data.get_tier() not in ['premium', 'vip']:
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+
+    if AnimeRequestSuggestion.objects.filter(user=request.user).exists():
+        return JsonResponse({'error': "Siz allaqachon so'rov yuborgansiz"}, status=400)
+
+    name = request.POST.get('name', '').strip()
+    if not name:
+        return JsonResponse({'error': "Anime nomini kiriting"}, status=400)
+
+    AnimeRequestSuggestion.objects.create(user=request.user, name=name)
+    return JsonResponse({'ok': True, 'name': name})
