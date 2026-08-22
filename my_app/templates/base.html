@@ -60,7 +60,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    
+
     <style>
         :root {
             --bg-base: #0a0a0f;
@@ -1262,7 +1262,32 @@
         .footer-link:hover { color: var(--accent); transform: translateX(3px); }
 
 
+        /* ==================== PREMIUM FON ==================== */
+        .premium-bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            will-change: transform;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            pointer-events: none;
+        }
 
+        .premium-bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.55);
+            z-index: -1;
+            pointer-events: none;
+        }
         {% block extra_css %}{% endblock %}
     </style>
 
@@ -1341,11 +1366,23 @@
         {% endif %}
 
     </style>
+    {% if s.premium_bg_on and s.premium_bg %}
+    <style id="premiumBgVars">
+        .premium-bg-layer {
+            background-image: url('{{ s.premium_bg.image.url }}');
+        }
+    </style>
+    {% endif %}
     {% endif %}
     {% endwith %}
     {% endif %}
 </head>
 <body>
+
+{% if request.user.is_authenticated and request.user.settings and request.user.settings.premium_bg_on and request.user.settings.premium_bg %}
+<div class="premium-bg-layer"></div>
+<div class="premium-bg-overlay"></div>
+{% endif %}
 
 <!-- ==================== NAVBAR ==================== -->
 <nav class="navbar" id="navbar">
