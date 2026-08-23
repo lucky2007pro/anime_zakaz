@@ -24,7 +24,7 @@ from django.template.loader import render_to_string
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
     Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,
-    UserSettings,AnimeSchedule,AnimeSectionItem, Notice, NoticeRead,WatchHistory, FavoriteAnime
+    UserSettings,AnimeSchedule,AnimeSectionItem, Notice, NoticeRead,WatchHistory, FavoriteAnime,NoResultsMedia
 )
 
 User = get_user_model()
@@ -476,11 +476,13 @@ def search(request):
     if request.user.is_authenticated:
         from .models import FavoriteAnime
         fav_ids = list(FavoriteAnime.objects.filter(user=request.user).values_list('movie_id', flat=True))
-
+        
+    no_results_media = NoResultsMedia.objects.filter(is_active=True).first()
     return render(request, 'search.html', {
         'movies': movies,
         'query': query,
         'fav_ids': fav_ids,
+        'no_results_media': no_results_media,
     })
 
 
