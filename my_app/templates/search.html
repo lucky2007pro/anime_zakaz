@@ -227,6 +227,53 @@
     border: 0;
 }
 
+/* ============ NO RESULTS + CHROMA-KEY MEDIA ============ */
+#no-results-wrap {
+    display: none;
+    grid-column: 1 / -1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px 10px 50px;
+    animation: nrFadeIn 0.4s ease;
+}
+
+@keyframes nrFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#no-results-canvas {
+    max-width: 320px;
+    width: 80%;
+    height: auto;
+    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.6));
+
+}
+
+@keyframes nrFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+#no-results-text {
+    margin-top: 18px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dim);
+}
+
+/* manba (source) media hech qachon ko'rinmasin, faqat canvas orqali chizamiz */
+.no-results-source-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
 @media (max-width: 768px) {
     .search-wrapper { margin: 10px auto 28px; }
     .search-wrapper form { flex-direction: column; padding: 14px; }
@@ -243,6 +290,7 @@
     .anime-card { height: 180px; }
     .card-title { font-size: 0.9rem; }
     .card-meta { font-size: 0.72rem; }
+    #no-results-canvas { max-width: 220px; }
 }
 </style>
 {% endblock %}
@@ -311,7 +359,22 @@
             </div>
         </div>
         {% endfor %}
+
+        <!-- "Hech narsa topilmadi" holati uchun animatsiyali blok (chroma-key bilan) -->
+        <div id="no-results-wrap">
+            <canvas id="no-results-canvas"></canvas>
+            <p id="no-results-text"></p>
+        </div>
     </div>
+
+    <!-- Admin yuklagan yashil fonli manba media (foydalanuvchiga ko'rinmaydi, faqat canvas uni chizadi) -->
+    {% if no_results_media %}
+        {% if no_results_media.media_type == 'video' and no_results_media.video %}
+        <video id="no-results-source" class="no-results-source-hidden" src="{{ no_results_media.video.url }}" muted loop playsinline preload="auto"></video>
+        {% elif no_results_media.media_type == 'image' and no_results_media.image %}
+        <img id="no-results-source" class="no-results-source-hidden" src="{{ no_results_media.image.url }}" alt="">
+        {% endif %}
+    {% endif %}
 </main>
 
 <script>
@@ -319,13 +382,80 @@ const searchInput = document.getElementById('search-input');
 const cards = document.querySelectorAll('.search-card');
 const container = document.getElementById('mainGrid');
 
+const noResultsWrap = document.getElementById('no-results-wrap');
+const noResultsText = document.getElementById('no-results-text');
+const nrCanvas = document.getElementById('no-results-canvas');
+const nrCtx = nrCanvas ? nrCanvas.getContext('2d') : null;
+const nrSource = document.getElementById('no-results-source');
+const nrIsVideo = !!(nrSource && nrSource.tagName === 'VIDEO');
+
+let nrRafId = null;
+let nrReady = false;
+
+/* ===== YASHIL FONNI OLIB TASHLASH (chroma-key) ===== */
+function nrStripGreen(imageData) {
+    const d = imageData.data;
+    for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i + 1], b = d[i + 2];
+        // yashil fon: yashil kanal qizil va ko'kdan sezilarli darajada baland bo'lsa
+        if (g > 80 && g > r * 1.2 && g > b * 1.2) {
+            const excess = Math.min(1, (g - Math.max(r, b)) / 90);
+            d[i + 3] = Math.max(0, 255 * (1 - excess * 1.4));
+        }
+    }
+    return imageData;
+}
+
+function nrDrawFrame() {
+    if (!nrCtx || !nrSource) return;
+
+    const w = nrIsVideo ? nrSource.videoWidth : nrSource.naturalWidth;
+    const h = nrIsVideo ? nrSource.videoHeight : nrSource.naturalHeight;
+
+    if (!w || !h) {
+        if (nrIsVideo) nrRafId = requestAnimationFrame(nrDrawFrame);
+        return;
+    }
+
+    if (nrCanvas.width !== w || nrCanvas.height !== h) {
+        nrCanvas.width = w;
+        nrCanvas.height = h;
+    }
+
+    nrCtx.drawImage(nrSource, 0, 0, w, h);
+    const frame = nrCtx.getImageData(0, 0, w, h);
+    nrCtx.putImageData(nrStripGreen(frame), 0, 0);
+
+    if (nrIsVideo) nrRafId = requestAnimationFrame(nrDrawFrame);
+}
+
+function nrStart() {
+    if (!nrSource) return;
+    if (nrIsVideo) {
+        nrSource.play().catch(() => {});
+        if (nrRafId) cancelAnimationFrame(nrRafId);
+        nrDrawFrame();
+    } else if (nrSource.complete && nrSource.naturalWidth) {
+        nrDrawFrame();
+    } else {
+        nrSource.onload = nrDrawFrame;
+    }
+}
+
+function nrStop() {
+    if (nrIsVideo && nrSource) nrSource.pause();
+    if (nrRafId) cancelAnimationFrame(nrRafId);
+    nrRafId = null;
+}
+
+/* ===== QIDIRUV FILTRI ===== */
 searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase().trim();
 
     let anyVisible = false;
     cards.forEach(card => {
         const title = card.getAttribute('data-title');
-        if(query.length === 0 || title.includes(query)){
+        if (query.length === 0 || title.includes(query)) {
             card.style.display = 'flex';
             anyVisible = true;
         } else {
@@ -333,21 +463,15 @@ searchInput.addEventListener('input', () => {
         }
     });
 
-    let existingMsg = document.getElementById('no-results-msg');
-    if(!anyVisible && query.length > 0){
-        if(!existingMsg){
-            const msg = document.createElement('p');
-            msg.id = 'no-results-msg';
-            msg.textContent = `"${query}" bo‘yicha hech narsa topilmadi ❌`;
-            msg.style.gridColumn = '1 / -1';
-            msg.style.textAlign = 'center';
-            msg.style.fontSize = '1.2rem';
-            msg.style.color = 'var(--text-dim)';
-            msg.style.marginTop = '40px';
-            container.appendChild(msg);
+    if (!anyVisible && query.length > 0) {
+        if (noResultsText) noResultsText.textContent = `"${query}" bo'yicha hech narsa topilmadi ❌`;
+        if (noResultsWrap) {
+            noResultsWrap.style.display = 'flex';
+            if (nrSource) nrStart();
         }
-    } else if(existingMsg){
-        existingMsg.remove();
+    } else {
+        if (noResultsWrap) noResultsWrap.style.display = 'none';
+        nrStop();
     }
 });
 </script>
