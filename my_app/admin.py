@@ -256,6 +256,14 @@ class AnimeRequestSuggestionAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
 
 
+@admin.register(NoResultsMedia)
+class NoResultsMediaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'media_type', 'is_active', 'created_at')
+    list_filter = ('media_type', 'is_active')
+    fields = ('media_type', 'image', 'video', 'is_active')
+
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
 # admin.site.register(MovieEpisode)  # Alohida ko‘rish shart emas, inline orqali boshqariladi
