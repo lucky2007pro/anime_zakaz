@@ -874,3 +874,37 @@ class AnimeRequestSuggestion(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.name}"
 
+# =======================
+# QIDIRUV - NATIJA TOPILMADI MEDIA (yashil fon avtomatik olib tashlanadi)
+# =======================
+class NoResultsMedia(models.Model):
+    MEDIA_TYPE_CHOICES = [
+        ('image', 'Rasm'),
+        ('video', 'Video'),
+    ]
+    media_type = models.CharField(
+        max_length=10, choices=MEDIA_TYPE_CHOICES, default='image',
+        help_text="Rasmmi yoki videomi?"
+    )
+    image = models.ImageField(
+        upload_to='no_results/', blank=True, null=True,
+        help_text="Yashil (chroma-key) fonli rasm — fon avtomatik shaffof qilinadi"
+    )
+    video = models.FileField(
+        upload_to='no_results/videos/', blank=True, null=True,
+        help_text="Yashil (chroma-key) fonli video — fon avtomatik shaffof qilinadi"
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Qidiruv - Natija topilmadi (media)"
+        verbose_name_plural = "Qidiruv - Natija topilmadi (media)"
+
+    def __str__(self):
+        return f"NoResultsMedia #{self.id} ({self.get_media_type_display()})"
+
+
+
+    
