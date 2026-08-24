@@ -1572,15 +1572,35 @@ def jackpot_redeem(request):
         elif JackpotCodeUse.objects.filter(user=request.user, code=jackpot).exists():
             messages.error(request, "Siz bu koddan avval foydalangansiz.")
         elif not jackpot.is_valid():
+            if jackpot.expires_at and jackpot.expires_at < timezone.now():
+                reason = "muddati tugagan"
+            elif jackpot.max_uses and jackpot.used_count() >= jackpot.max_uses:
+                reason = "foydalanuvchilar soni to'lgan"
+            else:
+                reason = "faol emas"
             AccountHistory.objects.create(
                 user=request.user,
-                text=f"Jackpot: \"{jackpot.code}\" — ulgurmadingiz, kod muddati tugagan"
+                text=f"Jackpot: \"{jackpot.code}\" — ulgurmadingiz, {reason}"
             )
-            messages.error(request, "Kod muddati tugagan yoki faol emas.")
+            messages.error(request, "Kod muddati tugagan, limitga yetgan yoki faol emas.")
         else:
             JackpotCodeUse.objects.create(user=request.user, code=jackpot)
 
-            if jackpot.reward_type == 'vip':
+            if jackpot.reward_type == 'vip_hour':
+                vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+                now = timezone.now()
+                base = vip_data.vip_expire if (vip_data.vip_expire and vip_data.vip_expire > now) else now
+                vip_data.is_vip = True
+                vip_data.tier = 'vip'
+                vip_data.vip_expire = base + timedelta(hours=jackpot.vip_hours)
+                vip_data.save()
+                AccountHistory.objects.create(
+                    user=request.user,
+                    text=f"Jackpot: {jackpot.vip_hours} soatlik VIP obuna aktivlashtirildi 🎉"
+                )
+                messages.success(request, f"Tabriklaymiz! {jackpot.vip_hours} soatlik VIP obuna aktivlashtirildi.")
+
+            elif jackpot.reward_type == 'vip_day':
                 vip_data, _ = VipUser.objects.get_or_create(user=request.user)
                 now = timezone.now()
                 base = vip_data.vip_expire if (vip_data.vip_expire and vip_data.vip_expire > now) else now
@@ -1593,7 +1613,8 @@ def jackpot_redeem(request):
                     text=f"Jackpot: {jackpot.vip_days} kunlik VIP obuna aktivlashtirildi 🎉"
                 )
                 messages.success(request, f"Tabriklaymiz! {jackpot.vip_days} kunlik VIP obuna aktivlashtirildi.")
-            else:
+
+            else:  # balance
                 UserBalance.objects.filter(user=request.user).update(amount=F('amount') + jackpot.balance_amount)
                 AccountHistory.objects.create(
                     user=request.user,
@@ -1601,7 +1622,6 @@ def jackpot_redeem(request):
                 )
                 messages.success(request, f"Tabriklaymiz! Hisobingizga {jackpot.balance_amount:,} so'm tushdi.".replace(',', '.'))
     return redirect('hisobim_page')
-
 
 @login_required
 def statistika_page(request):
