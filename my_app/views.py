@@ -24,10 +24,13 @@ from django.template.loader import render_to_string
 
 
 
+
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
     Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,
-    UserSettings,AnimeSchedule,AnimeSectionItem, Notice, NoticeRead,WatchHistory, FavoriteAnime,NoResultsMedia
+    UserSettings,AnimeSchedule,AnimeSectionItem, Notice, NoticeRead,WatchHistory, FavoriteAnime,NoResultsMedia,
+    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse,UserBalance
+
 )
 
 User = get_user_model()
@@ -1449,11 +1452,155 @@ def manifest_view(request):
 def offline_view(request):
     return render(request, 'offline.html')
 
+VIP_PLANS = [
+    {'key': '1_5week', 'label': "1.5 haftalik", 'price': 5000, 'days': 11},
+    {'key': '1_month', 'label': "1 oylik", 'price': 10000, 'days': 30},
+    {'key': '3_month', 'label': "3 oylik", 'price': 28000, 'days': 90},
+    {'key': '6_month', 'label': "6 oylik", 'price': 51000, 'days': 180},
+]
+VIP_PLANS_DICT = {p['key']: p for p in VIP_PLANS}
+
 @login_required
 def hisobim_page(request):
     from .models import UserBalance
     balance, _ = UserBalance.objects.get_or_create(user=request.user)
-    return render(request, 'hisobim.html', {'balance': balance})
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+
+    tz = ZoneInfo('Asia/Tashkent')
+    history = AccountHistory.objects.filter(user=request.user).order_by('-created_at')[:50]
+    for h in history:
+        h.local_time = localtime(h.created_at, tz)
+
+    my_debt_pending = DebtRequest.objects.filter(user=request.user, status='pending').exists()
+
+    vip_expire_local = None
+    if vip_data.vip_active():
+        vip_expire_local = localtime(vip_data.vip_expire, tz)
+
+    return render(request, 'hisobim.html', {
+        'balance': balance,
+        'vip_data': vip_data,
+        'vip_expire_local': vip_expire_local,
+        'vip_plans': VIP_PLANS,
+        'history': history,
+        'my_debt_pending': my_debt_pending,
+    })
+
+
+@login_required
+def vip_buy_balance(request, plan_key):
+    if request.method == 'POST':
+        plan = VIP_PLANS_DICT.get(plan_key)
+        if not plan:
+            messages.error(request, "Noto'g'ri reja tanlandi.")
+            return redirect('hisobim_page')
+
+        balance, _ = UserBalance.objects.get_or_create(user=request.user)
+        if balance.amount < plan['price']:
+            messages.error(request, "Hisobingizda mablag' yetarli emas.")
+            return redirect('hisobim_page')
+
+        UserBalance.objects.filter(user=request.user).update(amount=F('amount') - plan['price'])
+
+        vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+        now = timezone.now()
+        base = vip_data.vip_expire if (vip_data.vip_expire and vip_data.vip_expire > now) else now
+        vip_data.is_vip = True
+        vip_data.tier = 'vip'
+        vip_data.vip_expire = base + timedelta(days=plan['days'])
+        vip_data.save()
+
+        AccountHistory.objects.create(
+            user=request.user,
+            text=f"{plan['price']:,} so'm — {plan['label']} VIP obuna aktivlashtirildi".replace(',', '.')
+        )
+        messages.success(request, f"{plan['label']} VIP obuna faollashtirildi!")
+    return redirect('hisobim_page')
+
+
+@login_required
+def debt_request_add(request):
+    if request.method == 'POST':
+        if DebtRequest.objects.filter(user=request.user, status='pending').exists():
+            messages.warning(request, "Sizda hali ko'rib chiqilayotgan qarz so'rovi bor.")
+        else:
+            try:
+                amount = int(request.POST.get('amount', 0))
+            except ValueError:
+                amount = 0
+            if amount <= 0:
+                messages.error(request, "To'g'ri summa kiriting.")
+            else:
+                DebtRequest.objects.create(user=request.user, amount=amount)
+                AccountHistory.objects.create(
+                    user=request.user,
+                    text=f"{amount:,} so'm qarz so'raldi — ko'rib chiqilmoqda".replace(',', '.')
+                )
+                messages.success(request, "Qarz so'rovingiz yuborildi.")
+    return redirect('hisobim_page')
+
+
+@login_required
+def balance_topup_add(request):
+    if request.method == 'POST':
+        try:
+            amount = int(request.POST.get('amount', 0))
+        except ValueError:
+            amount = 0
+        image = request.FILES.get('receipt_image')
+
+        if amount <= 0 or not image:
+            messages.error(request, "Summa va chek rasmini to'g'ri kiriting.")
+        else:
+            BalanceTopupRequest.objects.create(user=request.user, amount=amount, image=image)
+            AccountHistory.objects.create(
+                user=request.user,
+                text=f"{amount:,} so'm hisobni to'ldirish so'rovi yuborildi — ko'rib chiqilmoqda".replace(',', '.')
+            )
+            messages.success(request, "So'rovingiz yuborildi! Admin tez orada tasdiqlaydi.")
+    return redirect('hisobim_page')
+
+
+@login_required
+def jackpot_redeem(request):
+    if request.method == 'POST':
+        code_str = request.POST.get('code', '').strip()
+        jackpot = JackpotCode.objects.filter(code__iexact=code_str).first() if code_str else None
+
+        if not jackpot:
+            messages.error(request, "Bunday jackpot kod topilmadi.")
+        elif JackpotCodeUse.objects.filter(user=request.user, code=jackpot).exists():
+            messages.error(request, "Siz bu koddan avval foydalangansiz.")
+        elif not jackpot.is_valid():
+            AccountHistory.objects.create(
+                user=request.user,
+                text=f"Jackpot: \"{jackpot.code}\" — ulgurmadingiz, kod muddati tugagan"
+            )
+            messages.error(request, "Kod muddati tugagan yoki faol emas.")
+        else:
+            JackpotCodeUse.objects.create(user=request.user, code=jackpot)
+
+            if jackpot.reward_type == 'vip':
+                vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+                now = timezone.now()
+                base = vip_data.vip_expire if (vip_data.vip_expire and vip_data.vip_expire > now) else now
+                vip_data.is_vip = True
+                vip_data.tier = 'vip'
+                vip_data.vip_expire = base + timedelta(days=jackpot.vip_days)
+                vip_data.save()
+                AccountHistory.objects.create(
+                    user=request.user,
+                    text=f"Jackpot: {jackpot.vip_days} kunlik VIP obuna aktivlashtirildi 🎉"
+                )
+                messages.success(request, f"Tabriklaymiz! {jackpot.vip_days} kunlik VIP obuna aktivlashtirildi.")
+            else:
+                UserBalance.objects.filter(user=request.user).update(amount=F('amount') + jackpot.balance_amount)
+                AccountHistory.objects.create(
+                    user=request.user,
+                    text=f"Jackpot: hisobingizga {jackpot.balance_amount:,} so'm tushdi 🎉".replace(',', '.')
+                )
+                messages.success(request, f"Tabriklaymiz! Hisobingizga {jackpot.balance_amount:,} so'm tushdi.".replace(',', '.'))
+    return redirect('hisobim_page')
 
 
 @login_required
