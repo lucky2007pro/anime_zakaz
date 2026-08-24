@@ -5,11 +5,22 @@
 {% block extra_css %}
 <style>
     .glass-panel { padding: 30px; }
-    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 12px; }
     .panel-header h2 { font-size: 1.5rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 1px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .header-actions .btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 800; cursor: pointer; text-decoration: none; text-transform: uppercase; box-shadow: 0 0 10px var(--accent-glow); transition: 0.3s;}
     .header-actions .btn:hover { background: white; box-shadow: 0 0 15px rgba(255,255,255,0.5); }
-    
+    .header-actions form { display: flex; gap: 8px; }
+    .header-actions input[type=text] {
+        background:#0a0a0f; border:1px solid var(--border-line); border-radius:6px;
+        padding:9px 14px; color:#fff; font-size:0.9rem; width:170px;
+    }
+    .header-actions .btn-outline {
+        background:#1e1e24; color:#fff; border:1px solid #333; padding:9px 18px;
+        border-radius:4px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:0.82rem;
+    }
+    .header-actions .btn-outline:hover { background: var(--accent); color:#000; border-color: var(--accent); }
+
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; padding: 15px; font-size: 0.75rem; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border-line); letter-spacing: 1px;}
     td { padding: 15px; font-size: 0.95rem; border-bottom: 1px solid #111; }
@@ -63,6 +74,13 @@
                 <a href="{% url 'admin_section_form' %}" class="btn">+ Qo'shish</a>
             {% elif type == 'notice' %}
                 <a href="{% url 'admin_notice_form' %}" class="btn">+ Qo'shish</a>
+            {% elif type == 'jackpot' %}
+                <a href="{% url 'admin_jackpot_form' %}" class="btn">+ Yangi jackpot kod</a>
+            {% elif type == 'hisob' %}
+                <form method="get" action="{% url 'admin_hisob_form_lookup' %}">
+                    <input type="text" name="user_id" placeholder="Foydalanuvchi ID">
+                    <button type="submit" class="btn-outline">ID orqali ochish</button>
+                </form>
             {% else %}
                 <button class="btn" style="opacity:0.5; pointer-events:none;">+ Qo'shish</button>
             {% endif %}
@@ -103,6 +121,10 @@
                     <th>Anime nomi</th><th>Bo'lim</th><th>Tartib</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'notice' %}
                     <th>Sarlavha</th><th>Matn</th><th>Turi</th><th>Holat</th><th>Sana</th><th>Harakatlar</th>
+                {% elif type == 'hisob' %}
+                    <th>Foydalanuvchi</th><th>Balans</th><th>Yangilangan sana</th><th>Harakatlar</th>
+                {% elif type == 'jackpot' %}
+                    <th>Kod</th><th>Mukofot turi</th><th>Foydalanilgan</th><th>Muddat</th><th>Holat</th><th>Harakatlar</th>
                 {% endif %}
             </tr>
         </thead>
@@ -266,6 +288,41 @@
                         {% else %}<span class="badge badge-red">Nofaol</span>{% endif %}
                     </td>
                     <td style="color:var(--text-dim); white-space:nowrap;">{{ item.created_at|date:"d.m.Y H:i" }}</td>
+
+                {% elif type == 'hisob' %}
+                    <td style="font-weight:700; color:#fff;">
+                        {{ item.user.username }}
+                        <div style="font-size:0.78rem; color:var(--text-dim); font-weight:400;">#{{ item.user.id }}</div>
+                    </td>
+                    <td style="color:var(--accent); font-weight:800; font-size:1.05rem;">{{ item.amount }} so'm</td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">{{ item.updated_at|date:"d.m.Y H:i" }}</td>
+
+                {% elif type == 'jackpot' %}
+                    <td style="font-weight:700; color:#fff;">{{ item.code }}</td>
+                    <td>
+                        {% if item.reward_type == 'vip_hour' %}
+                            <span class="badge badge-blue">{{ item.get_reward_type_display }} ({{ item.vip_hours }} soat)</span>
+                        {% elif item.reward_type == 'vip_day' %}
+                            <span class="badge badge-purple">{{ item.get_reward_type_display }} ({{ item.vip_days }} kun)</span>
+                        {% else %}
+                            <span class="badge badge-green">{{ item.get_reward_type_display }} ({{ item.balance_amount }} so'm)</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:var(--text-dim);">
+                        {{ item.used_count }}{% if item.max_uses %} / {{ item.max_uses }}{% else %} / ∞{% endif %}
+                    </td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">
+                        {% if item.expires_at %}{{ item.expires_at|date:"d.m.Y H:i" }}{% else %}Muddatsiz{% endif %}
+                    </td>
+                    <td>
+                        {% if item.is_valid %}
+                            <span class="badge badge-green">Faol</span>
+                        {% elif not item.is_active %}
+                            <span class="badge badge-red">O'chirilgan</span>
+                        {% else %}
+                            <span class="badge badge-yellow">Tugagan / To'lgan</span>
+                        {% endif %}
+                    </td>
                 {% endif %}
 
                 <!-- HARAKATLAR -->
@@ -345,6 +402,13 @@
                     {% elif type == 'notice' %}
                         <a href="{% url 'admin_notice_form' item.id %}" class="action-btn">Tahrirlash</a>
                         <a href="{% url 'admin_notice_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
+                    {% elif type == 'hisob' %}
+                        <a href="{% url 'admin_hisob_form' item.user.id %}" class="action-btn">Boshqarish</a>
+
+                    {% elif type == 'jackpot' %}
+                        <a href="{% url 'admin_jackpot_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_jackpot_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
 
                     {% elif type == 'newslike' or type == 'storyview' %}
                         <span style="color:var(--text-dim); font-size:0.82rem;">—</span>
