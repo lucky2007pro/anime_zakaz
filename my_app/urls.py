@@ -10,7 +10,7 @@ from .views import (
     anime_category,notice,delete_comment,service_worker_view,offline_view,manifest_view,
     hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
     imkon_vote_request_add, imkon_vote, imkon_anime_request_add,check_username,
-    news_load_more
+    news_load_more,vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem,
 )
 from .admin_views import *
 from django.conf import settings
@@ -160,6 +160,11 @@ urlpatterns = [
     path('news/load-more/', news_load_more, name='news_load_more'),
     path('news/<int:pk>/', news_detail, name='news_detail'),
     path('news/<int:pk>/like/', toggle_like, name='toggle_like'),
+
+    path('hisobim/vip-buy/<str:plan_key>/', vip_buy_balance, name='vip_buy_balance'),
+    path('hisobim/qarz-sorash/', debt_request_add, name='debt_request_add'),
+    path('hisobim/toldirish/', balance_topup_add, name='balance_topup_add'),
+    path('hisobim/jackpot/', jackpot_redeem, name='jackpot_redeem'),
 ]
 
 
