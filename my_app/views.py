@@ -18,6 +18,9 @@ import re
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+
 
 
 
@@ -28,7 +31,7 @@ from .models import (
 )
 
 User = get_user_model()
-
+NEWS_PAGE_SIZE = 9
 
 # =======================
 # REGISTER
@@ -476,8 +479,9 @@ def search(request):
     if request.user.is_authenticated:
         from .models import FavoriteAnime
         fav_ids = list(FavoriteAnime.objects.filter(user=request.user).values_list('movie_id', flat=True))
-        
+
     no_results_media = NoResultsMedia.objects.filter(is_active=True).first()
+
     return render(request, 'search.html', {
         'movies': movies,
         'query': query,
@@ -512,19 +516,25 @@ def anime_catalog(request):
 @login_required
 def chat(request):
     tz = ZoneInfo('Asia/Tashkent')
-
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
 
     messages_count = ChatMessage.objects.count()
     has_more = messages_count > 40
 
     messages_list = list(
-        ChatMessage.objects.select_related('user', 'reply_to', 'user__avatar', 'user__vip_data').order_by(
-            '-created_at')[:40])
+        ChatMessage.objects.select_related(
+            'user', 'reply_to', 'reply_to_news', 'user__avatar', 'user__vip_data'
+        ).order_by('-created_at')[:40])
     messages_list.reverse()
 
     for msg in messages_list:
         msg.local_created_at = localtime(msg.created_at, tz)
+
+    # YANGI — yangilikdan "javob yozish" orqali kelingan bo'lsa
+    reply_news_obj = None
+    reply_news_id = request.GET.get('reply_news')
+    if reply_news_id and reply_news_id.isdigit():
+        reply_news_obj = AnimeNews.objects.filter(id=reply_news_id).first()
 
     if request.method == "POST":
         if request.user.is_banned:
@@ -533,7 +543,9 @@ def chat(request):
 
         text = request.POST.get("message", "").strip()
         reply_to_id = request.POST.get("reply_to")
+        reply_to_news_id = request.POST.get("reply_to_news")   # YANGI
         reply_to_msg = None
+        reply_to_news = None                                    # YANGI
 
         if reply_to_id:
             try:
@@ -541,12 +553,16 @@ def chat(request):
             except:
                 pass
 
+        if reply_to_news_id and reply_to_news_id.isdigit():      # YANGI
+            reply_to_news = AnimeNews.objects.filter(id=reply_to_news_id).first()
+
         if text:
             new_msg = ChatMessage.objects.create(
                 user=request.user,
                 message=text,
                 created_at=timezone.now(),
-                reply_to=reply_to_msg
+                reply_to=reply_to_msg,
+                reply_to_news=reply_to_news,                      # YANGI
             )
             if reply_to_msg and reply_to_msg.user != request.user:
                 Notice.objects.create(
@@ -562,8 +578,9 @@ def chat(request):
     return render(request, 'chat.html', {
         'messages': messages_list,
         'has_more': has_more,
-        'user_tier': vip_data.get_tier(),          # YANGI
-        'vip_active': vip_data.vip_active(),       # YANGI
+        'user_tier': vip_data.get_tier(),
+        'vip_active': vip_data.vip_active(),
+        'reply_news_obj': reply_news_obj,   # YANGI
     })
 
 
@@ -579,8 +596,9 @@ def chat_messages_api(request):
     except ValueError:
         limit = 20
 
-    qs = ChatMessage.objects.select_related('user', 'user__avatar', 'user__vip_data', 'reply_to').order_by(
-        '-created_at')
+    qs = ChatMessage.objects.select_related(
+        'user', 'user__avatar', 'user__vip_data', 'reply_to', 'reply_to_news'   # reply_to_news qo'shildi
+    ).order_by('-created_at')
     if before_id and before_id.isdigit():
         qs = qs.filter(id__lt=before_id)
 
@@ -594,7 +612,17 @@ def chat_messages_api(request):
             reply_data = {
                 'id': msg.reply_to.id,
                 'username': msg.reply_to.user.username,
-                'message': msg.reply_to.message
+                'message': msg.reply_to.message,
+                'is_vip': hasattr(msg.reply_to.user, 'vip_data') and msg.reply_to.user.vip_data.vip_active(),
+            }
+
+        # YANGI
+        reply_news_data = None
+        if msg.reply_to_news:
+            reply_news_data = {
+                'id': msg.reply_to_news.id,
+                'title': msg.reply_to_news.title,
+                'image_url': msg.reply_to_news.image.url if msg.reply_to_news.image else None,
             }
 
         avatar_url = msg.user.avatar.image.url if getattr(msg.user, 'avatar', None) and msg.user.avatar.image else None
@@ -603,14 +631,16 @@ def chat_messages_api(request):
             'id': msg.id,
             'message': msg.message,
             'username': msg.user.username,
-            'display_name': msg.user.display_name(),  # YANGI
+            'display_name': msg.user.display_name(),
             'avatar_url': avatar_url,
+            'date': localtime(msg.created_at, tz).strftime('%d.%m.%Y'),   # eslatma: kodingizda buni tekshiring, agar yo'q bo'lsa qo'shing
             'time': localtime(msg.created_at, tz).strftime('%H:%M'),
             'edited': msg.edited,
             'is_own': msg.user == request.user,
             'is_admin': msg.user.is_admin_user,
             'is_vip': hasattr(msg.user, 'vip_data') and msg.user.vip_data.vip_active(),
             'reply_to': reply_data,
+            'reply_to_news': reply_news_data,   # YANGI
             'can_edit': (msg.user == request.user) or request.user.is_admin_user,
             'can_ban': request.user.is_admin_user and not msg.user.is_admin_user,
             'user_id': msg.user.id
@@ -755,12 +785,49 @@ def aloqa(request):
 # NEWS FEED (HOME PAGE)
 # =======================
 def news_feed(request):
-    news_list = AnimeNews.objects.all().order_by('-created_at')
+    news_qs = AnimeNews.objects.all().order_by('-created_at')
+    paginator = Paginator(news_qs, NEWS_PAGE_SIZE)
+    page_obj = paginator.get_page(1)
+
+    liked_ids = set()
+    if request.user.is_authenticated:
+        liked_ids = set(
+            NewsLike.objects.filter(user=request.user, news__in=page_obj.object_list)
+            .values_list('news_id', flat=True)
+        )
 
     return render(request, 'news.html', {
-        'news_list': news_list
+        'news_list': page_obj.object_list,
+        'liked_ids': liked_ids,
+        'has_more': page_obj.has_next(),
     })
 
+
+# =======================
+# NEWS — LOAD MORE (infinite scroll uchun AJAX)
+# =======================
+def news_load_more(request):
+    page_number = request.GET.get('page', 2)
+    news_qs = AnimeNews.objects.all().order_by('-created_at')
+    paginator = Paginator(news_qs, NEWS_PAGE_SIZE)
+    page_obj = paginator.get_page(page_number)
+
+    liked_ids = set()
+    if request.user.is_authenticated:
+        liked_ids = set(
+            NewsLike.objects.filter(user=request.user, news__in=page_obj.object_list)
+            .values_list('news_id', flat=True)
+        )
+
+    html = render_to_string('news_cards.html', {
+        'news_list': page_obj.object_list,
+        'liked_ids': liked_ids,
+    }, request=request)
+
+    return JsonResponse({
+        'html': html,
+        'has_more': page_obj.has_next(),
+    })
 # =======================
 # NEWS DETAIL PAGE
 # =======================
