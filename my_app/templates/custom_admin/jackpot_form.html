@@ -1,0 +1,218 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}Jackpot kod{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-panel { padding: 30px; margin-bottom: 25px; }
+    .panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; }
+    .panel-header h2 { font-size:1.4rem; font-weight:800; color:white; text-transform:uppercase; letter-spacing:1px; }
+
+    .form-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:18px; }
+    .form-group { display:flex; flex-direction:column; gap:8px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size:0.78rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.6px; font-weight:700; }
+    .form-group input[type=text],
+    .form-group input[type=number],
+    .form-group input[type=datetime-local],
+    .form-group select {
+        background:#0a0a0f; border:1px solid var(--border-line); border-radius:8px;
+        padding:11px 14px; color:#fff; font-size:0.95rem; font-family:'Outfit',sans-serif;
+    }
+    .form-group input:focus, .form-group select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 8px rgba(0,243,255,0.25); }
+
+    .checkbox-row { display:flex; align-items:center; gap:10px; }
+    .checkbox-row input { width:18px; height:18px; accent-color: var(--accent); }
+
+    .reward-block { display:none; }
+    .reward-block.active { display:flex; }
+
+    .btn-save {
+        background: var(--accent); color:#000; border:none; padding:12px 26px;
+        border-radius:6px; font-weight:800; cursor:pointer; text-transform:uppercase;
+        box-shadow:0 0 10px var(--accent-glow); font-size:0.9rem; margin-top:10px;
+    }
+    .btn-save:hover { background:#fff; }
+
+    .hint { font-size:0.72rem; color:var(--text-dim); margin-top:2px; }
+
+    /* USES TABLE */
+    table { width:100%; border-collapse:collapse; }
+    th { text-align:left; padding:12px; font-size:0.72rem; color:var(--accent); text-transform:uppercase; border-bottom:1px solid var(--border-line); letter-spacing:1px; }
+    td { padding:12px; font-size:0.9rem; border-bottom:1px solid #111; }
+    tr:hover td { background:#111; }
+
+    .action-btn { background:#1e1e24; color:white; border:1px solid #333; padding:5px 10px; border-radius:4px; cursor:pointer; text-decoration:none; font-size:0.78rem; }
+    .action-btn.delete { background:rgba(248,113,113,0.12); color:#f87171; border-color:rgba(248,113,113,0.35); }
+    .action-btn.delete:hover { background:#ef4444; color:#fff; }
+
+    .cancel-box { display:flex; gap:10px; align-items:center; margin-bottom:18px; flex-wrap:wrap; }
+    .cancel-box input { background:#0a0a0f; border:1px solid var(--border-line); border-radius:8px; padding:9px 12px; color:#fff; width:200px; }
+    .cancel-box button { background:#1e1e24; color:#f87171; border:1px solid rgba(248,113,113,0.35); padding:9px 16px; border-radius:6px; cursor:pointer; font-weight:700; }
+    .cancel-box button:hover { background:#ef4444; color:#fff; }
+
+    .badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:0.72rem; font-weight:700; }
+    .badge-blue { background: rgba(0,243,255,0.12); color: var(--accent); }
+    .badge-green { background: rgba(52,211,153,0.15); color: #34d399; }
+
+    @media (max-width: 768px){
+        .form-grid { grid-template-columns: 1fr; }
+        .glass-panel { padding:18px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="glass-panel">
+    <div class="panel-header">
+        <h2>{% if jackpot %}Jackpot kodni tahrirlash{% else %}Yangi jackpot kod{% endif %}</h2>
+        <a href="{% url 'admin_jackpot_list' %}" class="action-btn">← Ro'yxatga qaytish</a>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Kod</label>
+                <input type="text" name="code" value="{{ jackpot.code|default:'' }}" placeholder="Masalan: JACKPOT2026" required>
+            </div>
+
+            <div class="form-group">
+                <label>Mukofot turi</label>
+                <select name="reward_type" id="rewardType" onchange="toggleRewardBlocks()">
+                    {% for value, label in reward_choices %}
+                        <option value="{{ value }}" {% if jackpot.reward_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group reward-block" data-reward="vip_hour">
+                <label>VIP soat (necha soatlik VIP beriladi)</label>
+                <input type="number" name="vip_hours" min="0" value="{{ jackpot.vip_hours|default:0 }}">
+                <div class="hint">reward_type = "VIP obuna (soatlik)" bo'lsa ishlaydi</div>
+            </div>
+
+            <div class="form-group reward-block" data-reward="vip_day">
+                <label>VIP kun (necha kunlik VIP beriladi)</label>
+                <input type="number" name="vip_days" min="0" value="{{ jackpot.vip_days|default:0 }}">
+                <div class="hint">reward_type = "VIP obuna (kunlik)" bo'lsa ishlaydi</div>
+            </div>
+
+            <div class="form-group reward-block" data-reward="balance">
+                <label>Hisobga tushadigan summa (so'm)</label>
+                <input type="number" name="balance_amount" min="0" value="{{ jackpot.balance_amount|default:0 }}">
+                <div class="hint">reward_type = "Hisobga pul" bo'lsa ishlaydi</div>
+            </div>
+
+            <div class="form-group">
+                <label>Nechta foydalanuvchi ishlata oladi</label>
+                <input type="number" name="max_uses" min="0" value="{{ jackpot.max_uses|default:0 }}" placeholder="0 = cheksiz">
+                <div class="hint">Masalan 10 kiritsangiz — faqat 10 kishi foydalana oladi. 0 = cheksiz</div>
+            </div>
+
+            <div class="form-group">
+                <label>Muddati (ixtiyoriy)</label>
+                <input type="datetime-local" name="expires_at" value="{{ jackpot.expires_at|date:'Y-m-d\TH:i' }}">
+                <div class="hint">Bo'sh qoldirilsa — muddatsiz amal qiladi</div>
+            </div>
+
+            <div class="form-group">
+                <label>Holati</label>
+                <div class="checkbox-row">
+                    <input type="checkbox" name="is_active" id="isActive" {% if jackpot.is_active or not jackpot %}checked{% endif %}>
+                    <label for="isActive" style="text-transform:none; font-size:0.9rem; color:#fff;">Faol (foydalanish mumkin)</label>
+                </div>
+            </div>
+
+            {% if jackpot %}
+            <div class="form-group">
+                <label>Statistika</label>
+                <div style="color:var(--text-dim); font-size:0.9rem;">
+                    Ishlatilgan: <b style="color:#fff;">{{ jackpot.used_count }}</b>
+                    {% if jackpot.max_uses %} / {{ jackpot.max_uses }}{% endif %}
+                    &nbsp;·&nbsp;
+                    {% if jackpot.is_valid %}
+                        <span class="badge badge-green">Amal qilmoqda</span>
+                    {% else %}
+                        <span class="badge" style="background:rgba(248,113,113,0.12); color:#f87171;">Amal qilmayapti</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <button type="submit" class="btn-save">Saqlash</button>
+    </form>
+</div>
+
+{% if jackpot %}
+<div class="glass-panel">
+    <div class="panel-header">
+        <h2>Foydalanganlar ({{ uses|length }})</h2>
+    </div>
+
+    <div class="cancel-box">
+        <form method="post" action="{% url 'admin_jackpot_cancel_user' jackpot.pk %}" style="display:flex; gap:10px;">
+            {% csrf_token %}
+            <input type="text" name="user_id" placeholder="Foydalanuvchi ID" required>
+            <button type="submit" onclick="return confirm('Shu foydalanuvchi uchun jackpot bekor qilinsinmi? U kodni qayta ishlata oladi.');">
+                ID orqali bekor qilish
+            </button>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Foydalanuvchi</th>
+                <th>Ishlatilgan vaqti</th>
+                <th>Harakat</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for use in uses %}
+            <tr>
+                <td>#{{ use.user.id }}</td>
+                <td style="font-weight:600;">{{ use.user.username }}</td>
+                <td style="color:var(--text-dim);">{{ use.used_at|date:"d.m.Y H:i" }}</td>
+                <td>
+                    <form method="post" action="{% url 'admin_jackpot_cancel_user' jackpot.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ use.user.id }}">
+                        <button type="submit" class="action-btn delete" onclick="return confirm('{{ use.user.username }} uchun jackpot bekor qilinsinmi?');">
+                            Bekor qilish
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align:center; padding:30px; color:var(--text-dim);">Hali hech kim foydalanmagan</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="glass-panel">
+    <a href="{% url 'admin_jackpot_delete' jackpot.pk %}" class="action-btn delete" onclick="return confirm('Bu jackpot kod butunlay o\'chirilsinmi?');">
+        Kodni butunlay o'chirish
+    </a>
+</div>
+{% endif %}
+
+<script>
+    function toggleRewardBlocks() {
+        const val = document.getElementById('rewardType').value;
+        document.querySelectorAll('.reward-block').forEach(el => {
+            el.classList.toggle('active', el.dataset.reward === val);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', toggleRewardBlocks);
+</script>
+
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}Hisobim boshqaruvi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-panel { padding: 30px; margin-bottom: 25px; }
+    .panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+    .panel-header h2 { font-size:1.3rem; font-weight:800; color:white; text-transform:uppercase; letter-spacing:1px; }
+
+    .lookup-box { display:flex; gap:10px; flex-wrap:wrap; }
+    .lookup-box input {
+        background:#0a0a0f; border:1px solid var(--border-line); border-radius:8px;
+        padding:11px 14px; color:#fff; font-size:0.95rem; width:220px;
+    }
+    .lookup-box button {
+        background: var(--accent); color:#000; border:none; padding:11px 22px;
+        border-radius:6px; font-weight:800; cursor:pointer; text-transform:uppercase; font-size:0.85rem;
+        box-shadow:0 0 10px var(--accent-glow);
+    }
+    .lookup-box button:hover { background:#fff; }
+
+    .user-card { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:10px; }
+    .user-info h3 { font-size:1.3rem; color:#fff; margin-bottom:4px; }
+    .user-info .sub { color:var(--text-dim); font-size:0.85rem; }
+    .balance-amount { font-size:2rem; font-weight:900; color:var(--accent); text-shadow:0 0 12px var(--accent-glow); }
+    .balance-label { font-size:0.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; }
+
+    .action-forms { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:22px; }
+    .action-card { background:#0a0a0f; border:1px solid var(--border-line); border-radius:10px; padding:20px; }
+    .action-card h4 { font-size:0.9rem; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:14px; }
+    .action-card.fill h4 { color:#34d399; }
+    .action-card.withdraw h4 { color:#f87171; }
+    .action-card input[type=number] {
+        width:100%; background:#050505; border:1px solid var(--border-line); border-radius:8px;
+        padding:11px 14px; color:#fff; font-size:0.95rem; margin-bottom:12px;
+    }
+    .action-card button {
+        width:100%; border:none; padding:11px; border-radius:6px; font-weight:800;
+        cursor:pointer; text-transform:uppercase; font-size:0.85rem;
+    }
+    .action-card.fill button { background:#34d399; color:#000; }
+    .action-card.fill button:hover { background:#5eead4; }
+    .action-card.withdraw button { background:#f87171; color:#000; }
+    .action-card.withdraw button:hover { background:#fca5a5; }
+
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th { text-align:left; padding:12px; font-size:0.72rem; color:var(--accent); text-transform:uppercase; border-bottom:1px solid var(--border-line); letter-spacing:1px; }
+    td { padding:12px; font-size:0.9rem; border-bottom:1px solid #111; }
+    tr:hover td { background:#111; }
+
+    .empty-state { text-align:center; padding:50px 20px; color:var(--text-dim); }
+    .empty-state i { font-size:2.4rem; display:block; margin-bottom:10px; }
+
+    @media (max-width: 768px) {
+        .action-forms { grid-template-columns: 1fr; }
+        .glass-panel { padding:18px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="glass-panel">
+    <div class="panel-header">
+        <h2>Foydalanuvchini qidirish</h2>
+        <a href="{% url 'admin_hisob_list' %}" class="action-btn" style="background:#1e1e24; color:#fff; border:1px solid #333; padding:8px 14px; border-radius:4px; text-decoration:none; font-size:0.85rem;">← Ro'yxatga qaytish</a>
+    </div>
+    <form method="get" class="lookup-box">
+        <input type="text" name="user_id" placeholder="Foydalanuvchi ID" value="{{ target_user.id|default:'' }}" required>
+        <button type="submit">Qidirish</button>
+    </form>
+</div>
+
+{% if target_user %}
+
+<div class="glass-panel">
+    <div class="user-card">
+        <div class="user-info">
+            <h3>{{ target_user.username }}</h3>
+            <div class="sub">#{{ target_user.id }} &nbsp;·&nbsp; {{ target_user.email|default:"email kiritilmagan" }}</div>
+        </div>
+        <div style="text-align:right;">
+            <div class="balance-label">Joriy balans</div>
+            <div class="balance-amount">{{ balance.amount|default:0 }} so'm</div>
+        </div>
+    </div>
+
+    <div class="action-forms">
+        <form method="post" class="action-card fill">
+            {% csrf_token %}
+            <h4>Hisobni to'ldirish</h4>
+            <input type="hidden" name="user_id" value="{{ target_user.id }}">
+            <input type="hidden" name="action" value="toldirish">
+            <input type="number" name="amount" min="1" placeholder="Summa (so'm)" required>
+            <button type="submit">+ To'ldirish</button>
+        </form>
+
+        <form method="post" class="action-card withdraw">
+            {% csrf_token %}
+            <h4>Hisobdan yechish</h4>
+            <input type="hidden" name="user_id" value="{{ target_user.id }}">
+            <input type="hidden" name="action" value="yechish">
+            <input type="number" name="amount" min="1" placeholder="Summa (so'm)" required>
+            <button type="submit" onclick="return confirm('Ushbu foydalanuvchi hisobidan mablag\' yechilsinmi?');">− Yechish</button>
+        </form>
+    </div>
+</div>
+
+<div class="glass-panel">
+    <div class="panel-header">
+        <h2>So'nggi amallar tarixi</h2>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Amal</th>
+                <th>Sana</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in history %}
+            <tr>
+                <td>{{ h.text }}</td>
+                <td style="color:var(--text-dim); white-space:nowrap;">{{ h.created_at|date:"d.m.Y H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" style="text-align:center; padding:30px; color:var(--text-dim);">Tarix bo'sh</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+<div class="glass-panel">
+    <div class="empty-state">
+        <i class='bx bx-search-alt'></i>
+        Foydalanuvchi ID sini kiritib qidiring
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-panel { padding: 30px; }
+    .panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; flex-wrap:wrap; gap:12px; }
+    .panel-header h2 { font-size:1.4rem; font-weight:800; color:white; text-transform:uppercase; letter-spacing:1px; }
+
+    .stats-row { display:flex; gap:14px; margin-bottom:22px; flex-wrap:wrap; }
+    .stat-box { background:#0a0a0f; border:1px solid var(--border-line); border-radius:10px; padding:16px 22px; min-width:140px; }
+    .stat-box .num { font-size:1.6rem; font-weight:900; }
+    .stat-box .label { font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+    .stat-box.pending .num { color:#fbbf24; }
+    .stat-box.approved .num { color:#34d399; }
+    .stat-box.rejected .num { color:#f87171; }
+
+    .table-wrap { width:100%; overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:720px; }
+    th { text-align:left; padding:15px; font-size:0.75rem; color:var(--accent); text-transform:uppercase; border-bottom:1px solid var(--border-line); letter-spacing:1px; }
+    td { padding:15px; font-size:0.95rem; border-bottom:1px solid #111; }
+    tr:hover td { background:#111; }
+
+    .badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:0.75rem; font-weight:700; }
+    .badge-yellow { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .badge-green { background: rgba(52,211,153,0.15); color: #34d399; }
+    .badge-red { background: rgba(248,113,113,0.15); color: #f87171; }
+
+    .action-btn { background:#1e1e24; color:white; border:1px solid #333; padding:6px 12px; border-radius:4px; cursor:pointer; text-decoration:none; font-size:0.8rem; display:inline-block; margin:2px; }
+    .action-btn.success { background:rgba(52,211,153,0.15); color:#34d399; border-color:rgba(52,211,153,0.4); }
+    .action-btn.success:hover { background:#34d399; color:#000; }
+    .action-btn.delete { background:rgba(248,113,113,0.12); color:#f87171; border-color:rgba(248,113,113,0.35); }
+    .action-btn.delete:hover { background:#ef4444; color:#fff; }
+
+    .filter-tabs { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+    .filter-tabs a {
+        padding:8px 16px; border-radius:20px; font-size:0.82rem; font-weight:700;
+        text-decoration:none; color:var(--text-dim); border:1px solid var(--border-line); background:#0a0a0f;
+    }
+    .filter-tabs a.active { background:var(--accent); color:#000; border-color:var(--accent); }
+
+    @media (max-width: 768px) {
+        .glass-panel { padding:18px; }
+        .panel-header h2 { font-size:1.1rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <div class="panel-header">
+        <h2>Qarz so'rovlari</h2>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-box pending">
+            <div class="num">{{ debts|length }}</div>
+            <div class="label">Jami so'rovlar</div>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Foydalanuvchi</th>
+                    <th>Summa</th>
+                    <th>Holati</th>
+                    <th>So'ralgan sana</th>
+                    <th>Ko'rib chiqilgan sana</th>
+                    <th>Harakatlar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for debt in debts %}
+                <tr>
+                    <td style="font-weight:600;">{{ debt.user.username }} <span style="color:var(--text-dim); font-weight:400;">#{{ debt.user.id }}</span></td>
+                    <td style="color:var(--accent); font-weight:700;">{{ debt.amount }} so'm</td>
+                    <td>
+                        {% if debt.status == 'pending' %}
+                            <span class="badge badge-yellow">Kutilmoqda</span>
+                        {% elif debt.status == 'approved' %}
+                            <span class="badge badge-green">Tasdiqlangan</span>
+                        {% else %}
+                            <span class="badge badge-red">Rad etilgan</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">{{ debt.created_at|date:"d.m.Y H:i" }}</td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">
+                        {% if debt.processed_at %}{{ debt.processed_at|date:"d.m.Y H:i" }}{% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if debt.status == 'pending' %}
+                            <a href="{% url 'admin_qarz_tasdiqlash' debt.id %}" class="action-btn success" onclick="return confirm('{{ debt.user.username }} uchun {{ debt.amount }} so\'mlik qarz so\'rovi tasdiqlansinmi? Summasi hisobiga qo\'shiladi.');">
+                                Tasdiqlash
+                            </a>
+                            <a href="{% url 'admin_qarz_rad' debt.id %}" class="action-btn delete" onclick="return confirm('Bu qarz so\'rovi rad etilsinmi?');">
+                                Rad etish
+                            </a>
+                        {% else %}
+                            <span style="color:var(--text-dim); font-size:0.85rem;">Yakunlangan</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center; padding:40px; color:var(--text-dim);">
+                        <i class='bx bx-inbox' style="font-size:2rem; display:block; margin-bottom:8px;"></i>
+                        Hozircha qarz so'rovlari yo'q
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
