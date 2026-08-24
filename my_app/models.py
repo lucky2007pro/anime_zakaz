@@ -331,13 +331,7 @@ class FavoriteAnime(models.Model):
         unique_together = ('user', 'movie')
 
 
-class WatchHistory(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='watch_history')
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='watched_by')
-    last_watched = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        unique_together = ('user', 'movie')
 
 
 # =======================
@@ -917,3 +911,106 @@ class NoResultsMedia(models.Model):
     def __str__(self):
         return f"NoResultsMedia #{self.id} ({self.get_media_type_display()})"
 
+
+
+# =======================
+# HISOBIM — TARIX (AMALLAR TARIXI)
+# =======================
+class AccountHistory(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='account_history')
+    text = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Hisobim tarixi"
+        verbose_name_plural = "Hisobim tarixi"
+
+    def __str__(self):
+        return f"{self.user.username}: {self.text[:40]}"
+
+
+# =======================
+# QARZ SO'RASH
+# =======================
+class DebtRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Kutilmoqda'),
+        ('approved', 'Tasdiqlangan'),
+        ('rejected', 'Rad etilgan'),
+    ]
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='debt_requests')
+    amount = models.PositiveIntegerField(help_text="So'ralgan summa (so'm)")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Qarz so'rovi"
+        verbose_name_plural = "Qarz so'rovlari"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.amount} so'm ({self.get_status_display()})"
+
+
+# =======================
+# HISOBNI TO'LDIRISH (CHEK ORQALI, ISTAGAN SUMMA)
+# =======================
+class BalanceTopupRequest(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='balance_topups')
+    amount = models.PositiveIntegerField(help_text="Kiritmoqchi bo'lgan summa (so'm)")
+    image = models.ImageField(upload_to='balance_topups/%Y/%m/')
+    is_approved = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Hisobni to'ldirish so'rovi"
+        verbose_name_plural = "Hisobni to'ldirish so'rovlari"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.amount} so'm"
+
+
+# =======================
+# JACKPOT KODLAR
+# =======================
+class JackpotCode(models.Model):
+    REWARD_CHOICES = [
+        ('vip', "VIP obuna (kun)"),
+        ('balance', "Hisobga pul"),
+    ]
+    code = models.CharField(max_length=50, unique=True)
+    reward_type = models.CharField(max_length=10, choices=REWARD_CHOICES, default='balance')
+    vip_days = models.PositiveIntegerField(default=0, blank=True, help_text="reward_type=vip bo'lsa nechta kun")
+    balance_amount = models.PositiveIntegerField(default=0, blank=True, help_text="reward_type=balance bo'lsa nechta so'm")
+    expires_at = models.DateTimeField(null=True, blank=True, help_text="Bo'sh qoldirilsa — muddatsiz amal qiladi (admin o'zi bekor qilmaguncha)")
+    is_active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Jackpot kod"
+        verbose_name_plural = "Jackpot kodlar"
+
+    def is_valid(self):
+        if not self.is_active:
+            return False
+        if self.expires_at and self.expires_at < timezone.now():
+            return False
+        return True
+
+    def __str__(self):
+        return self.code
+
+
+class JackpotCodeUse(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='jackpot_uses')
+    code = models.ForeignKey(JackpotCode, on_delete=models.CASCADE, related_name='uses')
+    used_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'code')
