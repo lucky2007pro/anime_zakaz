@@ -5,28 +5,27 @@
 <meta charset="UTF-8">
 <title>{{ news.title }}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon"
-href="{% static 'images/favicon.svg' %}"
-type="image/svg+xml">
+<link rel="icon" href="{% static 'images/favicon.svg' %}" type="image/svg+xml">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-
     background-image: url("https://i.pinimg.com/736x/1d/6a/08/1d6a08d9b18f16cc49cdaddfa878e8a0.jpg");
-
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-
     position: relative;
     min-height: 100vh;
     color: #fff;
     z-index: 0;
 }
 
-/* 🔥 DARK OVERLAY (o‘qish uchun) */
+@media (max-width: 600px) {
+    body { background-attachment: scroll; }
+}
+
 body::before {
     content: "";
     position: fixed;
@@ -35,548 +34,266 @@ body::before {
     z-index: -1;
 }
 
-/* HEADER */
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 15px;
-
     background: rgba(20,20,20,0.85);
     backdrop-filter: blur(10px);
-
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
-.back {
-    color: #fff;
-    text-decoration: none;
-    font-size: 16px;
-}
+.back { color: #fff; text-decoration: none; font-size: 16px; }
 
-/* IMAGE (QIRQILMAYDI) */
-img {
+/* ============ RASM — 16:9, MOBIL VA PC BIR XIL ============ */
+.img-wrap {
     width: 100%;
-    max-height: 350px;
-
-    object-fit: contain;   /* 🔥 QIRQILMAYDI */
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
     background: #000;
-
-    display: block;
     position: relative;
     z-index: 1;
 }
 
-/* CONTENT CARD (o‘qish uchun fon) */
+.img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* CONTENT CARD */
 .content {
     padding: 15px;
-
     position: relative;
     z-index: 2;
-
     background: rgba(20,20,20,0.75);
     margin: 15px;
     border-radius: 12px;
-
     backdrop-filter: blur(10px);
 }
 
-.title {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
+.title { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
+.desc { font-size: 15px; color: #eee; line-height: 1.6; white-space: pre-line; word-wrap: break-word; }
 
-/* TEXT O‘QILADIGAN QILDIK */
-.desc {
-    font-size: 15px;
-    color: #eee;
-    line-height: 1.6;
-}
-
-/* LIKE */
-.actions {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px;
-
-    background: rgba(20,20,20,0.75);
-    margin: 15px;
-    border-radius: 12px;
-
-    position: relative;
-    z-index: 2;
-}
-
-.btn {
-    cursor: pointer;
-    background: #222;
-    border: none;
-    padding: 10px 15px;
-    color: #fff;
-    border-radius: 8px;
-    font-size: 14px;
-}
 .link-btn {
     display: inline-block;
-
     padding: 14px 22px;
     border-radius: 14px;
-
     color: #fff;
     text-decoration: none;
     font-weight: 600;
-
     background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
     border: 1px solid rgba(255,255,255,0.2);
-
     transition: 0.3s ease;
-
     box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
+.link-btn:hover { transform: translateY(-3px) scale(1.03); background: rgba(255,255,255,0.18); }
+.buttunsni_center_qilsih { display: flex; justify-content: center; }
 
-.link-btn:hover {
-    transform: translateY(-3px) scale(1.03);
-    background: rgba(255,255,255,0.18);
-}
-
-.buttunsni_center_qilsih {
-    display: flex;
-    justify-content: center;
-}
-
+/* ============ VIDEO — 16:9, YUKLAB OLISH O'CHIRILGAN ============ */
 .video-box {
-    margin-top: 20px;
+    margin-top: 0;
     border-radius: 16px;
     overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: #000;
 }
-
 .video-box video {
     width: 100%;
-    max-height: 450px;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ============ YANGILIK -> CHATGA JAVOB YOZISH TUGMASI ============ */
+/* (eski like-box o'rniga: shisha fon qoladi, ichida reply icon + rasm + nom) */
+.news-chat-cta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    margin: 15px;
     border-radius: 16px;
+
+    background: rgba(20,20,20,0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.08);
+
+    text-decoration: none;
+    color: #fff;
+    transition: transform 0.2s ease, background 0.2s ease;
 }
 
-/* 📱 MOBILE */
+.news-chat-cta:active { transform: scale(0.98); }
+.news-chat-cta:hover { background: rgba(30,30,30,0.85); }
+
+.news-chat-cta-icon {
+    font-size: 20px;
+    color: #00f3ff;
+    flex-shrink: 0;
+}
+
+.news-chat-cta-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #000;
+}
+
+.news-chat-cta-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.news-chat-cta-text strong {
+    font-size: 12px;
+    color: #00f3ff;
+    letter-spacing: 0.5px;
+}
+.news-chat-cta-text span {
+    font-size: 14px;
+    color: #ddd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.news-chat-cta-arrow {
+    font-size: 20px;
+    color: rgba(255,255,255,0.4);
+    flex-shrink: 0;
+}
+
+/* NAVBAR */
+.news-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: rgba(15,15,15,0.75);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.news-back {
+    display: flex; align-items: center; gap: 6px;
+    color: #fff; text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    background: rgba(255,255,255,0.08);
+    padding: 8px 12px; border-radius: 12px;
+    transition: 0.2s ease;
+}
+.news-back:active { transform: scale(0.96); }
+.news-logo {
+    font-size: 18px; font-weight: 800;
+    letter-spacing: 1px; color: #fff;
+    text-transform: uppercase;
+}
+.news-menu-btn {
+    width: 38px; height: 38px;
+    border: none; border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer;
+    transition: 0.2s ease;
+}
+.news-menu-btn:active { transform: scale(0.94); }
+
+.title { word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; }
+
 @media (max-width: 600px) {
-
-    body {
-        font-size: 14px;
-    }
-
-    /* 🔥 NAVBAR */
-    .news-navbar {
-        position: sticky;
-        top: 0;
-        z-index: 9999;
-
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        padding: 12px 14px;
-
-        background: rgba(15,15,15,0.75);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-
-    /* 🔙 BACK BUTTON */
-    .news-back {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        color: #fff;
-        text-decoration: none;
-
-        font-size: 14px;
-        font-weight: 500;
-
-        background: rgba(255,255,255,0.08);
-
-        padding: 8px 12px;
-        border-radius: 12px;
-
-        transition: 0.2s ease;
-    }
-
-    .news-back:active {
-        transform: scale(0.96);
-    }
-
-    /* 📰 NEWS LOGO */
-    .news-logo {
-        font-size: 18px;
-        font-weight: 800;
-
-        letter-spacing: 1px;
-        color: #fff;
-
-        text-transform: uppercase;
-    }
-
-    /* ⚙ MENU BUTTON */
-    .news-menu-btn {
-        width: 38px;
-        height: 38px;
-
-        border: none;
-        border-radius: 12px;
-
-        background: rgba(255,255,255,0.08);
-        color: #fff;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        font-size: 20px;
-        cursor: pointer;
-
-        transition: 0.2s ease;
-    }
-
-    .news-menu-btn:active {
-        transform: scale(0.94);
-    }
-
-    /* 🖼 IMAGE */
-    img {
-        width: 100%;
-        aspect-ratio: 9 / 16;
-        object-fit: contain;
-        background: #000;
-
-        display: block;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    /* 📦 CONTENT */
-    .content {
-        margin: 10px;
-        padding: 14px;
-
-        background: rgba(20,20,20,0.75);
-        backdrop-filter: blur(12px);
-
-        border-radius: 14px;
-        border: 1px solid rgba(255,255,255,0.08);
-
-        box-sizing: border-box;
-        overflow: hidden;
-    }
-
-    /* 📰 TITLE */
-    .title {
-        font-size: 17px;
-        font-weight: 700;
-        line-height: 1.4;
-        margin-bottom: 8px;
-
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        word-break: break-word;
-        max-width: 100%;
-    }
-
-    /* 📖 DESCRIPTION */
-    .desc {
-        font-size: 14px;
-        line-height: 1.7;
-        color: #eaeaea;
-        white-space: pre-line;
-
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        word-break: break-word;
-        max-width: 100%;
-    }
-
-    /* ❤️ ACTIONS */
-    .actions {
-        margin: 10px;
-        padding: 12px;
-
-        background: rgba(20,20,20,0.75);
-        border-radius: 14px;
-    }
-
-    .btn {
-        width: 100%;
-        font-size: 15px;
-        padding: 10px;
-        border-radius: 10px;
-    }
-
-    /* 🔥 OVERFLOW FIX */
-    * {
-        max-width: 100%;
-    }
+    body { font-size: 14px; }
+    .content { margin: 10px; padding: 14px; box-sizing: border-box; overflow: hidden; }
+    .title { font-size: 17px; line-height: 1.4; margin-bottom: 8px; }
+    .desc { font-size: 14px; line-height: 1.7; }
+    .news-chat-cta { margin: 10px; padding: 12px 14px; }
+    * { max-width: 100%; }
 }
 
-/* 🖥 TABLET + DESKTOP */
 @media (min-width: 768px) {
-
-    /* 🔥 NAVBAR */
-    .news-navbar {
-        position: sticky;
-        top: 0;
-        z-index: 9999;
-
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        padding: 16px 28px;
-
-        background: rgba(15,15,15,0.72);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    /* 🔙 BACK */
-    .news-back {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        color: #fff;
-        text-decoration: none;
-
-        font-size: 15px;
-        font-weight: 600;
-
-        background: rgba(255,255,255,0.08);
-
-        padding: 10px 16px;
-        border-radius: 14px;
-
-        transition: 0.25s ease;
-    }
-
-    .news-back:hover {
-        background: rgba(255,255,255,0.14);
-        transform: translateY(-2px);
-    }
-
-    /* 📰 LOGO */
-    .news-logo {
-        font-size: 24px;
-        font-weight: 800;
-
-        letter-spacing: 2px;
-        color: #fff;
-
-        text-transform: uppercase;
-    }
-
-    /* ☰ MENU */
-    .news-menu-btn {
-        width: 45px;
-        height: 45px;
-
-        border: none;
-        border-radius: 14px;
-
-        background: rgba(255,255,255,0.08);
-        color: #fff;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        font-size: 24px;
-        cursor: pointer;
-
-        transition: 0.25s ease;
-    }
-
-    .news-menu-btn:hover {
-        background: rgba(255,255,255,0.14);
-        transform: scale(1.05);
-    }
-
-    /* 🖼 IMAGE */
-    img {
-        width: 100%;
-        max-height: 650px;
-
-        object-fit: contain;
-        background: #000;
-
-        display: block;
-    }
-
-    /* 📦 CONTENT */
-    .content {
-        width: 85%;
-        margin: 25px auto;
-        padding: 24px;
-
-        background: rgba(20,20,20,0.72);
-        backdrop-filter: blur(14px);
-
-        border-radius: 18px;
-        border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    /* 📰 TITLE */
-    .title {
-        font-size: 30px;
-        font-weight: 800;
-        line-height: 1.4;
-
-        margin-bottom: 14px;
-    }
-
-    /* 📖 DESCRIPTION */
-    .desc {
-        font-size: 15px;
-        color: #eee;
-        line-height: 1.8;
-
-        /* 🔥 MUHIM QISM: enter va bo‘sh joylarni saqlaydi */
-        white-space: pre-line;
-
-        /* matnni chiroyli bo‘lishi uchun */
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-
-    /* ❤️ ACTIONS */
-    .actions {
-        width: 85%;
-        margin: 0 auto 30px auto;
-        padding: 18px;
-
-        background: rgba(20,20,20,0.72);
-        backdrop-filter: blur(14px);
-
-        border-radius: 18px;
-        border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .btn {
-        font-size: 16px;
-        padding: 12px 18px;
-
-        border-radius: 12px;
-
-        background: rgba(255,255,255,0.08);
-        color: #fff;
-
-        border: none;
-        cursor: pointer;
-
-        transition: 0.25s ease;
-    }
-
-    .btn:hover {
-        background: rgba(255,255,255,0.15);
-        transform: translateY(-2px);
-    }
+    .news-navbar { padding: 16px 28px; }
+    .news-logo { font-size: 24px; letter-spacing: 2px; }
+    .news-menu-btn { width: 45px; height: 45px; font-size: 24px; }
+    .content { width: 85%; margin: 25px auto; padding: 24px; border-radius: 18px; }
+    .title { font-size: 30px; margin-bottom: 14px; }
+    .desc { font-size: 15px; line-height: 1.8; }
+    .news-chat-cta { width: 85%; margin: 0 auto 20px auto; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="news-navbar">
-
-    <a href="javascript:history.back()" class="news-back">
-        ⬅ Orqaga
-    </a>
-
-    <div class="news-logo">
-        B•NEWS
-    </div>
-
-    <button class="news-menu-btn">
-        ☰
-    </button>
-
+    <a href="javascript:history.back()" class="news-back">⬅ Orqaga</a>
+    <div class="news-logo">B•NEWS</div>
+    <button class="news-menu-btn">☰</button>
 </div>
 
+<!-- 16:9 RASM -->
+<div class="img-wrap">
+    <img src="{{ news.image.url }}" alt="news image" loading="lazy">
+</div>
 
-<!-- IMAGE -->
-<img src="{{ news.image.url }}" alt="news image">
-
-<!-- 📰 TITLE -->
+<!-- TITLE -->
 <div class="content">
-    <div class="title">
-        {{ news.title }}
-    </div>
+    <div class="title">{{ news.title }}</div>
 </div>
 
-<!-- 📄 DESCRIPTION (ALOHIDA BLOCK) -->
+<!-- DESCRIPTION -->
 <div class="content">
-    <div class="desc">
-        {{ news.description }}
-    </div>
+    <div class="desc">{{ news.description }}</div>
 </div>
 
-<!-- 🎥 VIDEO (ALOHIDA BLOCK) -->
+<!-- VIDEO (agar bo'lsa) — 16:9, yuklab olish o'chirilgan -->
 {% if news.video %}
 <div class="content">
     <div class="video-box">
-        <video controls>
+        <video controls
+               controlsList="nodownload noremoteplayback"
+               disablePictureInPicture
+               oncontextmenu="return false;">
             <source src="{{ news.video.url }}" type="video/mp4">
         </video>
     </div>
 </div>
 {% endif %}
 
-<!-- 🔗 LINK (ALOHIDA BUTTON BLOCK) -->
+<!-- LINK (agar bo'lsa) -->
 {% if news.link %}
 <div class="buttunsni_center_qilsih">
-    <a href="{{ news.link }}" target="_blank" class="link-btn">
-        🔗 Havolaga o‘tish
-    </a>
+    <a href="{{ news.link }}" target="_blank" class="link-btn">🔗 Havolaga o‘tish</a>
 </div>
 {% endif %}
 
-<!-- ❤️ LIKE -->
-<div class="actions">
-    <button class="btn" onclick="likeNews({{ news.id }})">
-        ❤️ <span id="like-count">{{ news.total_likes }}</span>
-    </button>
-</div>
-
-
-
+<!-- CHATGA JAVOB YOZISH (like box o'rnida) -->
+<a href="{% url 'chat' %}?reply_news={{ news.id }}" class="news-chat-cta">
+    <i class='bx bx-reply news-chat-cta-icon'></i>
+    <img src="{{ news.image.url }}" class="news-chat-cta-thumb" alt="">
+    <span class="news-chat-cta-text">
+        <strong>BESTMEDIA NEWS</strong>
+        <span>Habar yozish — {{ news.title }}</span>
+    </span>
+    <i class='bx bx-chevron-right news-chat-cta-arrow'></i>
+</a>
 
 <script>
-
-function likeNews(id) {
-    fetch(`/news/${id}/like/`, {
-        method: "GET",
-        headers: {
-            "X-Requested-With": "XMLHttpRequest"
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("like-count").innerText = data.total_likes;
-    });
-}
-
-/* BACKGROUND + SCROLL RESTORE */
+/* BACKGROUND + SCROLL RESTORE — o'zgarishsiz qoldirildi */
 document.addEventListener("DOMContentLoaded", function () {
-
-    /* background */
     const bg = localStorage.getItem("bg");
-
     if (bg) {
         document.body.style.backgroundImage = `url('${bg}')`;
         document.body.style.backgroundSize = "cover";
@@ -584,18 +301,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.body.style.backgroundRepeat = "no-repeat";
         document.body.style.backgroundAttachment = "fixed";
     }
-
-    /* scroll restore */
     const pos = localStorage.getItem("scrollPos");
-
     if (pos) {
-        setTimeout(() => {
-            window.scrollTo(0, parseInt(pos));
-        }, 100);
+        setTimeout(() => { window.scrollTo(0, parseInt(pos)); }, 100);
     }
-
 });
-
 </script>
 
 </body>
