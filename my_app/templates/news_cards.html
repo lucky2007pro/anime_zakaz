@@ -1,0 +1,29 @@
+{% for news in news_list %}
+<div class="card">
+    <a href="{% url 'news_detail' news.id %}" class="card-link"></a>
+
+    <a href="{% url 'news_detail' news.id %}">
+        <div class="img-wrap">
+            <div class="skeleton"></div>
+            <img src="{{ news.image.url }}" alt="news image"
+                 loading="lazy"
+                 onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none';">
+        </div>
+    </a>
+
+    <div class="content">
+        <div class="title">{{ news.title }}</div>
+        <div class="desc">{{ news.description|truncatechars:120 }}</div>
+    </div>
+
+    <div class="actions">
+        <button class="like-btn {% if news.id in liked_ids %}liked{% endif %}"
+                onclick="likeNews({{ news.id }})">
+            <i class="bx {% if news.id in liked_ids %}bxs-heart{% else %}bx-heart{% endif %} like-icon"></i>
+            <span id="like-{{ news.id }}">{{ news.total_likes }}</span>
+        </button>
+
+        <a href="{% url 'news_detail' news.id %}" class="btn">📖 O‘qish</a>
+    </div>
+</div>
+{% endfor %}
