@@ -1,10 +1,543 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block title %}Hisobim | BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.hs-wrap {
+    max-width: 680px;
+    margin: 20px auto;
+    padding: 0 14px 36px;
+}
+
+.hs-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 16px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 800;
+    background: rgba(0,243,255,0.1);
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,243,255,0.2);
+    transition: 0.3s;
+}
+.hs-back:hover { background: rgba(0,243,255,0.2); }
+
+.hs-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-light, #fff);
+    margin: 0 0 10px 2px;
+}
+
+/* =========================
+   UMUMIY GLASS KARTA
+   ========================= */
+.pcard {
+    background: linear-gradient(145deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+    border: 1px solid rgba(255,255,255,0.085);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 10px 35px rgba(0,0,0,0.12);
+    contain: content;
+}
+
+.hs-section-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 12px;
+}
+.hs-section-title i { font-size: 14px; color: #b45cff; }
+
+/* =========================
+   BALANS KARTA
+   ========================= */
+.hs-balance-card {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 90% 5%, rgba(180,92,255,0.16), transparent 32%),
+        radial-gradient(circle at 5% 100%, rgba(0,243,255,0.07), transparent 35%),
+        linear-gradient(145deg, rgba(255,255,255,0.065), rgba(255,255,255,0.025));
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.045), 0 12px 40px rgba(0,0,0,0.16);
+}
+
+.hs-balance-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 6px;
+}
+
+.hs-balance-value {
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+.hs-balance-value span {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+}
+
+.hs-vip-status {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hs-vip-status i { font-size: 22px; }
+
+.hs-vip-status.active i { color: #b45cff; }
+.hs-vip-status.inactive i { color: rgba(255,255,255,0.35); }
+
+.hs-vip-status-text { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.85); }
+.hs-vip-status-text b { color: #d99aff; }
+
+/* =========================
+   VIP REJALAR GRID
+   1) 3)
+   2) 4)  -> mobil ustun-ustun to'ldiriladi
+   ========================= */
+.hs-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, auto);
+    grid-auto-flow: column;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+@media (min-width: 561px) {
+    .hs-plans-grid {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: auto;
+        grid-auto-flow: row;
+    }
+}
+
+.hs-plan-box {
+    background: linear-gradient(145deg, rgba(255,255,255,0.055), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.hs-plan-price {
+    font-size: 17px;
+    font-weight: 900;
+    color: #b45cff;
+}
+.hs-plan-price span { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 700; }
+
+.hs-plan-period {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+}
+
+.hs-plan-btn {
+    width: 100%;
+    border: none;
+    border-radius: 9px;
+    padding: 9px 6px;
+    background: linear-gradient(90deg, #b45cff, #9c4cff);
+    color: #fff;
+    font-weight: 800;
+    font-size: 11.5px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(180,92,255,0.18);
+}
+.hs-plan-btn:active { opacity: .9; }
+
+/* =========================
+   FORM ELEMENTLARI
+   ========================= */
+.hs-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.hs-field label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+}
+
+.hs-field input {
+    width: 100%;
+    box-sizing: border-box;
+    height: 42px;
+    padding: 0 12px;
+    background: linear-gradient(145deg, rgba(20,20,25,0.55), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,255,255,0.085);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.hs-field input:focus {
+    border-color: rgba(180,92,255,0.55);
+    box-shadow: 0 0 0 3px rgba(180,92,255,0.07);
+}
+
+.hs-file-input {
+    margin: 4px 0 12px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.09);
+    color: #fff;
+    font-size: 12px;
+}
+
+.hs-submit-btn {
+    width: 100%;
+    height: 43px;
+    border-radius: 11px;
+    background: linear-gradient(90deg, #00c3ff, #0088ff);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.10);
+    font-weight: 800;
+    font-size: 13px;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    letter-spacing: .02em;
+    box-shadow: 0 8px 22px rgba(0,180,255,0.18);
+}
+.hs-submit-btn:active { opacity: .9; }
+
+.hs-submit-btn.purple {
+    background: linear-gradient(90deg, #b45cff, #9c4cff);
+    box-shadow: 0 8px 22px rgba(180,92,255,0.18);
+}
+
+.hs-submit-btn.gold {
+    background: linear-gradient(90deg, #ffc107, #ff8f00);
+    box-shadow: 0 8px 22px rgba(255,193,7,0.18);
+    color: #1a1508;
+}
+
+.hs-hint {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.hs-pending-note {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffc107;
+    background: rgba(255,193,7,0.1);
+    border: 1px solid rgba(255,193,7,0.25);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+}
+
+.hs-card-num {
+    font-size: 1.05rem;
+    color: #ff3366;
+    font-weight: 900;
+    letter-spacing: .5px;
+    margin: 10px 0 16px;
+    padding: 13px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    word-break: break-all;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.hs-card-num i { cursor: pointer; color: var(--text-dim); flex-shrink: 0; }
+
+/* =========================
+   TARIX (TIMELINE)
+   ========================= */
+.hs-history-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.hs-history-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.hs-history-row:last-child { border-bottom: none; }
+
+.hs-history-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #b45cff;
+    margin-top: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(180,92,255,0.5);
+}
+
+.hs-history-text {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.4;
+}
+
+.hs-history-time {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+}
+
+.hs-empty {
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    padding: 6px 0;
+}
+
+@media (max-width: 560px) {
+    .hs-wrap { padding: 0 10px 24px; margin: 14px auto; }
+    .pcard, .hs-balance-card { padding: 13px; border-radius: 14px; }
+    .hs-balance-value { font-size: 27px; }
+    .hs-plan-price { font-size: 15px; }
+
+    .pcard, .hs-balance-card, .hs-field input {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    .pcard { background: rgba(26, 22, 34, 0.65); }
+    .hs-balance-card {
+        background:
+            radial-gradient(circle at 90% 5%, rgba(180,92,255,0.14), transparent 32%),
+            rgba(26, 22, 34, 0.7);
+    }
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+<div class="hs-wrap">
+
+    <a href="{% url 'profile' %}" class="hs-back"><i class='bx bx-arrow-back'></i> Orqaga</a>
+
+    <h2 class="hs-title">Hisobim</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="background: rgba(0,243,255,0.1); color: var(--accent); padding: 13px 15px; border-radius: 10px; margin-bottom: 14px; font-weight: 800; font-size: 12.5px; border: 1px solid var(--accent);">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- =====================================================
+         BALANS + VIP HOLATI
+         ===================================================== -->
+    <div class="hs-balance-card">
+        <div class="hs-balance-label">Balansingiz</div>
+        <div class="hs-balance-value">{{ balance.amount|floatformat:0 }} <span>so'm</span></div>
+
+        {% if vip_data.vip_active %}
+            <div class="hs-vip-status active">
+                <i class='bx bxs-crown'></i>
+                <div class="hs-vip-status-text">
+                    VIP obuna faol — tugash sanasi: <b>{{ vip_expire_local|date:"d.m.Y H:i" }}</b>
+                </div>
+            </div>
+        {% else %}
+            <div class="hs-vip-status inactive">
+                <i class='bx bx-crown'></i>
+                <div class="hs-vip-status-text">VIP obuna hali yo'q</div>
+            </div>
+        {% endif %}
+    </div>
+
+
+    <!-- =====================================================
+         VIP REJALAR
+         ===================================================== -->
+    <div class="pcard">
+        <p class="hs-section-title"><i class='bx bxs-crown'></i> VIP obuna narxlari</p>
+
+        <div class="hs-plans-grid">
+            {% for plan in vip_plans %}
+                <div class="hs-plan-box">
+                    <div class="hs-plan-price">{{ plan.price|floatformat:0 }} <span>so'm</span></div>
+                    <div class="hs-plan-period">{{ plan.label }}</div>
+
+                    <form method="POST" action="{% url 'vip_buy_balance' plan.key %}" style="width:100%;">
+                        {% csrf_token %}
+                        <button type="submit" class="hs-plan-btn">Aktivlashtirish</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+
+        <p class="hs-hint" style="margin-top:12px;">
+            Aktivlashtirish tugmasi bosilganda summa balansingizdan avtomatik yechiladi va admin tasdig'isiz VIP obuna faollashadi. Agar balansda mablag' yetarli bo'lmasa — pastdagi "Chek orqali to'lash" bo'limidan foydalaning.
+        </p>
+    </div>
+
+
+    <!-- =====================================================
+         CHEK ORQALI TO'LOV (ISTALGAN SUMMA)
+         ===================================================== -->
+    <div class="pcard">
+        <p class="hs-section-title"><i class='bx bx-wallet'></i> Chek orqali hisobni to'ldirish</p>
+
+        <p class="hs-hint">
+            Quyidagi manzilga to'lov qiling, so'ng qancha to'laganingizni kiriting va chek skrinshotini yuklang. Admin tasdiqlagach summa hisobingizga qo'shiladi.
+        </p>
+
+        <div class="hs-card-num" id="cardNumberToCopy">
+            https://t.me/ani_best_uzb_anime
+            <i class='bx bx-copy' onclick="copyCardInfo()" title="Nusxalash"></i>
+        </div>
+
+        <form method="POST" action="{% url 'balance_topup_add' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="hs-field">
+                <label for="topup_amount">To'lagan summangiz (so'm)</label>
+                <input type="number" min="1" id="topup_amount" name="amount" placeholder="Masalan: 15000" required>
+            </div>
+
+            <label style="display:block; font-size:11px; font-weight:600; color:rgba(255,255,255,0.45); margin-bottom:4px;">
+                To'lov cheki (skrinshot) *
+            </label>
+            <input type="file" name="receipt_image" class="hs-file-input" accept="image/*" required>
+
+            <button type="submit" class="hs-submit-btn">Chekni yuborish va tasdiqlash</button>
+        </form>
+    </div>
+
+
+    <!-- =====================================================
+         QARZ SO'RASH
+         ===================================================== -->
+    <div class="pcard">
+        <p class="hs-section-title"><i class='bx bx-hand-up'></i> Qarz so'rash</p>
+
+        {% if my_debt_pending %}
+            <div class="hs-pending-note">
+                Sizning qarz so'rovingiz hozircha ko'rib chiqilmoqda. Natija tarixda ko'rinadi.
+            </div>
+        {% else %}
+            <p class="hs-hint">
+                Balansingizga qarzga pul so'rashingiz mumkin. So'rovingiz admin tomonidan ko'rib chiqiladi va tasdiqlansa hisobingizga qo'shiladi.
+            </p>
+
+            <form method="POST" action="{% url 'debt_request_add' %}">
+                {% csrf_token %}
+
+                <div class="hs-field">
+                    <label for="debt_amount">So'ramoqchi bo'lgan summa (so'm)</label>
+                    <input type="number" min="1" id="debt_amount" name="amount" placeholder="Masalan: 11500" required>
+                </div>
+
+                <button type="submit" class="hs-submit-btn purple">Qarz so'rash</button>
+            </form>
+        {% endif %}
+    </div>
+
+
+    <!-- =====================================================
+         JACKPOT KOD
+         ===================================================== -->
+    <div class="pcard">
+        <p class="hs-section-title"><i class='bx bx-gift'></i> Jackpot kod</p>
+
+        <p class="hs-hint">
+            Admin bergan maxsus kodni kiriting — kod turi bo'yicha sizga bepul VIP kunlari yoki balansga pul tushishi mumkin.
+        </p>
+
+        <form method="POST" action="{% url 'jackpot_redeem' %}">
+            {% csrf_token %}
+
+            <div class="hs-field">
+                <label for="jackpot_code">Jackpot kod</label>
+                <input type="text" id="jackpot_code" name="code" placeholder="Masalan: 7SI10D8" required>
+            </div>
+
+            <button type="submit" class="hs-submit-btn gold">Kodni faollashtirish</button>
+        </form>
+    </div>
+
+
+    <!-- =====================================================
+         TARIX
+         ===================================================== -->
+    <p class="hs-section-title" style="margin:16px 0 8px 4px;"><i class='bx bx-history'></i> Tarix</p>
+
+    <div class="pcard hs-history-list">
+        {% for h in history %}
+            <div class="hs-history-row">
+                <div class="hs-history-dot"></div>
+                <div>
+                    <div class="hs-history-text">{{ h.text }}</div>
+                    <div class="hs-history-time">{{ h.local_time|date:"d.m.Y H:i" }}</div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="hs-empty">Hali hech qanday amal bajarilmagan.</p>
+        {% endfor %}
+    </div>
+
+</div>
+</main>
+
+<script>
+    function copyCardInfo() {
+        const text = "https://t.me/ani_best_uzb_anime";
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Havola nusxalandi: " + text);
+        });
+    }
+</script>
+{% endblock %}
