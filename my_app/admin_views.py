@@ -3,11 +3,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
-from .models import (
-    CustomUser, Movie, MovieEpisode, Category, ChatMessage,
-    SubscriptionReceipt, ProfileAvatar, VipUser, MovieComment,
-    AnimeSchedule, Story, StoryView, AnimeNews, NewsLike,AnimeSectionItem,Notice,MovieFrame,
-)
+from .models import *
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
@@ -657,7 +653,6 @@ def admin_notice_delete(request, pk):
     messages.success(request, "E'lon o'chirildi!")
     return redirect('admin_notices')
 
-
 # =======================
 # ANIME HAQIDA (about_info)
 # =======================
@@ -716,4 +711,225 @@ def admin_kadrlar_delete(request, pk):
     return redirect('admin_kadrlar_form', movie_id=movie_id)
 
 
+# =======================
+# JACKPOT KODLAR (ADMIN)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_jackpot_list(request):
+    codes = JackpotCode.objects.all().order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Jackpot kodlar',
+        'items': codes,
+        'type': 'jackpot'
+    })
 
+
+@user_passes_test(is_admin, login_url='/')
+def admin_jackpot_form(request, pk=None):
+    jackpot = get_object_or_404(JackpotCode, pk=pk) if pk else None
+
+    if request.method == 'POST':
+        if not jackpot:
+            jackpot = JackpotCode()
+
+        jackpot.code = request.POST.get('code', '').strip()
+        jackpot.reward_type = request.POST.get('reward_type', 'balance')
+
+        def _to_int(name):
+            try:
+                return int(request.POST.get(name, 0) or 0)
+            except (TypeError, ValueError):
+                return 0
+
+        jackpot.vip_hours = _to_int('vip_hours')
+        jackpot.vip_days = _to_int('vip_days')
+        jackpot.balance_amount = _to_int('balance_amount')
+        jackpot.max_uses = _to_int('max_uses')
+
+        expires_at = request.POST.get('expires_at', '').strip()
+        if expires_at:
+            from django.utils.dateparse import parse_datetime
+            jackpot.expires_at = parse_datetime(expires_at)
+        else:
+            jackpot.expires_at = None
+
+        jackpot.is_active = request.POST.get('is_active') == 'on'
+
+        if not jackpot.created_by_id:
+            jackpot.created_by = request.user
+
+        try:
+            jackpot.save()
+        except Exception:
+            messages.error(request, "Bu kod allaqachon mavjud yoki xatolik yuz berdi.")
+            return render(request, 'custom_admin/jackpot_form.html', {
+                'jackpot': jackpot,
+                'reward_choices': JackpotCode.REWARD_CHOICES,
+            })
+
+        messages.success(request, "Jackpot kod muvaffaqiyatli saqlandi!")
+        return redirect('admin_jackpot_form', pk=jackpot.pk)
+
+    uses = jackpot.uses.select_related('user').order_by('-used_at') if jackpot else []
+
+    return render(request, 'custom_admin/jackpot_form.html', {
+        'jackpot': jackpot,
+        'reward_choices': JackpotCode.REWARD_CHOICES,
+        'uses': uses,
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_jackpot_delete(request, pk):
+    jackpot = get_object_or_404(JackpotCode, pk=pk)
+    jackpot.delete()
+    messages.success(request, "Jackpot kod o'chirildi!")
+    return redirect('admin_jackpot_list')
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_jackpot_cancel_user(request, pk):
+    """Bitta foydalanuvchining shu koddan foydalanishini ID orqali bekor qilish."""
+    jackpot = get_object_or_404(JackpotCode, pk=pk)
+    if request.method != 'POST':
+        return redirect('admin_jackpot_form', pk=pk)
+
+    user_id = request.POST.get('user_id', '').strip()
+    if not user_id.isdigit():
+        messages.error(request, "Foydalanuvchi ID noto'g'ri kiritildi.")
+        return redirect('admin_jackpot_form', pk=jackpot.pk)
+
+    use = JackpotCodeUse.objects.filter(code=jackpot, user_id=user_id).first()
+    if use:
+        use.delete()
+        messages.success(request, f"#{user_id} ID li foydalanuvchi uchun jackpot bekor qilindi. U kodni qayta ishlata oladi.")
+    else:
+        messages.error(request, f"#{user_id} ID li foydalanuvchi bu koddan foydalanmagan.")
+    return redirect('admin_jackpot_form', pk=jackpot.pk)
+
+
+# =======================
+# HISOBIM BOSHQARUVI (BALANS)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_hisob_list(request):
+    balances = UserBalance.objects.select_related('user').order_by('-amount')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': "Foydalanuvchilar hisobi",
+        'items': balances,
+        'type': 'hisob'
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_hisob_form(request, user_id=None):
+    target_user = None
+    balance = None
+    history = []
+
+    lookup_id = user_id or request.GET.get('user_id', '').strip()
+    if lookup_id:
+        target_user = CustomUser.objects.filter(id=lookup_id).first()
+        if target_user:
+            balance, _ = UserBalance.objects.get_or_create(user=target_user)
+            history = AccountHistory.objects.filter(user=target_user).order_by('-created_at')[:30]
+        else:
+            messages.error(request, f"#{lookup_id} ID li foydalanuvchi topilmadi.")
+
+    if request.method == 'POST':
+        uid = request.POST.get('user_id', '').strip()
+        action = request.POST.get('action')
+        try:
+            amount = int(request.POST.get('amount', 0))
+        except (TypeError, ValueError):
+            amount = 0
+
+        target_user = CustomUser.objects.filter(id=uid).first()
+        if not target_user:
+            messages.error(request, f"#{uid} ID li foydalanuvchi topilmadi.")
+            return redirect('admin_hisob_form_lookup')
+
+        balance, _ = UserBalance.objects.get_or_create(user=target_user)
+
+        if amount <= 0:
+            messages.error(request, "To'g'ri summa kiriting.")
+            return redirect('admin_hisob_form', user_id=target_user.id)
+
+        if action == 'toldirish':
+            UserBalance.objects.filter(user=target_user).update(amount=F('amount') + amount)
+            AccountHistory.objects.create(
+                user=target_user,
+                text=f"Admin tomonidan hisobingiz {amount:,} so'm ga to'ldirildi".replace(',', '.')
+            )
+            messages.success(request, f"{target_user.username} hisobiga {amount:,} so'm qo'shildi.".replace(',', '.'))
+        elif action == 'yechish':
+            balance.refresh_from_db()
+            if balance.amount < amount:
+                messages.error(request, "Foydalanuvchi hisobida yetarli mablag' yo'q.")
+                return redirect('admin_hisob_form', user_id=target_user.id)
+            UserBalance.objects.filter(user=target_user).update(amount=F('amount') - amount)
+            AccountHistory.objects.create(
+                user=target_user,
+                text=f"Admin tomonidan hisobingizdan {amount:,} so'm yechib olindi".replace(',', '.')
+            )
+            messages.success(request, f"{target_user.username} hisobidan {amount:,} so'm yechildi.".replace(',', '.'))
+        else:
+            messages.error(request, "Noto'g'ri amal.")
+
+        return redirect('admin_hisob_form', user_id=target_user.id)
+
+    return render(request, 'custom_admin/hisob_form.html', {
+        'target_user': target_user,
+        'balance': balance,
+        'history': history,
+    })
+
+
+# =======================
+# QARZ SO'ROVLARI (ADMIN)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_qarz_list(request):
+    debts = DebtRequest.objects.select_related('user').order_by('-created_at')
+    return render(request, 'custom_admin/qarz_tastiq_form.html', {
+        'page_title': "Qarz so'rovlari",
+        'debts': debts,
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_qarz_tasdiqlash(request, pk):
+    debt = get_object_or_404(DebtRequest, pk=pk)
+    if debt.status != 'pending':
+        messages.error(request, "Bu so'rov allaqachon ko'rib chiqilgan.")
+        return redirect('admin_qarz_list')
+
+    UserBalance.objects.get_or_create(user=debt.user)
+    UserBalance.objects.filter(user=debt.user).update(amount=F('amount') + debt.amount)
+    debt.status = 'approved'
+    debt.processed_at = tz_utils.now()
+    debt.save()
+    AccountHistory.objects.create(
+        user=debt.user,
+        text=f"{debt.amount:,} so'm qarz so'rovi tasdiqlandi, hisobingizga qo'shildi".replace(',', '.')
+    )
+    messages.success(request, f"{debt.user.username} uchun qarz so'rovi tasdiqlandi.")
+    return redirect('admin_qarz_list')
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_qarz_rad(request, pk):
+    debt = get_object_or_404(DebtRequest, pk=pk)
+    if debt.status != 'pending':
+        messages.error(request, "Bu so'rov allaqachon ko'rib chiqilgan.")
+        return redirect('admin_qarz_list')
+
+    debt.status = 'rejected'
+    debt.processed_at = tz_utils.now()
+    debt.save()
+    AccountHistory.objects.create(
+        user=debt.user,
+        text=f"{debt.amount:,} so'm qarz so'rovi rad etildi".replace(',', '.')
+    )
+    messages.success(request, f"{debt.user.username} uchun qarz so'rovi rad etildi.")
+    return redirect('admin_qarz_list')
