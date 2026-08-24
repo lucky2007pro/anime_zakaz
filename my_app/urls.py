@@ -165,6 +165,24 @@ urlpatterns = [
     path('hisobim/qarz-sorash/', debt_request_add, name='debt_request_add'),
     path('hisobim/toldirish/', balance_topup_add, name='balance_topup_add'),
     path('hisobim/jackpot/', jackpot_redeem, name='jackpot_redeem'),
+
+    # JACKPOT (admin)
+    path('control-panel/jackpot/', admin_jackpot_list, name='admin_jackpot_list'),
+    path('control-panel/jackpot/add/', admin_jackpot_form, name='admin_jackpot_form'),
+    path('control-panel/jackpot/<int:pk>/edit/', admin_jackpot_form, name='admin_jackpot_form'),
+    path('control-panel/jackpot/<int:pk>/delete/', admin_jackpot_delete, name='admin_jackpot_delete'),
+    path('control-panel/jackpot/<int:pk>/cancel/', admin_jackpot_cancel_user, name='admin_jackpot_cancel_user'),
+
+    # HISOB (admin)
+    path('control-panel/hisob/', admin_hisob_list, name='admin_hisob_list'),
+    path('control-panel/hisob/qidirish/', admin_hisob_form, name='admin_hisob_form_lookup'),
+    path('control-panel/hisob/<int:user_id>/', admin_hisob_form, name='admin_hisob_form'),
+
+    # QARZ (admin)
+    path('control-panel/qarz/', admin_qarz_list, name='admin_qarz_list'),
+    path('control-panel/qarz/<int:pk>/tasdiqlash/', admin_qarz_tasdiqlash, name='admin_qarz_tasdiqlash'),
+    path('control-panel/qarz/<int:pk>/rad/', admin_qarz_rad, name='admin_qarz_rad'),
+
 ]
 
 
