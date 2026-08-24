@@ -34,147 +34,7 @@ body::before {
     z-index: -1;
 }
 
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    background: rgba(20,20,20,0.85);
-    backdrop-filter: blur(10px);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.back { color: #fff; text-decoration: none; font-size: 16px; }
-
-/* ============ RASM — 16:9, MOBIL VA PC BIR XIL ============ */
-.img-wrap {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: #000;
-    position: relative;
-    z-index: 1;
-}
-
-.img-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-/* CONTENT CARD */
-.content {
-    padding: 15px;
-    position: relative;
-    z-index: 2;
-    background: rgba(20,20,20,0.75);
-    margin: 15px;
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-}
-
-.title { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
-.desc { font-size: 15px; color: #eee; line-height: 1.6; white-space: pre-line; word-wrap: break-word; }
-
-.link-btn {
-    display: inline-block;
-    padding: 14px 22px;
-    border-radius: 14px;
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.2);
-    transition: 0.3s ease;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-}
-.link-btn:hover { transform: translateY(-3px) scale(1.03); background: rgba(255,255,255,0.18); }
-.buttunsni_center_qilsih { display: flex; justify-content: center; }
-
-/* ============ VIDEO — 16:9, YUKLAB OLISH O'CHIRILGAN ============ */
-.video-box {
-    margin-top: 0;
-    border-radius: 16px;
-    overflow: hidden;
-    aspect-ratio: 16 / 9;
-    background: #000;
-}
-.video-box video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-/* ============ YANGILIK -> CHATGA JAVOB YOZISH TUGMASI ============ */
-/* (eski like-box o'rniga: shisha fon qoladi, ichida reply icon + rasm + nom) */
-.news-chat-cta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    margin: 15px;
-    border-radius: 16px;
-
-    background: rgba(20,20,20,0.75);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.08);
-
-    text-decoration: none;
-    color: #fff;
-    transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.news-chat-cta:active { transform: scale(0.98); }
-.news-chat-cta:hover { background: rgba(30,30,30,0.85); }
-
-.news-chat-cta-icon {
-    font-size: 20px;
-    color: #00f3ff;
-    flex-shrink: 0;
-}
-
-.news-chat-cta-thumb {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    object-fit: cover;
-    flex-shrink: 0;
-    background: #000;
-}
-
-.news-chat-cta-text {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-.news-chat-cta-text strong {
-    font-size: 12px;
-    color: #00f3ff;
-    letter-spacing: 0.5px;
-}
-.news-chat-cta-text span {
-    font-size: 14px;
-    color: #ddd;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.news-chat-cta-arrow {
-    font-size: 20px;
-    color: rgba(255,255,255,0.4);
-    flex-shrink: 0;
-}
-
-/* NAVBAR */
+/* ============ NAVBAR ============ */
 .news-navbar {
     position: sticky;
     top: 0;
@@ -209,10 +69,305 @@ body::before {
     display: flex; align-items: center; justify-content: center;
     font-size: 20px; cursor: pointer;
     transition: 0.2s ease;
+    position: relative;
 }
 .news-menu-btn:active { transform: scale(0.94); }
 
-.title { word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; }
+/* ============ MENU DROPDOWN (3 chiziq bosilganda) ============ */
+.menu-dropdown {
+    position: absolute;
+    top: 52px;
+    right: 14px;
+    background: rgba(25,25,25,0.97);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    min-width: 210px;
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    z-index: 10000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.menu-dropdown.open { display: flex; }
+.menu-dropdown button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.15s ease;
+    width: 100%;
+}
+.menu-dropdown button:active { background: rgba(255,255,255,0.1); }
+.menu-dropdown button i { font-size: 18px; color: #00f3ff; }
+
+/* ============ MODAL OVERLAY (Xususiyat / Ulashish) ============ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 20000;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.info-side {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.title-box {
+    background: rgba(20,20,20,0.75);
+    border-radius: 14px;
+    padding: 16px 18px;
+    backdrop-filter: blur(10px);
+}
+
+.desc-box {
+    background: rgba(20,20,20,0.75);
+    border-radius: 14px;
+    padding: 16px 18px;
+    backdrop-filter: blur(10px);
+    flex: 1;
+}
+
+.title-box .title { margin-bottom: 0; }
+.desc-box .desc { margin: 0; }
+
+.modal-box {
+    background: rgba(22,22,22,0.98);
+    backdrop-filter: blur(18px);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: slideUp 0.25s ease;
+}
+@keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+@media (min-width: 768px) {
+    .modal-overlay { align-items: center; }
+    .modal-box { border-radius: 18px; max-width: 420px; }
+}
+
+.modal-handle {
+    width: 40px; height: 4px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 4px;
+    margin: 0 auto 16px;
+}
+.modal-title {
+    font-size: 17px; font-weight: 700;
+    margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.modal-close {
+    background: rgba(255,255,255,0.08);
+    border: none; color: #fff;
+    width: 30px; height: 30px; border-radius: 8px;
+    cursor: pointer; font-size: 16px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.info-row:last-child { border-bottom: none; }
+.info-row i { font-size: 20px; color: #00f3ff; width: 22px; text-align: center; }
+.info-row .info-label { font-size: 12px; color: #999; }
+.info-row .info-value { font-size: 14px; font-weight: 600; }
+
+.share-link-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+}
+.share-link-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #ddd;
+    font-size: 13px;
+    outline: none;
+    min-width: 0;
+}
+.share-link-box button {
+    background: rgba(0,243,255,0.15);
+    color: #00f3ff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.share-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+.share-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.06);
+    border: none;
+    border-radius: 14px;
+    padding: 14px 6px;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.15s ease;
+}
+.share-option:active { transform: scale(0.95); }
+.share-option i { font-size: 24px; }
+.share-option.telegram i { color: #29a9eb; }
+.share-option.copy i { color: #00f3ff; }
+.share-option.more i { color: #ccc; }
+
+/* ============ RASM / VIDEO — MAKSIMAL O'LCHAM ============ */
+.img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 380px;
+    overflow: hidden;
+    background: #000;
+    position: relative;
+    z-index: 1;
+    border-radius: 0;
+}
+.img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.content {
+    padding: 15px;
+    position: relative;
+    z-index: 2;
+    background: rgba(20,20,20,0.75);
+    margin: 15px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.title { font-size: 22px; font-weight: bold; margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; text-align: center; }
+.desc { font-size: 15px; color: #eee; line-height: 1.6; white-space: pre-line; word-wrap: break-word; }
+
+/* LIKE BAR */
+.like-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    margin: 0 15px 15px;
+}
+.like-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 30px;
+    padding: 9px 16px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+.like-btn i { font-size: 18px; }
+.like-btn.liked { color: #ff3b5c; border-color: rgba(255,59,92,0.4); background: rgba(255,59,92,0.1); }
+.like-btn.liked i { color: #ff3b5c; }
+.like-btn:active { transform: scale(0.95); }
+
+.link-btn {
+    display: inline-block;
+    padding: 14px 22px;
+    border-radius: 14px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.link-btn:hover { transform: translateY(-3px) scale(1.03); background: rgba(255,255,255,0.18); }
+.buttunsni_center_qilsih { display: flex; justify-content: center; }
+
+.video-box {
+    margin-top: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    max-width: 640px;
+    max-height: 360px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.video-box video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.news-chat-cta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    margin: 15px;
+    border-radius: 16px;
+    background: rgba(20,20,20,0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.08);
+    text-decoration: none;
+    color: #fff;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+.news-chat-cta:active { transform: scale(0.98); }
+.news-chat-cta:hover { background: rgba(30,30,30,0.85); }
+.news-chat-cta-icon { font-size: 20px; color: #00f3ff; flex-shrink: 0; }
+.news-chat-cta-thumb {
+    width: 40px; height: 40px; border-radius: 10px;
+    object-fit: cover; flex-shrink: 0; background: #000;
+}
+.news-chat-cta-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.news-chat-cta-text strong { font-size: 12px; color: #00f3ff; letter-spacing: 0.5px; }
+.news-chat-cta-text span {
+    font-size: 14px; color: #ddd; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.news-chat-cta-arrow { font-size: 20px; color: rgba(255,255,255,0.4); flex-shrink: 0; }
 
 @media (max-width: 600px) {
     body { font-size: 14px; }
@@ -220,16 +375,43 @@ body::before {
     .title { font-size: 17px; line-height: 1.4; margin-bottom: 8px; }
     .desc { font-size: 14px; line-height: 1.7; }
     .news-chat-cta { margin: 10px; padding: 12px 14px; }
+    .like-bar { margin: 0 10px 10px; }
     * { max-width: 100%; }
 }
 
+/* ============ PC STRUKTURASI: RASM | TITLE+DESC ============ */
 @media (min-width: 768px) {
     .news-navbar { padding: 16px 28px; }
     .news-logo { font-size: 24px; letter-spacing: 2px; }
     .news-menu-btn { width: 45px; height: 45px; font-size: 24px; }
-    .content { width: 85%; margin: 25px auto; padding: 24px; border-radius: 18px; }
-    .title { font-size: 30px; margin-bottom: 14px; }
-    .desc { font-size: 15px; line-height: 1.8; }
+
+    .top-section {
+        display: flex;
+        align-items: stretch;
+        width: 85%;
+        margin: 25px auto 0;
+        gap: 20px;
+    }
+    .top-section .img-wrap {
+        flex: 0 0 50%;
+        max-width: 50%;
+        max-height: 420px;
+        border-radius: 18px;
+        aspect-ratio: auto;
+    }
+    .top-section .info-side {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 14px;
+        min-width: 0;
+    }
+    .top-section .info-side .title { font-size: 28px; margin-bottom: 14px; text-align: center; }
+    .top-section .info-side .desc { font-size: 15px; line-height: 1.8; }
+
+    .content { width: 85%; margin: 20px auto; padding: 24px; border-radius: 18px; }
+    .like-bar { width: 85%; margin: 0 auto 20px; padding: 0; }
     .news-chat-cta { width: 85%; margin: 0 auto 20px auto; }
 }
 </style>
@@ -240,25 +422,29 @@ body::before {
 <div class="news-navbar">
     <a href="javascript:history.back()" class="news-back">⬅ Orqaga</a>
     <div class="news-logo">B•NEWS</div>
-    <button class="news-menu-btn">☰</button>
+    <button class="news-menu-btn" id="menuBtn">☰</button>
+
+    <div class="menu-dropdown" id="menuDropdown">
+        <button id="openInfoBtn"><i class='bx bx-info-circle'></i> Habar xususiyati</button>
+        <button id="openShareBtn"><i class='bx bx-share-alt'></i> Ulashish</button>
+    </div>
 </div>
 
-<!-- 16:9 RASM -->
-<div class="img-wrap">
-    <img src="{{ news.image.url }}" alt="news image" loading="lazy">
+<!-- ===== PC: RASM | TITLE+DESC, MOBIL: USTMA-UST ===== -->
+<div class="top-section">
+    <div class="img-wrap">
+        <img src="{{ news.image.url }}" alt="news image" loading="lazy">
+    </div>
+    <div class="info-side" style="margin:15px 0 0 0;">
+        <div class="title-box">
+            <div class="title">{{ news.title }}</div>
+        </div>
+        <div class="desc-box">
+            <div class="desc">{{ news.description }}</div>
+        </div>
+    </div>
 </div>
 
-<!-- TITLE -->
-<div class="content">
-    <div class="title">{{ news.title }}</div>
-</div>
-
-<!-- DESCRIPTION -->
-<div class="content">
-    <div class="desc">{{ news.description }}</div>
-</div>
-
-<!-- VIDEO (agar bo'lsa) — 16:9, yuklab olish o'chirilgan -->
 {% if news.video %}
 <div class="content">
     <div class="video-box">
@@ -272,14 +458,20 @@ body::before {
 </div>
 {% endif %}
 
-<!-- LINK (agar bo'lsa) -->
+<!-- LIKE BAR -->
+<div class="like-bar">
+    <button class="like-btn {% if is_liked %}liked{% endif %}" id="likeBtn" data-id="{{ news.id }}">
+        <i class='bx {% if is_liked %}bxs-heart{% else %}bx-heart{% endif %}' id="likeIcon"></i>
+        <span id="likeCount">{{ total_likes }}</span>
+    </button>
+</div>
+
 {% if news.link %}
 <div class="buttunsni_center_qilsih">
     <a href="{{ news.link }}" target="_blank" class="link-btn">🔗 Havolaga o‘tish</a>
 </div>
 {% endif %}
 
-<!-- CHATGA JAVOB YOZISH (like box o'rnida) -->
 <a href="{% url 'chat' %}?reply_news={{ news.id }}" class="news-chat-cta">
     <i class='bx bx-reply news-chat-cta-icon'></i>
     <img src="{{ news.image.url }}" class="news-chat-cta-thumb" alt="">
@@ -290,9 +482,82 @@ body::before {
     <i class='bx bx-chevron-right news-chat-cta-arrow'></i>
 </a>
 
+<!-- ===== HABAR XUSUSIYATI MODAL ===== -->
+<div class="modal-overlay" id="infoModal">
+    <div class="modal-box">
+        <div class="modal-handle"></div>
+        <div class="modal-title">
+            Habar xususiyati
+            <button class="modal-close" data-close="infoModal">✕</button>
+        </div>
+
+        <div class="info-row">
+            <i class='bx bx-calendar'></i>
+            <div>
+                <div class="info-label">Yuklangan sana</div>
+                <div class="info-value">{{ news.created_at|date:"d.m.Y H:i" }}</div>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <i class='bx bx-image'></i>
+            <div>
+                <div class="info-label">Rasm hajmi</div>
+                <div class="info-value">
+                    {% if image_size %}{{ image_size|filesizeformat }}{% else %}Noma'lum{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <i class='bx bx-user'></i>
+            <div>
+                <div class="info-label">Kim yuklagan</div>
+                <div class="info-value">
+                    {% if news.author %}{{ news.author.display_name }}{% else %}Admin{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ULASHISH MODAL ===== -->
+<div class="modal-overlay" id="shareModal">
+    <div class="modal-box">
+        <div class="modal-handle"></div>
+        <div class="modal-title">
+            Ulashish
+            <button class="modal-close" data-close="shareModal">✕</button>
+        </div>
+
+        <div class="share-link-box">
+            <input type="text" id="shareLinkInput" value="{{ share_url }}" readonly>
+            <button id="copyLinkBtn">Nusxalash</button>
+        </div>
+
+        <div class="share-options">
+            <a class="share-option telegram"
+               id="telegramShare"
+               target="_blank">
+                <i class='bx bxl-telegram'></i>
+                Telegram
+            </a>
+            <button class="share-option copy" id="copyLinkBtn2">
+                <i class='bx bx-link'></i>
+                Havolani nusxalash
+            </button>
+            <button class="share-option more" id="nativeShareBtn">
+                <i class='bx bx-dots-horizontal-rounded'></i>
+                Boshqa
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
-/* BACKGROUND + SCROLL RESTORE — o'zgarishsiz qoldirildi */
 document.addEventListener("DOMContentLoaded", function () {
+
+    /* ---------- BACKGROUND + SCROLL RESTORE ---------- */
     const bg = localStorage.getItem("bg");
     if (bg) {
         document.body.style.backgroundImage = `url('${bg}')`;
@@ -305,6 +570,124 @@ document.addEventListener("DOMContentLoaded", function () {
     if (pos) {
         setTimeout(() => { window.scrollTo(0, parseInt(pos)); }, 100);
     }
+
+    /* ---------- MENU DROPDOWN ---------- */
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+
+    menuBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menuDropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!menuDropdown.contains(e.target) && e.target !== menuBtn) {
+            menuDropdown.classList.remove('open');
+        }
+    });
+
+    /* ---------- MODALLAR ---------- */
+    const infoModal = document.getElementById('infoModal');
+    const shareModal = document.getElementById('shareModal');
+
+    document.getElementById('openInfoBtn').addEventListener('click', function () {
+        menuDropdown.classList.remove('open');
+        infoModal.classList.add('open');
+    });
+
+    document.getElementById('openShareBtn').addEventListener('click', function () {
+        menuDropdown.classList.remove('open');
+        shareModal.classList.add('open');
+    });
+
+    document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.getElementById(this.dataset.close).classList.remove('open');
+        });
+    });
+
+    [infoModal, shareModal].forEach(modal => {
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) modal.classList.remove('open');
+        });
+    });
+
+    /* ---------- ULASHISH ---------- */
+    const shareUrl = document.getElementById('shareLinkInput').value;
+    const shareTitle = {{ news.title|escapejs }};
+
+    document.getElementById('telegramShare').href =
+        "https://t.me/share/url?url=" + encodeURIComponent(shareUrl) + "&text=" + encodeURIComponent(shareTitle);
+
+    function copyShareLink() {
+        navigator.clipboard.writeText(shareUrl).then(function () {
+            const btns = [document.getElementById('copyLinkBtn'), document.getElementById('copyLinkBtn2')];
+            btns.forEach(b => {
+                if (!b) return;
+                const old = b.innerHTML;
+                b.innerHTML = b.id === 'copyLinkBtn' ? 'Nusxalandi ✓' : "<i class='bx bx-check'></i> Nusxalandi";
+                setTimeout(() => { b.innerHTML = old; }, 1500);
+            });
+        });
+    }
+
+    document.getElementById('copyLinkBtn').addEventListener('click', copyShareLink);
+    document.getElementById('copyLinkBtn2').addEventListener('click', copyShareLink);
+
+    document.getElementById('nativeShareBtn').addEventListener('click', function () {
+        if (navigator.share) {
+            navigator.share({ title: shareTitle, url: shareUrl }).catch(() => {});
+        } else {
+            copyShareLink();
+        }
+    });
+
+    /* ---------- LIKE ---------- */
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const likeBtn = document.getElementById('likeBtn');
+    const likeIcon = document.getElementById('likeIcon');
+    const likeCount = document.getElementById('likeCount');
+    const csrftoken = getCookie('csrftoken');
+
+    likeBtn.addEventListener('click', function () {
+        const newsId = this.dataset.id;
+        fetch(`/news/${newsId}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            likeCount.textContent = data.total_likes;
+            if (data.liked) {
+                likeBtn.classList.add('liked');
+                likeIcon.classList.remove('bx-heart');
+                likeIcon.classList.add('bxs-heart');
+            } else {
+                likeBtn.classList.remove('liked');
+                likeIcon.classList.remove('bxs-heart');
+                likeIcon.classList.add('bx-heart');
+            }
+        })
+        .catch(err => console.error('Like xato:', err));
+    });
+
 });
 </script>
 
