@@ -265,6 +265,14 @@ class ChatMessage(models.Model):
         blank=True,
         related_name='replies'
     )
+    # YANGI — yangilikka javob sifatida yozilgan xabar
+    reply_to_news = models.ForeignKey(
+        'AnimeNews',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='chat_replies'
+    )
 
     def local_created_at(self):
         """Vaqtni Tashkent timezone ga o‘giradi"""
@@ -874,6 +882,10 @@ class AnimeRequestSuggestion(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.name}"
 
+
+
+
+
 # =======================
 # QIDIRUV - NATIJA TOPILMADI MEDIA (yashil fon avtomatik olib tashlanadi)
 # =======================
@@ -905,6 +917,3 @@ class NoResultsMedia(models.Model):
     def __str__(self):
         return f"NoResultsMedia #{self.id} ({self.get_media_type_display()})"
 
-
-
-    
