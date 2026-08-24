@@ -979,13 +979,16 @@ class BalanceTopupRequest(models.Model):
 # =======================
 class JackpotCode(models.Model):
     REWARD_CHOICES = [
-        ('vip', "VIP obuna (kun)"),
+        ('vip_hour', "VIP obuna (soatlik)"),
+        ('vip_day', "VIP obuna (kunlik)"),
         ('balance', "Hisobga pul"),
     ]
     code = models.CharField(max_length=50, unique=True)
     reward_type = models.CharField(max_length=10, choices=REWARD_CHOICES, default='balance')
-    vip_days = models.PositiveIntegerField(default=0, blank=True, help_text="reward_type=vip bo'lsa nechta kun")
+    vip_hours = models.PositiveIntegerField(default=0, blank=True, help_text="reward_type=vip_hour bo'lsa nechta soat")
+    vip_days = models.PositiveIntegerField(default=0, blank=True, help_text="reward_type=vip_day bo'lsa nechta kun")
     balance_amount = models.PositiveIntegerField(default=0, blank=True, help_text="reward_type=balance bo'lsa nechta so'm")
+    max_uses = models.PositiveIntegerField(default=0, help_text="Nechta foydalanuvchi ishlata oladi (0 = cheksiz)")
     expires_at = models.DateTimeField(null=True, blank=True, help_text="Bo'sh qoldirilsa — muddatsiz amal qiladi (admin o'zi bekor qilmaguncha)")
     is_active = models.BooleanField(default=True)
     created_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
@@ -996,10 +999,20 @@ class JackpotCode(models.Model):
         verbose_name = "Jackpot kod"
         verbose_name_plural = "Jackpot kodlar"
 
+    def used_count(self):
+        return self.uses.count()
+
+    def remaining_uses(self):
+        if not self.max_uses:
+            return None
+        return max(self.max_uses - self.used_count(), 0)
+
     def is_valid(self):
         if not self.is_active:
             return False
         if self.expires_at and self.expires_at < timezone.now():
+            return False
+        if self.max_uses and self.used_count() >= self.max_uses:
             return False
         return True
 
