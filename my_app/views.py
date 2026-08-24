@@ -835,19 +835,30 @@ def news_detail(request, pk):
     news = get_object_or_404(AnimeNews, pk=pk)
 
     is_liked = False
-
     if request.user.is_authenticated:
         is_liked = NewsLike.objects.filter(
             user=request.user,
             news_id=pk
         ).exists()
 
+    # Rasm hajmi (bayt)
+    image_size = None
+    if news.image:
+        try:
+            image_size = news.image.size
+        except Exception:
+            image_size = None
+
+    # Ulashish uchun to'liq havola: domain/news/<id>/
+    share_url = request.build_absolute_uri(reverse('news_detail', args=[news.id]))
+
     return render(request, 'news_detail.html', {
         'news': news,
         'is_liked': is_liked,
-        'total_likes': news.likes.count()   # agar ManyToMany ishlatsang
+        'total_likes': news.likes.count(),
+        'image_size': image_size,
+        'share_url': share_url,
     })
-
 
 # =======================
 # LIKE / UNLIKE (TOGGLE)
