@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils import timezone
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode,
     SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
-    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,
-    PremiumBackground, AnimeVoteRequest, AnimeVote, AnimeRequestSuggestion,NoResultsMedia,
-
-
+    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,NoResultsMedia,
+    PremiumBackground, AnimeVoteRequest, AnimeVote, AnimeRequestSuggestion,
+    AccountHistory, DebtRequest, JackpotCode, JackpotCodeUse,
+    BalanceTopupRequest, UserBalance,
 )
 
 
@@ -39,7 +40,6 @@ class MovieEpisodeInline(admin.TabularInline):
     extra = 1
     fields = ('episode_number', 'title', 'video_url', 'video_file', 'description','intro_time')
     show_change_link = True
-
 
 
 class MovieFrameInline(admin.TabularInline):
@@ -205,7 +205,6 @@ class NoticeAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-
 # =======================
 # PREMIUM FON
 # =======================
@@ -255,13 +254,112 @@ class AnimeRequestSuggestionAdmin(admin.ModelAdmin):
     search_fields = ('name', 'user__username')
     readonly_fields = ('created_at',)
 
-
 @admin.register(NoResultsMedia)
 class NoResultsMediaAdmin(admin.ModelAdmin):
     list_display = ('id', 'media_type', 'is_active', 'created_at')
     list_filter = ('media_type', 'is_active')
     fields = ('media_type', 'image', 'video', 'is_active')
 
+@admin.register(AccountHistory)
+class AccountHistoryAdmin(admin.ModelAdmin):
+    list_display = ('user', 'text', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'text')
+    readonly_fields = ('created_at',)
+
+
+@admin.register(DebtRequest)
+class DebtRequestAdmin(admin.ModelAdmin):
+    list_display = ('user', 'amount', 'status', 'created_at', 'processed_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('user__username',)
+    actions = ['approve_debt', 'reject_debt']
+
+    def approve_debt(self, request, queryset):
+        count = 0
+        for debt in queryset.filter(status='pending'):
+            balance, _ = UserBalance.objects.get_or_create(user=debt.user)
+            balance.amount += debt.amount
+            balance.save()
+            debt.status = 'approved'
+            debt.processed_at = timezone.now()
+            debt.save()
+            AccountHistory.objects.create(
+                user=debt.user,
+                text=f"{debt.amount:,} so'm qarz so'rovi tasdiqlandi, hisobingizga qo'shildi".replace(',', '.')
+            )
+            count += 1
+        self.message_user(request, f"{count} ta qarz so'rovi tasdiqlandi")
+    approve_debt.short_description = "Tanlangan qarz so'rovlarini tasdiqlash"
+
+    def reject_debt(self, request, queryset):
+        count = 0
+        for debt in queryset.filter(status='pending'):
+            debt.status = 'rejected'
+            debt.processed_at = timezone.now()
+            debt.save()
+            AccountHistory.objects.create(
+                user=debt.user,
+                text=f"{debt.amount:,} so'm qarz so'rovi rad etildi".replace(',', '.')
+            )
+            count += 1
+        self.message_user(request, f"{count} ta qarz so'rovi rad etildi")
+    reject_debt.short_description = "Tanlangan qarz so'rovlarini rad etish"
+
+
+@admin.register(BalanceTopupRequest)
+class BalanceTopupRequestAdmin(admin.ModelAdmin):
+    list_display = ('user', 'amount', 'is_approved', 'is_rejected', 'created_at')
+    list_filter = ('is_approved', 'is_rejected', 'created_at')
+    search_fields = ('user__username',)
+    actions = ['approve_topup', 'reject_topup']
+
+    def approve_topup(self, request, queryset):
+        count = 0
+        for topup in queryset.filter(is_approved=False, is_rejected=False):
+            balance, _ = UserBalance.objects.get_or_create(user=topup.user)
+            balance.amount += topup.amount
+            balance.save()
+            topup.is_approved = True
+            topup.save()
+            AccountHistory.objects.create(
+                user=topup.user,
+                text=f"Hisobingiz {topup.amount:,} so'm ga to'ldirildi".replace(',', '.')
+            )
+            count += 1
+        self.message_user(request, f"{count} ta to'lov tasdiqlandi")
+    approve_topup.short_description = "Tanlangan to'lovlarni tasdiqlash"
+
+    def reject_topup(self, request, queryset):
+        count = 0
+        for topup in queryset.filter(is_approved=False, is_rejected=False):
+            topup.is_rejected = True
+            topup.save()
+            AccountHistory.objects.create(
+                user=topup.user,
+                text=f"{topup.amount:,} so'm to'lov cheki rad etildi".replace(',', '.')
+            )
+            count += 1
+        self.message_user(request, f"{count} ta to'lov rad etildi")
+    reject_topup.short_description = "Tanlangan to'lovlarni rad etish"
+
+
+@admin.register(JackpotCode)
+class JackpotCodeAdmin(admin.ModelAdmin):
+    list_display = ('code', 'reward_type', 'vip_days', 'balance_amount', 'expires_at', 'is_active', 'created_at')
+    list_filter = ('reward_type', 'is_active')
+    search_fields = ('code',)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.created_by_id:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(JackpotCodeUse)
+class JackpotCodeUseAdmin(admin.ModelAdmin):
+    list_display = ('user', 'code', 'used_at')
+    list_filter = ('used_at',)
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
