@@ -9,83 +9,62 @@
 content="BESTMEDIA NEWS — Anime, manga,trend yangiliklarini o‘qing. Eng yangi anime xabarlari va media kontentlar.">
 
 <meta name="keywords"
-content="anime news, anime uzbek, manga, news, bestmedia, anime yangiliklari">
+content="anime news, anime uzbek, manga, gaming news, bestmedia, anime yangiliklari">
 
 <meta name="author" content="BESTMEDIA OFFICIAL">
-
 <meta name="robots" content="index, follow">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- GOOGLE -->
 <meta name="googlebot" content="index, follow">
 
-<!-- OPEN GRAPH -->
 <meta property="og:title" content="BESTMEDIA NEWS">
-<meta property="og:description"
-content="Anime va gaming yangiliklari platformasi">
-
+<meta property="og:description" content="Anime va manga,donhua yangiliklar platformasi">
 <meta property="og:image" content="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-
 <meta property="og:type" content="website">
-
-<!-- TWITTER -->
 <meta name="twitter:card" content="summary_large_image">
 
-<!-- CANONICAL -->
 <link rel="canonical" href="https://bestmedia-official.uz/news">
-
-<!-- FAVICON -->
-<link rel="icon"
-href="https://bestmedia-official.uz/favicon.ico"
-type="image/x-icon">
-
+<link rel="icon" href="https://bestmedia-official.uz/favicon.ico" type="image/x-icon">
 
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-<link rel="icon"
-href="{% static 'images/favicon.svg' %}"
-type="image/svg+xml">
+<link rel="icon" href="{% static 'images/favicon.svg' %}" type="image/svg+xml">
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
     color: #fff;
-
     background-image: url("https://i.pinimg.com/736x/1d/6a/08/1d6a08d9b18f16cc49cdaddfa878e8a0.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
     background-attachment: fixed;
+}
+
+@media (max-width: 600px) {
+    body { background-attachment: scroll; } /* iOS Safari fixed bilan ishlamaydi */
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     padding: 12px 14px;
     background: rgba(20,20,20,0.8);
     backdrop-filter: blur(12px);
-
     position: sticky;
     top: 0;
     z-index: 1000;
-
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* CENTER TITLE */
 .nav-title {
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 1px;
 }
 
-/* BUTTONS */
 .nav-btn {
     background: rgba(255,255,255,0.08);
     border: none;
@@ -94,26 +73,79 @@ body {
     border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
+    display: flex;
+    align-items: center;
 }
 
-/* SETTINGS PANEL */
-.settings-wrapper {
-    position: relative;
+/* ICON BUTTONS (qidiruv / sozlamalar) */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
+
+.icon-btn {
+    background: rgba(255,255,255,0.08);
+    border: none;
+    color: #fff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.icon-btn:active { transform: scale(0.92); }
+
+/* SEARCH BAR */
+.search-bar {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease, padding 0.25s ease;
+    padding: 0 14px;
+    background: rgba(15,15,15,0.6);
+}
+
+.search-bar.open {
+    max-height: 64px;
+    padding: 10px 14px;
+}
+
+.search-bar input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+.search-bar input::placeholder { color: #999; }
+
+/* SETTINGS PANEL */
+.settings-wrapper { position: relative; }
 
 .settings-panel {
     display: none;
     position: absolute;
     right: 0;
-    top: 40px;
-
+    top: 46px;
     background: #1c1c1c;
     padding: 10px;
     border-radius: 12px;
-    width: 180px;
-
+    width: 190px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 1001;
 }
+
+.settings-panel h4 { margin: 4px 0 10px; font-size: 14px; }
 
 .bg-list {
     display: flex;
@@ -121,24 +153,27 @@ body {
     justify-content: center;
     align-items: center;
     margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
-.settings-panel img {
-    width: 55px;
-    height: 55px;
+.settings-panel img,
+.bg-swatch {
+    width: 50px;
+    height: 50px;
     object-fit: cover;
-
     border-radius: 50%;
     cursor: pointer;
-
     border: 2px solid rgba(255,255,255,0.15);
     transition: 0.2s ease;
 }
 
-.settings-panel img:hover {
+.settings-panel img:hover,
+.bg-swatch:hover {
     transform: scale(1.1);
     border-color: #ff3b5c;
 }
+
+.bg-swatch.bg-black { background: #000; }
 
 .reset-btn {
     width: 100%;
@@ -155,63 +190,63 @@ body {
     background: rgba(26, 26, 26, 0.55);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-
-
     margin: 10px;
     border-radius: 16px;
     overflow: hidden;
-
     border: 1px solid rgba(255, 255, 255, 0.08);
-
     box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     position: relative;
 }
 
-/* butun card bosiladigan bo‘lsin */
-.card-link {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-}
+.card-link { position: absolute; inset: 0; z-index: 1; }
+.actions { position: relative; z-index: 2; }
 
-/* boshqa buttonlar ustida ishlashi uchun */
-.actions {
-    position: relative;
-    z-index: 2;
-}
-
-/* hover effect (desktop) */
 .card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 35px rgba(0,0,0,0.6);
 }
 
-.card img {
+/* IMAGE + SKELETON */
+.img-wrap {
+    position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;   /* bir xil format */
-    object-fit: contain;
+    aspect-ratio: 16 / 9;
     background: #111;
+    overflow: hidden;
 }
+
+.img-wrap .skeleton {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 37%, #1a1a1a 63%);
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+
+.img-wrap img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.img-wrap img.loaded { opacity: 1; }
 
 /* CONTENT */
-.content {
-    padding: 10px;
-}
+.content { padding: 10px; }
+.title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+.desc { font-size: 14px; color: #bbb; }
 
-.title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.desc {
-    font-size: 14px;
-    color: #bbb;
-}
-
-/* BUTTONS */
+/* ACTIONS */
 .actions {
     display: flex;
     justify-content: space-between;
@@ -227,14 +262,7 @@ body {
     border: none;
 }
 
-.like {
-    color: #ff4d4d;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
+a { text-decoration: none; color: inherit; }
 
 .card-container {
     display: grid;
@@ -254,173 +282,62 @@ a {
     cursor: pointer;
 }
 
-.like-icon {
-    font-size: 20px;
-    color: #aaa;
-    transition: 0.2s;
-}
+.like-icon { font-size: 20px; color: #aaa; transition: 0.2s; }
 
 .like-btn.liked .like-icon {
     color: #ff3b5c;
     transform: scale(1.2);
 }
 
-@media (max-width: 600px) {
-
-        .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        padding: 12px 14px;
-        font-size: 16px;
-
-        background: rgba(28, 28, 28, 0.85);
-        backdrop-filter: blur(10px);
-
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    /* 🔙 BACK BUTTON */
-    .back-btn {
-        font-size: 13px;
-        color: #fff;
-        text-decoration: none;
-
-        background: rgba(255,255,255,0.08);
-        padding: 6px 10px;
-        border-radius: 8px;
-
-        transition: 0.2s;
-    }
-
-    .back-btn:active {
-        transform: scale(0.95);
-    }
-
-    /* 🔥 TITLE CENTER EFFECT */
-    .header-title {
-        flex: 1;
-        text-align: center;
-        font-weight: 600;
-        font-size: 16px;
-        color: #fff;
-    }
-
-    /* 📦 CONTAINER */
-    .card-container {
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-        gap: 12px;
-
-        /* 🔥 chetlardan bo‘shliq */
-        padding: 12px 10px;
-
-        box-sizing: border-box;
-    }
-
-    /* 🧊 CARD */
-    .card {
-        border-radius: 14px;
-        overflow: hidden;
-        margin: 0;
-
-        /* yumshoq ko‘rinish */
-        border: 1px solid rgba(255, 255, 255, 0.05);
-
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    /* ✨ tap effect (mobile hover o‘rniga) */
-    .card:active {
-        transform: scale(0.98);
-    }
-
-    /* 🖼 IMAGE */
-    .card img {
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-        display: block;
-        background: #000;
-    }
-
-    /* 📰 TITLE */
-    .title {
-        font-size: 16px;
-        font-weight: 600;
-        line-height: 1.3;
-    }
-
-    /* 📝 DESCRIPTION */
-    .desc {
-        font-size: 13px;
-        color: #bbb;
-        line-height: 1.4;
-
-        /* 3 qator limit */
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    /* ❤️ + BUTTONS */
-    .actions {
-        padding: 8px;
-    }
-
-    .btn {
-        font-size: 13px;
-    }
+/* LOADING / INFINITE SCROLL */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    color: #aaa;
+    font-size: 14px;
 }
 
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: #ff3b5c;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#scrollSentinel { height: 1px; }
+
+@media (max-width: 600px) {
+    .header { padding: 12px 14px; }
+    .card-container { grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 12px; padding: 12px 10px; box-sizing: border-box; }
+    .card { border-radius: 14px; margin: 0; border: 1px solid rgba(255, 255, 255, 0.05); }
+    .card:active { transform: scale(0.98); }
+    .title { font-size: 16px; font-weight: 600; line-height: 1.3; }
+    .desc {
+        font-size: 13px; color: #bbb; line-height: 1.4;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .actions { padding: 8px; }
+    .btn { font-size: 13px; }
+}
 
 @media (min-width: 768px) {
-    .card-container {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 15px;
-        padding: 15px;
-    }
-
-    .card {
-        border-radius: 14px;
-        overflow: hidden;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-    }
-
-    .card img {
-        width: 100%;
-        height: auto;
-        object-fit: contain; /* rasm qirqilmasin */
-    }
-
-    .title {
-        font-size: 19px;
-    }
-
-    .desc {
-        font-size: 14px;
-    }
+    .card-container { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; padding: 15px; }
+    .card { border-radius: 14px; }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); }
+    .title { font-size: 19px; }
+    .desc { font-size: 14px; }
 }
 
-
-
-/* 🖥 DESKTOP */
 @media (min-width: 1024px) {
-    .card-container {
-        grid-template-columns: repeat(3, 1fr);
-    }
+    .card-container { grid-template-columns: repeat(3, 1fr); }
 }
-
 </style>
 
 <meta name="google-site-verification" content="GOOGLE_CODE">
@@ -429,101 +346,65 @@ a {
 <body>
 
 <div class="header">
+    <a href="{% url 'home' %}" class="nav-btn" aria-label="Orqaga">⬅</a>
+    <div class="nav-title">BESTMEDIA NEWS</div>
 
-    <!-- LEFT: BACK -->
-    <a href="{% url 'home' %}" class="nav-btn">
-        ⬅ Orqaga
-    </a>
-
-    <!-- CENTER TITLE -->
-    <div class="nav-title">
-        BESTMEDIA NEWS
-    </div>
-
-    <!-- RIGHT SETTINGS -->
-    <div class="settings-wrapper">
-        <button onclick="toggleSettings()" class="nav-btn">
-            ⚙ Sozlamalar
+    <div class="header-actions">
+        <button class="icon-btn" onclick="toggleSearch()" aria-label="Qidiruv">
+            <i class='bx bx-search'></i>
         </button>
 
-        <!-- DROPDOWN -->
-        <div id="settingsPanel" class="settings-panel">
+        <div class="settings-wrapper">
+            <button class="icon-btn" onclick="toggleSettings()" aria-label="Sozlamalar">
+                <i class='bx bx-cog'></i>
+            </button>
 
-            <h4>🎨 Background tanlash</h4>
-
-            <div class="bg-list">
-                <img src="https://i.pinimg.com/736x/5b/53/88/5b53888b7f316b71d14f25932d09a7a8.jpg"
-                     onclick="setBg(this.src)">
-
-                <img src="https://i.pinimg.com/736x/2f/3e/24/2f3e24af82da99275c2d8677985c5a26.jpg"
-                     onclick="setBg(this.src)">
+            <div id="settingsPanel" class="settings-panel">
+                <h4>🎨 Fon tanlash</h4>
+                <div class="bg-list">
+                    <img src="https://i.pinimg.com/736x/5b/53/88/5b53888b7f316b71d14f25932d09a7a8.jpg" onclick="setBg(this.src)">
+                    <img src="https://i.pinimg.com/736x/2f/3e/24/2f3e24af82da99275c2d8677985c5a26.jpg" onclick="setBg(this.src)">
+                    <div class="bg-swatch bg-black" onclick="setBg('#000000')" title="Qora fon"></div>
+                </div>
+                <button onclick="resetBg()" class="reset-btn">Reset</button>
             </div>
-
-            <button onclick="resetBg()" class="reset-btn">Reset</button>
-
         </div>
     </div>
-
 </div>
 
-<div class="card-container">
-
-{% for news in news_list %}
-
-<div class="card">
-
-    <!-- 🔥 CARD FULL CLICK -->
-    <a href="{% url 'news_detail' news.id %}" class="card-link"></a>
-
-    <a href="{% url 'news_detail' news.id %}">
-        <img src="{{ news.image.url }}" alt="news image">
-    </a>
-
-    <div class="content">
-        <div class="title">{{ news.title }}</div>
-        <div class="desc">
-            {{ news.description|truncatechars:120 }}
-        </div>
-    </div>
-
-    <div class="actions">
-
-        <button class="like-btn {% if user in news.likes.all %}liked{% endif %}"
-                onclick="likeNews({{ news.id }})">
-
-            <i class="bx {% if user in news.likes.all %}bxs-heart{% else %}bx-heart{% endif %} like-icon"></i>
-
-            <span id="like-{{ news.id }}">{{ news.total_likes }}</span>
-        </button>
-
-        <!-- 📖 O‘QISH -->
-        <a href="{% url 'news_detail' news.id %}" class="btn">📖 O‘qish</a>
-
-    </div>
-
+<div id="searchBar" class="search-bar">
+    <input type="text" id="searchInput" placeholder="Yangilik qidirish..." oninput="filterNews()">
 </div>
 
-{% endfor %}
-
+<div id="newsContainer" class="card-container">
+    {% include 'news_cards.html' %}
 </div>
+
+<div id="loadingIndicator" class="loading-indicator" style="display:none;">
+    <div class="spinner"></div> Yuklanmoqda...
+</div>
+
+{% if has_more %}
+    <div id="scrollSentinel"></div>
+{% endif %}
 
 <script>
 
 let settingsOpen = false;
+let currentPage = 1;
+let isLoading = false;
+let hasMore = {{ has_more|yesno:"true,false" }};
 
+/* ============ LIKE ============ */
 function likeNews(id) {
-
     const btn = document.querySelector(`#like-${id}`).closest(".like-btn");
 
     fetch(`/news/${id}/like/`, {
         method: "GET",
-        headers: {
-            "X-Requested-With": "XMLHttpRequest"
-        }
+        headers: { "X-Requested-With": "XMLHttpRequest" }
     })
     .then(res => res.json())
     .then(data => {
-
         document.getElementById(`like-${id}`).innerText = data.total_likes;
 
         if (data.liked) {
@@ -533,31 +414,30 @@ function likeNews(id) {
             btn.classList.remove("liked");
             btn.querySelector("i").className = "bx bx-heart like-icon";
         }
-
     });
 }
 
-
-
-function setBg(url) {
-    document.body.style.backgroundImage = `url(${url})`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundPosition = "center";
-
-    localStorage.setItem("bg", url);
+/* ============ BACKGROUND ============ */
+function setBg(value) {
+    if (value.startsWith('#')) {
+        document.body.style.backgroundImage = "none";
+        document.body.style.backgroundColor = value;
+    } else {
+        document.body.style.backgroundColor = "";
+        document.body.style.backgroundImage = `url(${value})`;
+        document.body.style.backgroundSize = "cover";
+        document.body.style.backgroundPosition = "center";
+    }
+    localStorage.setItem("bg", value);
 }
 
 function resetBg() {
     document.body.style.backgroundImage = "none";
+    document.body.style.backgroundColor = "";
     localStorage.removeItem("bg");
 }
 
-/* LOAD SAVED BG */
-window.onload = function () {
-    const bg = localStorage.getItem("bg");
-    if (bg) setBg(bg);
-}
-
+/* ============ SETTINGS PANEL ============ */
 function toggleSettings() {
     const panel = document.getElementById("settingsPanel");
     settingsOpen = !settingsOpen;
@@ -565,29 +445,87 @@ function toggleSettings() {
 }
 
 function closeSettings() {
-    const panel = document.getElementById("settingsPanel");
-    panel.style.display = "none";
+    document.getElementById("settingsPanel").style.display = "none";
     settingsOpen = false;
 }
 
-/* scroll bo‘lsa */
-window.addEventListener("scroll", () => {
-    if (settingsOpen) closeSettings();
-});
+window.addEventListener("scroll", () => { if (settingsOpen) closeSettings(); });
 
-/* ekranga touch bo‘lsa */
 document.addEventListener("touchstart", (e) => {
-    const panel = document.getElementById("settingsPanel");
     const button = document.querySelector(".settings-wrapper");
+    if (settingsOpen && !button.contains(e.target)) closeSettings();
+});
 
-    if (settingsOpen && !button.contains(e.target)) {
-        closeSettings();
+/* ============ SEARCH (yuklangan cardlar ichida) ============ */
+function toggleSearch() {
+    const bar = document.getElementById('searchBar');
+    bar.classList.toggle('open');
+    if (bar.classList.contains('open')) {
+        document.getElementById('searchInput').focus();
+    } else {
+        document.getElementById('searchInput').value = '';
+        filterNews();
     }
-});
+}
 
-window.addEventListener("scroll", function () {
-    localStorage.setItem("scrollPos", window.scrollY);
-});
+function filterNews() {
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    document.querySelectorAll('#newsContainer .card').forEach(card => {
+        const title = card.querySelector('.title').textContent.toLowerCase();
+        card.style.display = title.includes(q) ? '' : 'none';
+    });
+}
+
+/* ============ INFINITE SCROLL (sekin/silliq) ============ */
+function initInfiniteScroll() {
+    const sentinel = document.getElementById('scrollSentinel');
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !isLoading && hasMore) {
+                loadMoreNews();
+            }
+        });
+    }, { rootMargin: '250px' });
+
+    observer.observe(sentinel);
+}
+
+function loadMoreNews() {
+    isLoading = true;
+    document.getElementById('loadingIndicator').style.display = 'flex';
+    currentPage += 1;
+
+    /* atayin kichik kechikish — tez skroll qilinganda darhol "sakramasin" */
+    setTimeout(() => {
+        fetch(`/news/load-more/?page=${currentPage}`, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('newsContainer').insertAdjacentHTML('beforeend', data.html);
+            hasMore = data.has_more;
+            document.getElementById('loadingIndicator').style.display = 'none';
+            isLoading = false;
+
+            if (!hasMore) {
+                const sentinel = document.getElementById('scrollSentinel');
+                if (sentinel) sentinel.remove();
+            }
+        })
+        .catch(() => {
+            isLoading = false;
+            document.getElementById('loadingIndicator').style.display = 'none';
+        });
+    }, 600);
+}
+
+window.onload = function () {
+    const bg = localStorage.getItem("bg");
+    if (bg) setBg(bg);
+    initInfiniteScroll();
+};
 
 </script>
 
