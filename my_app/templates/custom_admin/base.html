@@ -281,7 +281,24 @@
             </a>
         </li>
     </ul>
-
+    <h4 class="menu-title">MOLIYA</h4>
+    <ul class="menu-list">
+        <li>
+            <a href="{% url 'admin_hisob_list' %}" class="{% if 'hisob' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-wallet'></i> Hisoblar
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_qarz_list' %}" class="{% if 'qarz' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-hand-down'></i> Qarz so'rovlari
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_jackpot_list' %}" class="{% if 'jackpot' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-gift'></i> Jackpot kodlar
+            </a>
+        </li>
+    </ul>
     <div class="sidebar-bottom">
         <a href="{% url 'home' %}" class="sidebar-bottom-link">
             <i class='bx bx-globe'></i> Saytga o'tish
