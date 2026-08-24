@@ -30,9 +30,6 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
     <style>
-    /* =====================================================
-       CSS VARIABLES
-       ===================================================== */
     :root {
         --accent:       #00f3ff;
         --bg-base:      #0d0d1a;
@@ -44,9 +41,6 @@
         --app-vh: 1vh;
     }
 
-    /* =====================================================
-       RESET
-       ===================================================== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
         height: 100%;
@@ -58,9 +52,6 @@
         background: var(--bg-base);
     }
 
-    /* =====================================================
-       PAGE WRAPPER — desktop markazlash uchun
-       ===================================================== */
     .page-shell {
         position: fixed;
         inset: 0;
@@ -76,7 +67,6 @@
             center/cover no-repeat;
     }
 
-    /* Chat + Sidebar umumiy qatorli joylashuv */
     .layout-row {
         display: flex;
         align-items: stretch;
@@ -84,9 +74,6 @@
         gap: 16px;
     }
 
-    /* =====================================================
-       CHAT PAGE — mobil: full screen | desktop: oyna
-       ===================================================== */
     .chat-page {
         display: flex;
         flex-direction: column;
@@ -113,7 +100,6 @@
         }
     }
 
-    /* Mobilda: to'liq ekran, hech qanday bo'shliq/gap/radius yo'q */
     @media (max-width: 768px) {
         .page-shell {
             align-items: stretch;
@@ -132,10 +118,6 @@
         }
     }
 
-    /* =====================================================
-       DESKTOP SIDEBAR — profil + sozlamalar + stikerlar
-       (faqat PC, mobilda ko'rinmaydi)
-       ===================================================== */
     .chat-sidebar { display: none; }
 
     @media (min-width: 769px) {
@@ -162,7 +144,6 @@
         box-shadow: 0 12px 34px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
     }
 
-    /* ---- Tier ranglar (sidebar va modal uchun umumiy) ---- */
     .tier-basic   { --tier-color:#00f3ff; --tier-color-2:#00b8ff; --tier-glow: rgba(0,243,255,0.2); }
     .tier-premium { --tier-color:#ffc107; --tier-color-2:#ff8f00; --tier-glow: rgba(255,193,7,0.25); }
     .tier-vip     { --tier-color:#b45cff; --tier-color-2:#ff5cd6; --tier-glow: rgba(180,92,255,0.28); }
@@ -232,7 +213,6 @@
         margin-bottom: 12px;
     }
 
-    /* Sozlamalar — doimiy ochiq (PC) */
     .side-settings-row { display: flex; flex-direction: column; gap: 10px; }
     .side-setting-block { }
     .side-setting-label { font-size: 11.5px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; }
@@ -273,7 +253,6 @@
     .side-bg-remove i { font-size: 0.9rem; }
     .side-bg-remove:hover { border-color:#ef4444; color:#ef4444; }
 
-    /* Stikerlar — doimiy ochiq (PC) */
     .side-sticker-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -291,14 +270,10 @@
     .side-sticker-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .side-sticker-item:hover { border-color: var(--accent); transform: scale(1.05); }
 
-    /* Desktopda gear tugmasi kerak emas — sidebar allaqachon ochiq */
     @media (min-width: 769px) {
         .chat-nav-settings { display: none; }
     }
 
-    /* =====================================================
-       CHAT BACKGROUND LAYER
-       ===================================================== */
     #chatBgLayer {
         position: absolute; inset: 0;
         background-size: cover; background-position: center; background-repeat: no-repeat;
@@ -323,9 +298,6 @@
         border-radius: inherit;
     }
 
-    /* =====================================================
-       NAVBAR — oddiy shisha (glass)
-       ===================================================== */
     .chat-nav {
         flex-shrink: 0;
         display: flex;
@@ -368,9 +340,6 @@
     }
     .chat-nav-settings.active { transform: rotate(60deg); }
 
-    /* =====================================================
-       CHAT AREA
-       ===================================================== */
     .chat-area { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; overflow: hidden; }
 
     .chat-box {
@@ -391,9 +360,6 @@
     #loadMoreBtn.loading { opacity: 0.45; pointer-events: none; }
     #topSentinel { height: 1px; flex-shrink: 0; }
 
-    /* =====================================================
-       SANA AJRATGICH (date separator)
-       ===================================================== */
     .date-separator {
         display: flex;
         align-items: center;
@@ -415,9 +381,6 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.25);
     }
 
-    /* =====================================================
-       MESSAGE WRAPPERS
-       ===================================================== */
     .message-wrapper { display: flex; align-items: flex-end; gap: 8px; width: 100%; animation: msgIn 0.17s ease; }
     @keyframes msgIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .message-wrapper[data-own="true"] { flex-direction: row-reverse; }
@@ -440,7 +403,6 @@
         transition: box-shadow 0.4s ease;
     }
 
-
     .message-wrapper[data-own="true"] .message { background: rgba(0,243,255,0.14); border-color: rgba(0,243,255,0.22); border-radius: 18px 18px 4px 18px; }
 
     .message.is-sticker { background: transparent !important; border-color: transparent !important; backdrop-filter: none !important; padding: 0; }
@@ -452,10 +414,8 @@
     .message-username { font-size: 0.76rem; font-weight: 800; color: var(--accent); margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
     .message-wrapper[data-own="true"] .message-username { display: none; }
 
-    /* Admin icon (rasm) */
     .admin-icon-badge { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 
-    /* VIP ism — oltin rang + porlash effekti */
     .vip-name-glow {
         background: linear-gradient(90deg, #ffd700 0%, #fff6c9 25%, #ffd700 50%, #ffb300 75%, #ffd700 100%);
         background-size: 250% auto;
@@ -471,14 +431,10 @@
     .message-time { font-size: 0.64rem; color: var(--text-dim); opacity: 0.75; }
     .edited-badge { font-size: 0.62rem; color: var(--text-dim); opacity: 0.6; }
 
-    /* Boshqa xabarga o'tilganda vaqtincha yoritish (reply bosilganda) */
     .message-wrapper.highlight-flash .message {
         box-shadow: 0 0 0 2px var(--accent), 0 0 22px rgba(0,243,255,0.45);
     }
 
-    /* =====================================================
-       ACTION BUTTONS
-       ===================================================== */
     .msg-actions {
         position: absolute; top: 5px; right: 7px; display: flex; gap: 5px;
         opacity: 0; pointer-events: none; transition: opacity 0.17s;
@@ -490,9 +446,6 @@
     .msg-actions i, .msg-actions a { color: var(--text-dim); cursor: pointer; text-decoration: none; font-size: 0.82rem; transition: color 0.14s; display: flex; align-items: center; }
     .msg-actions i:hover, .msg-actions a:hover i { color: var(--accent); }
 
-    /* =====================================================
-       REPLY QUOTE
-       ===================================================== */
     .reply-info {
         background: rgba(0,0,0,0.3); padding: 5px 9px; border-left: 3px solid var(--accent);
         border-radius: 0 6px 6px 0; font-size: 0.78rem; margin-bottom: 5px; color: var(--text-dim);
@@ -508,14 +461,20 @@
     .reply-sticker-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; flex-shrink: 0; vertical-align: middle; border: 1px solid var(--glass-border); }
     #replyStickerThumb { width: 38px; height: 38px; object-fit: cover; border-radius: 8px; flex-shrink: 0; display: none; border: 1px solid rgba(0,243,255,0.3); }
 
-    /* ---- Reply info: VIP foydalanuvchiga javob berilganda ---- */
     .reply-info.reply-info-vip { border-left-color: #b45cff; background: rgba(180,92,255,0.08); }
     .reply-info-vip:hover { background: rgba(180,92,255,0.14); }
     .reply-info-vip .reply-icon-vip { color: #b45cff !important; opacity: 1 !important; }
 
-    /* =====================================================
-       EDIT FORM
-       ===================================================== */
+    /* YANGI — yangilikka javob (reply_to_news) uslubi */
+    .reply-info.reply-info-news {
+        border-left-color: #00f3ff;
+        background: rgba(0,243,255,0.08);
+        text-decoration: none;
+    }
+    .reply-info-news:hover { background: rgba(0,243,255,0.16); }
+    .reply-info-news strong { color: #00f3ff; }
+    .reply-info-news img.reply-sticker-thumb { border-radius: 6px; }
+
     .edit-form { display: none; flex-wrap: wrap; gap: 7px; margin-top: 7px; }
     .edit-form label { display: block; width: 100%; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 2px; }
     .edit-form input { flex: 1; min-width: 0; padding: 6px 10px; background: var(--bg-base); border: 1px solid var(--glass-border); color: white; border-radius: 6px; font-family: inherit; font-size: 0.88rem; outline: none; }
@@ -523,9 +482,6 @@
     .edit-form button { padding: 6px 11px; background: var(--glass-bg); color: white; border: 1px solid var(--glass-border); border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.82rem; }
     .edit-form button[type="submit"] { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
 
-    /* =====================================================
-       SETTINGS PANEL (mobil overlay) — GLASS
-       ===================================================== */
     .settings-panel {
         position: absolute; bottom: 0; left: 0; right: 0; max-height: 0; overflow: hidden;
         background: rgba(255,255,255,0.07);
@@ -539,7 +495,6 @@
     .settings-panel::-webkit-scrollbar { width: 4px; }
     .settings-panel::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
 
-    /* ---- Sozlamalar ichidagi "sahifalar" (asosiy / ovoz / tungi / fon) ---- */
     .settings-view { display: none; }
     .settings-view.active { display: block; animation: settingsViewIn 0.22s ease; }
     @keyframes settingsViewIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
@@ -592,9 +547,6 @@
     .dark-mode-btn.on-btn.active { background: rgba(0,243,255,0.1); border-color: var(--accent); color: var(--accent); }
     .dark-mode-btn.off-btn.active { background: rgba(255,100,100,0.1); border-color: #ef4444; color: #ef4444; }
 
-    /* =====================================================
-       EMOJI + STICKER PANEL (mobil overlay)
-       ===================================================== */
     .emoji-panel {
         position: absolute; bottom: 0; left: 0; right: 0; height: 0; overflow: hidden;
         background: rgba(255,255,255,0.07);
@@ -619,9 +571,6 @@
     .sticker-img-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .sticker-img-item:hover { border-color: var(--accent); transform: scale(1.06); box-shadow: 0 0 12px rgba(0,243,255,0.35); }
 
-    /* =====================================================
-       REPLY PREVIEW
-       ===================================================== */
     .reply-preview { flex-shrink: 0; background: rgba(0,243,255,0.07); padding: 7px 14px; border-top: 1px solid rgba(0,243,255,0.15); display: none; align-items: center; gap: 10px; font-size: 0.83rem; position: relative; z-index: 10; }
     .reply-preview-bar { width: 3px; height: 30px; background: var(--accent); border-radius: 3px; flex-shrink: 0; }
     .reply-preview-content { flex: 1; min-width: 0; }
@@ -630,9 +579,6 @@
     .reply-cancel-btn { flex-shrink: 0; background: transparent; color: var(--text-dim); border: none; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 50%; transition: color 0.15s; display: flex; align-items: center; }
     .reply-cancel-btn:hover { color: var(--accent); }
 
-    /* =====================================================
-       INPUT PANEL
-       ===================================================== */
     .chat-form {
         flex-shrink: 0;
         display: flex;
@@ -674,9 +620,6 @@
     .send-btn:hover { transform: scale(1.08); box-shadow: 0 0 12px rgba(0,243,255,0.5); }
     .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    /* =====================================================
-       SCROLL-TO-BOTTOM
-       ===================================================== */
     #scrollDownBtn {
         position: absolute; bottom: 64px; right: 14px; width: 36px; height: 36px; border-radius: 50%;
         background: var(--bg-surface); border: 1px solid var(--glass-border); color: var(--text-light);
@@ -698,9 +641,6 @@
     }
     .message-wrapper.swiped-right .message { transform: translateX(36px); }
 
-    /* =====================================================
-       VIP — MOBILDA MAXSUS RANGLI XABAR QUTISI (gold/premium)
-       ===================================================== */
     @media (max-width: 768px) {
         .message-wrapper[data-vip="true"] .message {
             background: linear-gradient(135deg, rgba(255,215,0,0.16), rgba(255,143,0,0.08));
@@ -717,9 +657,6 @@
         }
     }
 
-    /* =====================================================
-       USER MINI-PROFIL MODAL (avatar bosilganda)
-       ===================================================== */
     .user-profile-overlay {
         position: fixed; inset: 0; z-index: 300; display: none;
         align-items: center; justify-content: center;
@@ -753,7 +690,6 @@
     .tier-premium .upm-badge { background: rgba(255,193,7,0.14); color:#ffc107; border-color: rgba(255,193,7,0.3); }
     .tier-vip .upm-badge { background: linear-gradient(90deg, rgba(180,92,255,0.2), rgba(255,92,214,0.2)); color:#d78bff; border-color: rgba(180,92,255,0.35); }
 
-    /* ---- VIP profil moduli — @nic gold + glass, badge gold pulse, ID/Ism gold, sana wave ---- */
     .upm-name-vip {
         display: inline-flex; align-items: center; gap: 4px;
         color: #ffd700; padding: 4px 14px; border-radius: 14px;
@@ -821,9 +757,6 @@
     .tier-vip .upm-level-num { background: linear-gradient(90deg, var(--tier-color), var(--tier-color-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .upm-level-label { font-size: 8px; font-weight: 800; letter-spacing: .1em; color: rgba(0,243,255,0.6); }
 
-    /* =====================================================
-       DESKTOP — chat-nav / chat-form spacing
-       ===================================================== */
     @media (min-width: 769px) {
         .chat-nav {
             margin: 12px 14px 0;
@@ -834,9 +767,6 @@
         }
     }
 
-    /* =====================================================
-       MOBILE — NAVBAR / INPUT
-       ===================================================== */
     @media (max-width: 768px) {
         .chat-box { padding: 9px 13px 7px; }
         .message { max-width: 78%; }
@@ -895,12 +825,8 @@
 
 <div class="chat-page">
 
-    <!-- Background layer -->
     <div id="chatBgLayer"></div>
 
-    <!-- ═══════════════════════════════════════
-         NAVBAR
-    ══════════════════════════════════════════ -->
     <nav class="chat-nav">
         <a href="{% url 'home' %}" class="chat-nav-back">
             <i class='bx bx-chevron-left'></i>
@@ -918,12 +844,8 @@
         </button>
     </nav>
 
-    <!-- ═══════════════════════════════════════
-         CHAT AREA
-    ══════════════════════════════════════════ -->
     <div class="chat-area" id="chatArea">
 
-        <!-- MESSAGES -->
         <div class="chat-box" id="chatBox">
 
             <div id="topSentinel"></div>
@@ -992,7 +914,15 @@
                         {% endif %}
                     </div>
 
-                    {% if msg.reply_to %}
+                    <!-- YANGI: yangilikka javob bo'lsa — reply_to o'rniga shu ko'rinadi -->
+                    {% if msg.reply_to_news %}
+                    <a href="{% url 'news_detail' msg.reply_to_news.id %}" class="reply-info reply-info-news" title="Yangilikka o'tish">
+                        {% if msg.reply_to_news.image %}
+                        <img src="{{ msg.reply_to_news.image.url }}" class="reply-sticker-thumb" alt="">
+                        {% endif %}
+                        <span><strong>BESTMEDIA NEWS</strong>: "{{ msg.reply_to_news.title|truncatechars:40 }}"</span>
+                    </a>
+                    {% elif msg.reply_to %}
                     {% with rtype=msg.reply_to.message|slice:":11" %}
                     <div class="reply-info{% if msg.reply_to.user.vip_data.vip_active %} reply-info-vip{% endif %}"
                          data-reply-id="{{ msg.reply_to.id }}"
@@ -1054,10 +984,8 @@
 
         </div><!-- .chat-box -->
 
-        <!-- SETTINGS PANEL (mobil overlay) — icon ichida sahifalar: asosiy / fon / ovoz / tungi -->
         <div class="settings-panel" id="settingsPanel">
 
-            <!-- ASOSIY: Fon / Ovoz / Tungi -->
             <div class="settings-view active" id="settingsMainView">
                 <div class="settings-buttons">
                     <button type="button" class="settings-action-btn" id="bgSettingBtn" onclick="openSettingsSub('bg')">
@@ -1075,7 +1003,6 @@
                 </div>
             </div>
 
-            <!-- FON TANLASH -->
             <div class="settings-view" id="settingsBgView">
                 <div class="settings-subview-header">
                     <button type="button" class="settings-back-btn" onclick="openSettingsSub('main')">
@@ -1141,7 +1068,6 @@
                 </div>
             </div>
 
-            <!-- OVOZ REJIMI -->
             <div class="settings-view" id="settingsSoundView">
                 <div class="settings-subview-header">
                     <button type="button" class="settings-back-btn" onclick="openSettingsSub('main')">
@@ -1163,7 +1089,6 @@
                 </div>
             </div>
 
-            <!-- TUNGI REJIM -->
             <div class="settings-view" id="settingsDarkView">
                 <div class="settings-subview-header">
                     <button type="button" class="settings-back-btn" onclick="openSettingsSub('main')">
@@ -1187,7 +1112,6 @@
 
         </div>
 
-<!-- EMOJI + STICKER PANEL (mobil overlay) -->
 <div class="emoji-panel" id="emojiPanel">
 
     <div class="emoji-tabs">
@@ -1200,12 +1124,10 @@
         </button>
     </div>
 
-    <!-- Emoji -->
     <div class="emoji-tab-content" id="emojiTabContent">
         <div class="emoji-grid" id="emojiGrid"></div>
     </div>
 
-    <!-- Sticker -->
     <div class="emoji-tab-content" id="stickerTabContent" style="display:none;">
         <div class="sticker-img-grid">
 
@@ -1264,7 +1186,6 @@
 
 </div>
 
-        <!-- REPLY PREVIEW -->
         <div id="replyPreview" class="reply-preview">
             <div class="reply-preview-bar"></div>
             <img id="replyStickerThumb" src="" alt="stiker">
@@ -1277,10 +1198,10 @@
             </button>
         </div>
 
-        <!-- INPUT FORM -->
         <form method="POST" class="chat-form" id="chatForm">
             {% csrf_token %}
             <input type="hidden" name="reply_to" id="replyToInput" value="">
+            <input type="hidden" name="reply_to_news" id="replyToNewsInput" value="">
 
             <button type="button" class="emoji-toggle" id="emojiToggle" aria-label="Emoji / Stiker">
                 <i class='bx bx-smile'></i>
@@ -1305,7 +1226,6 @@
             </button>
         </form>
 
-        <!-- Scroll-to-bottom -->
         <button id="scrollDownBtn" aria-label="Oxirgi xabarga">
             <i class='bx bx-chevron-down'></i>
             <span class="badge" id="unreadBadge"></span>
@@ -1315,12 +1235,8 @@
 
 </div><!-- .chat-page -->
 
-<!-- ═══════════════════════════════════════
-     DESKTOP SIDEBAR — profil + sozlamalar + stikerlar
-══════════════════════════════════════════ -->
 <div class="chat-sidebar">
 
-    <!-- MENING PROFILIM -->
     <div class="side-card tier-{{ user_tier|default:'basic' }}">
         <a href="{% url 'home' %}" class="side-back-btn">
             <i class='bx bx-chevron-left'></i> Orqaga
@@ -1362,7 +1278,6 @@
         </div>
     </div>
 
-    <!-- SOZLAMALAR — doimiy ochiq -->
     <div class="side-card">
         <p class="side-section-title">Sozlamalar</p>
         <div class="side-settings-row">
@@ -1466,7 +1381,6 @@
         </div>
     </div>
 
-<!-- STIKERLAR -->
 <div class="side-card">
     <p class="side-section-title">Stikerlar</p>
 
@@ -1535,9 +1449,6 @@
 </div><!-- .layout-row -->
 </div><!-- .page-shell -->
 
-<!-- ═══════════════════════════════════════
-     USER MINI-PROFIL MODAL (avatar bosilganda)
-══════════════════════════════════════════ -->
 <div class="user-profile-overlay" id="userProfileOverlay" onclick="if(event.target===this) closeUserProfileModal()">
     <div class="user-profile-modal" id="userProfileModalCard">
         <button class="upm-close" onclick="closeUserProfileModal()"><i class='bx bx-x'></i></button>
@@ -1548,13 +1459,6 @@
 </div>
 
 <script>
-/* =========================================================
-   MOBIL UCHUN HAQIQIY VIEWPORT BALANDLIGI (--app-vh)
-   iOS/Android manzil panelidan qat'iy nazar to'liq ekranni
-   ta'minlaydi va klaviatura ochilganda sahifa "sakramasligi"
-   uchun visualViewport'ga qarab page-shell balandligi va
-   yuqori chetini (offsetTop) real vaqtda moslaydi.
-   ========================================================= */
 const pageShellEl = document.getElementById("pageShell");
 
 function setAppVh() {
@@ -1575,17 +1479,11 @@ window.addEventListener('resize', setAppVh);
 window.addEventListener('orientationchange', setAppVh);
 if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', setAppVh);
-    /* Klaviatura ochilganda/yopilganda brauzer sahifani o'zi
-       aylantirib yuborishi mumkin — buni bekor qilamiz,
-       shu bois chat "tepaga sakrab" ketmaydi. */
     window.visualViewport.addEventListener('scroll', function() {
         window.scrollTo(0, 0);
     });
 }
 
-/* =========================================================
-   DEFAULT BG
-   ========================================================= */
 const DEFAULT_BG    = "https://i.pinimg.com/736x/db/d1/e8/dbd1e8c885246d27c3a00b40935d4b0f.jpg";
 const BG_STORAGE_KEY = "chat_bg_url";
 const chatBgLayer   = document.getElementById("chatBgLayer");
@@ -1623,9 +1521,6 @@ function getRandomBg() {
     }
 })();
 
-/* =========================================================
-   EMOJI LIST
-   ========================================================= */
 const EMOJIS = ("😀😁😂🤣😃😄😅😆😉😊😋😎😍🥰😘😗😙😚🙂🤗🤩🤔🤨😐😑😶" +
     "🙄😏😣😥😮🤐😯😪😫🥱😴😌😛😜😝🤤😒😓😔😕🙃🤑😲☹️🙁😖😞😟" +
     "😤😢😭😦😧😨😩🤯😬🥵🥶😱😰😳🤪😵🥴😠😡🤬😷🤒🤕🤧🥺😇🥳🤠" +
@@ -1650,9 +1545,6 @@ const EMOJIS = ("😀😁😂🤣😃😄😅😆😉😊😋😎😍🥰😘�
     });
 })();
 
-/* =========================================================
-   TAB SWITCH
-   ========================================================= */
 function switchTab(tab) {
     const ec = document.getElementById("emojiTabContent");
     const sc = document.getElementById("stickerTabContent");
@@ -1667,9 +1559,6 @@ function switchTab(tab) {
     }
 }
 
-/* =========================================================
-   SEND STICKER
-   ========================================================= */
 function sendSticker(url) {
     const inp  = document.getElementById("messageInput");
     const form = document.getElementById("chatForm");
@@ -1679,9 +1568,6 @@ function sendSticker(url) {
     form.requestSubmit();
 }
 
-/* =========================================================
-   EMOJI PANEL TOGGLE (mobil overlay)
-   ========================================================= */
 const emojiPanel  = document.getElementById("emojiPanel");
 const emojiToggle = document.getElementById("emojiToggle");
 let emojiPanelState = "closed";
@@ -1715,12 +1601,6 @@ if (emojiToggle && emojiPanel) {
     });
 }
 
-/* =========================================================
-   SETTINGS PANEL TOGGLE (mobil overlay)
-   Sozlamalar ichida sahifalar: asosiy (fon/ovoz/tungi) →
-   ovoz yoki tungi bosilsa, shu ikonka ICHIDA pastki
-   sahifaga o'tadi, "Orqaga" bosilsa asosiy sahifaga qaytadi.
-   ========================================================= */
 const settingsToggle = document.getElementById("settingsToggle");
 const settingsPanel  = document.getElementById("settingsPanel");
 
@@ -1762,9 +1642,6 @@ document.addEventListener("click", function(e) {
     if (!inSettings) closeSettingsPanel();
 });
 
-/* =========================================================
-   BACKGROUND SETTINGS (mobil + sidebar umumiy)
-   ========================================================= */
 function setBgImage(url) {
     if (!chatBgLayer) return;
     chatBgLayer.style.backgroundImage = `url('${url}')`;
@@ -1788,9 +1665,6 @@ function markSelectedBg(url) {
     });
 }
 
-/* =========================================================
-   EDIT / CLOSE EDIT
-   ========================================================= */
 function openEdit(id) {
     const textEl = document.getElementById("text-" + id);
     const formEl = document.getElementById("edit-form-" + id);
@@ -1804,9 +1678,6 @@ function closeEdit(id) {
     document.getElementById("edit-form-" + id).style.display = "none";
 }
 
-/* =========================================================
-   SO'ZLAR BO'YICHA QISQARTIRISH (reply uchun, 6 tagacha so'z)
-   ========================================================= */
 function truncateWords(str, n) {
     if (!str) return "";
     const words = str.trim().split(/\s+/);
@@ -1815,9 +1686,11 @@ function truncateWords(str, n) {
 }
 
 /* =========================================================
-   REPLY
+   REPLY (oddiy xabarga)
    ========================================================= */
 function replyMessage(messageId, username, message) {
+    document.getElementById("replyToNewsInput").value = "";   /* YANGI — news-reply bilan aralashmasin */
+
     const preview = document.getElementById("replyPreview");
     if (!preview) return;
     preview.style.display = "flex";
@@ -1836,15 +1709,36 @@ function replyMessage(messageId, username, message) {
     document.getElementById("replyToInput").value = messageId;
     document.getElementById("messageInput").focus();
 }
+
+/* =========================================================
+   YANGI — YANGILIKKA JAVOB YOZISH (news_detail'dagi tugmadan keladi)
+   ========================================================= */
+function replyToNews(newsId, title, imageUrl) {
+    document.getElementById("replyToInput").value = "";   /* oddiy reply bilan aralashmasin */
+
+    const preview = document.getElementById("replyPreview");
+    if (!preview) return;
+    preview.style.display = "flex";
+
+    document.getElementById("replyUsername").innerText = "BESTMEDIA NEWS";
+    document.getElementById("replyMessage").innerText = title;
+
+    const thumbEl = document.getElementById("replyStickerThumb");
+    if (thumbEl) { thumbEl.src = imageUrl || ""; thumbEl.style.display = imageUrl ? "block" : "none"; }
+
+    document.getElementById("replyToNewsInput").value = newsId;
+    document.getElementById("messageInput").focus();
+}
+
 function cancelReply() {
     const preview = document.getElementById("replyPreview");
     if (preview) preview.style.display = "none";
     document.getElementById("replyToInput").value = "";
+    document.getElementById("replyToNewsInput").value = "";   /* YANGI */
     const thumbEl = document.getElementById("replyStickerThumb");
     if (thumbEl) { thumbEl.src = ""; thumbEl.style.display = "none"; }
 }
 
-/* Reply qutisi bosilganda — asl xabarga o'tish */
 function scrollToMessage(id) {
     if (!id) return;
     const target = document.querySelector('.message-wrapper[data-msg-id="' + id + '"]');
@@ -1854,9 +1748,6 @@ function scrollToMessage(id) {
     setTimeout(function() { target.classList.remove("highlight-flash"); }, 1200);
 }
 
-/* =========================================================
-   USER MINI-PROFIL MODAL
-   ========================================================= */
 function userProfileUrl(id) {
     return "{% url 'user_mini_profile_api' 0 %}".replace('/0/', '/' + id + '/');
 }
@@ -1944,10 +1835,6 @@ function renderUserProfileModal(data) {
     `;
 }
 
-/* =========================================================
-   MOBILE KEYBOARD FIX — chat pastga tayanadi, "tepaga
-   sakrash" oldini oladi (input fokus bo'lganda pastga tortadi)
-   ========================================================= */
 (function() {
     const chatBox = document.getElementById("chatBox");
     function applyVV() {
@@ -1975,9 +1862,6 @@ function renderUserProfileModal(data) {
     }
 })();
 
-/* =========================================================
-   AUTO-GROW TEXTAREA
-   ========================================================= */
 const messageInput = document.getElementById("messageInput");
 
 function autoGrow(el) {
@@ -2005,9 +1889,6 @@ if (messageInput) {
     });
 }
 
-/* =========================================================
-   TOUCH — long press
-   ========================================================= */
 (function() {
     let pressTimer = null;
     function clearActive() {
@@ -2025,9 +1906,6 @@ if (messageInput) {
     });
 })();
 
-/* =========================================================
-   SWIPE-TO-REPLY
-   ========================================================= */
 (function() {
     let sX=0, sY=0, dX=0, dY=0, aw=null;
     document.addEventListener("touchstart", function(e) {
@@ -2062,9 +1940,6 @@ if (messageInput) {
     }, { passive: true });
 })();
 
-/* =========================================================
-   SCROLL HELPERS
-   ========================================================= */
 const chatBox = document.getElementById("chatBox");
 function isNearBottom() {
     if (!chatBox) return true;
@@ -2081,9 +1956,6 @@ function scrollToBottom(instant) {
     }
 }
 
-/* =========================================================
-   SCROLL-TO-BOTTOM BUTTON
-   ========================================================= */
 const scrollDownBtn = document.getElementById("scrollDownBtn");
 const unreadBadge   = document.getElementById("unreadBadge");
 let unreadCount = 0;
@@ -2105,9 +1977,6 @@ if (chatBox && scrollDownBtn) {
     });
 }
 
-/* =========================================================
-   INITIAL SCROLL
-   ========================================================= */
 function forceScrollToBottom() {
     const box = document.getElementById("chatBox");
     if (!box) return;
@@ -2125,9 +1994,6 @@ window.addEventListener("load", function() {
     setTimeout(forceScrollToBottom, 800);
 });
 
-/* =========================================================
-   FORM SUBMIT
-   ========================================================= */
 const chatForm = document.getElementById("chatForm");
 if (chatForm) {
     chatForm.addEventListener("submit", function(e) {
@@ -2141,15 +2007,11 @@ if (sessionStorage.getItem("chatScrollToBottom") === "1") {
     window.addEventListener("load", function() { scrollToBottom(true); });
 }
 
-/* =========================================================
-   LOAD OLDER MESSAGES
-   ========================================================= */
 function getOldestMsgId() {
     const wrappers = chatBox ? chatBox.querySelectorAll(".message-wrapper[data-msg-id]") : [];
     return wrappers.length ? wrappers[0].getAttribute("data-msg-id") : null;
 }
 
-/* Chatda hozir ko'rinib turgan eng eski sana (ajratgichlarni takrorlamaslik uchun) */
 function getTopVisibleDate() {
     const el = chatBox ? chatBox.querySelector(".date-separator[data-date]") : null;
     return el ? el.getAttribute("data-date") : null;
@@ -2184,8 +2046,6 @@ function loadOlderMessages() {
         const wrapper  = loadMoreBtn ? loadMoreBtn.closest(".load-more-wrapper") : null;
         let anchor = wrapper || sentinel;
         let runningDate = getTopVisibleDate();
-        // Eski xabarlar server tomonidan eng yangisidan eng eskisiga qarab keladi,
-        // shuning uchun teskari tartibda joylab, sana ajratgichlarni to'g'ri joyga qo'yamiz.
         const msgs = data.messages.slice().reverse();
         msgs.forEach(msg => {
             if (msg.date && msg.date !== runningDate) {
@@ -2226,22 +2086,30 @@ function buildMessageEl(msg) {
         : escHtml(displayName);
     const vipCrownHtml = msg.is_vip ? `<i class='bx bx-crown' style="color:#ffd700;font-size:0.78rem;"></i>` : "";
     const editedHtml = msg.edited   ? `<span class="edited-badge">(tahrirlangan)</span>` : "";
-    const replyHtml  = msg.reply_to
-        ? (() => {
-            const rm = msg.reply_to.message || "";
-            const isStickerReply = rm.startsWith("__sticker__");
-            const isReplyVip = !!msg.reply_to.is_vip;
-            const replyIconClass = isReplyVip ? "bx bx-reply reply-icon-vip" : "bx bx-reply";
-            const replyNameHtml = isReplyVip
-                ? `<strong class="vip-name-glow">${escHtml(msg.reply_to.username)}</strong>`
-                : `<strong>${escHtml(msg.reply_to.username)}</strong>`;
-            const replyBody = isStickerReply
-                ? `<img src="${escHtml(rm.slice(11))}" class="reply-sticker-thumb"> <span style="font-style:italic;opacity:0.7;">🖼 Stiker</span>`
-                : `"${escHtml(truncateWords(rm, 6))}"`;
-            const replyTargetId = msg.reply_to.id != null ? msg.reply_to.id : "";
-            return `<div class="reply-info${isReplyVip ? " reply-info-vip" : ""}" data-reply-id="${escHtml(replyTargetId)}" onclick="scrollToMessage(this.dataset.replyId)" title="Asl xabarga o'tish"><i class='${replyIconClass}' style="font-size:1rem;opacity:0.7;flex-shrink:0;"></i>${replyNameHtml}: ${replyBody}</div>`;
-          })()
-        : "";
+
+    /* YANGI — reply_to_news birinchi tekshiriladi, aks holda oddiy reply_to */
+    let replyHtml = "";
+    if (msg.reply_to_news) {
+        const rn = msg.reply_to_news;
+        replyHtml = `<a href="/news/${rn.id}/" class="reply-info reply-info-news" title="Yangilikka o'tish">
+            ${rn.image_url ? `<img src="${escHtml(rn.image_url)}" class="reply-sticker-thumb">` : ''}
+            <span><strong>BESTMEDIA NEWS</strong>: "${escHtml(truncateWords(rn.title, 8))}"</span>
+        </a>`;
+    } else if (msg.reply_to) {
+        const rm = msg.reply_to.message || "";
+        const isStickerReply = rm.startsWith("__sticker__");
+        const isReplyVip = !!msg.reply_to.is_vip;
+        const replyIconClass = isReplyVip ? "bx bx-reply reply-icon-vip" : "bx bx-reply";
+        const replyNameHtml = isReplyVip
+            ? `<strong class="vip-name-glow">${escHtml(msg.reply_to.username)}</strong>`
+            : `<strong>${escHtml(msg.reply_to.username)}</strong>`;
+        const replyBody = isStickerReply
+            ? `<img src="${escHtml(rm.slice(11))}" class="reply-sticker-thumb"> <span style="font-style:italic;opacity:0.7;">🖼 Stiker</span>`
+            : `"${escHtml(truncateWords(rm, 6))}"`;
+        const replyTargetId = msg.reply_to.id != null ? msg.reply_to.id : "";
+        replyHtml = `<div class="reply-info${isReplyVip ? " reply-info-vip" : ""}" data-reply-id="${escHtml(replyTargetId)}" onclick="scrollToMessage(this.dataset.replyId)" title="Asl xabarga o'tish"><i class='${replyIconClass}' style="font-size:1rem;opacity:0.7;flex-shrink:0;"></i>${replyNameHtml}: ${replyBody}</div>`;
+    }
+
     const avatarLetter = (displayName || "?")[0].toUpperCase();
     const isSticker = msg.message && msg.message.startsWith("__sticker__");
     const bodyHtml  = isSticker
@@ -2269,16 +2137,12 @@ function escHtml(str) {
     return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-/* IntersectionObserver */
 if (chatBox && hasMoreMessages) {
     const obs = new IntersectionObserver(entries => { if (entries[0].isIntersecting) loadOlderMessages(); }, { root: chatBox, threshold: 0.1 });
     const sen = document.getElementById("topSentinel");
     if (sen) obs.observe(sen);
 }
 
-/* =========================================================
-   SOUND
-   ========================================================= */
 function playMsgSound() {
     const mode = localStorage.getItem("chat_sound_mode") || "on";
     if (mode === "mute") return;
@@ -2313,9 +2177,6 @@ function setSoundMode(mode) {
     if (icon) icon.className = mode === "mute" ? "bx bx-volume-mute" : "bx bx-volume-full";
 }
 
-/* =========================================================
-   DARK MODE
-   ========================================================= */
 function setDarkMode(enabled) {
     const bg = document.getElementById("chatBgLayer");
     if (!bg) return;
@@ -2329,9 +2190,6 @@ function setDarkMode(enabled) {
     if (icon) icon.className = enabled ? "bx bx-moon" : "bx bx-sun";
 }
 
-/* =========================================================
-   INIT
-   ========================================================= */
 (function initSettings() {
     const soundMode = localStorage.getItem("chat_sound_mode") || "on";
     setSoundMode(soundMode);
@@ -2339,6 +2197,18 @@ function setDarkMode(enabled) {
     const darkMode = localStorage.getItem("chat_dark_mode") === "1";
     setDarkMode(darkMode);
 })();
+
+/* YANGI — agar news_detail'dan "Habar yozish" orqali kelingan bo'lsa,
+   sahifa ochilishi bilan reply-preview avtomatik ochiladi */
+{% if reply_news_obj %}
+document.addEventListener("DOMContentLoaded", function() {
+    replyToNews(
+        {{ reply_news_obj.id }},
+        "{{ reply_news_obj.title|escapejs }}",
+        "{% if reply_news_obj.image %}{{ reply_news_obj.image.url|escapejs }}{% endif %}"
+    );
+});
+{% endif %}
 </script>
 
 </body>
