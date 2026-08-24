@@ -344,17 +344,30 @@ class BalanceTopupRequestAdmin(admin.ModelAdmin):
     reject_topup.short_description = "Tanlangan to'lovlarni rad etish"
 
 
+# --- Inline: jackpot kodni kim ishlatganini ko'rsatish va o'chirish (bekor qilish) ---
+class JackpotCodeUseInline(admin.TabularInline):
+    model = JackpotCodeUse
+    extra = 0
+    readonly_fields = ('user', 'used_at')
+    can_delete = True   # shu yerdan ham bitta foydalanuvchini bekor qilsa bo'ladi
+
+
 @admin.register(JackpotCode)
 class JackpotCodeAdmin(admin.ModelAdmin):
-    list_display = ('code', 'reward_type', 'vip_days', 'balance_amount', 'expires_at', 'is_active', 'created_at')
+    list_display = ('code', 'reward_type', 'vip_hours', 'vip_days', 'balance_amount',
+                     'max_uses', 'used_count_display', 'expires_at', 'is_active', 'created_at')
     list_filter = ('reward_type', 'is_active')
     search_fields = ('code',)
+    inlines = [JackpotCodeUseInline]
+
+    def used_count_display(self, obj):
+        return obj.used_count()
+    used_count_display.short_description = "Foydalanilgan"
 
     def save_model(self, request, obj, form, change):
         if not obj.created_by_id:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
-
 
 @admin.register(JackpotCodeUse)
 class JackpotCodeUseAdmin(admin.ModelAdmin):
