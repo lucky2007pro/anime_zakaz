@@ -158,7 +158,8 @@ urlpatterns = [
     path('imkon/anime-sorash/qoshish/', imkon_anime_request_add, name='imkon_anime_request_add'),
     path('check-username/', check_username, name='check_username'),
     path('news/load-more/', news_load_more, name='news_load_more'),
-
+    path('news/<int:pk>/', news_detail, name='news_detail'),
+    path('news/<int:pk>/like/', toggle_like, name='toggle_like'),
 ]
 
 
