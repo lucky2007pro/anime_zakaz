@@ -343,6 +343,21 @@
     .imkon-msg.show { display: block; }
     .imkon-msg.err { color: #ff5b5b; }
     .imkon-msg.ok { color: #4ade80; }
+
+    /* ===== BETA HOME STATUS ===== */
+    .imkon-beta-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-top: 10px;
+    }
+
+    .imkon-beta-status.on { color: #4ade80; }
+    .imkon-beta-status.off { color: var(--text-dim); }
+
+    .imkon-beta-status b { color: #d99aff; }
 </style>
 {% endblock %}
 
@@ -366,7 +381,26 @@
 
     {% else %}
 
-    <!-- ================= 1) PREMIUM FON ================= -->
+    <!-- ================= 1) OXIRGI VERSIYANI SINAB KO'RISH ================= -->
+    <div class="imkon-card">
+        <div class="imkon-card-head">
+            <div>
+                <div class="imkon-card-title"><i class='bx bxs-rocket'></i> Oxirgi versiyani sinab ko'rish</div>
+                <div class="imkon-card-desc">Yoqsangiz, bosh sahifaning yangi (beta) versiyasi ochiladi. Sinov muddati tugagach, avtomatik odatdagi sahifaga qaytasiz.</div>
+
+                <div class="imkon-beta-status {% if beta_home_active %}on{% else %}off{% endif %}" id="betaStatusText">
+                    {% if beta_home_active %}
+                        <i class='bx bx-check-circle'></i> Yoqilgan — Tugash sanasi: <b>{{ beta_expire_local|date:"d.m.Y H:i" }}</b>
+                    {% else %}
+                        <i class='bx bx-x-circle'></i> O'chirilgan
+                    {% endif %}
+                </div>
+            </div>
+            <div class="imkon-toggle {% if beta_home_active %}on{% endif %}" id="betaToggle" onclick="toggleBetaHome()"></div>
+        </div>
+    </div>
+
+    <!-- ================= 2) PREMIUM FON ================= -->
     <div class="imkon-card">
         <div class="imkon-card-head">
             <div>
@@ -390,7 +424,7 @@
         </div>
     </div>
 
-    <!-- ================= 2) SO'ROVNOMA ================= -->
+    <!-- ================= 3) SO'ROVNOMA ================= -->
     <div class="imkon-card">
         <div class="imkon-card-title"><i class='bx bxs-conversation'></i> Premium so'rovnoma</div>
         <div class="imkon-card-desc">Faqat 1 ta anime nomi taklif qiling. 10 ovoz yig'sa — ANI BEST tomonidan ovozlashtiriladi.</div>
@@ -428,13 +462,13 @@
         </div>
     </div>
 
-    <!-- ================= 3) OBUNACHILAR SONI ================= -->
+    <!-- ================= 4) OBUNACHILAR SONI ================= -->
     <div class="imkon-card">
         <div class="imkon-card-title"><i class='bx bxs-group'></i> Premium obunachilar soni</div>
         <p class="imkon-stat-value">{{ premium_count }}</p>
     </div>
 
-    <!-- ================= 4) TELEGRAM YUKLAB OLISH ================= -->
+    <!-- ================= 5) TELEGRAM YUKLAB OLISH ================= -->
     <div class="imkon-card">
         <div class="imkon-card-head">
             <div>
@@ -445,7 +479,7 @@
         </div>
     </div>
 
-    <!-- ================= 5) OLDINDAN ANIME SO'RASH ================= -->
+    <!-- ================= 6) OLDINDAN ANIME SO'RASH ================= -->
     <div class="imkon-card">
         <div class="imkon-card-title"><i class='bx bxs-search-alt'></i> Oldindan anime surash</div>
         <div class="imkon-card-desc">To'xtab qolgan yoki ANI BEST'da hali chiqmagan animeni so'rang (1 marta)</div>
@@ -479,6 +513,28 @@
 
 <script>
 const CSRF = '{{ csrf_token }}';
+
+function toggleBetaHome() {
+    fetch("{% url 'imkon_toggle_beta_home' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+
+        const toggle = document.getElementById('betaToggle');
+        const statusText = document.getElementById('betaStatusText');
+
+        toggle.classList.toggle('on', data.beta_home_on);
+
+        if (data.beta_home_on) {
+            statusText.className = 'imkon-beta-status on';
+            statusText.innerHTML = "<i class='bx bx-check-circle'></i> Yoqilgan — Tugash sanasi: <b>" + data.expire_text + "</b>";
+        } else {
+            statusText.className = 'imkon-beta-status off';
+            statusText.innerHTML = "<i class='bx bx-x-circle'></i> O'chirilgan";
+        }
+    });
+}
 
 function toggleBg() {
     fetch("{% url 'imkon_toggle_bg' %}", {
