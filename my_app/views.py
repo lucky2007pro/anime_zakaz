@@ -36,6 +36,7 @@ from .models import (
 
 User = get_user_model()
 NEWS_PAGE_SIZE = 9
+BETA_HOME_TRIAL_DAYS = 7 
 
 # =======================
 # REGISTER
