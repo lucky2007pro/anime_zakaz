@@ -20,8 +20,9 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
-
-
+import json
+from pywebpush import webpush, WebPushException
+from django.conf import settings
 
 
 
@@ -29,7 +30,7 @@ from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
     Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,
     UserSettings,AnimeSchedule,AnimeSectionItem, Notice, NoticeRead,WatchHistory, FavoriteAnime,NoResultsMedia,
-    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse,UserBalance
+    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse,UserBalance,PushSubscription,
 
 )
 
@@ -383,6 +384,54 @@ def check_username(request):
     exists = CustomUser.objects.filter(username=username).exists()
     return JsonResponse({'exists': exists})
 
+# =======================
+# PUSH NOTIFICATION — OBUNA SAQLASH
+# =======================
+@login_required
+def save_push_subscription(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        endpoint = data['endpoint']
+        keys = data['keys']
+
+        PushSubscription.objects.update_or_create(
+            endpoint=endpoint,
+            defaults={
+                'user': request.user,
+                'p256dh': keys['p256dh'],
+                'auth': keys['auth'],
+            }
+        )
+        return JsonResponse({'status': 'ok'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+# =======================
+# PUSH NOTIFICATION — YUBORISH (ichki funksiya, boshqa view'lardan chaqiriladi)
+# =======================
+def send_push_notification(user, title, body, url='/'):
+    subs = PushSubscription.objects.filter(user=user)
+    for sub in subs:
+        try:
+            webpush(
+                subscription_info={
+                    "endpoint": sub.endpoint,
+                    "keys": {"p256dh": sub.p256dh, "auth": sub.auth}
+                },
+                data=json.dumps({"title": title, "body": body, "url": url}),
+                vapid_private_key=settings.VAPID_PRIVATE_KEY,
+                vapid_claims={"sub": f"mailto:{settings.VAPID_ADMIN_EMAIL}"}
+            )
+        except WebPushException as ex:
+            # 410 = obuna eskirgan/bekor qilingan, bazadan o'chiramiz
+            if ex.response is not None and ex.response.status_code == 410:
+                sub.delete()
+            else:
+                print("Push xatosi:", ex)
 
 # =======================
 # PROFILE
@@ -539,6 +588,22 @@ def chat(request):
     if reply_news_id and reply_news_id.isdigit():
         reply_news_obj = AnimeNews.objects.filter(id=reply_news_id).first()
 
+    if reply_to_msg and reply_to_msg.user != request.user:
+        Notice.objects.create(
+            notice_type='reply',
+            created_by=request.user,
+            target_user=reply_to_msg.user,
+            title=f"{request.user.username} sizga javob berdi",
+            message=text,
+            related_chat_message=new_msg,
+        )
+        # YANGI — push notification yuborish
+        send_push_notification(
+            user=reply_to_msg.user,
+            title=f"{request.user.username} sizga javob berdi",
+            body=text[:100],
+            url='/chat/'
+        )
     if request.method == "POST":
         if request.user.is_banned:
             messages.error(request, "Siz yozolmaysiz")
