@@ -551,6 +551,24 @@ class UserSettings(models.Model):
         ('premium', 'Premium (To\'q binafsha)'),
     ]
 
+
+    # PREMIUM IMKONIYATLAR
+    premium_bg_on = models.BooleanField(default=False)
+    premium_bg = models.ForeignKey(
+        'PremiumBackground', on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
+    )
+    telegram_download_on = models.BooleanField(default=False)
+
+    # YANGI — OXIRGI VERSIYANI SINAB KO'RISH (BETA HOME)
+    beta_home_on = models.BooleanField(
+        default=False,
+        help_text="Yoqilsa, bosh sahifa o'rniga home_vip.html ko'rsatiladi"
+    )
+    beta_home_expire = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Sinov muddati tugash vaqti — o'tgach avtomatik o'chadi"
+    )
+
     user = models.OneToOneField(
         'CustomUser',
         on_delete=models.CASCADE,
@@ -601,6 +619,7 @@ class UserSettings(models.Model):
 
     def __str__(self):
         return f"{self.user.username} – sozlamalar"
+
 
 
 # =======================
@@ -1027,6 +1046,8 @@ class JackpotCodeUse(models.Model):
 
     class Meta:
         unique_together = ('user', 'code')
+
+
 
 
 
