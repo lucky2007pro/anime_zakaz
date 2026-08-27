@@ -1799,6 +1799,17 @@ def imkon_page(request):
         .order_by('-total')
     )
 
+    # YANGI — BETA HOME (oxirgi versiyani sinab ko'rish) holati
+    beta_home_active = False
+    beta_expire_local = None
+    if settings_obj.beta_home_on:
+        if settings_obj.beta_home_expire and settings_obj.beta_home_expire > timezone.now():
+            beta_home_active = True
+            beta_expire_local = localtime(settings_obj.beta_home_expire, ZoneInfo('Asia/Tashkent'))
+        else:
+            settings_obj.beta_home_on = False
+            settings_obj.save(update_fields=['beta_home_on'])
+
     context = {
         'is_premium': is_premium,
         'user_tier': tier,
@@ -1810,9 +1821,38 @@ def imkon_page(request):
         'my_vote_request': my_vote_request,
         'my_request': my_request,
         'requested_names': requested_names,
+        'beta_home_active': beta_home_active,      # YANGI
+        'beta_expire_local': beta_expire_local,    # YANGI
     }
     return render(request, 'imkon.html', context)
 
+
+@login_required
+def imkon_toggle_beta_home(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import UserSettings, VipUser
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    if vip_data.get_tier() not in ['premium', 'vip'] and not (request.user.is_staff or request.user.is_admin_user):
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.beta_home_on = not settings_obj.beta_home_on
+
+    if settings_obj.beta_home_on:
+        settings_obj.beta_home_expire = timezone.now() + timedelta(days=BETA_HOME_TRIAL_DAYS)
+    settings_obj.save()
+
+    expire_text = None
+    if settings_obj.beta_home_on and settings_obj.beta_home_expire:
+        expire_text = localtime(
+            settings_obj.beta_home_expire, ZoneInfo('Asia/Tashkent')
+        ).strftime('%d.%m.%Y %H:%M')
+
+    return JsonResponse({
+        'beta_home_on': settings_obj.beta_home_on,
+        'expire_text': expire_text,
+    })
 
 @login_required
 def imkon_toggle_bg(request):
