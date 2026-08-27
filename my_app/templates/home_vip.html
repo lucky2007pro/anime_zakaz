@@ -1,0 +1,1350 @@
+```
+{% extends 'base.html' %}
+{% load static %}
+
+{% static 'images/default.svg' as default_movie_poster %}
+
+{% block title %}BESTMEDIA - Bosh Sahifa (Beta){% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ================= BETA BADGE ================= */
+    .beta-top-bar {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 10px 5% 0;
+    }
+
+    .beta-badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, rgba(180,92,255,0.18), rgba(0,243,255,0.12));
+        border: 1px solid rgba(180,92,255,0.35);
+        color: #d99aff;
+        padding: 7px 16px;
+        border-radius: 30px;
+        font-size: 0.78rem;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+    }
+    .beta-badge-pill i { font-size: 1rem; }
+
+    /* ================= YUQORI IKKI USTUN: HIKOYALAR + CHIQISH KUNLARI ================= */
+    .top-split-grid {
+        max-width: 1400px;
+        margin: 14px auto 0;
+        padding: 0 4%;
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+        gap: 26px;
+        align-items: start;
+    }
+
+    .split-col-title {
+        font-size: 0.72rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--text-dim);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin: 0 0 10px;
+    }
+    .split-col-title i { color: var(--accent); font-size: 0.95rem; }
+
+    .split-col {
+        padding: 2px 0;
+        min-height: 168px;
+        min-width: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+    }
+
+    /* ---- HIKOYALAR (chap ustun) ---- */
+    .story-container {
+        display: flex;
+        flex-direction: row;
+        gap: 11px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        padding: 2px 2px 8px 0;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        min-width: 0;
+    }
+    .story-container::-webkit-scrollbar { display: none; }
+
+    .story-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        min-width: 56px;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .story-ring {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        padding: 2.5px;
+        background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+    }
+    .story-ring.seen { background: #444; }
+
+    .story-ring img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #0f0f13;
+    }
+
+    .story-item span {
+        font-size: 10.5px;
+        color: #aaa;
+        max-width: 62px;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .story-item:active .story-ring { transform: scale(0.94); }
+
+    .split-empty-msg {
+        color: var(--text-dim);
+        font-size: 0.76rem;
+        padding: 20px 6px;
+        text-align: center;
+    }
+
+    /* ---- ANIME CHIQISH KUNLARI (o'ng ustun) ---- */
+    .day-pills-row {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        padding: 1px 1px 8px 0;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .day-pills-row::-webkit-scrollbar { display: none; }
+
+    .day-pill {
+        flex-shrink: 0;
+        padding: 7px 12px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: var(--text-dim);
+        font-size: 0.7rem;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .day-pill.active {
+        background: linear-gradient(135deg, #ff003c, #ff4d6d);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(255, 0, 60, 0.3);
+    }
+
+    .day-pill:not(.active):hover {
+        background: rgba(255,255,255,0.1);
+        color: var(--text-light);
+    }
+
+    .schedule-mini-card {
+        display: flex;
+        gap: 10px;
+        text-decoration: none;
+        color: inherit;
+        background: rgba(255,255,255,0.035);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 12px;
+        padding: 7px;
+        transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        min-width: 0;
+    }
+    .schedule-mini-card:hover {
+        border-color: rgba(255, 0, 60, 0.3);
+        background: rgba(255,255,255,0.055);
+        transform: translateY(-2px);
+    }
+
+    .schedule-mini-poster {
+        width: 52px;
+        height: 74px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: #1a1a22;
+    }
+
+    .schedule-mini-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .schedule-mini-title {
+        font-size: 0.82rem;
+        font-weight: 900;
+        color: var(--text-light);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.25;
+    }
+
+    .schedule-mini-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #ff4d6d;
+    }
+    .schedule-mini-meta i { font-size: 0.85rem; }
+
+    .schedule-mini-empty {
+        text-align: center;
+        color: var(--text-dim);
+        font-size: 0.76rem;
+        padding: 22px 6px;
+    }
+    .schedule-mini-empty i {
+        display: block;
+        font-size: 1.6rem;
+        margin-bottom: 6px;
+        opacity: 0.4;
+    }
+
+    /* ================= HERO SLIDER ================= */
+    .slider-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        min-height: 320px;
+        max-height: 90vh;
+        overflow: hidden;
+        border-radius: 16px;
+        margin: 0 auto;
+        box-shadow: 0 0 0 2px rgba(0, 243, 255, 0.25), 0 0 40px rgba(0, 243, 255, 0.12);
+    }
+
+    .slides-wrapper {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        cursor: grab;
+        user-select: none;
+        will-change: transform;
+    }
+    .slides-wrapper.dragging { cursor: grabbing; transition: none; }
+
+    .slide {
+        min-width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        padding: 5% 5% 8% 5%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .slide-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; overflow: hidden; }
+    .slide-bg img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
+    .slide-bg-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+
+    .slide-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(to right, rgba(15,15,19,0.92) 0%, rgba(15,15,19,0.35) 55%, transparent 100%),
+                    linear-gradient(to top, rgba(15,15,19,1) 0%, transparent 50%);
+    }
+
+    .slide-content { position: relative; z-index: 10; max-width: 680px; }
+
+    .tags { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+    .tag {
+        background: rgba(0, 243, 255, 0.13);
+        color: var(--accent);
+        padding: 4px 11px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        border: 1px solid rgba(0, 243, 255, 0.28);
+    }
+    .tag-muted { background: rgba(255,255,255,0.07); color: var(--text-light); border-color: rgba(255,255,255,0.12); }
+
+    .slide-title {
+        font-size: 3.4rem;
+        font-weight: 900;
+        line-height: 1.08;
+        margin-bottom: 12px;
+        text-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        letter-spacing: -0.02em;
+    }
+
+    .slide-meta-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+    .slide-meta-item { display: flex; align-items: center; gap: 5px; font-size: 0.82rem; font-weight: 700; color: var(--text-dim); }
+    .slide-meta-item i { font-size: 0.95rem; color: var(--accent); }
+
+    .slide-rating {
+        background: rgba(234, 179, 8, 0.18);
+        color: #fbbf24;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 0.78rem;
+        font-weight: 800;
+        border: 1px solid rgba(234, 179, 8, 0.35);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .slider-controls {
+        position: static;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin: 16px auto 0;
+        z-index: 20;
+    }
+
+    .dot {
+        position: relative;
+        flex: 0 0 auto;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.25);
+        overflow: hidden;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+        outline: none;
+        transition: width 0.35s ease, border-radius 0.35s ease, background 0.3s ease;
+    }
+    .dot-fill { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--accent); border-radius: inherit; display: block; }
+    .dot.viewed { background: var(--accent); }
+    .dot.active { width: 26px; border-radius: 999px; background: rgba(255,255,255,0.25); }
+    .dot.active .dot-fill { animation: dotFillProgress 5s linear forwards; }
+    @keyframes dotFillProgress { from { width: 0%; } to { width: 100%; } }
+    .slider-controls .dot:only-child { width: 8px !important; border-radius: 50% !important; background: var(--accent) !important; }
+    .slider-controls .dot:only-child .dot-fill { display: none; }
+
+    .slider-wrapper-outer { max-width: 1400px; margin: 0 auto; padding: 0 5%; }
+
+    .hero-buttons { margin-top: 25px; display: flex; justify-content: flex-start; width: 100%; }
+    .btn-main {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 28px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #ff003c, #ff4d6d);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 8px 25px rgba(255, 0, 60, 0.35);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .btn-main:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 12px 30px rgba(255, 0, 60, 0.5); }
+    .btn-main:active { transform: scale(0.96); }
+
+    /* ================= KATEGORIYA: KICHIK PILL TUGMALAR, BITTA QATOR ================= */
+    .beta-category-section {
+        max-width: 1400px;
+        margin: 36px auto 0;
+        padding: 0 5%;
+    }
+
+    .beta-category-heading {
+        font-size: 1.5rem;
+        font-weight: 900;
+        margin-bottom: 14px;
+    }
+    .beta-category-heading span { color: var(--accent); }
+
+    .beta-tab-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 22px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .beta-tab-buttons::-webkit-scrollbar { display: none; }
+
+    .beta-tab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 16px;
+        border-radius: 30px;
+        border: 1.5px solid rgba(255,255,255,0.09);
+        background: rgba(255,255,255,0.04);
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+        white-space: nowrap;
+        flex-shrink: 0;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .beta-tab-btn i.tab-icon {
+        font-size: 1.05rem;
+        color: var(--text-dim);
+        transition: color 0.25s ease;
+    }
+
+    .beta-tab-btn .tab-label {
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: var(--text-light);
+    }
+
+    .beta-tab-btn .tab-count {
+        font-size: 0.68rem;
+        font-weight: 900;
+        color: var(--text-dim);
+        background: rgba(255,255,255,0.07);
+        padding: 1px 7px;
+        border-radius: 20px;
+    }
+
+    .beta-tab-btn.kunlik.active {
+        background: linear-gradient(135deg, #ff003c, #ff4d6d);
+        border-color: transparent;
+        box-shadow: 0 6px 18px rgba(255, 0, 60, 0.3);
+    }
+    .beta-tab-btn.kunlik.active i.tab-icon,
+    .beta-tab-btn.kunlik.active .tab-label { color: #fff; }
+    .beta-tab-btn.kunlik.active .tab-count { background: rgba(255,255,255,0.25); color: #fff; }
+
+    .beta-tab-btn.barcha.active {
+        background: linear-gradient(135deg, #0ea5e9, #6366f1);
+        border-color: transparent;
+        box-shadow: 0 6px 18px rgba(14, 165, 233, 0.3);
+    }
+    .beta-tab-btn.barcha.active i.tab-icon,
+    .beta-tab-btn.barcha.active .tab-label { color: #fff; }
+    .beta-tab-btn.barcha.active .tab-count { background: rgba(255,255,255,0.25); color: #fff; }
+
+    .beta-tab-btn:not(.active):hover {
+        border-color: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.08);
+    }
+
+    /* Panel'lar */
+    .beta-panel { display: none; }
+    .beta-panel.active { display: block; }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 22px;
+        padding-bottom: 50px;
+    }
+
+    .card-wrapper {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        content-visibility: auto;
+        contain-intrinsic-size: 290px 360px;
+    }
+
+    .anime-card {
+        width: 100%;
+        height: 290px;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        background: var(--bg-surface);
+    }
+    .anime-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .card-inner-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(10,10,15,0.98) 0%, rgba(10,10,15,0.6) 40%, transparent 70%);
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 12px 11px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .card-wrapper:hover .card-inner-overlay { opacity: 1; }
+
+    .card-inner-title {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.3;
+    }
+
+    .card-inner-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .card-inner-views { display: flex; align-items: center; gap: 3px; font-size: 0.7rem; color: rgba(255,255,255,0.5); font-weight: 700; }
+    .card-inner-views i { font-size: 0.8rem; }
+
+    .top-badge-group { position: absolute; top: 8px; left: 8px; display: flex; gap: 4px; z-index: 10; }
+    .top-badge-episode { background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; color: #FFC107; }
+    .top-badge-year { background: #eab308; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; color: #000; }
+
+    .tier-badge {
+        position: absolute; top: 8px; right: 8px;
+        padding: 3px 8px; border-radius: 6px;
+        font-size: 0.72rem; font-weight: 900;
+        z-index: 10; display: flex; align-items: center; gap: 3px;
+        letter-spacing: 0.5px;
+    }
+    .tier-badge.vip { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.5); }
+    .tier-badge.premium { background: rgba(244, 63, 94, 0.2); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+    .fav-badge {
+        position: absolute; bottom: 8px; right: 8px;
+        background: rgba(0,0,0,0.5);
+        width: 32px; height: 32px; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        color: #fff; font-size: 1.1rem; z-index: 10;
+        transition: background 0.2s, color 0.2s;
+        border: none; cursor: pointer;
+    }
+    .fav-badge:hover { background: rgba(255,255,255,0.2); color: #ff3366; }
+    .fav-badge i.bxs-star { color: #ff3366; }
+
+    .card-info-bottom { display: flex; flex-direction: column; gap: 2px; padding: 10px 4px 0; }
+    .card-title {
+        font-size: 1rem; font-weight: 800; color: var(--text-light);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        transition: color 0.3s ease;
+    }
+    .card-wrapper:hover .card-title { color: var(--accent); }
+
+    .card-meta { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; color: var(--text-dim); }
+    .tag-jp { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 3px; color: var(--text-light); font-size: 0.65rem; font-weight: 800; }
+
+    .beta-panel-empty {
+        text-align: center;
+        padding: 50px 20px;
+        color: var(--text-dim);
+    }
+    .beta-panel-empty i { font-size: 2.6rem; display: block; margin-bottom: 12px; opacity: 0.4; }
+
+    /* ----- STORY TOP SPACE ----- */
+    .story-top-space { margin-top: 75px; }
+
+    /* ----- MOBILE ----- */
+    @media (max-width: 600px) {
+        .story-top-space { margin-top: 62px !important; }
+
+        /* HERO */
+        .slide-content {
+            width: 100% !important;
+            text-align: left !important;
+            align-items: flex-start !important;
+        }
+
+        .slide-title {
+            font-size: 1.5rem !important;
+            text-align: left !important;
+            line-height: 1.2;
+        }
+
+        .tags {
+            display: flex;
+            justify-content: flex-start !important;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .slide-meta-row {
+            display: flex;
+            justify-content: flex-start !important;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .hero-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start !important;
+        }
+
+        .btn-main {
+            margin-left: 0 !important;
+            width: auto;
+        }
+
+        .slider-container {
+            aspect-ratio: 16 / 9;
+            min-height: 220px;
+            border-radius: 10px;
+        }
+
+        .slide { padding: 20px 14px 50px; }
+
+        /* ================= MOBILE: STORY LEFT + SCHEDULE RIGHT ================= */
+        .top-split-grid {
+            width: 100%;
+            box-sizing: border-box;
+            grid-template-columns: minmax(0, 1.18fr) minmax(118px, 0.82fr);
+            gap: 14px;
+            padding: 0 14px;
+            margin-top: 12px;
+            align-items: start;
+        }
+
+        .split-col {
+            min-height: 0;
+            padding: 0;
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            min-width: 0;
+        }
+
+        .split-col-title {
+            font-size: 0.62rem;
+            margin: 0 0 8px;
+            gap: 5px;
+            letter-spacing: 0.055em;
+            white-space: nowrap;
+        }
+
+        .split-col-title i {
+            font-size: 0.9rem;
+        }
+
+        /* STORY */
+        .story-container {
+            gap: 9px;
+            padding: 1px 0 7px;
+            margin: 0;
+        }
+
+        .story-item {
+            min-width: 54px;
+            width: 54px;
+            gap: 4px;
+        }
+
+        .story-ring {
+            width: 54px;
+            height: 54px;
+            padding: 2px;
+        }
+
+        .story-ring img {
+            border-width: 2px;
+        }
+
+        .story-item span {
+            font-size: 9px;
+            max-width: 54px;
+            line-height: 1.15;
+        }
+
+        /* SCHEDULE */
+        .day-pills-row {
+            gap: 5px;
+            padding: 0 0 7px;
+            margin: 0;
+        }
+
+        .day-pill {
+            padding: 5px 8px;
+            font-size: 0.58rem;
+            line-height: 1;
+            border-radius: 999px;
+        }
+
+        .schedule-mini-card {
+            gap: 7px;
+            padding: 6px;
+            border-radius: 10px;
+            min-height: 58px;
+        }
+
+        .schedule-mini-poster {
+            width: 34px;
+            height: 50px;
+            border-radius: 6px;
+        }
+
+        .schedule-mini-info {
+            gap: 3px;
+            min-width: 0;
+        }
+
+        .schedule-mini-title {
+            font-size: 0.66rem;
+            line-height: 1.18;
+            -webkit-line-clamp: 2;
+        }
+
+        .schedule-mini-meta {
+            font-size: 0.56rem;
+            gap: 3px;
+        }
+
+        .schedule-mini-meta i {
+            font-size: 0.7rem;
+        }
+
+        .schedule-mini-empty {
+            padding: 10px 2px;
+            font-size: 0.62rem;
+        }
+
+        .schedule-mini-empty i {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+
+        /* KATEGORIYALAR */
+        .beta-category-section { padding: 0 4%; }
+        .beta-category-heading { font-size: 1.2rem; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .anime-card { height: 240px; }
+        .card-inner-overlay { opacity: 1; }
+        .slides-wrapper { will-change: auto; }
+    }
+
+    @media (max-width: 1024px) { .slide-title { font-size: 2.8rem; } }
+
+    @media (max-width: 768px) {
+        .slider-wrapper-outer { padding: 0 3%; }
+        .slider-container { aspect-ratio: 16 / 9; min-height: 200px; max-height: 56vw; border-radius: 10px; }
+        .slide { padding: 18px 16px 54px; align-items: flex-end; }
+        .slide-content { max-width: 100%; }
+        .slide-title { font-size: 2rem; }
+        .slide-meta-row { display: none; }
+        .beta-category-section { padding: 0 4%; }
+        .beta-category-heading { font-size: 1.2rem; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .anime-card { height: 240px; }
+        .card-inner-overlay { opacity: 1; }
+        .slides-wrapper { will-change: auto; }
+    }
+
+    @media (max-width: 480px) {
+        .slider-wrapper-outer { padding: 0; }
+        .slider-container {
+            aspect-ratio: 16 / 9;
+            min-height: 200px;
+            max-height: 56vw;
+            border-radius: 0;
+            box-shadow: none;
+            margin-top: 0;
+        }
+
+        .slide {
+            padding: 30px 14px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .tags { gap: 6px; margin-bottom: 8px; }
+        .slide-title { font-size: 1.5rem; line-height: 1.2; }
+
+        /* Story / Schedule: tetap two-column on small phones */
+        .top-split-grid {
+            grid-template-columns: minmax(0, 1.15fr) minmax(112px, 0.85fr);
+            gap: 10px;
+            padding: 0 12px;
+        }
+
+        .split-col-title {
+            font-size: 0.58rem;
+        }
+
+        .story-container {
+            gap: 7px;
+        }
+
+        .story-item,
+        .story-ring {
+            width: 50px;
+        }
+
+        .story-item {
+            min-width: 50px;
+        }
+
+        .story-ring {
+            height: 50px;
+        }
+
+        .story-item span {
+            max-width: 50px;
+            font-size: 8.5px;
+        }
+
+        .day-pills-row {
+            gap: 4px;
+        }
+
+        .day-pill {
+            padding: 5px 7px;
+            font-size: 0.55rem;
+        }
+
+        .schedule-mini-card {
+            gap: 6px;
+            padding: 5px;
+        }
+
+        .schedule-mini-poster {
+            width: 31px;
+            height: 46px;
+        }
+
+        .schedule-mini-title {
+            font-size: 0.62rem;
+        }
+
+        .schedule-mini-meta {
+            font-size: 0.53rem;
+        }
+
+        .cards-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .anime-card { height: 200px; }
+        .card-title { font-size: 0.88rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="story-top-space">
+
+    <!-- BETA BADGE -->
+    <div class="beta-top-bar">
+        <span class="beta-badge-pill"><i class='bx bx-rocket'></i> Siz oxirgi versiyani sinamoqdasiz</span>
+    </div>
+
+    <!-- ================= YUQORI IKKI USTUN: HIKOYALAR (chap) + CHIQISH KUNLARI (o'ng) ================= -->
+    <div class="top-split-grid">
+
+        <!-- CHAP: HIKOYALAR -->
+        <div class="split-col">
+            <p class="split-col-title"><i class='bx bx-images'></i> Hikoyalar</p>
+            <div class="story-container">
+                {% for story in stories %}
+                <a href="{% url 'story_view' story.id %}" class="story-item">
+                    <div class="story-ring {% if story.id in seen_stories %}seen{% endif %}">
+                        {% if story.image %}
+                            <img src="{{ story.image.url }}" alt="{{ story.title }}" loading="lazy" decoding="async">
+                        {% else %}
+                            <img src="https://via.placeholder.com/150" alt="story" loading="lazy" decoding="async">
+                        {% endif %}
+                    </div>
+                    <span>{{ story.title }}</span>
+                </a>
+                {% empty %}
+                    <p class="split-empty-msg">Hozircha story yo'q</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- O'NG: ANIME CHIQISH KUNLARI -->
+        <div class="split-col">
+            <p class="split-col-title"><i class='bx bx-calendar-star'></i> Chiqish kunlari</p>
+
+            <div class="day-pills-row" id="dayPillsRow">
+                <button class="day-pill" data-day="dushanba" onclick="selectScheduleDay('dushanba', this)">Dush</button>
+                <button class="day-pill" data-day="seshanba" onclick="selectScheduleDay('seshanba', this)">Sesh</button>
+                <button class="day-pill" data-day="chorshanba" onclick="selectScheduleDay('chorshanba', this)">Chor</button>
+                <button class="day-pill" data-day="payshanba" onclick="selectScheduleDay('payshanba', this)">Pay</button>
+                <button class="day-pill" data-day="juma" onclick="selectScheduleDay('juma', this)">Jum</button>
+                <button class="day-pill" data-day="shanba" onclick="selectScheduleDay('shanba', this)">Shan</button>
+                <button class="day-pill" data-day="yakshanba" onclick="selectScheduleDay('yakshanba', this)">Yak</button>
+            </div>
+
+            <div id="scheduleMiniWrapper">
+                {% for item in schedule_list %}
+                <a href="{{ item.watch_url }}" class="schedule-mini-card" data-day="{{ item.day }}" style="display:none;">
+                    <img class="schedule-mini-poster" src="{{ item.image_url }}" alt="{{ item.name }}"
+                         loading="lazy" decoding="async" onerror="this.src='{{ default_movie_poster }}'">
+                    <div class="schedule-mini-info">
+                        <div class="schedule-mini-title">{{ item.name }}</div>
+                        <div class="schedule-mini-meta"><i class='bx bx-play-circle'></i> {{ item.episode_number }}-qism</div>
+                    </div>
+                </a>
+                {% endfor %}
+                <div class="schedule-mini-empty" id="scheduleMiniEmpty" style="display:none;">
+                    <i class='bx bx-calendar-x'></i>
+                    Bu kunda anime yo'q
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= HERO SLIDER ================= -->
+    {% if hero_movies %}
+    <div class="slider-wrapper-outer" style="margin-top: 24px;">
+        <div class="slider-container" id="heroSlider">
+            <div class="slides-wrapper" id="slidesWrapper">
+
+                {% for anime in hero_movies %}
+                {% if anime.id %}
+                <div class="slide">
+
+                    {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
+                        <video class="slide-bg-video" autoplay loop muted playsinline preload="metadata">
+                            <source src="{{ anime.hero_media.url }}">
+                        </video>
+                    {% elif anime.hero_media %}
+                        <div class="slide-bg">
+                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}" loading="eager" decoding="async">
+                        </div>
+                    {% else %}
+                        <div class="slide-bg">
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="eager" decoding="async">
+                        </div>
+                    {% endif %}
+
+                    <div class="slide-overlay"></div>
+
+                    <div class="slide-content">
+                        <div class="tags">
+                            <span class="tag">YANGI</span>
+                            <span class="tag tag-muted">{{ anime.created_at|date:"Y" }}</span>
+                            {% if anime.episodes.count > 0 %}
+                            <span class="tag">{{ anime.episodes.count }} qism</span>
+                            {% endif %}
+                            {% if anime.category %}
+                            <span class="tag tag-muted">{{ anime.category.name }}</span>
+                            {% endif %}
+                        </div>
+
+                        <h1 class="slide-title">{{ anime.title }}</h1>
+
+                        <div class="slide-meta-row">
+                            {% if anime.release_year %}
+                            <div class="slide-meta-item">
+                                <i class='bx bx-calendar'></i>
+                                <span>{{ anime.release_year }}</span>
+                            </div>
+                            {% endif %}
+                            {% if anime.views_count %}
+                            <div class="slide-meta-item">
+                                <i class='bx bx-show'></i>
+                                <span>{{ anime.views_count }}</span>
+                            </div>
+                            {% endif %}
+                            {% if anime.rating %}
+                            <div class="slide-rating">
+                                <i class='bx bxs-star'></i>
+                                {{ anime.rating }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="hero-buttons">
+                            <a href="{% url 'movie_detail' anime.id %}" class="btn-main">
+                                ▶ Hozir ko'rish
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <div class="slider-controls" id="sliderControls">
+            {% for h_anime in hero_movies %}
+            {% if h_anime.id %}
+            <button class="dot dot-{{ forloop.counter0 }} {% if forloop.counter0 == 0 %}active{% endif %}"
+                 aria-pressed="{% if forloop.counter0 == 0 %}true{% else %}false{% endif %}"
+                 onclick="goToSlide({{ forloop.counter0 }})">
+                <span class="dot-fill"></span>
+            </button>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ================= KATEGORIYA: KUNLIK / BARCHA (kichik pill tugmalar) ================= -->
+    <div class="beta-category-section">
+        <h3 class="beta-category-heading">Animelar <span>ro'yxati</span></h3>
+
+        <div class="beta-tab-buttons">
+            <button class="beta-tab-btn kunlik" data-target="beta-panel-daily" onclick="switchBetaTab(this)">
+                <i class='bx bx-calendar-check tab-icon'></i>
+                <span class="tab-label">Kunlik anime</span>
+                <span class="tab-count">{{ daily_movies|length }}</span>
+            </button>
+
+            <button class="beta-tab-btn barcha active" data-target="beta-panel-all" onclick="switchBetaTab(this)">
+                <i class='bx bx-collection tab-icon'></i>
+                <span class="tab-label">Barcha animelar</span>
+                <span class="tab-count">{{ all_movies_beta|length }}</span>
+            </button>
+        </div>
+
+        <!-- KUNLIK ANIME PANEL -->
+        <div class="beta-panel" id="beta-panel-daily">
+            <div class="cards-grid">
+                {% for anime in daily_movies %}
+                {% if anime.id %}
+                <div class="card-wrapper">
+                    <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
+                        <div class="top-badge-group">
+                            {% if anime.release_year %}<div class="top-badge-year">{{ anime.release_year }}</div>{% endif %}
+                            {% if anime.episodes.count > 0 %}
+                            <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
+                            {% else %}
+                            <div class="top-badge-episode">Film</div>
+                            {% endif %}
+                        </div>
+
+                        {% if anime.minimum_tier == 'vip' %}
+                        <div class="tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
+                        {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
+                        <div class="tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
+                        {% endif %}
+
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" decoding="async">
+
+                        <div class="card-inner-overlay">
+                            <div class="card-inner-title">{{ anime.title }}</div>
+                            <div class="card-inner-meta">
+                                {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                                <div class="card-inner-views"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</div>
+                            </div>
+                        </div>
+
+                        <button class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})" aria-label="Saqlash">
+                            {% if anime.id in fav_ids %}
+                                <i class='bx bxs-star' id="fav-icon-daily-{{ anime.id }}"></i>
+                            {% else %}
+                                <i class='bx bx-star' id="fav-icon-daily-{{ anime.id }}"></i>
+                            {% endif %}
+                        </button>
+                    </div>
+
+                    <div class="card-info-bottom">
+                        <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                            <h4 class="card-title">{{ anime.title }}</h4>
+                        </a>
+                        <div class="card-meta" style="margin-top:4px;">
+                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                            <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="beta-panel-empty" style="grid-column:1/-1;">
+                    <i class='bx bx-calendar-star'></i>
+                    Hozircha kunlik anime yo'q
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- BARCHA ANIMELAR PANEL (sahifa ochilganda ochiq turadi) -->
+        <div class="beta-panel active" id="beta-panel-all">
+            <div class="cards-grid">
+                {% for anime in all_movies_beta %}
+                {% if anime.id %}
+                <div class="card-wrapper">
+                    <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
+                        <div class="top-badge-group">
+                            {% if anime.release_year %}<div class="top-badge-year">{{ anime.release_year }}</div>{% endif %}
+                            {% if anime.episodes.count > 0 %}
+                            <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
+                            {% else %}
+                            <div class="top-badge-episode">Film</div>
+                            {% endif %}
+                        </div>
+
+                        {% if anime.minimum_tier == 'vip' %}
+                        <div class="tier-badge vip"><i class='bx bxs-crown'></i> VIP</div>
+                        {% elif anime.minimum_tier == 'premium' or anime.is_premium %}
+                        <div class="tier-badge premium"><i class='bx bxs-diamond'></i> Premium</div>
+                        {% endif %}
+
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" decoding="async">
+
+                        <div class="card-inner-overlay">
+                            <div class="card-inner-title">{{ anime.title }}</div>
+                            <div class="card-inner-meta">
+                                {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                                <div class="card-inner-views"><i class='bx bx-show'></i> {{ anime.views_count|default:"0" }}</div>
+                            </div>
+                        </div>
+
+                        <button class="fav-badge" onclick="toggleFavorite(event, {{ anime.id }})" aria-label="Saqlash">
+                            {% if anime.id in fav_ids %}
+                                <i class='bx bxs-star' id="fav-icon-all-{{ anime.id }}"></i>
+                            {% else %}
+                                <i class='bx bx-star' id="fav-icon-all-{{ anime.id }}"></i>
+                            {% endif %}
+                        </button>
+                    </div>
+
+                    <div class="card-info-bottom">
+                        <a href="{% url 'movie_detail' anime.id %}" style="text-decoration:none; color:inherit;">
+                            <h4 class="card-title">{{ anime.title }}</h4>
+                        </a>
+                        <div class="card-meta" style="margin-top:4px;">
+                            {% if anime.category %}<span class="tag-jp">{{ anime.category.name }}</span>{% endif %}
+                            <span style="font-weight:800; color:var(--text-dim);">{{ anime.release_year|default:anime.created_at|date:"Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="beta-panel-empty" style="grid-column:1/-1;">
+                    <i class='bx bx-collection'></i>
+                    Hozircha anime yo'q
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div><!-- /story-top-space -->
+
+<script>
+/* ================= HERO SLIDER ================= */
+(function() {
+    const wrapper = document.getElementById('slidesWrapper');
+    if (!wrapper) return;
+
+    const slides = wrapper.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    if (totalSlides === 0) return;
+
+    let currentSlide = 0;
+    let autoPlayTimer = null;
+    let heroStartX = 0;
+    let heroDragging = false;
+    let heroMoved = 0;
+
+    function updateDots() {
+        const dots = document.querySelectorAll('#sliderControls .dot');
+        dots.forEach(function(d, i) {
+            d.setAttribute('aria-pressed', i === currentSlide ? 'true' : 'false');
+            d.classList.remove('viewed', 'active');
+            if (i < currentSlide) {
+                d.classList.add('viewed');
+            } else if (i === currentSlide) {
+                d.classList.add('active');
+                const fill = d.querySelector('.dot-fill');
+                if (fill) {
+                    fill.style.animation = 'none';
+                    void fill.offsetWidth;
+                    fill.style.animation = '';
+                }
+            }
+        });
+    }
+
+    function pauseDotFill() {
+        document.querySelectorAll('#sliderControls .dot.active .dot-fill').forEach(function(f) {
+            f.style.animationPlayState = 'paused';
+        });
+    }
+
+    function goToSlide(index) {
+        currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
+        wrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+        wrapper.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+        updateDots();
+    }
+
+    window.goToSlide = goToSlide;
+
+    function resetAutoPlay() {
+        if (autoPlayTimer) clearInterval(autoPlayTimer);
+        if (totalSlides > 1) {
+            autoPlayTimer = setInterval(function() {
+                goToSlide(currentSlide + 1);
+            }, 5000);
+        }
+    }
+
+    updateDots();
+    resetAutoPlay();
+
+    if ('IntersectionObserver' in window) {
+        const heroObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    resetAutoPlay();
+                } else if (autoPlayTimer) {
+                    clearInterval(autoPlayTimer);
+                    autoPlayTimer = null;
+                }
+            });
+        }, { threshold: 0.1 });
+        heroObserver.observe(wrapper);
+    }
+
+    wrapper.addEventListener('touchstart', function(e) {
+        heroStartX = e.touches[0].clientX;
+        heroDragging = true;
+        heroMoved = 0;
+        wrapper.style.transition = 'none';
+        if (autoPlayTimer) clearInterval(autoPlayTimer);
+        pauseDotFill();
+    }, { passive: true });
+
+    wrapper.addEventListener('touchmove', function(e) {
+        if (!heroDragging) return;
+        heroMoved = e.touches[0].clientX - heroStartX;
+        const base = -currentSlide * 100;
+        const pct = (heroMoved / wrapper.offsetWidth) * 100;
+        wrapper.style.transform = 'translateX(calc(' + base + '% + ' + pct + 'px))';
+    }, { passive: true });
+
+    wrapper.addEventListener('touchend', function() {
+        if (!heroDragging) return;
+        heroDragging = false;
+        if (heroMoved < -50) goToSlide(currentSlide + 1);
+        else if (heroMoved > 50) goToSlide(currentSlide - 1);
+        else goToSlide(currentSlide);
+        heroMoved = 0;
+        resetAutoPlay();
+    });
+
+    wrapper.addEventListener('mousedown', function(e) {
+        heroStartX = e.clientX;
+        heroDragging = true;
+        heroMoved = 0;
+        wrapper.classList.add('dragging');
+        wrapper.style.transition = 'none';
+        if (autoPlayTimer) clearInterval(autoPlayTimer);
+        pauseDotFill();
+    });
+
+    window.addEventListener('mousemove', function(e) {
+        if (!heroDragging) return;
+        heroMoved = e.clientX - heroStartX;
+        const base = -currentSlide * 100;
+        const pct = (heroMoved / wrapper.offsetWidth) * 100;
+        wrapper.style.transform = 'translateX(calc(' + base + '% + ' + pct + 'px))';
+    });
+
+    window.addEventListener('mouseup', function() {
+        if (!heroDragging) return;
+        heroDragging = false;
+        wrapper.classList.remove('dragging');
+        if (heroMoved < -50) goToSlide(currentSlide + 1);
+        else if (heroMoved > 50) goToSlide(currentSlide - 1);
+        else goToSlide(currentSlide);
+        heroMoved = 0;
+        resetAutoPlay();
+    });
+})();
+
+/* ================= ANIME CHIQISH KUNLARI — KUN PILLARI ================= */
+(function() {
+    const DAYS_UZ = ['yakshanba','dushanba','seshanba','chorshanba','payshanba','juma','shanba'];
+    const todayIndex = new Date().getDay();
+    const todayKey = DAYS_UZ[todayIndex];
+
+    const pills = document.querySelectorAll('#dayPillsRow .day-pill');
+    let initialDay = todayKey;
+
+    let found = false;
+    pills.forEach(function(p) {
+        if (p.dataset.day === todayKey) found = true;
+    });
+    if (!found && pills.length > 0) initialDay = pills[0].dataset.day;
+
+    pills.forEach(function(p) {
+        p.classList.toggle('active', p.dataset.day === initialDay);
+    });
+
+    showScheduleDay(initialDay);
+
+    window.selectScheduleDay = function(dayKey, btn) {
+        pills.forEach(function(p) { p.classList.remove('active'); });
+        if (btn) btn.classList.add('active');
+        showScheduleDay(dayKey);
+    };
+
+    function showScheduleDay(dayKey) {
+        const cards = document.querySelectorAll('.schedule-mini-card');
+        const emptyEl = document.getElementById('scheduleMiniEmpty');
+        let count = 0;
+
+        cards.forEach(function(card) {
+            if (card.dataset.day === dayKey) {
+                card.style.display = 'flex';
+                count++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (emptyEl) emptyEl.style.display = count === 0 ? 'block' : 'none';
+    }
+})();
+
+/* ================= KATEGORIYA TUGMALARI ================= */
+function switchBetaTab(btn) {
+    document.querySelectorAll('.beta-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.beta-panel').forEach(function(p) { p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+}
+</script>
+
+{% endblock %}
+```
