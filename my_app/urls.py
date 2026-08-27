@@ -19,7 +19,7 @@ from .views import (
     offline_view, manifest_view,
 
     hisobim_page, statistika_page, imkan_page, imkan_toggle_bg,
-    imkan_select_bg, imkan_toggle_telegram_download,
+    imkan_select_bg, imkon_toggle_telegram_download,
     imkan_vote_request_add, imkan_vote, imkan_anime_request_add,
     check_username,
 
