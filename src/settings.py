@@ -214,3 +214,15 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
 }
+
+
+# ============ WEB PUSH (VAPID) ============
+VAPID_PUBLIC_KEY = config(
+    'VAPID_PUBLIC_KEY',
+    default='BIV_qRywliALoRuqskqFzPIu-uhA6YPVMV0zo9PWAqt4SDiHvXIuAvcD6iO32Q5BJ0J-bSEX9eUeAU5jdy0RsnI'
+)
+VAPID_PRIVATE_KEY = config(
+    'VAPID_PRIVATE_KEY',
+    default='gL3bQeMXN1nDKRHH8PgxhzzSUYPdri90GCdwl4JO2ts'
+)
+VAPID_ADMIN_EMAIL = config('VAPID_ADMIN_EMAIL', default='admin@bestmedia-official.uz')
