@@ -41,6 +41,55 @@ self.addEventListener('install', function (event) {
     );
 });
 
+
+/* ==========================================================================
+   PUSH NOTIFICATION
+   Bu qism yuqoridagi offline-cache logikasidan MUSTAQIL ishlaydi —
+   fetch bilan aralashmaydi, shuning uchun xavfsiz qo'shildi.
+========================================================================== */
+
+self.addEventListener('push', function (event) {
+    let data = { title: "BESTMEDIA", body: "Yangi xabar bor!", url: "/" };
+
+    if (event.data) {
+        try {
+            data = event.data.json();
+        } catch (e) {
+            data.body = event.data.text();
+        }
+    }
+
+    const options = {
+        body: data.body,
+        icon: '/static/images/favicon-192x192.png',
+        badge: '/static/images/favicon-48x48.png',
+        vibrate: [200, 100, 200],
+        data: { url: data.url || '/' }
+    };
+
+    event.waitUntil(
+        self.registration.showNotification(data.title, options)
+    );
+});
+
+self.addEventListener('notificationclick', function (event) {
+    event.notification.close();
+    const url = event.notification.data.url || '/';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+            for (const client of clientList) {
+                if (client.url === url && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow(url);
+            }
+        })
+    );
+});
+
 /* ---------------------------------------------------------------
    ACTIVATE — eski kesh versiyalarini tozalash
 --------------------------------------------------------------- */
