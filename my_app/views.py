@@ -588,22 +588,6 @@ def chat(request):
     if reply_news_id and reply_news_id.isdigit():
         reply_news_obj = AnimeNews.objects.filter(id=reply_news_id).first()
 
-    if reply_to_msg and reply_to_msg.user != request.user:
-        Notice.objects.create(
-            notice_type='reply',
-            created_by=request.user,
-            target_user=reply_to_msg.user,
-            title=f"{request.user.username} sizga javob berdi",
-            message=text,
-            related_chat_message=new_msg,
-        )
-        # YANGI — push notification yuborish
-        send_push_notification(
-            user=reply_to_msg.user,
-            title=f"{request.user.username} sizga javob berdi",
-            body=text[:100],
-            url='/chat/'
-        )
     if request.method == "POST":
         if request.user.is_banned:
             messages.error(request, "Siz yozolmaysiz")
@@ -640,6 +624,13 @@ def chat(request):
                     title=f"{request.user.username} sizga javob berdi",
                     message=text,
                     related_chat_message=new_msg,
+                )
+                # YANGI — push notification yuborish
+                send_push_notification(
+                    user=reply_to_msg.user,
+                    title=f"{request.user.username} sizga javob berdi",
+                    body=text[:100],
+                    url='/chat/'
                 )
         return redirect('chat')
 
