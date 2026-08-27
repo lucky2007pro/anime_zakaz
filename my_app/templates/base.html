@@ -1890,6 +1890,9 @@
 </audio>
 {% endif %}
 
+<script>
+    window.USER_AUTHENTICATED = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
+</script>
 <script src="{% static 'js/push.js' %}"></script>
 <script>
 /* ================= SCROLL ================= */

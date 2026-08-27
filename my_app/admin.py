@@ -195,15 +195,40 @@ class AnimeSectionItemAdmin(admin.ModelAdmin):
 
 @admin.register(Notice)
 class NoticeAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created_by', 'is_active', 'created_at')
-    list_filter = ('is_active',)
-    search_fields = ('title', 'message')
+    list_display = ('title', 'notice_type', 'target_user', 'created_by', 'is_active', 'created_at')
+    list_filter = ('notice_type', 'is_active', 'created_at')
+    search_fields = ('title', 'message', 'target_user__username')
     readonly_fields = ('created_at',)
 
     def save_model(self, request, obj, form, change):
+        is_new = obj.pk is None
         if not obj.created_by_id:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+        # Yangi va faol e'lon bo'lsa push yuborish
+        if is_new and obj.is_active:
+            if obj.notice_type == 'admin' and not obj.target_user:
+                try:
+                    from .views import send_broadcast_push_notification
+                    send_broadcast_push_notification(
+                        title=obj.title or "BESTMEDIA E'lon",
+                        body=obj.message[:150],
+                        url='/notice/'
+                    )
+                except Exception as e:
+                    print("Admin notice broadcast push xatosi:", e)
+            elif obj.target_user:
+                try:
+                    from .views import send_push_notification
+                    send_push_notification(
+                        user=obj.target_user,
+                        title=obj.title or "BESTMEDIA Bildirishnoma",
+                        body=obj.message[:150],
+                        url='/notice/'
+                    )
+                except Exception as e:
+                    print("Admin notice target push xatosi:", e)
 
 
 # =======================

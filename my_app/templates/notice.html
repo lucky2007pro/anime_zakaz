@@ -1026,6 +1026,270 @@ body::before {
         background: rgba(139,92,246,0.10);
         border-color: rgba(167,139,250,0.20);
     }
+    .notice-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-admin-broadcast {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(0, 243, 255, 0.25) 100%);
+        border: 1px solid rgba(0, 243, 255, 0.35);
+        color: #fff;
+        padding: 8px 18px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 800;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 20px rgba(0, 243, 255, 0.15);
+    }
+    .btn-admin-broadcast:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 243, 255, 0.3);
+        border-color: #00f3ff;
+    }
+
+    /* Push Permission Banner */
+    .push-permission-card {
+        background: rgba(15, 23, 42, 0.65);
+        border: 1px solid rgba(0, 243, 255, 0.25);
+        border-radius: 18px;
+        padding: 14px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
+    }
+    .push-permission-card.hidden { display: none !important; }
+    .push-card-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .push-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(0, 243, 255, 0.12);
+        border: 1px solid rgba(0, 243, 255, 0.3);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+        animation: pulseBell 2s infinite ease-in-out;
+    }
+    @keyframes pulseBell {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(0, 243, 255, 0); }
+        50% { transform: scale(1.06); box-shadow: 0 0 16px rgba(0, 243, 255, 0.35); }
+    }
+    .push-card-text h4 {
+        margin: 0 0 3px 0;
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #fff;
+    }
+    .push-card-text p {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        line-height: 1.35;
+    }
+    .push-card-btn {
+        background: linear-gradient(135deg, #00f3ff 0%, #00a8ff 100%);
+        color: #0a0e17;
+        font-weight: 800;
+        font-size: 0.82rem;
+        padding: 9px 20px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 18px rgba(0, 243, 255, 0.3);
+    }
+    .push-card-btn:hover {
+        transform: scale(1.04);
+        box-shadow: 0 6px 25px rgba(0, 243, 255, 0.5);
+    }
+
+    /* Push Active Badge */
+    .push-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #34d399;
+        margin-bottom: 15px;
+    }
+    .push-status-pill .pulse-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Modal Form Styles */
+    .modal-backdrop-custom {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(5, 8, 15, 0.75);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    .modal-backdrop-custom.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .modal-dialog-custom {
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(0, 243, 255, 0.25);
+        border-radius: 24px;
+        width: 100%;
+        max-width: 520px;
+        padding: 26px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transform: scale(0.92);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-backdrop-custom.show .modal-dialog-custom {
+        transform: scale(1);
+    }
+    .modal-header-custom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+    }
+    .modal-header-custom h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+    .modal-header-custom h3 i { color: var(--accent); }
+    .modal-close-btn {
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .modal-close-btn:hover { color: #fff; transform: scale(1.1); }
+    .form-group-custom {
+        margin-bottom: 16px;
+    }
+    .form-group-custom label {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--text-dim);
+        margin-bottom: 6px;
+    }
+    .form-control-custom {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 12px 14px;
+        color: #fff;
+        font-family: inherit;
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-sizing: border-box;
+    }
+    .form-control-custom:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+    }
+    .modal-checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 10px 14px;
+        background: rgba(0, 243, 255, 0.06);
+        border: 1px solid rgba(0, 243, 255, 0.15);
+        border-radius: 12px;
+        cursor: pointer;
+    }
+    .modal-checkbox-row input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--accent);
+        cursor: pointer;
+    }
+    .modal-checkbox-row span {
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: #fff;
+    }
+    .modal-actions-custom {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    .btn-modal-cancel {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-dim);
+        padding: 10px 18px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .btn-modal-cancel:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .btn-modal-submit {
+        background: linear-gradient(135deg, #00f3ff 0%, #00a8ff 100%);
+        border: none;
+        color: #0a0e17;
+        padding: 10px 22px;
+        border-radius: 14px;
+        font-weight: 800;
+        font-size: 0.88rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 18px rgba(0, 243, 255, 0.35);
+    }
+    .btn-modal-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0, 243, 255, 0.5); }
 }
 
 
@@ -1037,11 +1301,40 @@ body::before {
     <div class="notice-header">
         <h1><i class='bx bx-bell'></i> Bildirishnomalar</h1>
 
-        {% if admin_notices or reply_notices %}
-        <a href="{% url 'notice' %}?mark_all=1" class="notice-mark-all">
-            <i class='bx bx-check-double'></i> Barchasini o'qilgan deb belgilash
-        </a>
-        {% endif %}
+        <div class="notice-header-actions">
+            {% if request.user.is_staff or request.user.is_superuser %}
+            <button type="button" class="btn-admin-broadcast" onclick="openBroadcastModal()">
+                <i class='bx bxs-megaphone'></i> Ommaviy xabar (+ Push)
+            </button>
+            {% endif %}
+
+            {% if admin_notices or reply_notices %}
+            <a href="{% url 'notice' %}?mark_all=1" class="notice-mark-all">
+                <i class='bx bx-check-double'></i> Barchasini o'qilgan qilish
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Push Notification Status / Activation Banner -->
+    <div id="pushPermissionCard" class="push-permission-card" style="display: none;">
+        <div class="push-card-left">
+            <div class="push-card-icon">
+                <i class='bx bxs-bell-ring'></i>
+            </div>
+            <div class="push-card-text">
+                <h4>Telefoningizda bildirishnomalarni yoqing</h4>
+                <p>Admin e'lonlari va yangiliklarni saytda bo'lmasangiz ham bevosita telefoningiz ekranida qabul qiling.</p>
+            </div>
+        </div>
+        <button type="button" class="push-card-btn" onclick="enablePushNotifications(this)">
+            <i class='bx bx-bell'></i> Yoqish
+        </button>
+    </div>
+
+    <div id="pushStatusPill" class="push-status-pill" style="display: none;">
+        <span class="pulse-dot"></span>
+        <span>Push bildirishnomalar telefoningizda faol</span>
     </div>
 
     <!-- ================= TABS ================= -->
@@ -1264,7 +1557,100 @@ function toggleNoticeMessage(event, btn) {
         }
     });
 })();
+
+/* ================= PUSH NOTIFICATION CONTROLS ================= */
+function updatePushStatusUI() {
+    var card = document.getElementById('pushPermissionCard');
+    var pill = document.getElementById('pushStatusPill');
+    if (!card || !pill) return;
+
+    if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+        card.style.display = 'none';
+        pill.style.display = 'none';
+        return;
+    }
+
+    if (Notification.permission === 'granted') {
+        card.style.display = 'none';
+        pill.style.display = 'inline-flex';
+    } else if (Notification.permission === 'default') {
+        card.style.display = 'flex';
+        pill.style.display = 'none';
+    } else {
+        card.style.display = 'none';
+        pill.style.display = 'none';
+    }
+}
+
+async function enablePushNotifications(btn) {
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Yoqilmoqda...";
+    }
+    if (typeof window.subscribeToPush === 'function') {
+        var res = await window.subscribeToPush(true);
+        if (res && res.success) {
+            updatePushStatusUI();
+        } else if (res && res.reason === 'denied') {
+            alert("Brauzer sozlamalarida bildirishnomalar bloklangan. Iltimos, sayt sozlamalaridan ruxsat bering.");
+        }
+    }
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = "<i class='bx bx-bell'></i> Yoqish";
+    }
+    updatePushStatusUI();
+}
+
+window.addEventListener('push-subscription-changed', updatePushStatusUI);
+document.addEventListener('DOMContentLoaded', updatePushStatusUI);
+
+/* ================= ADMIN BROADCAST MODAL ================= */
+function openBroadcastModal() {
+    var m = document.getElementById('broadcastModal');
+    if (m) m.classList.add('show');
+}
+function closeBroadcastModal() {
+    var m = document.getElementById('broadcastModal');
+    if (m) m.classList.remove('show');
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeBroadcastModal();
+});
 </script>
+
+{% if request.user.is_staff or request.user.is_superuser %}
+<!-- Admin Broadcast Modal -->
+<div id="broadcastModal" class="modal-backdrop-custom" onclick="if(event.target===this) closeBroadcastModal()">
+    <div class="modal-dialog-custom">
+        <div class="modal-header-custom">
+            <h3><i class='bx bxs-megaphone'></i> Ommaviy xabar yuborish</h3>
+            <button type="button" class="modal-close-btn" onclick="closeBroadcastModal()">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'notice' %}">
+            {% csrf_token %}
+            <div class="form-group-custom">
+                <label>Sarlavha (Ixtiyoriy)</label>
+                <input type="text" name="title" class="form-control-custom" placeholder="Masalan: Yangi anime qismi chiqdi!" />
+            </div>
+            <div class="form-group-custom">
+                <label>Xabar matni *</label>
+                <textarea name="message" rows="4" class="form-control-custom" placeholder="Barcha foydalanuvchilar ekranida chiqadigan xabarni yozing..." required></textarea>
+            </div>
+            <label class="modal-checkbox-row">
+                <input type="checkbox" name="send_push" value="1" checked />
+                <span>Barcha foydalanuvchilarning telefoniga Push bildirishnoma yuborilsin (Chrome)</span>
+            </label>
+            <div class="modal-actions-custom">
+                <button type="button" class="btn-modal-cancel" onclick="closeBroadcastModal()">Bekor qilish</button>
+                <button type="submit" class="btn-modal-submit">
+                    <i class='bx bx-send'></i> Yuborish
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
 
 {% block footer %}{% endblock footer %}
 {% endblock %}

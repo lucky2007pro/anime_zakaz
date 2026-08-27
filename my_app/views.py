@@ -385,8 +385,30 @@ def check_username(request):
     return JsonResponse({'exists': exists})
 
 # =======================
-# PUSH NOTIFICATION — OBUNA SAQLASH
+# PUSH NOTIFICATION — OBUNA SAQLASH VA YUBORISH
 # =======================
+import threading
+
+def _send_webpush_worker(sub_id, endpoint, p256dh, auth, payload):
+    try:
+        webpush(
+            subscription_info={
+                "endpoint": endpoint,
+                "keys": {"p256dh": p256dh, "auth": auth}
+            },
+            data=payload,
+            vapid_private_key=settings.VAPID_PRIVATE_KEY,
+            vapid_claims={"sub": f"mailto:{settings.VAPID_ADMIN_EMAIL}"}
+        )
+    except WebPushException as ex:
+        # 404 yoki 410 = obuna eskirgan / bekor qilingan, bazadan o'chiramiz
+        if ex.response is not None and ex.response.status_code in (404, 410):
+            PushSubscription.objects.filter(id=sub_id).delete()
+        else:
+            print("Push xatosi:", ex)
+    except Exception as e:
+        print("Push umumiy xatosi:", e)
+
 @login_required
 def save_push_subscription(request):
     if request.method != 'POST':
@@ -410,28 +432,31 @@ def save_push_subscription(request):
         return JsonResponse({'error': str(e)}, status=400)
 
 
-# =======================
-# PUSH NOTIFICATION — YUBORISH (ichki funksiya, boshqa view'lardan chaqiriladi)
-# =======================
-def send_push_notification(user, title, body, url='/'):
-    subs = PushSubscription.objects.filter(user=user)
-    for sub in subs:
-        try:
-            webpush(
-                subscription_info={
-                    "endpoint": sub.endpoint,
-                    "keys": {"p256dh": sub.p256dh, "auth": sub.auth}
-                },
-                data=json.dumps({"title": title, "body": body, "url": url}),
-                vapid_private_key=settings.VAPID_PRIVATE_KEY,
-                vapid_claims={"sub": f"mailto:{settings.VAPID_ADMIN_EMAIL}"}
-            )
-        except WebPushException as ex:
-            # 410 = obuna eskirgan/bekor qilingan, bazadan o'chiramiz
-            if ex.response is not None and ex.response.status_code == 410:
-                sub.delete()
-            else:
-                print("Push xatosi:", ex)
+def send_push_notification(user, title, body, url='/notice/'):
+    """Bitta foydalanuvchining barcha qurilmalariga (Chrome/telefon) push yuborish"""
+    payload = json.dumps({"title": title, "body": body, "url": url})
+    subs = list(PushSubscription.objects.filter(user=user).values('id', 'endpoint', 'p256dh', 'auth'))
+    for s in subs:
+        t = threading.Thread(
+            target=_send_webpush_worker,
+            args=(s['id'], s['endpoint'], s['p256dh'], s['auth'], payload),
+            daemon=True
+        )
+        t.start()
+
+
+def send_broadcast_push_notification(title, body, url='/notice/'):
+    """Barcha obuna bo'lgan foydalanuvchilarning telefon/kompyuteriga ommaviy push yuborish"""
+    payload = json.dumps({"title": title, "body": body, "url": url})
+    subs = list(PushSubscription.objects.all().values('id', 'endpoint', 'p256dh', 'auth'))
+    for s in subs:
+        t = threading.Thread(
+            target=_send_webpush_worker,
+            args=(s['id'], s['endpoint'], s['p256dh'], s['auth'], payload),
+            daemon=True
+        )
+        t.start()
+
 
 # =======================
 # PROFILE
@@ -1432,6 +1457,31 @@ def anime_category(request):
 
 @login_required
 def notice(request):
+    # Admin tomonidan yangi ommaviy xabar yuborish
+    if request.method == "POST" and (request.user.is_staff or request.user.is_superuser):
+        title = request.POST.get('title', '').strip()
+        message = request.POST.get('message', '').strip()
+        send_push = request.POST.get('send_push') == '1' or 'send_push' in request.POST
+
+        if message:
+            new_notice = Notice.objects.create(
+                notice_type='admin',
+                title=title or "BESTMEDIA E'lon",
+                message=message,
+                created_by=request.user,
+                is_active=True
+            )
+            if send_push:
+                send_broadcast_push_notification(
+                    title=new_notice.title,
+                    body=message[:150],
+                    url='/notice/'
+                )
+            messages.success(request, "Ommaviy e'lon va Push bildirishnoma barcha qurilmalarga yuborildi!")
+        else:
+            messages.error(request, "Xabar matni bo'sh bo'lishi mumkin emas!")
+        return redirect('notice')
+
     base_qs = Notice.objects.filter(is_active=True).filter(
         Q(notice_type='admin', target_user__isnull=True) |
         Q(notice_type='reply', target_user=request.user)
