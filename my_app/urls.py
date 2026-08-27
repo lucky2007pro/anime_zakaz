@@ -10,7 +10,7 @@ from .views import (
     anime_category,notice,delete_comment,service_worker_view,offline_view,manifest_view,
     hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
     imkon_vote_request_add, imkon_vote, imkon_anime_request_add,check_username,
-    news_load_more,vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem,
+    news_load_more,vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem,imkon_toggle_beta_home
     save_push_subscription,
 )
 from .admin_views import *
@@ -184,7 +184,9 @@ urlpatterns = [
     path('control-panel/qarz/', admin_qarz_list, name='admin_qarz_list'),
     path('control-panel/qarz/<int:pk>/tasdiqlash/', admin_qarz_tasdiqlash, name='admin_qarz_tasdiqlash'),
     path('control-panel/qarz/<int:pk>/rad/', admin_qarz_rad, name='admin_qarz_rad'),
-
+    path('imkon/anime-sorash/qoshish/', imkon_anime_request_add, name='imkon_anime_request_add'),
+    path('imkon/beta-home/toggle/', imkon_toggle_beta_home, name='imkon_toggle_beta_home'),  # YANGI
+    
 ]
 
 
