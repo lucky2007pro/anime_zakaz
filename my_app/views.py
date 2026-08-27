@@ -102,6 +102,8 @@ def logout_view(request):
 # HOME
 # =======================
 def home(request):
+    template_name = 'home.html'
+
     movies = Movie.objects.prefetch_related('episodes').annotate(
         last_episode=Max('episodes__created_at')
     ).order_by('-last_episode')
@@ -140,6 +142,10 @@ def home(request):
     # ================= WELCOME TOAST =================
     show_welcome = False
 
+    # YANGI — beta home uchun qo'shimcha ma'lumotlar
+    daily_movies = None
+    all_movies_beta = None
+
     if request.user.is_authenticated:
         from .models import FavoriteAnime
 
@@ -159,6 +165,27 @@ def home(request):
 
         show_welcome = request.session.get('show_welcome', False)
         request.session['show_welcome'] = False
+
+        # YANGI — BETA HOME TEKSHIRUVI
+        user_settings, _ = UserSettings.objects.get_or_create(user=request.user)
+        if user_settings.beta_home_on:
+            if user_settings.beta_home_expire and user_settings.beta_home_expire > timezone.now():
+                template_name = 'home_vip.html'
+
+                # Beta home uchun qo'shimcha ma'lumotlar (kunlik / barcha animelar)
+                from .models import AnimeSectionItem
+                daily_movies = list(
+                    Movie.objects.select_related('category').prefetch_related('episodes').filter(
+                        section_items__section='daily'
+                    ).order_by('section_items__order', '-section_items__created_at')
+                )
+                all_movies_beta = list(
+                    Movie.objects.select_related('category').prefetch_related('episodes')
+                    .order_by('-created_at')[:20]
+                )
+            else:
+                user_settings.beta_home_on = False
+                user_settings.save(update_fields=['beta_home_on'])
 
     # ================= SCHEDULE =================
     schedule_list = list(AnimeSchedule.objects.filter(is_active=True))
@@ -181,9 +208,13 @@ def home(request):
         'fav_ids': fav_ids,
         'schedule_list': schedule_list,
         'show_welcome': show_welcome,
+
+        # BETA HOME
+        'daily_movies': daily_movies,
+        'all_movies_beta': all_movies_beta,
     }
 
-    return render(request, 'home.html', context)
+    return render(request, template_name, context)
 
 
 # =======================
