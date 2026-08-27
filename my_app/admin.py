@@ -1,13 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils import timezone
+
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode,
     SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
     Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,NoResultsMedia,
     PremiumBackground, AnimeVoteRequest, AnimeVote, AnimeRequestSuggestion,
     AccountHistory, DebtRequest, JackpotCode, JackpotCodeUse,
-    BalanceTopupRequest, UserBalance,
+    BalanceTopupRequest, UserBalance,PushSubscription,
 )
 
 
@@ -373,6 +374,17 @@ class JackpotCodeAdmin(admin.ModelAdmin):
 class JackpotCodeUseAdmin(admin.ModelAdmin):
     list_display = ('user', 'code', 'used_at')
     list_filter = ('used_at',)
+
+
+@admin.register(PushSubscription)
+class PushSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'endpoint_short', 'created_at')
+    search_fields = ('user__username',)
+    readonly_fields = ('created_at',)
+
+    def endpoint_short(self, obj):
+        return obj.endpoint[:60] + '...'
+    endpoint_short.short_description = "Endpoint"
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
