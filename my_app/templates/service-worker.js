@@ -6,7 +6,7 @@
 
    MUHIM: Har safar base.html yoki home.html'ni jiddiy o'zgartirsangiz,
    CACHE_VERSION raqamini oshiring (v1 -> v2), aks holda foydalanuvchilar
-   eski versiyani ko'rishda davom etadi.
+   eski versiyani ko'rishda davom etadi..
 ========================================================================== */
 
 const CACHE_VERSION   = 'v1';
