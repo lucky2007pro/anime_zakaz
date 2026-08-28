@@ -4,13 +4,13 @@ from .views import (
     register, login, home, movie_detail, check_username,
     profile, make_vip, search, anime_catalog,
     chat, chat_messages_api, edit_message, delete_message, ban_user,
-    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,reels, aloqa, news_feed, news_detail, toggle_like,next_story_view, prev_story_view, story_view, mark_story_seen,
+    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page, reels, aloqa, news_feed, news_detail, toggle_like, next_story_view, prev_story_view, story_view, mark_story_seen,
     reels_feed, reel_detail, toggle_reel_like, add_reel_comment, reel_comments_api, reel_share,
-    settings_privacy,settings_devices,settings_premium,settings_telegram,settings_general,user_mini_profile_api,
-    anime_category,notice,delete_comment,service_worker_view,offline_view,manifest_view,
+    settings_privacy, settings_devices, settings_premium, settings_telegram, settings_general, user_mini_profile_api,
+    anime_category, notice, delete_comment, service_worker_view, offline_view, manifest_view,
     hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
-    imkon_vote_request_add, imkon_vote, imkon_anime_request_add,check_username,
-    news_load_more,vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem, imkon_toggle_beta_home,
+    imkon_vote_request_add, imkon_vote, imkon_anime_request_add, check_username,
+    news_load_more, vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem, imkon_toggle_beta_home,
     save_push_subscription, send_test_push_api,
 )
 from .admin_views import *
