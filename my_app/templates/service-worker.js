@@ -9,7 +9,7 @@
    eski versiyani ko'rishda davom etadi..
 ========================================================================== */
 
-const CACHE_VERSION   = 'v1';
+const CACHE_VERSION   = 'v2';
 const SHELL_CACHE      = 'bm-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE    = 'bm-runtime-' + CACHE_VERSION;
 const OFFLINE_URL       = '/offline/';   // Django urls.py'da shu manzilga view qo'shing (pastda tushuntiraman)
@@ -49,7 +49,7 @@ self.addEventListener('install', function (event) {
 ========================================================================== */
 
 self.addEventListener('push', function (event) {
-    let data = { title: "BESTMEDIA", body: "Yangi xabar bor!", url: "/" };
+    let data = { title: "BESTMEDIA", body: "Yangi bildirishnoma bor!", url: "/notice/" };
 
     if (event.data) {
         try {
@@ -59,16 +59,20 @@ self.addEventListener('push', function (event) {
         }
     }
 
+    const title = data.title || "BESTMEDIA";
     const options = {
-        body: data.body,
+        body: data.body || "Yangi xabarnoma!",
         icon: '/static/images/favicon-192x192.png',
         badge: '/static/images/favicon-48x48.png',
-        vibrate: [200, 100, 200],
-        data: { url: data.url || '/' }
+        vibrate: [300, 100, 300],
+        tag: 'bestmedia-notice-' + Date.now(),
+        renotify: true,
+        requireInteraction: false,
+        data: { url: data.url || '/notice/' }
     };
 
     event.waitUntil(
-        self.registration.showNotification(data.title, options)
+        self.registration.showNotification(title, options)
     );
 });
 

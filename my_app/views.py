@@ -490,6 +490,32 @@ def send_broadcast_push_notification(title, body, url='/notice/'):
         t.start()
 
 
+@login_required
+def send_test_push_api(request):
+    """Foydalanuvchining o'z telefoniga sinov uchun push bildirishnoma yuborish"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+
+    subs_count = PushSubscription.objects.filter(user=request.user).count()
+    if subs_count == 0:
+        return JsonResponse({
+            'status': 'error',
+            'message': "Sizning qurilmangiz hali obuna bo'lmagan. Iltimos, avval 'Yoqish' tugmasini bosib ruxsat bering."
+        }, status=400)
+
+    send_push_notification(
+        user=request.user,
+        title="🔔 BESTMEDIA TEST",
+        body="Tabriklaymiz! Sizning telefoningizda Push bildirishnomalar 100% ishlamoqda! 🎉",
+        url="/notice/"
+    )
+    return JsonResponse({
+        'status': 'ok',
+        'count': subs_count,
+        'message': f"Test xabar {subs_count} ta qurilmangizga yuborildi! 1-2 soniyada telefoningiz tepasida paydo bo'ladi."
+    })
+
+
 # =======================
 # PROFILE
 # =======================

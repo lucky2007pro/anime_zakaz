@@ -63,6 +63,13 @@
             <label for="is_active" style="margin:0; text-transform:none; letter-spacing:0;">Faol (foydalanuvchilarga ko'rinsin)</label>
         </div>
 
+        <div class="form-group checkbox-row" style="background: rgba(0, 243, 255, 0.08); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(0, 243, 255, 0.25);">
+            <input type="checkbox" id="send_push" name="send_push" checked>
+            <label for="send_push" style="margin:0; text-transform:none; letter-spacing:0; color: #00f3ff; font-weight: 700;">
+                🔔 Barcha foydalanuvchilarning telefoniga Push bildirishnoma yuborilsin (Chrome)
+            </label>
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn-save">Saqlash</button>
             <a href="{% url 'admin_notices' %}" class="btn-cancel">Bekor qilish</a>

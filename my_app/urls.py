@@ -11,7 +11,7 @@ from .views import (
     hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
     imkon_vote_request_add, imkon_vote, imkon_anime_request_add,check_username,
     news_load_more,vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem, imkon_toggle_beta_home,
-    save_push_subscription,
+    save_push_subscription, send_test_push_api,
 )
 from .admin_views import *
 from django.conf import settings
@@ -148,6 +148,7 @@ urlpatterns = [
     path('manifest.json', manifest_view, name='manifest'),
     path('offline/', offline_view, name='offline_page'),
     path('save-push-subscription/', save_push_subscription, name='save_push_subscription'),
+    path('send-test-push/', send_test_push_api, name='send_test_push_api'),
     path('hisobim/', hisobim_page, name='hisobim_page'),
     path('statistika/', statistika_page, name='statistika_page'),
     path('imkon/', imkon_page, name='imkon_page'),

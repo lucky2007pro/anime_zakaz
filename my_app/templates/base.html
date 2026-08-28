@@ -2308,12 +2308,13 @@ function markActiveTab() {
 
 })();
 
-/* ================= SERVICE WORKER — OFFLINE ================= */
+/* ================= SERVICE WORKER — OFFLINE & PUSH ================= */
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
         navigator.serviceWorker.register('/service-worker.js')
             .then(function (reg) {
-                console.log('SW ro\'yxatdan o\'tdi:', reg.scope);
+                reg.update();
+                console.log('SW ro\'yxatdan o\'tdi va yangilandi:', reg.scope);
             })
             .catch(function (err) {
                 console.warn('SW xatosi:', err);

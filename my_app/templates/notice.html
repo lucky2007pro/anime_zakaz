@@ -1335,6 +1335,9 @@ body::before {
     <div id="pushStatusPill" class="push-status-pill" style="display: none;">
         <span class="pulse-dot"></span>
         <span>Push bildirishnomalar telefoningizda faol</span>
+        <button type="button" class="btn-test-push-inline" onclick="sendTestPushToSelf(this)" style="margin-left: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">
+            <i class='bx bx-paper-plane'></i> Test yuborish
+        </button>
     </div>
 
     <!-- ================= TABS ================= -->
@@ -1600,6 +1603,34 @@ async function enablePushNotifications(btn) {
         btn.innerHTML = "<i class='bx bx-bell'></i> Yoqish";
     }
     updatePushStatusUI();
+}
+
+async function sendTestPushToSelf(btn) {
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Yuborilmoqda...";
+    }
+    try {
+        var res = await fetch('/send-test-push/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        });
+        var data = await res.json();
+        if (data.status === 'ok') {
+            alert("✅ " + data.message);
+        } else {
+            alert("⚠️ " + (data.message || "Xatolik yuz berdi"));
+        }
+    } catch (e) {
+        alert("Xatolik: " + e.message);
+    }
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = "<i class='bx bx-paper-plane'></i> Test yuborish";
+    }
 }
 
 window.addEventListener('push-subscription-changed', updatePushStatusUI);

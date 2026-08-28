@@ -636,6 +636,7 @@ def admin_notices(request):
 def admin_notice_form(request, pk=None):
     notice = get_object_or_404(Notice, pk=pk) if pk else None
     if request.method == 'POST':
+        is_new = notice is None
         if not notice:
             notice = Notice()
         notice.title = request.POST.get('title', '').strip()
@@ -643,9 +644,22 @@ def admin_notice_form(request, pk=None):
         notice.notice_type = 'admin'          # <-- doim 'admin', forma orqali o'zgartirilmaydi
         notice.target_user = None             # <-- hammaga ko'rinishi uchun bo'sh
         notice.created_by = request.user
-        notice.is_active = request.POST.get('is_active') == 'on'
+        notice.is_active = request.POST.get('is_active') == 'on' or 'is_active' in request.POST
         notice.save()
-        messages.success(request, "E'lon muvaffaqiyatli saqlandi!")
+
+        send_push = request.POST.get('send_push') == 'on' or 'send_push' in request.POST or is_new
+        if notice.is_active and send_push:
+            try:
+                from .views import send_broadcast_push_notification
+                send_broadcast_push_notification(
+                    title=notice.title or "BESTMEDIA E'lon",
+                    body=notice.message[:150],
+                    url='/notice/'
+                )
+            except Exception as e:
+                print("admin_notice_form push xatosi:", e)
+
+        messages.success(request, "E'lon saqlandi va barcha foydalanuvchilarning telefoniga Push bildirishnoma yuborildi!")
         return redirect('admin_notices')
     return render(request, 'custom_admin/notice_form.html', {'notice': notice})
 
