@@ -1932,9 +1932,9 @@ def imkon_set_music_volume(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
     try:
-        volume = int(request.POST.get('volume', 50))
+        volume = int(request.POST.get('volume', 30))
     except ValueError:
-        volume = 50
+        volume = 30
     volume = max(0, min(100, volume))
 
     settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
