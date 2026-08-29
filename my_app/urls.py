@@ -11,7 +11,8 @@ from .views import (
     hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
     imkon_vote_request_add, imkon_vote, imkon_anime_request_add, check_username,
     news_load_more, vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem, imkon_toggle_beta_home,
-    save_push_subscription, send_test_push_api,
+    save_push_subscription, send_test_push_api,imkon_set_music_volume,imkon_select_music,imkon_toggle_music
+
 )
 from .admin_views import *
 from django.conf import settings
@@ -186,6 +187,9 @@ urlpatterns = [
     path('control-panel/qarz/<int:pk>/tasdiqlash/', admin_qarz_tasdiqlash, name='admin_qarz_tasdiqlash'),
     path('control-panel/qarz/<int:pk>/rad/', admin_qarz_rad, name='admin_qarz_rad'),
     path('imkon/beta-home/toggle/', imkon_toggle_beta_home, name='imkon_toggle_beta_home'),  # YANGI
+    path('imkon/musiqa/yoqish/', imkon_toggle_music, name='imkon_toggle_music'),
+    path('imkon/musiqa/<int:pk>/tanlash/', imkon_select_music, name='imkon_select_music'),
+    path('imkon/musiqa/balandlik/', imkon_set_music_volume, name='imkon_set_music_volume'),
 ]
 
 
