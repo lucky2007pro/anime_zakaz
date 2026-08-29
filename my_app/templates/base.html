@@ -1430,6 +1430,7 @@
     {% endif %}
     {% endwith %}
     {% endif %}
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
@@ -1827,6 +1828,9 @@
 
 <!-- ==================== NETWORK TOAST — tab bar ustidan chiqadi ==================== -->
 <div id="networkToast"></div>
+
+{% block content %}
+{% endblock %}
 
 {% block footer %}
 <footer style="

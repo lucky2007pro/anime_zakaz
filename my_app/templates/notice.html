@@ -4,6 +4,7 @@
 {% block title %}Bildirishnomalar — BESTMEDIA{% endblock %}
 
 {% block extra_css %}
+<style>
 body {
     position: relative;
     background: transparent;
@@ -1149,150 +1150,273 @@ body::before {
         box-shadow: 0 0 8px #10b981;
     }
 
+    /* Header & Admin Broadcast Button */
+    .notice-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-admin-broadcast {
+        background: linear-gradient(135deg, rgba(0, 243, 255, 0.15) 0%, rgba(168, 85, 247, 0.2) 100%);
+        border: 1px solid rgba(0, 243, 255, 0.4);
+        color: #00f3ff;
+        padding: 8px 18px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 800;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.25s ease;
+        box-shadow: 0 0 15px rgba(0, 243, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        font-family: inherit;
+        text-decoration: none;
+    }
+
+    .btn-admin-broadcast:hover {
+        background: linear-gradient(135deg, #00f3ff 0%, #a855f7 100%);
+        color: #000;
+        border-color: transparent;
+        box-shadow: 0 0 25px rgba(0, 243, 255, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .btn-admin-broadcast:active {
+        transform: scale(0.96);
+    }
+
+    .btn-test-push-inline {
+        margin-left: 10px;
+        background: rgba(0, 243, 255, 0.12);
+        border: 1px solid rgba(0, 243, 255, 0.3);
+        color: #00f3ff;
+        padding: 4px 12px;
+        border-radius: 14px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: inherit;
+    }
+
+    .btn-test-push-inline:hover {
+        background: #00f3ff;
+        color: #000;
+        box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+    }
+
     /* Modal Form Styles */
     .modal-backdrop-custom {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(5, 8, 15, 0.75);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
         z-index: 99999;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 16px;
         opacity: 0;
+        visibility: hidden;
         pointer-events: none;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
     }
+
     .modal-backdrop-custom.show {
         opacity: 1;
+        visibility: visible;
         pointer-events: auto;
     }
+
     .modal-dialog-custom {
-        background: rgba(15, 23, 42, 0.85);
-        border: 1px solid rgba(0, 243, 255, 0.25);
-        border-radius: 24px;
+        background: #111420;
+        background: linear-gradient(180deg, #161b2b 0%, #0d111a 100%);
+        border: 1px solid rgba(0, 243, 255, 0.3);
+        border-radius: 20px;
         width: 100%;
         max-width: 520px;
-        padding: 26px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        transform: scale(0.92);
+        padding: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 243, 255, 0.15);
+        transform: translateY(20px) scale(0.95);
         transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-sizing: border-box;
     }
+
     .modal-backdrop-custom.show .modal-dialog-custom {
-        transform: scale(1);
+        transform: translateY(0) scale(1);
     }
+
     .modal-header-custom {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 18px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
+
     .modal-header-custom h3 {
         margin: 0;
-        font-size: 1.25rem;
-        font-weight: 900;
+        font-size: 1.15rem;
+        font-weight: 800;
         color: #fff;
         display: flex;
         align-items: center;
-        gap: 9px;
+        gap: 8px;
     }
-    .modal-header-custom h3 i { color: var(--accent); }
+
+    .modal-header-custom h3 i {
+        color: #00f3ff;
+    }
+
     .modal-close-btn {
-        background: none;
-        border: none;
-        color: var(--text-dim);
-        font-size: 1.5rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        transition: 0.2s;
+        transition: all 0.2s ease;
+        line-height: 1;
     }
-    .modal-close-btn:hover { color: #fff; transform: scale(1.1); }
+
+    .modal-close-btn:hover {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: #ef4444;
+        color: #ef4444;
+        transform: rotate(90deg);
+    }
+
     .form-group-custom {
         margin-bottom: 16px;
     }
+
     .form-group-custom label {
         display: block;
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         font-weight: 700;
-        color: var(--text-dim);
-        margin-bottom: 6px;
+        color: #a1a1aa;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 7px;
     }
+
     .form-control-custom {
         width: 100%;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 14px;
+        background: #090c14;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
         padding: 12px 14px;
         color: #fff;
         font-family: inherit;
-        font-size: 0.9rem;
+        font-size: 0.92rem;
         outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
+        transition: all 0.25s ease;
         box-sizing: border-box;
     }
+
     .form-control-custom:focus {
-        border-color: var(--accent);
+        border-color: #00f3ff;
+        background: #0d121f;
         box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
     }
+
+    .form-control-custom::placeholder {
+        color: #52525b;
+    }
+
     .modal-checkbox-row {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 20px;
-        padding: 10px 14px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 22px;
+        padding: 12px 14px;
         background: rgba(0, 243, 255, 0.06);
-        border: 1px solid rgba(0, 243, 255, 0.15);
+        border: 1px solid rgba(0, 243, 255, 0.2);
         border-radius: 12px;
         cursor: pointer;
+        user-select: none;
     }
-    .modal-checkbox-row input {
+
+    .modal-checkbox-row input[type="checkbox"] {
         width: 18px;
         height: 18px;
-        accent-color: var(--accent);
+        accent-color: #00f3ff;
         cursor: pointer;
     }
+
     .modal-checkbox-row span {
-        font-size: 0.84rem;
+        font-size: 0.82rem;
         font-weight: 700;
         color: #fff;
     }
+
     .modal-actions-custom {
         display: flex;
         justify-content: flex-end;
-        gap: 10px;
+        gap: 12px;
     }
+
     .btn-modal-cancel {
         background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: var(--text-dim);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #d4d4d8;
         padding: 10px 18px;
-        border-radius: 14px;
+        border-radius: 12px;
         font-weight: 700;
         font-size: 0.85rem;
         cursor: pointer;
-        transition: 0.2s;
+        transition: all 0.2s ease;
+        font-family: inherit;
     }
-    .btn-modal-cancel:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+    .btn-modal-cancel:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+    }
+
     .btn-modal-submit {
         background: linear-gradient(135deg, #00f3ff 0%, #00a8ff 100%);
         border: none;
-        color: #0a0e17;
+        color: #050811;
         padding: 10px 22px;
-        border-radius: 14px;
+        border-radius: 12px;
         font-weight: 800;
         font-size: 0.88rem;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
         box-shadow: 0 4px 18px rgba(0, 243, 255, 0.35);
+        font-family: inherit;
     }
-    .btn-modal-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0, 243, 255, 0.5); }
-}
 
+    .btn-modal-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 243, 255, 0.5);
+    }
 
+    .btn-modal-submit:active {
+        transform: scale(0.96);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -1302,7 +1426,7 @@ body::before {
         <h1><i class='bx bx-bell'></i> Bildirishnomalar</h1>
 
         <div class="notice-header-actions">
-            {% if request.user.is_staff or request.user.is_superuser %}
+            {% if request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
             <button type="button" class="btn-admin-broadcast" onclick="openBroadcastModal()">
                 <i class='bx bxs-megaphone'></i> Ommaviy xabar (+ Push)
             </button>
@@ -1650,7 +1774,7 @@ document.addEventListener('keydown', function(e) {
 });
 </script>
 
-{% if request.user.is_staff or request.user.is_superuser %}
+{% if request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
 <!-- Admin Broadcast Modal -->
 <div id="broadcastModal" class="modal-backdrop-custom" onclick="if(event.target===this) closeBroadcastModal()">
     <div class="modal-dialog-custom">
