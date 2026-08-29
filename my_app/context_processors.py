@@ -13,6 +13,18 @@ def notices_context(request):
     return {'unread_notices_count': count}
 
 
+def premium_music_context(request):
+    if request.user.is_authenticated:
+        from .models import UserSettings
+        s = UserSettings.objects.filter(user=request.user).select_related('premium_music').first()
+        if s and s.premium_music_on and s.premium_music:
+            return {
+                'global_music_on': True,
+                'global_music_url': s.premium_music.file.url,
+                'global_music_volume': s.premium_music_volume,
+            }
+    return {'global_music_on': False, 'global_music_url': None, 'global_music_volume': 50}
+
 def navbar_extra(request):
     """
     base.html (mobil navbar) uchun kerak bo'ladigan qo'shimcha ma'lumotlar:
