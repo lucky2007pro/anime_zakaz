@@ -1542,7 +1542,7 @@ def anime_category(request):
 @login_required
 def notice(request):
     # Admin tomonidan yangi ommaviy xabar yuborish
-    if request.method == "POST" and (request.user.is_staff or request.user.is_superuser):
+    if request.method == "POST" and (request.user.is_staff or request.user.is_superuser or getattr(request.user, 'is_admin_user', False)):
         title = request.POST.get('title', '').strip()
         message = request.POST.get('message', '').strip()
         send_push = request.POST.get('send_push') == '1' or 'send_push' in request.POST
