@@ -1668,9 +1668,16 @@ document.addEventListener('keydown', function(e) {
                 <label>Xabar matni *</label>
                 <textarea name="message" rows="4" class="form-control-custom" placeholder="Barcha foydalanuvchilar ekranida chiqadigan xabarni yozing..." required></textarea>
             </div>
-            <label class="modal-checkbox-row">
-                <input type="checkbox" name="send_push" value="1" checked />
-                <span>Barcha foydalanuvchilarning telefoniga Push bildirishnoma yuborilsin (Chrome)</span>
+            <label class="modal-checkbox-row" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                <span style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" name="send_push" value="1" checked />
+                    <span>Barcha foydalanuvchilarning telefoniga Push bildirishnoma yuborilsin</span>
+                </span>
+                {% if push_subscribers_count %}
+                <span style="font-size:0.78rem; color:#00f3ff; font-weight:700; background:rgba(0,243,255,0.15); padding:2px 8px; border-radius:4px; border:1px solid rgba(0,243,255,0.3);">
+                    {{ push_subscribers_count }} ta qurilma
+                </span>
+                {% endif %}
             </label>
             <div class="modal-actions-custom">
                 <button type="button" class="btn-modal-cancel" onclick="closeBroadcastModal()">Bekor qilish</button>

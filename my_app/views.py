@@ -489,7 +489,7 @@ def save_push_subscription(request):
 
 
 def send_push_notification(user, title, body, url='/notice/'):
-    """Bitta foydalanuvchining barcha qurilmalariga (Chrome/telefon) push yuborish"""
+    """Bitta foydalanuvchining barcha qurilmalariga push yuborish"""
     payload = json.dumps({"title": title, "body": body, "url": url})
     subs = list(PushSubscription.objects.filter(user=user).values('id', 'endpoint', 'p256dh', 'auth'))
     for s in subs:
@@ -499,6 +499,7 @@ def send_push_notification(user, title, body, url='/notice/'):
             daemon=True
         )
         t.start()
+    return len(subs)
 
 
 def send_broadcast_push_notification(title, body, url='/notice/'):
@@ -512,6 +513,7 @@ def send_broadcast_push_notification(title, body, url='/notice/'):
             daemon=True
         )
         t.start()
+    return len(subs)
 
 
 @login_required
@@ -1553,13 +1555,17 @@ def notice(request):
                 created_by=request.user,
                 is_active=True
             )
+            sent_count = 0
             if send_push:
-                send_broadcast_push_notification(
+                sent_count = send_broadcast_push_notification(
                     title=new_notice.title,
                     body=message[:150],
                     url='/notice/'
                 )
-            messages.success(request, "Ommaviy e'lon va Push bildirishnoma barcha qurilmalarga yuborildi!")
+            if sent_count > 0:
+                messages.success(request, f"Ommaviy e'lon saqlandi va {sent_count} ta foydalanuvchi qurilmasiga Push bildirishnoma yuborildi!")
+            else:
+                messages.success(request, "Ommaviy e'lon muvaffaqiyatli saqlandi!")
         else:
             messages.error(request, "Xabar matni bo'sh bo'lishi mumkin emas!")
         return redirect('notice')
@@ -1612,11 +1618,16 @@ def notice(request):
     admin_unread_count = sum(1 for n in admin_notices if not n.is_read)
     reply_unread_count = sum(1 for n in reply_notices if not n.is_read)
 
+    push_subscribers_count = PushSubscription.objects.count()
+    unique_push_users = PushSubscription.objects.values('user').distinct().count()
+
     return render(request, 'notice.html', {
         'admin_notices': admin_notices,
         'reply_notices': reply_notices,
         'admin_unread_count': admin_unread_count,
         'reply_unread_count': reply_unread_count,
+        'push_subscribers_count': push_subscribers_count,
+        'unique_push_users': unique_push_users,
     })
 
 # =======================

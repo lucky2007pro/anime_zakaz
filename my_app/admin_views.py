@@ -625,16 +625,27 @@ def admin_section_delete(request, pk):
 @user_passes_test(is_admin, login_url='/')
 def admin_notices(request):
     notices = Notice.objects.all().order_by('-created_at')
+    push_subscribers_count = PushSubscription.objects.count()
+    unique_push_users = PushSubscription.objects.values('user').distinct().count()
+    total_users_count = CustomUser.objects.count()
+
     return render(request, 'custom_admin/list_base.html', {
         'page_title': "E'lonlar",
         'items': notices,
-        'type': 'notice'
+        'type': 'notice',
+        'push_subscribers_count': push_subscribers_count,
+        'unique_push_users': unique_push_users,
+        'total_users_count': total_users_count,
     })
 
 
 @user_passes_test(is_admin, login_url='/')
 def admin_notice_form(request, pk=None):
     notice = get_object_or_404(Notice, pk=pk) if pk else None
+    push_subscribers_count = PushSubscription.objects.count()
+    unique_push_users = PushSubscription.objects.values('user').distinct().count()
+    total_users_count = CustomUser.objects.count()
+
     if request.method == 'POST':
         is_new = notice is None
         if not notice:
@@ -648,10 +659,11 @@ def admin_notice_form(request, pk=None):
         notice.save()
 
         send_push = request.POST.get('send_push') == 'on' or 'send_push' in request.POST or is_new
+        sent_count = 0
         if notice.is_active and send_push:
             try:
                 from .views import send_broadcast_push_notification
-                send_broadcast_push_notification(
+                sent_count = send_broadcast_push_notification(
                     title=notice.title or "BESTMEDIA E'lon",
                     body=notice.message[:150],
                     url='/notice/'
@@ -659,9 +671,18 @@ def admin_notice_form(request, pk=None):
             except Exception as e:
                 print("admin_notice_form push xatosi:", e)
 
-        messages.success(request, "E'lon saqlandi va barcha foydalanuvchilarning telefoniga Push bildirishnoma yuborildi!")
+        if sent_count > 0:
+            messages.success(request, f"E'lon muvaffaqiyatli saqlandi va {sent_count} ta foydalanuvchi qurilmasiga Push bildirishnoma yuborildi!")
+        else:
+            messages.success(request, "E'lon muvaffaqiyatli saqlandi!")
         return redirect('admin_notices')
-    return render(request, 'custom_admin/notice_form.html', {'notice': notice})
+
+    return render(request, 'custom_admin/notice_form.html', {
+        'notice': notice,
+        'push_subscribers_count': push_subscribers_count,
+        'unique_push_users': unique_push_users,
+        'total_users_count': total_users_count,
+    })
 
 @user_passes_test(is_admin, login_url='/')
 def admin_notice_delete(request, pk):
