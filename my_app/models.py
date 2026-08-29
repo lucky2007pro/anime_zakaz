@@ -559,6 +559,15 @@ class UserSettings(models.Model):
     )
     telegram_download_on = models.BooleanField(default=False)
 
+    # PREMIUM MUZIKALAR
+    premium_music_on = models.BooleanField(default=False)
+    premium_music = models.ForeignKey(
+        'PremiumMusic', on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
+    )
+    premium_music_volume = models.PositiveSmallIntegerField(
+        default=50, help_text="0-100 oralig'ida ovoz balandligi"
+    )
+
     # YANGI — OXIRGI VERSIYANI SINAB KO'RISH (BETA HOME)
     beta_home_on = models.BooleanField(
         default=False,
@@ -1069,3 +1078,22 @@ class PushSubscription(models.Model):
 
     def __str__(self):
         return f"{self.user.username} — push obuna"
+
+
+# =======================
+# PREMIUM MUZIKALAR
+# =======================
+class PremiumMusic(models.Model):
+    name = models.CharField(max_length=200, help_text="Musiqa nomi (foydalanuvchiga shu nom ko'rinadi)")
+    file = models.FileField(upload_to='premium_music/', help_text="Musiqa fayli (mp3)")
+    order = models.PositiveSmallIntegerField(default=0, help_text="Kichik raqam avval chiqadi")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = "Premium musiqa"
+        verbose_name_plural = "Premium musiqalar"
+
+    def __str__(self):
+        return self.name
