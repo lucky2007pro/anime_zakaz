@@ -174,15 +174,40 @@ def home(request):
                 template_name = 'home_vip.html'
 
                 # Beta home uchun qo'shimcha ma'lumotlar (kunlik / barcha animelar)
+                #
+                # MUHIM O'ZGARISH:
+                # Avval bu ro'yxatlar faqat "-created_at" (anime birinchi
+                # marta qo'shilgan sana) bo'yicha saralangan edi. Shu sabab
+                # admin biror animega (masalan Shiki) yangi qism qo'shsa ham,
+                # u ro'yxatda joyini o'zgartirmasdi va tartib "tasodifiy"
+                # ko'rinardi.
+                #
+                # Endi har bir anime uchun "oxirgi qism qachon qo'shilgani"
+                # (episodes__created_at ning eng kattasi) hisoblanadi va
+                # ro'yxat aynan shu bo'yicha kamayish tartibida saralanadi —
+                # xuddi yuqoridagi asosiy "movies" ro'yxati kabi. Natijada:
+                # kimga yangi qism tushsa — o'sha eng tepaga chiqadi,
+                # qolganlari o'z navbati bilan pastga suriladi.
                 from .models import AnimeSectionItem
+
                 daily_movies = list(
-                    Movie.objects.select_related('category').prefetch_related('episodes').filter(
-                        section_items__section='daily'
-                    ).order_by('section_items__order', '-section_items__created_at')
+                    Movie.objects.select_related('category').prefetch_related('episodes')
+                    .filter(section_items__section='daily')
+                    .annotate(last_episode_at=Max('episodes__created_at'))
+                    .order_by(
+                        'section_items__order',
+                        F('last_episode_at').desc(nulls_last=True),
+                        '-created_at',
+                    )
                 )
+
                 all_movies_beta = list(
                     Movie.objects.select_related('category').prefetch_related('episodes')
-                    .order_by('-created_at')[:20]
+                    .annotate(last_episode_at=Max('episodes__created_at'))
+                    .order_by(
+                        F('last_episode_at').desc(nulls_last=True),
+                        '-created_at',
+                    )[:20]
                 )
             else:
                 user_settings.beta_home_on = False
