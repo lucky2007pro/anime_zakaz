@@ -36,7 +36,7 @@ from .models import (
 
 User = get_user_model()
 NEWS_PAGE_SIZE = 9
-BETA_HOME_TRIAL_DAYS = 7 
+BETA_HOME_TRIAL_DAYS = 7
 
 # =======================
 # REGISTER
@@ -241,7 +241,6 @@ def home(request):
     }
 
     return render(request, template_name, context)
-
 
 # =======================
 # MOVIE DETAIL
@@ -1820,9 +1819,9 @@ def statistika_page(request):
 def imkon_page(request):
     from .models import (
         UserSettings, PremiumBackground, AnimeVoteRequest, AnimeVote,
-        AnimeRequestSuggestion, VipUser
+        AnimeRequestSuggestion, VipUser, PremiumMusic
     )
-
+    musics = PremiumMusic.objects.filter(is_active=True)
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     tier = vip_data.get_tier()
     is_premium = tier in ['premium', 'vip'] or request.user.is_staff or request.user.is_admin_user
@@ -1875,9 +1874,74 @@ def imkon_page(request):
         'requested_names': requested_names,
         'beta_home_active': beta_home_active,      # YANGI
         'beta_expire_local': beta_expire_local,    # YANGI
+        'musics': musics,
     }
     return render(request, 'imkon.html', context)
 
+# =======================
+# PREMIUM MUZIKA — YOQISH/O'CHIRISH
+# =======================
+@login_required
+def imkon_toggle_music(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import VipUser
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    if vip_data.get_tier() not in ['premium', 'vip'] and not (request.user.is_staff or request.user.is_admin_user):
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.premium_music_on = not settings_obj.premium_music_on
+    settings_obj.save()
+
+    return JsonResponse({'premium_music_on': settings_obj.premium_music_on})
+
+
+# =======================
+# PREMIUM MUZIKA — TANLASH (bosilgan musiqa saytda ijro bo'ladi)
+# =======================
+@login_required
+def imkon_select_music(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import PremiumMusic, VipUser
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    if vip_data.get_tier() not in ['premium', 'vip'] and not (request.user.is_staff or request.user.is_admin_user):
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+
+    music = get_object_or_404(PremiumMusic, pk=pk, is_active=True)
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.premium_music = music
+    settings_obj.premium_music_on = True
+    settings_obj.save()
+
+    return JsonResponse({
+        'ok': True,
+        'music_id': music.id,
+        'music_url': music.file.url,
+        'music_name': music.name,
+    })
+
+
+# =======================
+# PREMIUM MUZIKA — BALANDLIKNI SAQLASH
+# (Faqat balandlik boshqariladi, daqiqa/pozitsiya boshqarilmaydi)
+# =======================
+@login_required
+def imkon_set_music_volume(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    try:
+        volume = int(request.POST.get('volume', 50))
+    except ValueError:
+        volume = 50
+    volume = max(0, min(100, volume))
+
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.premium_music_volume = volume
+    settings_obj.save(update_fields=['premium_music_volume'])
+
+    return JsonResponse({'ok': True, 'volume': volume})
 
 @login_required
 def imkon_toggle_beta_home(request):
@@ -2007,3 +2071,4 @@ def imkon_anime_request_add(request):
 
     AnimeRequestSuggestion.objects.create(user=request.user, name=name)
     return JsonResponse({'ok': True, 'name': name})
+
