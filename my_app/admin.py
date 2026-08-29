@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils import timezone
+from .models import PremiumMusic
 
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode,
@@ -411,6 +412,11 @@ class PushSubscriptionAdmin(admin.ModelAdmin):
         return obj.endpoint[:60] + '...'
     endpoint_short.short_description = "Endpoint"
 
+@admin.register(PremiumMusic)
+class PremiumMusicAdmin(admin.ModelAdmin):
+    list_display = ('name', 'order', 'is_active', 'created_at')
+    list_editable = ('order', 'is_active')
+    ordering = ('order', '-created_at')
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
@@ -428,4 +434,3 @@ admin.site.register(NewsLike, NewsLikeAdmin)
 
 admin.site.register(Story, StoryAdmin)
 admin.site.register(StoryView)
-
