@@ -9,7 +9,7 @@
    eski versiyani ko'rishda davom etadi..
 ========================================================================== */
 
-const CACHE_VERSION   = 'v2';
+const CACHE_VERSION   = 'v3';
 const SHELL_CACHE      = 'bm-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE    = 'bm-runtime-' + CACHE_VERSION;
 const OFFLINE_URL       = '/offline/';   // Django urls.py'da shu manzilga view qo'shing (pastda tushuntiraman)
