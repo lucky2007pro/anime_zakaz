@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils import timezone
-from .models import PremiumMusic
+
 
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode,
