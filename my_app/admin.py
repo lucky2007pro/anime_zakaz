@@ -9,7 +9,7 @@ from .models import (
     Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,NoResultsMedia,
     PremiumBackground, AnimeVoteRequest, AnimeVote, AnimeRequestSuggestion,
     AccountHistory, DebtRequest, JackpotCode, JackpotCodeUse,
-    BalanceTopupRequest, UserBalance,PushSubscription,
+    BalanceTopupRequest, UserBalance,PushSubscription,PremiumMusic
 )
 
 
