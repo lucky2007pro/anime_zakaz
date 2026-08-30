@@ -30,7 +30,7 @@ from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
     Story, StoryView, Reel, ReelLike, ReelComment, ReelShare,
     UserSettings,AnimeSchedule,AnimeSectionItem, Notice, NoticeRead,WatchHistory, FavoriteAnime,NoResultsMedia,
-    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse,UserBalance,PushSubscription,
+    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse,UserBalance,PushSubscription,PremiumMusic
 
 )
 
