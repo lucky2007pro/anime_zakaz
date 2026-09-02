@@ -18,14 +18,15 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: linear-gradient(135deg, rgba(180,92,255,0.18), rgba(0,243,255,0.12));
-        border: 1px solid rgba(180,92,255,0.35);
-        color: #d99aff;
+        background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(255,193,7,0.12));
+        border: 1px solid rgba(255,215,0,0.45);
+        color: #ffd700;
         padding: 7px 16px;
         border-radius: 30px;
         font-size: 0.78rem;
         font-weight: 900;
         letter-spacing: 0.5px;
+        box-shadow: 0 0 14px rgba(255,215,0,0.15);
     }
     .beta-badge-pill i { font-size: 1rem; }
 
@@ -1389,20 +1390,38 @@ function switchBetaTab(btn) {
     document.getElementById(btn.dataset.target).classList.add('active');
 }
 
-/* ================= XUSH KELIBSIZ -> BETA XABARI (5 soniyadan keyin) ================= */
+/* ================= BETA BADGE — 3 TA XABAR AYLANMA (har 5 soniyada) ================= */
 (function() {
     var textEl = document.getElementById('betaBadgeText');
     var iconEl = document.getElementById('betaBadgeIcon');
     if (!textEl) return;
 
-    setTimeout(function() {
+    var betaMessages = [
+        { icon: 'bx bx-hand',        text: 'Xush kelibsiz!' },
+        { icon: 'bx bx-rocket',      text: 'Siz oxirgi versiyani sinamoqdasiz' },
+        { icon: 'bx bxs-crown',      text: 'VIP bilan cheksiz imkoniyat' }
+    ];
+
+    var currentIndex = 0; // 0-index hozir ko'rinib turgan "Xush kelibsiz!"
+
+    function showNextMessage() {
+        currentIndex = (currentIndex + 1) % betaMessages.length;
+        var msg = betaMessages[currentIndex];
+
         // chiqib ketish animatsiyasi
         textEl.style.opacity = '0';
         textEl.style.transform = 'translateY(-6px)';
 
         setTimeout(function() {
-            textEl.textContent = "Siz oxirgi versiyani sinamoqdasiz";
-            if (iconEl) iconEl.className = 'bx bx-rocket';
+            textEl.textContent = msg.text;
+
+            if (iconEl) {
+                var newIcon = document.createElement('i');
+                newIcon.id = 'betaBadgeIcon';
+                newIcon.className = msg.icon;
+                iconEl.replaceWith(newIcon);
+                iconEl = newIcon; // yangi elementni referens sifatida saqlab qolamiz
+            }
 
             // kirish animatsiyasi
             textEl.style.transform = 'translateY(6px)';
@@ -1413,8 +1432,12 @@ function switchBetaTab(btn) {
                 });
             });
         }, 400);
-    }, 5000);
+    }
+
+    setInterval(showNextMessage, 5000);
 })();
+
+
 </script>
 
 {% endblock %}
