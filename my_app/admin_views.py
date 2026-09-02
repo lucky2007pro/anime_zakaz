@@ -971,3 +971,71 @@ def admin_qarz_rad(request, pk):
     )
     messages.success(request, f"{debt.user.username} uchun qarz so'rovi rad etildi.")
     return redirect('admin_qarz_list')
+
+
+
+# =======================
+# REELBEST (ADMIN)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_reelbest_list(request):
+    reels = ReelBest.objects.select_related('user', 'movie').order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'ReelBest',
+        'items': reels,
+        'type': 'reelbest'
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_reelbest_form(request, pk=None):
+    reel = get_object_or_404(ReelBest, pk=pk) if pk else None
+    movies = Movie.objects.all().order_by('title')
+
+    if request.method == 'POST':
+        if not reel:
+            reel = ReelBest()
+
+        reel.title = request.POST.get('title', '').strip() or None
+        reel.description = request.POST.get('description', '').strip() or None
+
+        movie_id = request.POST.get('movie')
+        reel.movie = Movie.objects.get(id=movie_id) if movie_id else None
+
+        video_url = request.POST.get('video_url', '').strip()
+        reel.video_url = video_url or None
+
+        if not reel.user_id:
+            reel.user = request.user
+
+        video_file = request.FILES.get('video_file')
+        thumbnail = request.FILES.get('thumbnail')
+        if video_file:
+            reel.video_file = video_file
+        if thumbnail:
+            reel.thumbnail = thumbnail
+
+        try:
+            reel.save()
+        except Exception:
+            err_msg = "Video yuklanmadi. Video URL kiriting yoki to'g'ri video formatini yuklang."
+            if _is_ajax(request):
+                return JsonResponse({'ok': False, 'error': err_msg}, status=400)
+            messages.error(request, err_msg)
+            return render(request, 'custom_admin/reelbest_form.html', {'reel': reel, 'movies': movies})
+
+        if _is_ajax(request):
+            return JsonResponse({'ok': True, 'redirect_url': reverse('admin_reelbest_list')})
+
+        messages.success(request, "ReelBest muvaffaqiyatli saqlandi!")
+        return redirect('admin_reelbest_list')
+
+    return render(request, 'custom_admin/reelbest_form.html', {'reel': reel, 'movies': movies})
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_reelbest_delete(request, pk):
+    reel = get_object_or_404(ReelBest, pk=pk)
+    reel.delete()
+    messages.success(request, "ReelBest o'chirildi!")
+    return redirect('admin_reelbest_list')
