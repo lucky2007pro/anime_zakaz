@@ -7,38 +7,6 @@
 
 {% block extra_css %}
 <style>
-    /* ================= STATUS BAR BLUR =================
-       FAQAT PWA standalone rejimida (ya'ni sayt "Add to Home Screen"
-       orqali ilova sifatida ochilganda) ko'rinadi. Oddiy Chrome/Safari
-       brauzerida (manzil paneli o'zining alohida qatlami bo'lgani uchun)
-       bu blok umuman render qilinmaydi — shu sabab "title" qismi
-       (brauzer sarlavha/manzil qatori) ustiga hech narsa chiqib
-       ko'rinishni buzmaydi. */
-    .status-bar-blur {
-        display: none;
-    }
-
-    @media all and (display-mode: standalone), all and (display-mode: fullscreen) {
-        .status-bar-blur {
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: env(safe-area-inset-top, 0px);
-            background: rgba(15, 15, 19, 0.55);
-            backdrop-filter: blur(22px) saturate(160%);
-            -webkit-backdrop-filter: blur(22px) saturate(160%);
-            z-index: 99999;
-            pointer-events: none;
-        }
-
-        @media (max-width: 600px) {
-            .status-bar-blur {
-                height: max(env(safe-area-inset-top, 44px), 44px);
-            }
-        }
-    }
 
     /* ================= BETA BADGE ================= */
     .beta-top-bar {
@@ -935,7 +903,7 @@
 
 {% block content %}
 
-<div class="status-bar-blur"></div>
+
 
 <div class="story-top-space">
 
