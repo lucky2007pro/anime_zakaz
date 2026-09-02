@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
@@ -7,7 +8,6 @@
 
 {% block extra_css %}
 <style>
-
     /* ================= BETA BADGE ================= */
     .beta-top-bar {
         max-width: 1400px;
@@ -252,11 +252,6 @@
         border-radius: 16px;
         margin: 0 auto;
         box-shadow: 0 0 0 2px rgba(0, 243, 255, 0.25), 0 0 40px rgba(0, 243, 255, 0.12);
-        -webkit-mask-image: -webkit-radial-gradient(white, black);
-        mask-image: radial-gradient(white, black);
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-        isolation: isolate;
     }
 
     .slides-wrapper {
@@ -272,7 +267,6 @@
 
     .slide {
         min-width: 100%;
-        width: 100%;
         height: 100%;
         position: relative;
         display: flex;
@@ -280,35 +274,11 @@
         padding: 5% 5% 8% 5%;
         overflow: hidden;
         flex-shrink: 0;
-        box-sizing: border-box;
     }
 
-    .slide-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        overflow: hidden;
-    }
-    .slide-bg img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center center;
-        display: block;
-        max-width: 100%;
-    }
-    .slide-bg-video {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        z-index: 1;
-    }
+    .slide-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; overflow: hidden; }
+    .slide-bg img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
+    .slide-bg-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
 
     .slide-overlay {
         position: absolute;
@@ -651,18 +621,9 @@
             aspect-ratio: 16 / 9;
             min-height: 220px;
             border-radius: 10px;
-            width: 100%;
         }
 
         .slide { padding: 20px 14px 50px; }
-
-        .slide-bg, .slide-bg-video {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        .slide-bg img, .slide-bg-video {
-            border-radius: inherit;
-        }
 
         /* ================= MOBILE: STORY LEFT + SCHEDULE RIGHT ================= */
         .top-split-grid {
@@ -782,11 +743,11 @@
             margin-bottom: 3px;
         }
 
-        /* KATEGORIYALAR — MOBIL: karta rasmi kattaroq */
+        /* KATEGORIYALAR */
         .beta-category-section { padding: 0 4%; }
         .beta-category-heading { font-size: 1.2rem; }
-        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-        .anime-card { height: 320px; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .anime-card { height: 240px; }
         .card-inner-overlay { opacity: 1; }
         .slides-wrapper { will-change: auto; }
     }
@@ -802,8 +763,8 @@
         .slide-meta-row { display: none; }
         .beta-category-section { padding: 0 4%; }
         .beta-category-heading { font-size: 1.2rem; }
-        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-        .anime-card { height: 320px; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .anime-card { height: 240px; }
         .card-inner-overlay { opacity: 1; }
         .slides-wrapper { will-change: auto; }
     }
@@ -891,19 +852,16 @@
 
         .cards-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
+            gap: 10px;
         }
 
-        /* KICHIK EKRAN — karta rasmi ham kattaroq */
-        .anime-card { height: 270px; }
-        .card-title { font-size: 0.9rem; }
+        .anime-card { height: 200px; }
+        .card-title { font-size: 0.88rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-
-
 
 <div class="story-top-space">
 
@@ -1260,9 +1218,22 @@
         }
     }
 
-    // Doim ishlaydi — sahifa ko'rinmasa ham (scroll bilan pastga tushilganda) to'xtamaydi.
     updateDots();
     resetAutoPlay();
+
+    if ('IntersectionObserver' in window) {
+        const heroObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    resetAutoPlay();
+                } else if (autoPlayTimer) {
+                    clearInterval(autoPlayTimer);
+                    autoPlayTimer = null;
+                }
+            });
+        }, { threshold: 0.1 });
+        heroObserver.observe(wrapper);
+    }
 
     wrapper.addEventListener('touchstart', function(e) {
         heroStartX = e.touches[0].clientX;
