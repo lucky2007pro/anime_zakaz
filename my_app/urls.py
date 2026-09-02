@@ -101,7 +101,11 @@ urlpatterns = [
     path('reels/<int:reel_id>/comment/', reelbest_add_comment, name='reelbest_add_comment'),
     path('reels/<int:reel_id>/comments/', reelbest_comments_api, name='reelbest_comments_api'),
     path('reels/<int:reel_id>/view/', reelbest_view_increment, name='reelbest_view_increment'),
-
+    # REELBEST (admin)
+    path('control-panel/reelbest/', admin_reelbest_list, name='admin_reelbest_list'),
+    path('control-panel/reelbest/add/', admin_reelbest_form, name='admin_reelbest_form'),
+    path('control-panel/reelbest/<int:pk>/edit/', admin_reelbest_form, name='admin_reelbest_form'),
+    path('control-panel/reelbest/<int:pk>/delete/', admin_reelbest_delete, name='admin_reelbest_delete'),
 
     path('settings/', settings_general, name='settings_general'),
     path('settings/telegram/', settings_telegram, name='settings_telegram'),
