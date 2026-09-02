@@ -73,6 +73,13 @@
     <button id="rbCloseComments">✕</button>
   </div>
   <div class="rb-comments-list" id="rbCommentsList"></div>
+
+  <!-- kimga javob berilayotganini ko'rsatuvchi chip -->
+  <div class="rb-reply-context" id="rbReplyContext" style="display:none;">
+    <span id="rbReplyContextText"></span>
+    <button type="button" id="rbCancelReply">✕</button>
+  </div>
+
   <form id="rbCommentForm" class="rb-comment-form">
     {% csrf_token %}
     <input type="text" id="rbCommentInput" placeholder="Izoh yozing..." maxlength="500" autocomplete="off">
@@ -120,11 +127,11 @@
     object-fit: contain;
   }
 
-  /* ===== O'NG TOMONDAGI IKONKALAR — video ICHIDA, ekrandan chiqmaydi ===== */
+  /* ===== O'NG TOMONDAGI IKONKALAR — biroz teparoq ko'tarildi ===== */
   .rb-icons {
     position: absolute;
     right: 10px;
-    bottom: 100px;
+    bottom: 150px; /* edi: 100px */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -132,7 +139,7 @@
     z-index: 5;
   }
   .rb-icon-btn {
-    background: rgba(0,0,0,.35);
+    background: none;
     border: none;
     color: #fff;
     display: flex;
@@ -140,8 +147,7 @@
     align-items: center;
     gap: 4px;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
+    padding: 4px;
     -webkit-tap-highlight-color: transparent;
   }
   .rb-icon-svg {
@@ -159,15 +165,36 @@
     text-shadow: 0 1px 3px rgba(0,0,0,.7);
   }
 
+  /* ===== CAPTION — mobilda ko'rinmay qolish muammosi tuzatildi =====
+     - z-index qo'shildi (ikonkalar ostida qolib ketmasligi uchun)
+     - pastki chegara animeni-ko'rish panelidan tepaga chiqarildi
+     - fon gradienti bilan o'qilishi yaxshilandi
+     - safe-area (notch/home-indicator) hisobga olindi
+  */
   .rb-caption {
     position: absolute;
     left: 12px;
     right: 70px;
-    bottom: 16px;
+    bottom: 56px;
+    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
     color: #fff;
+    z-index: 6;
+    padding: 8px 8px 8px 0;
+    background: linear-gradient(0deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 100%);
+    border-radius: 8px;
   }
-  .rb-caption-title { font-weight: 700; font-size: 15px; }
-  .rb-caption-desc { font-size: 13px; opacity: .85; margin-top: 2px; }
+  .rb-caption-title {
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.3;
+    text-shadow: 0 1px 3px rgba(0,0,0,.8);
+  }
+  .rb-caption-desc {
+    font-size: 13px;
+    opacity: .9;
+    margin-top: 2px;
+    text-shadow: 0 1px 3px rgba(0,0,0,.8);
+  }
 
   .rb-anime-bar {
     position: absolute;
@@ -177,11 +204,13 @@
     justify-content: center;
     gap: 8px;
     padding: 10px 12px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
     background: linear-gradient(0deg, rgba(0,0,0,.85), transparent);
     color: #fff;
     text-decoration: none;
     font-size: 14px;
     font-weight: 600;
+    z-index: 7;
   }
 
   .rb-empty { color: #fff; text-align: center; padding-top: 40vh; }
@@ -206,10 +235,50 @@
   .rb-comments-header button { background: none; border: none; color: #fff; font-size: 16px; cursor: pointer; }
   .rb-comments-list { flex: 1; overflow-y: auto; padding: 10px 16px; }
   .rb-comment-item { display: flex; gap: 8px; margin-bottom: 12px; }
-  .rb-comment-item img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+  .rb-comment-item img,
+  .rb-comment-item .rb-avatar-fallback {
+    width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+  }
+  .rb-avatar-fallback { background: #444; }
   .rb-comment-user { color: #fff; font-weight: 600; font-size: 13px; }
   .rb-comment-text { color: #ddd; font-size: 13px; }
-  .rb-comment-time { color: #888; font-size: 11px; margin-top: 2px; }
+  .rb-comment-meta { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
+  .rb-comment-time { color: #888; font-size: 11px; }
+
+  /* ===== REPLY (javob) ===== */
+  .rb-reply-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+  }
+  .rb-reply-btn:hover { color: #aaa; }
+  .rb-replies {
+    margin-top: 10px;
+    padding-left: 14px;
+    border-left: 1px solid rgba(255,255,255,.08);
+  }
+  .rb-replies .rb-comment-item { margin-bottom: 10px; }
+  .rb-replies .rb-comment-item img,
+  .rb-replies .rb-comment-item .rb-avatar-fallback {
+    width: 26px; height: 26px;
+  }
+
+  .rb-reply-context {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px;
+    background: #1e1e24;
+    color: #ccc;
+    font-size: 12px;
+  }
+  .rb-reply-context button {
+    background: none; border: none; color: #ccc; cursor: pointer; font-size: 13px;
+  }
 
   .rb-comment-form {
     display: flex; gap: 8px; padding: 10px 16px;
@@ -232,8 +301,9 @@
 
   @media (min-width: 900px) {
     .rb-stage { grid-template-columns: 1fr 2.2fr 1fr; }
-    .rb-icons { right: 24px; bottom: 120px; }
+    .rb-icons { right: 24px; bottom: 170px; }
     .rb-icon-svg { width: 32px; height: 32px; }
+    .rb-caption { bottom: 60px; }
   }
 </style>
 
@@ -301,23 +371,66 @@
   const list = document.getElementById('rbCommentsList');
   const form = document.getElementById('rbCommentForm');
   const input = document.getElementById('rbCommentInput');
-  let activeReelId = null;
+  const replyContext = document.getElementById('rbReplyContext');
+  const replyContextText = document.getElementById('rbReplyContextText');
+  const cancelReplyBtn = document.getElementById('rbCancelReply');
 
-  function renderComments(comments) {
-    list.innerHTML = comments.map(c => `
-      <div class="rb-comment-item">
-        ${c.avatar ? `<img src="${c.avatar}">` : `<div style="width:32px;height:32px;border-radius:50%;background:#444"></div>`}
+  let activeReelId = null;
+  let replyToId = null;
+  let replyToUser = null;
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str == null ? '' : String(str);
+    return d.innerHTML;
+  }
+
+  function renderComment(c) {
+    const avatar = c.avatar
+      ? `<img src="${escapeHtml(c.avatar)}">`
+      : `<div class="rb-avatar-fallback"></div>`;
+
+    const replies = (c.replies || []).map(renderComment).join('');
+
+    return `
+      <div class="rb-comment-item" data-comment-id="${escapeHtml(c.id)}">
+        ${avatar}
         <div>
-          <div class="rb-comment-user">${c.user}</div>
-          <div class="rb-comment-text">${c.text}</div>
-          <div class="rb-comment-time">${c.time}</div>
+          <div class="rb-comment-user">${escapeHtml(c.user)}</div>
+          <div class="rb-comment-text">${escapeHtml(c.text)}</div>
+          <div class="rb-comment-meta">
+            <span class="rb-comment-time">${escapeHtml(c.time)}</span>
+            <button type="button" class="rb-reply-btn" data-comment-id="${escapeHtml(c.id)}" data-user="${escapeHtml(c.user)}">Javob berish</button>
+          </div>
+          ${replies ? `<div class="rb-replies">${replies}</div>` : ''}
         </div>
       </div>
-    `).join('') || '<p style="color:#888;text-align:center;">Hali izoh yo\'q</p>';
+    `;
+  }
+
+  function renderComments(comments) {
+    list.innerHTML = comments.map(renderComment).join('') || '<p style="color:#888;text-align:center;">Hali izoh yo\'q</p>';
+  }
+
+  function setReplyTarget(id, user) {
+    replyToId = id;
+    replyToUser = user;
+    replyContextText.textContent = `Javob: @${user}`;
+    replyContext.style.display = 'flex';
+    input.placeholder = `@${user} ga javob yozing...`;
+    input.focus();
+  }
+
+  function clearReplyTarget() {
+    replyToId = null;
+    replyToUser = null;
+    replyContext.style.display = 'none';
+    input.placeholder = 'Izoh yozing...';
   }
 
   function openComments(reelId) {
     activeReelId = reelId;
+    clearReplyTarget();
     panel.classList.add('open');
     overlay.classList.add('open');
     fetch(`/reels/${reelId}/comments/`).then(r => r.json()).then(data => renderComments(data.comments));
@@ -327,6 +440,7 @@
     panel.classList.remove('open');
     overlay.classList.remove('open');
     activeReelId = null;
+    clearReplyTarget();
   }
 
   document.querySelectorAll('.rb-comment-btn').forEach(btn => {
@@ -335,15 +449,27 @@
 
   document.getElementById('rbCloseComments').addEventListener('click', closeComments);
   overlay.addEventListener('click', closeComments);
+  cancelReplyBtn.addEventListener('click', clearReplyTarget);
+
+  // Reply tugmalarini bosishni delegatsiya orqali ushlaymiz (izohlar dinamik chizilgani uchun)
+  list.addEventListener('click', (e) => {
+    const btn = e.target.closest('.rb-reply-btn');
+    if (!btn) return;
+    setReplyTarget(btn.dataset.commentId, btn.dataset.user);
+  });
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const text = input.value.trim();
     if (!text || !activeReelId) return;
 
-    postForm(`/reels/${activeReelId}/comment/`, { text }).then(data => {
+    const payload = { text };
+    if (replyToId) payload.parent_id = replyToId;
+
+    postForm(`/reels/${activeReelId}/comment/`, payload).then(data => {
       if (data.status === 'ok') {
         input.value = '';
+        clearReplyTarget();
         const slide = document.querySelector(`.rb-slide[data-reel-id="${activeReelId}"]`);
         slide.querySelector('.rb-comment-count').textContent = data.total_comments;
         fetch(`/reels/${activeReelId}/comments/`).then(r => r.json()).then(d => renderComments(d.comments));
