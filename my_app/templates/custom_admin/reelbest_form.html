@@ -1,0 +1,166 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}{% if reel %}ReelBest tahrirlash{% else %}Yangi ReelBest{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-panel { padding: 30px; max-width: 720px; }
+    .panel-header { margin-bottom: 25px; }
+    .panel-header h2 { font-size: 1.4rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 1px; }
+    .panel-header p { color: var(--text-dim); font-size: 0.85rem; margin-top: 6px; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+        display: block; margin-bottom: 8px; color: var(--text-dim);
+        font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .form-group .hint { color: #555; font-size: 0.78rem; margin-top: 6px; }
+
+    .form-control {
+        width: 100%; padding: 12px 14px; background: #0a0a0f;
+        border: 1px solid var(--border-line); color: #fff; border-radius: 8px;
+        outline: none; transition: 0.25s; font-family: 'Outfit', sans-serif; font-size: 0.95rem;
+    }
+    .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,243,255,0.12); }
+    textarea.form-control { resize: vertical; min-height: 90px; }
+
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%238892b0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 36px;
+    }
+
+    input[type="file"].form-control {
+        padding: 10px 14px;
+        cursor: pointer;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+
+    .current-preview {
+        display: flex; align-items: center; gap: 14px;
+        background: #0a0a0f; border: 1px solid var(--border-line); border-radius: 10px;
+        padding: 12px 14px; margin-bottom: 14px;
+    }
+    .current-preview video, .current-preview img {
+        width: 70px; height: 100px; object-fit: cover; border-radius: 8px; background: #000;
+    }
+    .current-preview .info { font-size: 0.85rem; color: var(--text-dim); }
+    .current-preview .info strong { color: #fff; display: block; margin-bottom: 3px; }
+
+    .form-actions {
+        display: flex; gap: 12px; margin-top: 28px; padding-top: 22px;
+        border-top: 1px solid var(--border-line);
+    }
+    .btn-save {
+        background: var(--accent); color: #000; border: none; padding: 12px 28px;
+        border-radius: 6px; font-weight: 800; cursor: pointer; text-transform: uppercase;
+        font-size: 0.85rem; box-shadow: 0 0 12px var(--accent-glow); transition: 0.3s;
+        font-family: 'Outfit', sans-serif;
+    }
+    .btn-save:hover { background: #fff; box-shadow: 0 0 18px rgba(255,255,255,0.5); }
+    .btn-cancel {
+        background: #1e1e24; color: #fff; border: 1px solid #333; padding: 12px 24px;
+        border-radius: 6px; font-weight: 700; cursor: pointer; text-decoration: none;
+        text-transform: uppercase; font-size: 0.85rem; display: inline-flex; align-items: center;
+        transition: 0.25s;
+    }
+    .btn-cancel:hover { border-color: #666; color: #fff; }
+
+    .alert-error {
+        background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.35);
+        color: #f87171; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.88rem;
+    }
+
+    .optional-tag {
+        display: inline-block; margin-left: 6px; font-size: 0.68rem; font-weight: 700;
+        color: #555; text-transform: none; letter-spacing: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <div class="panel-header">
+        <h2>{% if reel %}ReelBest tahrirlash{% else %}Yangi ReelBest qo'shish{% endif %}</h2>
+        <p>Video majburiy emas, lekin video_file yoki video_url dan kamida bittasini kiritish tavsiya etiladi. Sarlavha, tavsif va anime — hammasi ixtiyoriy.</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-error">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if reel and reel.pk %}
+    <div class="current-preview">
+        {% if reel.get_video_src %}
+            <video src="{{ reel.get_video_src }}" muted></video>
+        {% elif reel.thumbnail %}
+            <img src="{{ reel.thumbnail.url }}" alt="thumbnail">
+        {% else %}
+            <div style="width:70px; height:100px; background:var(--border-line); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                <i class='bx bx-video' style="color:var(--text-dim); font-size:1.6rem;"></i>
+            </div>
+        {% endif %}
+        <div class="info">
+            <strong>{{ reel.title|default:"Sarlavhasiz ReelBest" }}</strong>
+            ♥ {{ reel.total_likes }} · 💬 {{ reel.total_comments }} · 👁 {{ reel.views_count }}
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Sarlavha <span class="optional-tag">(ixtiyoriy)</span></label>
+            <input type="text" name="title" class="form-control" maxlength="200"
+                   value="{{ reel.title|default:'' }}" placeholder="Masalan: Eng kulgili sahna">
+        </div>
+
+        <div class="form-group">
+            <label>Tavsif <span class="optional-tag">(ixtiyoriy)</span></label>
+            <textarea name="description" class="form-control" placeholder="Qisqacha tavsif...">{{ reel.description|default:'' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Anime <span class="optional-tag">(ixtiyoriy — tanlansa "Animeni ko'rish" tugmasi chiqadi)</span></label>
+            <select name="movie" class="form-control">
+                <option value="">— Tanlanmagan —</option>
+                {% for m in movies %}
+                    <option value="{{ m.id }}" {% if reel and reel.movie_id == m.id %}selected{% endif %}>{{ m.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Video URL <span class="optional-tag">(ixtiyoriy — Bunny.net yoki mp4 link)</span></label>
+            <input type="url" name="video_url" class="form-control"
+                   value="{{ reel.video_url|default:'' }}" placeholder="https://...">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Video fayl <span class="optional-tag">(ixtiyoriy)</span></label>
+                <input type="file" name="video_file" class="form-control" accept="video/*">
+                <p class="hint">Yuklansa, Video URL o'rniga shu ishlatiladi.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Thumbnail (poster) <span class="optional-tag">(ixtiyoriy)</span></label>
+                <input type="file" name="thumbnail" class="form-control" accept="image/*">
+                <p class="hint">Video yuklanmaguncha ko'rsatiladigan rasm.</p>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Saqlash</button>
+            <a href="{% url 'admin_reelbest_list' %}" class="btn-cancel">Bekor qilish</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
