@@ -29,6 +29,11 @@
     }
     .beta-badge-pill i { font-size: 1rem; }
 
+    .beta-badge-text {
+        display: inline-block;
+        transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
     /* ================= YUQORI IKKI USTUN: HIKOYALAR + CHIQISH KUNLARI ================= */
     .top-split-grid {
         max-width: 1400px;
@@ -609,7 +614,9 @@
 
     /* ----- MOBILE ----- */
     @media (max-width: 600px) {
-        .story-top-space { margin-top: 62px !important; }
+        /* FIX: beta-badge navbar (base.html) ostida qolib ketmasligi uchun
+           top-space navbar balandligidan sezilarli katta qilindi. */
+        .story-top-space { margin-top: 82px !important; }
 
         /* HERO */
         .slide-content {
@@ -699,7 +706,7 @@
             font-size: 0.9rem;
         }
 
-        /* STORY */
+        /* STORY — mobilda biroz kattaroq */
         .story-container {
             gap: 9px;
             padding: 1px 0 7px;
@@ -707,15 +714,15 @@
         }
 
         .story-item {
-            min-width: 54px;
-            width: 54px;
+            min-width: 64px;
+            width: 64px;
             gap: 4px;
         }
 
         .story-ring {
-            width: 54px;
-            height: 54px;
-            padding: 2px;
+            width: 64px;
+            height: 64px;
+            padding: 2.5px;
         }
 
         .story-ring img {
@@ -723,12 +730,12 @@
         }
 
         .story-item span {
-            font-size: 9px;
-            max-width: 54px;
+            font-size: 9.5px;
+            max-width: 64px;
             line-height: 1.15;
         }
 
-        /* SCHEDULE */
+        /* SCHEDULE — rasm va title mobilda kattaroq */
         .day-pills-row {
             gap: 5px;
             padding: 0 0 7px;
@@ -743,36 +750,36 @@
         }
 
         .schedule-mini-card {
-            gap: 7px;
-            padding: 6px;
+            gap: 8px;
+            padding: 7px;
             border-radius: 10px;
-            min-height: 58px;
+            min-height: 68px;
         }
 
         .schedule-mini-poster {
-            width: 34px;
-            height: 50px;
-            border-radius: 6px;
+            width: 44px;
+            height: 64px;
+            border-radius: 7px;
         }
 
         .schedule-mini-info {
-            gap: 3px;
+            gap: 4px;
             min-width: 0;
         }
 
         .schedule-mini-title {
-            font-size: 0.66rem;
-            line-height: 1.18;
+            font-size: 0.76rem;
+            line-height: 1.2;
             -webkit-line-clamp: 2;
         }
 
         .schedule-mini-meta {
-            font-size: 0.56rem;
+            font-size: 0.62rem;
             gap: 3px;
         }
 
         .schedule-mini-meta i {
-            font-size: 0.7rem;
+            font-size: 0.78rem;
         }
 
         .schedule-mini-empty {
@@ -789,7 +796,7 @@
         .beta-category-section { padding: 0 4%; }
         .beta-category-heading { font-size: 1.2rem; }
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-        .anime-card { height: 270px; }
+        .anime-card { height: 300px; }
         .card-inner-overlay { opacity: 1; }
         .slides-wrapper { will-change: auto; }
     }
@@ -849,20 +856,20 @@
 
         .story-item,
         .story-ring {
-            width: 50px;
+            width: 58px;
         }
 
         .story-item {
-            min-width: 50px;
+            min-width: 58px;
         }
 
         .story-ring {
-            height: 50px;
+            height: 58px;
         }
 
         .story-item span {
-            max-width: 50px;
-            font-size: 8.5px;
+            max-width: 58px;
+            font-size: 9px;
         }
 
         .day-pills-row {
@@ -875,21 +882,21 @@
         }
 
         .schedule-mini-card {
-            gap: 6px;
-            padding: 5px;
+            gap: 7px;
+            padding: 6px;
         }
 
         .schedule-mini-poster {
-            width: 31px;
-            height: 46px;
+            width: 40px;
+            height: 58px;
         }
 
         .schedule-mini-title {
-            font-size: 0.62rem;
+            font-size: 0.7rem;
         }
 
         .schedule-mini-meta {
-            font-size: 0.53rem;
+            font-size: 0.58rem;
         }
 
         .cards-grid {
@@ -898,7 +905,7 @@
         }
 
         /* KICHIK EKRAN — karta rasmi ham kattaroq */
-        .anime-card { height: 230px; }
+        .anime-card { height: 255px; }
         .card-title { font-size: 0.88rem; }
     }
 </style>
@@ -910,7 +917,10 @@
 
     <!-- BETA BADGE -->
     <div class="beta-top-bar">
-        <span class="beta-badge-pill"><i class='bx bx-rocket'></i> Siz oxirgi versiyani sinamoqdasiz</span>
+        <span class="beta-badge-pill">
+            <i class='bx bx-hand' id="betaBadgeIcon"></i>
+            <span id="betaBadgeText" class="beta-badge-text">Xush kelibsiz!</span>
+        </span>
     </div>
 
     <!-- ================= YUQORI IKKI USTUN: HIKOYALAR (chap) + CHIQISH KUNLARI (o'ng) ================= -->
@@ -1378,6 +1388,33 @@ function switchBetaTab(btn) {
     btn.classList.add('active');
     document.getElementById(btn.dataset.target).classList.add('active');
 }
+
+/* ================= XUSH KELIBSIZ -> BETA XABARI (5 soniyadan keyin) ================= */
+(function() {
+    var textEl = document.getElementById('betaBadgeText');
+    var iconEl = document.getElementById('betaBadgeIcon');
+    if (!textEl) return;
+
+    setTimeout(function() {
+        // chiqib ketish animatsiyasi
+        textEl.style.opacity = '0';
+        textEl.style.transform = 'translateY(-6px)';
+
+        setTimeout(function() {
+            textEl.textContent = "Siz oxirgi versiyani sinamoqdasiz";
+            if (iconEl) iconEl.className = 'bx bx-rocket';
+
+            // kirish animatsiyasi
+            textEl.style.transform = 'translateY(6px)';
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    textEl.style.opacity = '1';
+                    textEl.style.transform = 'translateY(0)';
+                });
+            });
+        }, 400);
+    }, 5000);
+})();
 </script>
 
 {% endblock %}
