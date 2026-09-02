@@ -89,7 +89,7 @@ class CategoryListView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
 class ReelListView(generics.ListAPIView):
-    queryset = Reel.objects.all().order_by('-created_at')
+    queryset = ReelBest.objects.all().order_by('-created_at')
     serializer_class = ReelSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -136,23 +136,14 @@ class ToggleReelLikeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        reel = get_object_or_404(Reel, id=pk)
-        like, created = ReelLike.objects.get_or_create(user=request.user, reel=reel)
-        if not created:
-            like.delete()
-            liked = False
-        else:
-            liked = True
-        return Response({
-            'liked': liked,
-            'total_likes': reel.likes.count(),
-        })
+        reel = get_object_or_404(ReelBest, id=pk)
+        like, created = ReelBestLike.objects.get_or_create(user=request.user, reel=reel)
 
 class AddReelCommentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        reel = get_object_or_404(Reel, id=pk)
+        reel = get_object_or_404(ReelBest, id=pk)
         text = request.data.get('text', '').strip()
         reply_to_id = request.data.get('reply_to')
 
@@ -162,27 +153,24 @@ class AddReelCommentView(APIView):
         reply_obj = None
         if reply_to_id:
             try:
-                reply_obj = ReelComment.objects.get(id=int(reply_to_id))
-            except (ReelComment.DoesNotExist, ValueError):
+                reply_obj = ReelBestComment.objects.get(id=int(reply_to_id))
+            except (ReelBestComment.DoesNotExist, ValueError):
                 pass
 
-        comment = ReelComment.objects.create(
+        comment = ReelBestComment.objects.create(
             reel=reel,
             user=request.user,
             text=text,
             reply_to=reply_obj
         )
-
-        serializer = ReelCommentSerializer(comment)
-        return Response(serializer.data, status=201)
-
+        
 class ReelCommentListView(generics.ListAPIView):
     serializer_class = ReelCommentSerializer
     permission_classes = [AllowAny]
 
     def get_queryset(self):
         reel_id = self.kwargs['pk']
-        return ReelComment.objects.filter(reel_id=reel_id).order_by('-created_at')
+        return ReelBestComment.objects.filter(reel_id=reel_id).order_by('-created_at')
 
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
