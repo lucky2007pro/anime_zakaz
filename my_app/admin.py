@@ -132,21 +132,6 @@ class StoryAdmin(admin.ModelAdmin):
 
     total_views.short_description = "Ko‘rishlar"
 
-@admin.register(Reel)
-class ReelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'title', 'views_count', 'shares_count', 'total_likes', 'total_comments', 'created_at')
-    list_filter = ('created_at',)
-    search_fields = ('user__username', 'title', 'description')
-    readonly_fields = ('views_count', 'shares_count', 'created_at')
-    ordering = ('-created_at',)
-
-    def total_likes(self, obj):
-        return obj.likes.count()
-    total_likes.short_description = 'Likelar'
-
-    def total_comments(self, obj):
-        return obj.comments.count()
-    total_comments.short_description = 'Izohlar'
 
 
 
