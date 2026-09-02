@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.utils import timezone
 from .models import (
-    Movie, Category, Reel, CustomUser, AnimeNews, FavoriteAnime, WatchHistory, 
-    ReelComment, ReelLike, Story, AnimeSchedule, MovieComment, ChatMessage, 
+    Movie, Category, ReelBest, CustomUser, AnimeNews, FavoriteAnime, WatchHistory, 
+    ReelBestComment, ReelBestLike, Story, AnimeSchedule, MovieComment, ChatMessage, 
     SiteSettings, UserSettings
 )
 from .serializers import (
