@@ -1794,6 +1794,7 @@
 </div>
 
 <!-- ==================== BOTTOM TAB BAR ==================== -->
+{% block bottom_tabbar %}
 <nav class="bottom-tab-bar{% if request.user.is_authenticated and request.user.settings and not request.user.settings.tabbar_on %} tab-hidden{% endif %}"
      id="bottomTabBar"
      aria-label="Pastki navigatsiya">
@@ -1824,6 +1825,7 @@
     </a>
 
 </nav>
+{% endblock bottom_tabbar %}
 
 <!-- ==================== NETWORK TOAST — tab bar ustidan chiqadi ==================== -->
 <div id="networkToast"></div>
