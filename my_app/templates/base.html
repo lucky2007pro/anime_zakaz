@@ -1342,36 +1342,6 @@
             z-index: -1;
             pointer-events: none;
         }
-        /* ==================== STATUS BAR BLUR ==================== */
-        /* Faqat PWA standalone/fullscreen rejimida (uy ekraniga qo'shilgan
-           holatda) ishlaydi. Oddiy brauzerda (Chrome, Safari tab) hech
-           narsa chiqmaydi — chunki bu rejimlarda alohida display-mode yo'q. */
-        .status-bar-blur {
-            display: none;
-        }
-
-        @media all and (display-mode: standalone), all and (display-mode: fullscreen) {
-            .status-bar-blur {
-                display: block;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: env(safe-area-inset-top, 0px);
-                background: rgba(10, 10, 15, 0.55);
-                backdrop-filter: blur(22px) saturate(160%);
-                -webkit-backdrop-filter: blur(22px) saturate(160%);
-                z-index: 100000;
-                pointer-events: none;
-            }
-
-            @media (max-width: 768px) {
-                .status-bar-blur {
-                    height: max(env(safe-area-inset-top, 44px), 44px);
-                }
-            }
-        }
-
         {% block extra_css %}{% endblock %}
     </style>
 
@@ -1462,8 +1432,6 @@
     {% endif %}
 </head>
 <body>
-
-<div class="status-bar-blur"></div>
 
 {% if request.user.is_authenticated and request.user.settings and request.user.settings.premium_bg_on and request.user.settings.premium_bg %}
 <div class="premium-bg-layer"></div>
