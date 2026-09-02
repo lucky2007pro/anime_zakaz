@@ -6,7 +6,7 @@ from django.utils import timezone
 from .models import (
     Category, CustomUser, VipUser, Movie, MovieEpisode,
     SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
-    Reel, ReelLike, ReelComment, ReelShare,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,NoResultsMedia,
+    ReelBest, ReelBestLike, ReelBestComment,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,NoResultsMedia,
     PremiumBackground, AnimeVoteRequest, AnimeVote, AnimeRequestSuggestion,
     AccountHistory, DebtRequest, JackpotCode, JackpotCodeUse,
     BalanceTopupRequest, UserBalance,PushSubscription,PremiumMusic
@@ -149,32 +149,20 @@ class ReelAdmin(admin.ModelAdmin):
     total_comments.short_description = 'Izohlar'
 
 
-@admin.register(ReelLike)
-class ReelLikeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'reel', 'created_at')
-    list_filter = ('created_at',)
-    search_fields = ('user__username',)
-    ordering = ('-created_at',)
+
+@admin.register(ReelBest)
+class ReelBestAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'user', 'movie', 'total_likes', 'total_comments', 'views_count', 'created_at')
+    list_filter = ('created_at', 'movie')
+    search_fields = ('title', 'description', 'user__username')
 
 
-@admin.register(ReelComment)
-class ReelCommentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'reel', 'text_short', 'reply_to', 'created_at')
-    list_filter = ('created_at',)
-    search_fields = ('user__username', 'text')
-    ordering = ('-created_at',)
-
-    def text_short(self, obj):
-        return obj.text[:50]
-    text_short.short_description = 'Izoh'
+@admin.register(ReelBestComment)
+class ReelBestCommentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'reel', 'user', 'text', 'created_at')
+    search_fields = ('text', 'user__username')
 
 
-@admin.register(ReelShare)
-class ReelShareAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'reel', 'shared_at')
-    list_filter = ('shared_at',)
-    search_fields = ('user__username',)
-    ordering = ('-shared_at',)
 
 @admin.register(AnimeSchedule)
 class AnimeScheduleAdmin(admin.ModelAdmin):
@@ -434,3 +422,9 @@ admin.site.register(NewsLike, NewsLikeAdmin)
 
 admin.site.register(Story, StoryAdmin)
 admin.site.register(StoryView)
+
+admin.site.register(ReelBestLike)
+
+
+
+
