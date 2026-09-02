@@ -1168,10 +1168,23 @@ def reelbest_add_comment(request, reel_id):
 
     reel = get_object_or_404(ReelBest, id=reel_id)
     text = request.POST.get('text', '').strip()
+    parent_id = request.POST.get('parent_id')
+
     if not text:
         return JsonResponse({'error': "Izoh bo'sh bo'lmasin"}, status=400)
 
-    comment = ReelBestComment.objects.create(reel=reel, user=request.user, text=text)
+    reply_to = None
+    if parent_id:
+        reply_to = ReelBestComment.objects.filter(id=parent_id, reel=reel).first()
+        # Agar javob berilayotgan izoh o'zi ham javob bo'lsa (2-daraja),
+        # uni eng tepadagi asosiy izohga "yassilaymiz" — shunda barcha
+        # javoblar bitta ro'yxatda, bitta izoh ostida chiqadi.
+        if reply_to and reply_to.reply_to_id:
+            reply_to = reply_to.reply_to
+
+    comment = ReelBestComment.objects.create(
+        reel=reel, user=request.user, text=text, reply_to=reply_to
+    )
 
     avatar_url = None
     if getattr(request.user, 'avatar', None) and request.user.avatar.image:
@@ -1185,6 +1198,7 @@ def reelbest_add_comment(request, reel_id):
             'text': comment.text,
             'time': comment.created_at.strftime('%H:%M'),
             'avatar': avatar_url,
+            'parent_id': reply_to.id if reply_to else None,
         },
         'total_comments': reel.comments.count(),
     })
@@ -1192,24 +1206,32 @@ def reelbest_add_comment(request, reel_id):
 
 @login_required
 def reelbest_comments_api(request, reel_id):
-    comments = (
+    top_comments = (
         ReelBestComment.objects
         .select_related('user', 'user__avatar')
-        .filter(reel_id=reel_id)
+        .filter(reel_id=reel_id, reply_to__isnull=True)
+        .prefetch_related('replies__user', 'replies__user__avatar')
         .order_by('created_at')
     )
-    data = []
-    for c in comments:
+
+    def serialize(c):
         avatar_url = None
         if getattr(c.user, 'avatar', None) and c.user.avatar.image:
             avatar_url = c.user.avatar.image.url
-        data.append({
+        return {
             'id': c.id,
             'user': c.user.username,
             'text': c.text,
             'time': c.created_at.strftime('%H:%M'),
             'avatar': avatar_url,
-        })
+        }
+
+    data = []
+    for c in top_comments:
+        item = serialize(c)
+        item['replies'] = [serialize(r) for r in c.replies.all().order_by('created_at')]
+        data.append(item)
+
     return JsonResponse({'comments': data})
 
 
