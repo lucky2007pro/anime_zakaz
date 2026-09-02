@@ -271,6 +271,11 @@
             </a>
         </li>
         <li>
+            <a href="{% url 'admin_reelbest_list' %}" class="{% if 'reelbest' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-video'></i> ReelBest
+            </a>
+        </li>
+        <li>
             <a href="{% url 'admin_sections' %}" class="{% if 'section' in request.resolver_match.url_name %}active{% endif %}">
                 <i class='bx bx-layer'></i> Kategoriya bo'limlari
             </a>
