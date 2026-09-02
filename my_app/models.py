@@ -464,21 +464,34 @@ class StoryView(models.Model):
 
 
 # =======================
-# REELS
+# REELBEST
 # =======================
-class Reel(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reels')
+class ReelBest(models.Model):
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE,
+        related_name='reelbest_posts', null=True, blank=True
+    )
     title = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    video_file = models.FileField(upload_to='reels/videos/', blank=True, null=True)
+
+    video_file = models.FileField(upload_to='reelbest/videos/', blank=True, null=True)
     video_url = models.URLField(blank=True, null=True)
-    thumbnail = models.ImageField(upload_to='reels/thumbnails/', blank=True, null=True)
+    thumbnail = models.ImageField(upload_to='reelbest/thumbnails/', blank=True, null=True)
+
+    # Ixtiyoriy — anime bilan bog'lash
+    movie = models.ForeignKey(
+        Movie, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='reelbest_items',
+        help_text="Ixtiyoriy — tanlansa 'Animeni ko'rish' tugmasi chiqadi"
+    )
+
     views_count = models.PositiveIntegerField(default=0)
-    shares_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = "ReelBest"
+        verbose_name_plural = "ReelBest'lar"
 
     def total_likes(self):
         return self.likes.count()
@@ -492,31 +505,27 @@ class Reel(models.Model):
         return self.video_url or ''
 
     def __str__(self):
-        return f"Reel #{self.id} - {self.user.username}"
+        return self.title or f"ReelBest #{self.id}"
 
 
-class ReelLike(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reel_likes')
-    reel = models.ForeignKey(Reel, on_delete=models.CASCADE, related_name='likes')
+class ReelBestLike(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reelbest_likes')
+    reel = models.ForeignKey(ReelBest, on_delete=models.CASCADE, related_name='likes')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'reel')
 
     def __str__(self):
-        return f"{self.user.username} liked Reel#{self.reel.id}"
+        return f"{self.user.username} liked ReelBest#{self.reel.id}"
 
 
-class ReelComment(models.Model):
-    reel = models.ForeignKey(Reel, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reel_comments')
+class ReelBestComment(models.Model):
+    reel = models.ForeignKey(ReelBest, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reelbest_comments')
     text = models.TextField()
     reply_to = models.ForeignKey(
-        'self',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='replies'
+        'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies'
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -525,15 +534,6 @@ class ReelComment(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.text[:30]}"
-
-
-class ReelShare(models.Model):
-    reel = models.ForeignKey(Reel, on_delete=models.CASCADE, related_name='shares')
-    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
-    shared_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Reel#{self.reel.id} shared"
 
 
 
