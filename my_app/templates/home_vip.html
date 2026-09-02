@@ -7,6 +7,39 @@
 
 {% block extra_css %}
 <style>
+    /* ================= STATUS BAR BLUR =================
+       FAQAT PWA standalone rejimida (ya'ni sayt "Add to Home Screen"
+       orqali ilova sifatida ochilganda) ko'rinadi. Oddiy Chrome/Safari
+       brauzerida (manzil paneli o'zining alohida qatlami bo'lgani uchun)
+       bu blok umuman render qilinmaydi — shu sabab "title" qismi
+       (brauzer sarlavha/manzil qatori) ustiga hech narsa chiqib
+       ko'rinishni buzmaydi. */
+    .status-bar-blur {
+        display: none;
+    }
+
+    @media all and (display-mode: standalone), all and (display-mode: fullscreen) {
+        .status-bar-blur {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: env(safe-area-inset-top, 0px);
+            background: rgba(15, 15, 19, 0.55);
+            backdrop-filter: blur(22px) saturate(160%);
+            -webkit-backdrop-filter: blur(22px) saturate(160%);
+            z-index: 99999;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .status-bar-blur {
+                height: max(env(safe-area-inset-top, 44px), 44px);
+            }
+        }
+    }
+
     /* ================= BETA BADGE ================= */
     .beta-top-bar {
         max-width: 1400px;
@@ -241,9 +274,6 @@
     }
 
     /* ================= HERO SLIDER ================= */
-    /* FIX: overflow:hidden + border-radius + transform (slides-wrapper animatsiyasi)
-       birga ishlatilganda iOS Safari'da rasm/box tashqarisiga "sizib chiqadi".
-       Shu sababli mask-image trick va compositing layer qo'shildi. */
     .slider-container {
         position: relative;
         width: 100%;
@@ -369,32 +399,6 @@
         gap: 8px;
         margin: 16px auto 0;
         z-index: 20;
-    }
-
-    /* ================= STATUS BAR BLUR (soat/batareya joyi bilan uyg'unlashtirish) ================= */
-    .status-bar-blur {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: env(safe-area-inset-top, 0px);
-        min-height: 0;
-        background: rgba(15, 15, 19, 0.55);
-        backdrop-filter: blur(22px) saturate(160%);
-        -webkit-backdrop-filter: blur(22px) saturate(160%);
-        z-index: 99999;
-        pointer-events: none;
-    }
-
-    /* env() qo'llamaydigan holatlar uchun taxminiy balandlik (odatiy notch/status bar) */
-    @supports not (height: env(safe-area-inset-top)) {
-        .status-bar-blur { height: 0; }
-    }
-
-    @media (max-width: 600px) {
-        .status-bar-blur {
-            height: max(env(safe-area-inset-top, 44px), 44px);
-        }
     }
 
     .dot {
@@ -675,7 +679,6 @@
             width: auto;
         }
 
-        /* MOBIL: box va rasm bir-biriga to'liq mos, chiqib ketmaydi */
         .slider-container {
             aspect-ratio: 16 / 9;
             min-height: 220px;
@@ -814,8 +817,8 @@
         /* KATEGORIYALAR — MOBIL: karta rasmi kattaroq */
         .beta-category-section { padding: 0 4%; }
         .beta-category-heading { font-size: 1.2rem; }
-        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-        .anime-card { height: 270px; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .anime-card { height: 320px; }
         .card-inner-overlay { opacity: 1; }
         .slides-wrapper { will-change: auto; }
     }
@@ -831,8 +834,8 @@
         .slide-meta-row { display: none; }
         .beta-category-section { padding: 0 4%; }
         .beta-category-heading { font-size: 1.2rem; }
-        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-        .anime-card { height: 270px; }
+        .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .anime-card { height: 320px; }
         .card-inner-overlay { opacity: 1; }
         .slides-wrapper { will-change: auto; }
     }
@@ -920,17 +923,19 @@
 
         .cards-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
+            gap: 8px;
         }
 
         /* KICHIK EKRAN — karta rasmi ham kattaroq */
-        .anime-card { height: 230px; }
-        .card-title { font-size: 0.88rem; }
+        .anime-card { height: 270px; }
+        .card-title { font-size: 0.9rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
+
+<div class="status-bar-blur"></div>
 
 <div class="story-top-space">
 
@@ -1290,10 +1295,6 @@
     // Doim ishlaydi — sahifa ko'rinmasa ham (scroll bilan pastga tushilganda) to'xtamaydi.
     updateDots();
     resetAutoPlay();
-
-    // Faqat foydalanuvchi bevosita ushlab tortayotganda (drag) pauza bo'ladi,
-    // qo'yib yuborilishi bilan darhol davom etadi — IntersectionObserver orqali
-    // "ekrandan chiqqanda to'xtash" endi olib tashlandi.
 
     wrapper.addEventListener('touchstart', function(e) {
         heroStartX = e.touches[0].clientX;
