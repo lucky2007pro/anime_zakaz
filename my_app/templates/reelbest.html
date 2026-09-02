@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="rb-feed" id="rbFeed">
+  {% for reel in reels %}
+  <section class="rb-slide" data-reel-id="{{ reel.id }}">
+
+    <div class="rb-stage">
+      <!-- bo'shliq | video | bo'shliq -->
+      <div class="rb-spacer"></div>
+
+      <div class="rb-video-wrap">
+        <video
+          class="rb-video"
+          src="{{ reel.get_video_src }}"
+          poster="{% if reel.thumbnail %}{{ reel.thumbnail.url }}{% endif %}"
+          loop
+          playsinline
+          preload="metadata"
+        ></video>
+
+        <!-- o'ng tomondagi ikonkalar (video ustida overlay) -->
+        <div class="rb-icons">
+          <button class="rb-icon-btn rb-like-btn {% if reel.id in liked_ids %}active{% endif %}"
+                  data-reel-id="{{ reel.id }}">
+            <svg viewBox="0 0 24 24" class="rb-icon-svg">
+              <path d="M12 21s-6.7-4.3-9.3-8.2C.9 9.9 1.6 6.5 4.4 5 6.6 3.8 9.2 4.6 12 7.5 14.8 4.6 17.4 3.8 19.6 5c2.8 1.5 3.5 4.9 1.7 7.8C18.7 16.7 12 21 12 21z"/>
+            </svg>
+            <span class="rb-count rb-like-count">{{ reel.total_likes }}</span>
+          </button>
+
+          <button class="rb-icon-btn rb-comment-btn" data-reel-id="{{ reel.id }}">
+            <svg viewBox="0 0 24 24" class="rb-icon-svg">
+              <path d="M4 4h16v12H7l-3 3V4z"/>
+            </svg>
+            <span class="rb-count rb-comment-count">{{ reel.total_comments }}</span>
+          </button>
+        </div>
+
+        {% if reel.title or reel.description %}
+        <div class="rb-caption">
+          {% if reel.title %}<div class="rb-caption-title">{{ reel.title }}</div>{% endif %}
+          {% if reel.description %}<div class="rb-caption-desc">{{ reel.description }}</div>{% endif %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="rb-spacer"></div>
+    </div>
+
+    <!-- pastki panel — animeni ko'rish -->
+    {% if reel.movie %}
+    <a class="rb-anime-bar" href="{% url 'movie_detail' reel.movie.id %}">
+      <svg viewBox="0 0 24 24" class="rb-icon-svg small">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      <span>{{ reel.movie.title }} — Animeni ko'rish</span>
+    </a>
+    {% endif %}
+
+  </section>
+  {% empty %}
+  <div class="rb-empty">Hozircha reels mavjud emas</div>
+  {% endfor %}
+</div>
+
+<!-- Izohlar paneli -->
+<div class="rb-comments-panel" id="rbCommentsPanel">
+  <div class="rb-comments-header">
+    <span>Izohlar</span>
+    <button id="rbCloseComments">✕</button>
+  </div>
+  <div class="rb-comments-list" id="rbCommentsList"></div>
+  <form id="rbCommentForm" class="rb-comment-form">
+    {% csrf_token %}
+    <input type="text" id="rbCommentInput" placeholder="Izoh yozing..." maxlength="500" autocomplete="off">
+    <button type="submit">Yuborish</button>
+  </form>
+</div>
+<div class="rb-overlay" id="rbOverlay"></div>
+
+<style>
+  .rb-feed {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    background: #000;
+  }
+  .rb-slide {
+    height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .rb-stage {
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    align-items: center;
+    height: 100%;
+  }
+  .rb-spacer { height: 100%; }
+  .rb-video-wrap {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rb-video {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 14px;
+    background: #111;
+    object-fit: cover;
+  }
+  .rb-icons {
+    position: absolute;
+    right: -8px;
+    bottom: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    transform: translateX(100%);
+  }
+  .rb-icon-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .rb-icon-svg {
+    width: 32px;
+    height: 32px;
+    fill: #fff;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,.6));
+  }
+  .rb-icon-svg.small { width: 20px; height: 20px; }
+  .rb-like-btn.active .rb-icon-svg { fill: #ff3b5c; }
+  .rb-count { font-size: 12px; color: #fff; }
+
+  .rb-caption {
+    position: absolute;
+    left: 12px;
+    bottom: 16px;
+    max-width: 70%;
+    color: #fff;
+  }
+  .rb-caption-title { font-weight: 700; font-size: 15px; }
+  .rb-caption-desc { font-size: 13px; opacity: .85; margin-top: 2px; }
+
+  .rb-anime-bar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: linear-gradient(0deg, rgba(0,0,0,.85), transparent);
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .rb-empty { color: #fff; text-align: center; padding-top: 40vh; }
+
+  .rb-comments-panel {
+    position: fixed;
+    left: 0; right: 0; bottom: -70vh;
+    height: 65vh;
+    background: #16161a;
+    border-radius: 16px 16px 0 0;
+    transition: bottom .25s ease;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+  }
+  .rb-comments-panel.open { bottom: 0; }
+  .rb-comments-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; color: #fff; font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .rb-comments-header button { background: none; border: none; color: #fff; font-size: 16px; cursor: pointer; }
+  .rb-comments-list { flex: 1; overflow-y: auto; padding: 10px 16px; }
+  .rb-comment-item { display: flex; gap: 8px; margin-bottom: 12px; }
+  .rb-comment-item img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+  .rb-comment-user { color: #fff; font-weight: 600; font-size: 13px; }
+  .rb-comment-text { color: #ddd; font-size: 13px; }
+  .rb-comment-time { color: #888; font-size: 11px; margin-top: 2px; }
+
+  .rb-comment-form {
+    display: flex; gap: 8px; padding: 10px 16px;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .rb-comment-form input {
+    flex: 1; border-radius: 20px; border: none; padding: 10px 14px;
+    background: #26262c; color: #fff;
+  }
+  .rb-comment-form button {
+    border: none; border-radius: 20px; padding: 0 16px;
+    background: #ff3b5c; color: #fff; font-weight: 600; cursor: pointer;
+  }
+
+  .rb-overlay {
+    display: none;
+    position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 55;
+  }
+  .rb-overlay.open { display: block; }
+
+  @media (min-width: 900px) {
+    .rb-stage { grid-template-columns: 1fr 1.4fr 1fr; }
+  }
+</style>
+
+<script>
+(function () {
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  function postForm(url, data) {
+    const body = new URLSearchParams(data || {});
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body,
+    }).then(r => r.json());
+  }
+
+  // ===== Video autoplay faqat ekranda ko'rinayotgan reelda =====
+  const videos = document.querySelectorAll('.rb-video');
+  const viewedOnce = new Set();
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const video = entry.target;
+      const slide = video.closest('.rb-slide');
+      const reelId = slide.dataset.reelId;
+
+      if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+        video.play().catch(() => {});
+        if (!viewedOnce.has(reelId)) {
+          viewedOnce.add(reelId);
+          postForm(`/reels/${reelId}/view/`);
+        }
+      } else {
+        video.pause();
+      }
+    });
+  }, { threshold: [0, 0.6, 1] });
+
+  videos.forEach(v => observer.observe(v));
+
+  videos.forEach(v => {
+    v.addEventListener('click', () => {
+      if (v.paused) v.play(); else v.pause();
+    });
+  });
+
+  // ===== LIKE =====
+  document.querySelectorAll('.rb-like-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const reelId = btn.dataset.reelId;
+      postForm(`/reels/${reelId}/like/`).then(data => {
+        btn.classList.toggle('active', data.liked);
+        btn.querySelector('.rb-like-count').textContent = data.total_likes;
+      });
+    });
+  });
+
+  // ===== COMMENTS PANEL =====
+  const panel = document.getElementById('rbCommentsPanel');
+  const overlay = document.getElementById('rbOverlay');
+  const list = document.getElementById('rbCommentsList');
+  const form = document.getElementById('rbCommentForm');
+  const input = document.getElementById('rbCommentInput');
+  let activeReelId = null;
+
+  function renderComments(comments) {
+    list.innerHTML = comments.map(c => `
+      <div class="rb-comment-item">
+        ${c.avatar ? `<img src="${c.avatar}">` : `<div style="width:32px;height:32px;border-radius:50%;background:#444"></div>`}
+        <div>
+          <div class="rb-comment-user">${c.user}</div>
+          <div class="rb-comment-text">${c.text}</div>
+          <div class="rb-comment-time">${c.time}</div>
+        </div>
+      </div>
+    `).join('') || '<p style="color:#888;text-align:center;">Hali izoh yo\'q</p>';
+  }
+
+  function openComments(reelId) {
+    activeReelId = reelId;
+    panel.classList.add('open');
+    overlay.classList.add('open');
+    fetch(`/reels/${reelId}/comments/`).then(r => r.json()).then(data => renderComments(data.comments));
+  }
+
+  function closeComments() {
+    panel.classList.remove('open');
+    overlay.classList.remove('open');
+    activeReelId = null;
+  }
+
+  document.querySelectorAll('.rb-comment-btn').forEach(btn => {
+    btn.addEventListener('click', () => openComments(btn.dataset.reelId));
+  });
+
+  document.getElementById('rbCloseComments').addEventListener('click', closeComments);
+  overlay.addEventListener('click', closeComments);
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text || !activeReelId) return;
+
+    postForm(`/reels/${activeReelId}/comment/`, { text }).then(data => {
+      if (data.status === 'ok') {
+        input.value = '';
+        const slide = document.querySelector(`.rb-slide[data-reel-id="${activeReelId}"]`);
+        slide.querySelector('.rb-comment-count').textContent = data.total_comments;
+        fetch(`/reels/${activeReelId}/comments/`).then(r => r.json()).then(d => renderComments(d.comments));
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}
