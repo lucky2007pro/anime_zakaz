@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (
-    Movie, Category, MovieEpisode, Reel, CustomUser, AnimeNews, Story, 
-    FavoriteAnime, WatchHistory, ReelComment, MovieComment, AnimeSchedule, 
+    Movie, Category, MovieEpisode, ReelBest, CustomUser, AnimeNews, Story, 
+    FavoriteAnime, WatchHistory, ReelBestComment, MovieComment, AnimeSchedule, 
     ChatMessage, SiteSettings, UserSettings
 )
 
@@ -48,9 +48,8 @@ class ReelSerializer(serializers.ModelSerializer):
     is_liked = serializers.SerializerMethodField()
 
     class Meta:
-        model = Reel
-        fields = ['id', 'user_name', 'title', 'description', 'video_src', 'thumbnail', 'views_count', 'shares_count', 'total_likes', 'total_comments', 'is_liked', 'created_at']
-
+        model = ReelBest
+        fields = ['id', 'user_name', 'title', 'description', 'video_src', 'thumbnail', 'views_count', 'total_likes', 'total_comments', 'is_liked', 'created_at']
     def get_video_src(self, obj):
         return obj.get_video_src()
 
@@ -108,9 +107,9 @@ class ReelCommentSerializer(serializers.ModelSerializer):
     user_avatar = serializers.SerializerMethodField()
 
     class Meta:
-        model = ReelComment
+        model = ReelBestComment
         fields = ['id', 'user_name', 'user_avatar', 'text', 'created_at', 'reply_to']
-
+        
     def get_user_avatar(self, obj):
         if obj.user.avatar and obj.user.avatar.image:
             return obj.user.avatar.image.url
