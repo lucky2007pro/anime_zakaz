@@ -4,14 +4,14 @@ from .views import (
     register, login, home, movie_detail, check_username,
     profile, make_vip, search, anime_catalog,
     chat, chat_messages_api, edit_message, delete_message, ban_user,
-    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page,  aloqa, news_feed, news_detail, toggle_like, next_story_view, prev_story_view, story_view, mark_story_seen,
+    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page, aloqa, news_feed, news_detail, toggle_like, next_story_view, prev_story_view, story_view, mark_story_seen,
+    reelbest_view_increment,reelbest_comments_api,reelbest_add_comment,reelbest_toggle_like,reelbest_page,
     settings_privacy, settings_devices, settings_premium, settings_telegram, settings_general, user_mini_profile_api,
     anime_category, notice, delete_comment, service_worker_view, offline_view, manifest_view,
     hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
     imkon_vote_request_add, imkon_vote, imkon_anime_request_add, check_username,
     news_load_more, vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem, imkon_toggle_beta_home,
-    save_push_subscription, send_test_push_api,imkon_set_music_volume,imkon_select_music,imkon_toggle_music,
-    reelbest_view_increment,reelbest_comments_api,reelbest_add_comment,reelbest_toggle_like,reelbest_page,
+    save_push_subscription, send_test_push_api,imkon_set_music_volume,imkon_select_music,imkon_toggle_music
 
 )
 from .admin_views import *
@@ -42,6 +42,7 @@ urlpatterns = [
     path('news/', news_feed, name='news_feed'),
     path('news/<int:pk>/', news_detail, name='news_detail'),
     path('news/<int:pk>/like/', toggle_like, name='toggle_like'),
+
     path('aloqa/', aloqa, name='aloqa'),
 
     path('chat/', chat, name='chat'),
@@ -95,6 +96,11 @@ urlpatterns = [
     path('story/<int:story_id>/next/', next_story_view, name='next_story'),
     path('story/<int:story_id>/prev/', prev_story_view, name='prev_story'),
 
+    path('reels/', reelbest_page, name='reels'),
+    path('reels/<int:reel_id>/like/', reelbest_toggle_like, name='reelbest_toggle_like'),
+    path('reels/<int:reel_id>/comment/', reelbest_add_comment, name='reelbest_add_comment'),
+    path('reels/<int:reel_id>/comments/', reelbest_comments_api, name='reelbest_comments_api'),
+    path('reels/<int:reel_id>/view/', reelbest_view_increment, name='reelbest_view_increment'),
 
 
     path('settings/', settings_general, name='settings_general'),
@@ -102,12 +108,6 @@ urlpatterns = [
     path('settings/premium/', settings_premium, name='settings_premium'),
     path('settings/devices/', settings_devices, name='settings_devices'),
     path('settings/privacy/', settings_privacy, name='settings_privacy'),
-
-    path('reels/', reelbest_page, name='reels'),
-    path('reels/<int:reel_id>/like/', reelbest_toggle_like, name='reelbest_toggle_like'),
-    path('reels/<int:reel_id>/comment/', reelbest_add_comment, name='reelbest_add_comment'),
-    path('reels/<int:reel_id>/comments/', reelbest_comments_api, name='reelbest_comments_api'),
-    path('reels/<int:reel_id>/view/', reelbest_view_increment, name='reelbest_view_increment'),
 
 
 
