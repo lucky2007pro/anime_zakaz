@@ -76,6 +76,8 @@
                 <a href="{% url 'admin_notice_form' %}" class="btn">+ Qo'shish</a>
             {% elif type == 'jackpot' %}
                 <a href="{% url 'admin_jackpot_form' %}" class="btn">+ Yangi jackpot kod</a>
+            {% elif type == 'reelbest' %}
+                <a href="{% url 'admin_reelbest_form' %}" class="btn">+ Qo'shish</a>
             {% elif type == 'hisob' %}
                 <form method="get" action="{% url 'admin_hisob_form_lookup' %}">
                     <input type="text" name="user_id" placeholder="Foydalanuvchi ID">
@@ -86,43 +88,6 @@
             {% endif %}
         </div>
     </div>
-
-    {% if type == 'notice' %}
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px;">
-        <div style="background: rgba(0, 243, 255, 0.07); border: 1px solid rgba(0, 243, 255, 0.25); border-radius: 10px; padding: 18px; display:flex; align-items:center; gap:15px;">
-            <div style="width:48px; height:48px; border-radius:10px; background:rgba(0,243,255,0.15); display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:var(--accent);">
-                <i class='bx bxs-bell-ring'></i>
-            </div>
-            <div>
-                <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; font-weight:700;">🔔 Push Obunachilar</div>
-                <div style="font-size: 1.4rem; font-weight: 800; color: #fff;">{{ push_subscribers_count|default:0 }} <span style="font-size: 0.8rem; font-weight: 600; color: var(--accent);">qurilma</span></div>
-                <div style="font-size: 0.75rem; color: #a1a1aa;">({{ unique_push_users|default:0 }} ta faol user)</div>
-            </div>
-        </div>
-
-        <div style="background: rgba(176, 0, 255, 0.07); border: 1px solid rgba(176, 0, 255, 0.25); border-radius: 10px; padding: 18px; display:flex; align-items:center; gap:15px;">
-            <div style="width:48px; height:48px; border-radius:10px; background:rgba(176,0,255,0.15); display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:#d8b4fe;">
-                <i class='bx bxs-user-detail'></i>
-            </div>
-            <div>
-                <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; font-weight:700;">👥 Jami Foydalanuvchilar</div>
-                <div style="font-size: 1.4rem; font-weight: 800; color: #fff;">{{ total_users_count|default:0 }} <span style="font-size: 0.8rem; font-weight: 600; color: #d8b4fe;">ta user</span></div>
-                <div style="font-size: 0.75rem; color: #a1a1aa;">Ro'yxatdan o'tganlar</div>
-            </div>
-        </div>
-
-        <div style="background: rgba(52, 211, 153, 0.07); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 10px; padding: 18px; display:flex; align-items:center; gap:15px;">
-            <div style="width:48px; height:48px; border-radius:10px; background:rgba(52,211,153,0.15); display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:#34d399;">
-                <i class='bx bxs-megaphone'></i>
-            </div>
-            <div>
-                <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; font-weight:700;">📢 Jami E'lonlar</div>
-                <div style="font-size: 1.4rem; font-weight: 800; color: #fff;">{{ items|length }} <span style="font-size: 0.8rem; font-weight: 600; color: #34d399;">ta e'lon</span></div>
-                <div style="font-size: 0.75rem; color: #a1a1aa;">Barcha xabarlar</div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     <div class="table-wrap">
     <table>
@@ -157,11 +122,13 @@
                 {% elif type == 'section' %}
                     <th>Anime nomi</th><th>Bo'lim</th><th>Tartib</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'notice' %}
-                    <th>Sarlavha</th><th>Matn</th><th>Turi</th><th>O'qiganlar</th><th>Holat</th><th>Sana</th><th>Harakatlar</th>
+                    <th>Sarlavha</th><th>Matn</th><th>Turi</th><th>Holat</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'hisob' %}
                     <th>Foydalanuvchi</th><th>Balans</th><th>Yangilangan sana</th><th>Harakatlar</th>
                 {% elif type == 'jackpot' %}
                     <th>Kod</th><th>Mukofot turi</th><th>Foydalanilgan</th><th>Muddat</th><th>Holat</th><th>Harakatlar</th>
+                {% elif type == 'reelbest' %}
+                    <th>Video</th><th>Sarlavha</th><th>Anime</th><th>Muallif</th><th>Like/Izoh</th><th>Ko'rishlar</th><th>Sana</th><th>Harakatlar</th>
                 {% endif %}
             </tr>
         </thead>
@@ -321,11 +288,6 @@
                         {% endif %}
                     </td>
                     <td>
-                        <span class="badge badge-yellow" title="Bu e'lonni o'qigan foydalanuvchilar soni">
-                            <i class='bx bx-check-double'></i> {{ item.reads.count }} ta user
-                        </span>
-                    </td>
-                    <td>
                         {% if item.is_active %}<span class="badge badge-green">Faol</span>
                         {% else %}<span class="badge badge-red">Nofaol</span>{% endif %}
                     </td>
@@ -365,6 +327,26 @@
                             <span class="badge badge-yellow">Tugagan / To'lgan</span>
                         {% endif %}
                     </td>
+
+                {% elif type == 'reelbest' %}
+                    <td>
+                        {% if item.thumbnail %}
+                            <img src="{{ item.thumbnail.url }}" style="width:55px; height:78px; object-fit:cover; border-radius:8px; border:1px solid var(--border-line);">
+                        {% else %}
+                            <div style="width:55px; height:78px; background:var(--border-line); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                                <i class='bx bx-video' style="color:var(--accent); font-size:1.4rem;"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td style="font-weight:700; color:#fff;">{{ item.title|default:"—"|truncatechars:35 }}</td>
+                    <td style="color:var(--text-dim);">{{ item.movie.title|default:"—"|truncatechars:25 }}</td>
+                    <td style="color:var(--text-dim);">{{ item.user.username|default:"—" }}</td>
+                    <td>
+                        <span class="badge badge-blue">♥ {{ item.total_likes }}</span>
+                        <span class="badge badge-purple">💬 {{ item.total_comments }}</span>
+                    </td>
+                    <td style="color:var(--text-dim);">👁 {{ item.views_count }}</td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">{{ item.created_at|date:"d.m.Y H:i" }}</td>
                 {% endif %}
 
                 <!-- HARAKATLAR -->
@@ -451,6 +433,10 @@
                     {% elif type == 'jackpot' %}
                         <a href="{% url 'admin_jackpot_form' item.id %}" class="action-btn">Tahrirlash</a>
                         <a href="{% url 'admin_jackpot_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
+
+                    {% elif type == 'reelbest' %}
+                        <a href="{% url 'admin_reelbest_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_reelbest_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
 
                     {% elif type == 'newslike' or type == 'storyview' %}
                         <span style="color:var(--text-dim); font-size:0.82rem;">—</span>
