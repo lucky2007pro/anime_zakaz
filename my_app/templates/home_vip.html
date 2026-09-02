@@ -371,6 +371,32 @@
         z-index: 20;
     }
 
+    /* ================= STATUS BAR BLUR (soat/batareya joyi bilan uyg'unlashtirish) ================= */
+    .status-bar-blur {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: env(safe-area-inset-top, 0px);
+        min-height: 0;
+        background: rgba(15, 15, 19, 0.55);
+        backdrop-filter: blur(22px) saturate(160%);
+        -webkit-backdrop-filter: blur(22px) saturate(160%);
+        z-index: 99999;
+        pointer-events: none;
+    }
+
+    /* env() qo'llamaydigan holatlar uchun taxminiy balandlik (odatiy notch/status bar) */
+    @supports not (height: env(safe-area-inset-top)) {
+        .status-bar-blur { height: 0; }
+    }
+
+    @media (max-width: 600px) {
+        .status-bar-blur {
+            height: max(env(safe-area-inset-top, 44px), 44px);
+        }
+    }
+
     .dot {
         position: relative;
         flex: 0 0 auto;
