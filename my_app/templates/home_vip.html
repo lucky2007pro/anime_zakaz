@@ -268,27 +268,53 @@
     }
 
     .slides-wrapper {
-        display: flex;
+        position: relative;
         width: 100%;
         height: 100%;
-        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         cursor: grab;
         user-select: none;
-        will-change: transform;
     }
-    .slides-wrapper.dragging { cursor: grabbing; transition: none; }
+    .slides-wrapper.dragging { cursor: grabbing; }
 
     .slide {
-        min-width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-        position: relative;
         display: flex;
         align-items: flex-end;
         padding: 5% 5% 8% 5%;
         overflow: hidden;
-        flex-shrink: 0;
         box-sizing: border-box;
+        opacity: 0;
+        z-index: 1;
+        pointer-events: none;
+        transition: opacity 0.7s ease;
+    }
+
+    .slide.active {
+        opacity: 1;
+        z-index: 2;
+        pointer-events: auto;
+    }
+
+    .slide.outgoing {
+        opacity: 0;
+        z-index: 1;
+        transition: opacity 0.5s ease;
+    }
+
+    /* Rasm/video zoom-in animatsiyasi, faqat active bo'lganda ishga tushadi */
+    .slide.active .slide-bg img,
+    .slide.active .slide-bg-video {
+        animation: slideZoomIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+        transform-origin: center center;
+    }
+
+    @keyframes slideZoomIn {
+        from { transform: scale(1.18); }
+        to   { transform: scale(1); }
     }
 
     .slide-bg {
@@ -1214,7 +1240,7 @@
 </div><!-- /story-top-space -->
 
 <script>
-/* ================= HERO SLIDER ================= */
+/* ================= HERO SLIDER (FADE + ZOOM) ================= */
 (function() {
     const wrapper = document.getElementById('slidesWrapper');
     if (!wrapper) return;
@@ -1227,7 +1253,9 @@
     let autoPlayTimer = null;
     let heroStartX = 0;
     let heroDragging = false;
-    let heroMoved = 0;
+
+    // Boshlang'ich holat — birinchi slayd active
+    slides[0].classList.add('active');
 
     function updateDots() {
         const dots = document.querySelectorAll('#sliderControls .dot');
@@ -1255,9 +1283,31 @@
     }
 
     function goToSlide(index) {
-        currentSlide = ((index % totalSlides) + totalSlides) % totalSlides;
-        wrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
-        wrapper.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+        const nextIndex = ((index % totalSlides) + totalSlides) % totalSlides;
+        if (nextIndex === currentSlide) return;
+
+        const currentEl = slides[currentSlide];
+        const nextEl = slides[nextIndex];
+
+        // Eski slaydni sekin xiralashtirib chiqarish
+        currentEl.classList.remove('active');
+        currentEl.classList.add('outgoing');
+
+        // Zoom animatsiyasi qaytadan ishga tushishi uchun eski animatsiyani tozalaymiz
+        const media = nextEl.querySelector('.slide-bg img, .slide-bg-video');
+        if (media) {
+            media.style.animation = 'none';
+            void media.offsetWidth; // reflow
+            media.style.animation = '';
+        }
+
+        nextEl.classList.add('active');
+
+        setTimeout(function() {
+            currentEl.classList.remove('outgoing');
+        }, 500);
+
+        currentSlide = nextIndex;
         updateDots();
     }
 
@@ -1272,67 +1322,41 @@
         }
     }
 
-    // Doim ishlaydi — sahifa ko'rinmasa ham (scroll bilan pastga tushilganda) to'xtamaydi.
     updateDots();
     resetAutoPlay();
 
-    // Faqat foydalanuvchi bevosita ushlab tortayotganda (drag) pauza bo'ladi,
-    // qo'yib yuborilishi bilan darhol davom etadi — IntersectionObserver orqali
-    // "ekrandan chiqqanda to'xtash" endi olib tashlandi.
-
+    // Swipe — faqat yo'nalishni aniqlash uchun
     wrapper.addEventListener('touchstart', function(e) {
         heroStartX = e.touches[0].clientX;
         heroDragging = true;
-        heroMoved = 0;
-        wrapper.style.transition = 'none';
         if (autoPlayTimer) clearInterval(autoPlayTimer);
         pauseDotFill();
     }, { passive: true });
 
-    wrapper.addEventListener('touchmove', function(e) {
-        if (!heroDragging) return;
-        heroMoved = e.touches[0].clientX - heroStartX;
-        const base = -currentSlide * 100;
-        const pct = (heroMoved / wrapper.offsetWidth) * 100;
-        wrapper.style.transform = 'translateX(calc(' + base + '% + ' + pct + 'px))';
-    }, { passive: true });
-
-    wrapper.addEventListener('touchend', function() {
+    wrapper.addEventListener('touchend', function(e) {
         if (!heroDragging) return;
         heroDragging = false;
-        if (heroMoved < -50) goToSlide(currentSlide + 1);
-        else if (heroMoved > 50) goToSlide(currentSlide - 1);
-        else goToSlide(currentSlide);
-        heroMoved = 0;
+        const diff = e.changedTouches[0].clientX - heroStartX;
+        if (diff < -50) goToSlide(currentSlide + 1);
+        else if (diff > 50) goToSlide(currentSlide - 1);
         resetAutoPlay();
     });
 
     wrapper.addEventListener('mousedown', function(e) {
         heroStartX = e.clientX;
         heroDragging = true;
-        heroMoved = 0;
         wrapper.classList.add('dragging');
-        wrapper.style.transition = 'none';
         if (autoPlayTimer) clearInterval(autoPlayTimer);
         pauseDotFill();
     });
 
-    window.addEventListener('mousemove', function(e) {
-        if (!heroDragging) return;
-        heroMoved = e.clientX - heroStartX;
-        const base = -currentSlide * 100;
-        const pct = (heroMoved / wrapper.offsetWidth) * 100;
-        wrapper.style.transform = 'translateX(calc(' + base + '% + ' + pct + 'px))';
-    });
-
-    window.addEventListener('mouseup', function() {
+    window.addEventListener('mouseup', function(e) {
         if (!heroDragging) return;
         heroDragging = false;
         wrapper.classList.remove('dragging');
-        if (heroMoved < -50) goToSlide(currentSlide + 1);
-        else if (heroMoved > 50) goToSlide(currentSlide - 1);
-        else goToSlide(currentSlide);
-        heroMoved = 0;
+        const diff = e.clientX - heroStartX;
+        if (diff < -50) goToSlide(currentSlide + 1);
+        else if (diff > 50) goToSlide(currentSlide - 1);
         resetAutoPlay();
     });
 })();
@@ -1436,8 +1460,8 @@ function switchBetaTab(btn) {
 
     setInterval(showNextMessage, 5000);
 })();
-
-
 </script>
+
+
 
 {% endblock %}
