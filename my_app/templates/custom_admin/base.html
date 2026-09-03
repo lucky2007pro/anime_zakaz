@@ -280,6 +280,11 @@
                 <i class='bx bx-layer'></i> Kategoriya bo'limlari
             </a>
         </li>
+         <li>
+            <a href="{% url 'admin_premium_list' %}" class="{% if 'premium' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bxs-crown'></i> Premium azolar
+            </a>
+        </li>       
         <li>
             <a href="{% url 'admin_notices' %}" class="{% if 'notice' in request.resolver_match.url_name %}active{% endif %}">
                 <i class='bx bx-bell'></i> E'lonlar
