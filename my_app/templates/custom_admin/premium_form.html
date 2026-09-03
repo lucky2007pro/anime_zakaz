@@ -1,0 +1,129 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}Premium obunani boshqarish{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-wrap { max-width: 640px; margin: 0 auto; }
+
+    .form-group { margin-bottom: 22px; }
+    .form-label {
+        display:block; font-size:0.8rem; color:var(--text-dim); text-transform:uppercase;
+        letter-spacing:1px; margin-bottom:8px; font-weight:700;
+    }
+    .form-input, .form-select {
+        width:100%; background:#0a0a0f; border:1px solid var(--border-line); border-radius:8px;
+        padding:12px 16px; color:#fff; font-size:0.95rem; font-family:'Outfit', sans-serif;
+    }
+    .form-input:focus, .form-select:focus { outline:none; border-color: var(--accent); }
+
+    .form-check-row { display:flex; align-items:center; gap:10px; cursor:pointer; }
+    .form-check-row input[type=checkbox] { width:20px; height:20px; accent-color: var(--accent); cursor:pointer; }
+
+    .user-badge-box {
+        display:flex; align-items:center; gap:14px; background:#0a0a0f; border:1px solid var(--border-line);
+        border-radius:10px; padding:16px 20px; margin-bottom:28px;
+    }
+    .user-badge-box .avatar-fallback {
+        width:48px; height:48px; border-radius:50%; background:var(--border-line);
+        display:flex; align-items:center; justify-content:center;
+        font-weight:900; color:var(--accent); font-size:1.2rem; flex-shrink:0;
+    }
+    .user-badge-box .u-name { font-weight:800; color:#fff; font-size:1.05rem; }
+    .user-badge-box .u-sub { font-size:0.78rem; color:var(--text-dim); margin-top:2px; }
+
+    .status-pill {
+        display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:999px;
+        font-size:0.72rem; font-weight:800; margin-left:auto;
+    }
+    .status-pill.active { background: rgba(52,211,153,0.15); color:#34d399; }
+    .status-pill.inactive { background: rgba(248,113,113,0.15); color:#f87171; }
+
+    .form-actions { display:flex; gap:12px; margin-top:30px; flex-wrap:wrap; }
+    .btn-save {
+        background: var(--accent); color:#000; border:none; padding:13px 28px; border-radius:8px;
+        font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;
+        box-shadow: 0 0 12px var(--accent-glow); font-family:'Outfit', sans-serif;
+    }
+    .btn-save:hover { background:#fff; }
+    .btn-cancel {
+        background:#1e1e24; color:#fff; border:1px solid #333; padding:13px 28px; border-radius:8px;
+        font-weight:700; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center;
+    }
+    .btn-cancel:hover { border-color:#666; }
+    .btn-danger-outline {
+        background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:13px 28px; border-radius:8px;
+        font-weight:700; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; margin-left:auto;
+    }
+    .btn-danger-outline:hover { background:#ef4444; color:#fff; }
+
+    .hint { font-size:0.75rem; color:var(--text-dim); margin-top:6px; line-height:1.5; }
+
+    @media (max-width: 600px) {
+        .form-actions { flex-direction:column; }
+        .btn-danger-outline { margin-left:0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel form-wrap">
+    <div class="panel-header" style="margin-bottom:20px;">
+        <h2 style="font-size:1.3rem; font-weight:800; color:#fff; text-transform:uppercase;">
+            Premium obunani boshqarish
+        </h2>
+    </div>
+
+    <div class="user-badge-box">
+        <div class="avatar-fallback">{{ vip.user.username|slice:":1"|upper }}</div>
+        <div>
+            <div class="u-name">{{ vip.user.username }}</div>
+            <div class="u-sub">ID: #{{ vip.user.id }} &nbsp;·&nbsp; {{ vip.user.email|default:"email kiritilmagan" }}</div>
+        </div>
+        {% if vip.vip_active %}
+            <span class="status-pill active"><i class='bx bx-check-circle'></i> Faol</span>
+        {% else %}
+            <span class="status-pill inactive"><i class='bx bx-x-circle'></i> Tugagan</span>
+        {% endif %}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label class="form-check-row">
+                <input type="checkbox" name="is_vip" {% if vip.is_vip %}checked{% endif %}>
+                <span class="form-label" style="margin-bottom:0;">Obuna faol (VIP holati yoqilgan)</span>
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Reja / Daraja</label>
+            <select name="tier" class="form-select">
+                <option value="basic" {% if vip.tier == 'basic' %}selected{% endif %}>Basic</option>
+                <option value="premium" {% if vip.tier == 'premium' %}selected{% endif %}>Premium</option>
+                <option value="vip" {% if vip.tier == 'vip' %}selected{% endif %}>VIP</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Tugash sanasi</label>
+            <input type="datetime-local" name="vip_expire" class="form-input"
+                   value="{% if vip.vip_expire %}{{ vip.vip_expire|date:'Y-m-d\TH:i' }}{% endif %}">
+            <p class="hint">
+                Muddatni uzaytirish uchun yangi sana tanlang. Maydonni bo'sh qoldirsangiz — tugash sanasi
+                o'chiriladi (obuna darhol muddati tugagan hisoblanadi, lekin "Obuna faol" belgisi alohida boshqariladi).
+            </p>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Saqlash</button>
+            <a href="{% url 'admin_premium_list' %}" class="btn-cancel">Orqaga</a>
+            <a href="{% url 'admin_premium_cancel' vip.id %}" class="btn-danger-outline"
+               onclick="return confirm('{{ vip.user.username }} obunasini butunlay bekor qilishni tasdiqlaysizmi?');">
+                <i class='bx bx-x-circle' style="margin-right:6px;"></i> Obunani bekor qilish
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
