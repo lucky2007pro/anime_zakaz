@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils import timezone
+from .models import VipUser
 
 
 from .models import (
@@ -343,6 +344,15 @@ class BalanceTopupRequestAdmin(admin.ModelAdmin):
         self.message_user(request, f"{count} ta to'lov rad etildi")
     reject_topup.short_description = "Tanlangan to'lovlarni rad etish"
 
+
+
+
+@admin.register(VipUser)
+class VipUserAdmin(admin.ModelAdmin):
+    list_display = ('user', 'tier', 'is_vip', 'vip_expire')
+    list_filter = ('tier', 'is_vip')
+    search_fields = ('user__username', 'user__email')
+    ordering = ('-vip_expire',)
 
 # --- Inline: jackpot kodni kim ishlatganini ko'rsatish va o'chirish (bekor qilish) ---
 class JackpotCodeUseInline(admin.TabularInline):
