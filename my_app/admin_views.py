@@ -1039,3 +1039,51 @@ def admin_reelbest_delete(request, pk):
     reel.delete()
     messages.success(request, "ReelBest o'chirildi!")
     return redirect('admin_reelbest_list')
+
+
+# =======================
+# PREMIUM AZOLAR (VIP RO'YXATI)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_premium_list(request):
+    vip_users = VipUser.objects.filter(is_vip=True).select_related('user').order_by('-vip_expire')
+    total_vip = vip_users.count()
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Premium azolar',
+        'items': vip_users,
+        'type': 'premium',
+        'total_vip': total_vip,
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_premium_form(request, pk):
+    vip = get_object_or_404(VipUser, pk=pk)
+
+    if request.method == 'POST':
+        vip.tier = request.POST.get('tier', vip.tier)
+        vip.is_vip = request.POST.get('is_vip') == 'on'
+
+        expires_at = request.POST.get('vip_expire', '').strip()
+        if expires_at:
+            from django.utils.dateparse import parse_datetime
+            vip.vip_expire = parse_datetime(expires_at)
+        else:
+            vip.vip_expire = None
+
+        vip.save()
+        messages.success(request, f"{vip.user.username} uchun obuna ma'lumotlari yangilandi!")
+        return redirect('admin_premium_list')
+
+    return render(request, 'custom_admin/premium_form.html', {'vip': vip})
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_premium_cancel(request, pk):
+    vip = get_object_or_404(VipUser, pk=pk)
+    vip.is_vip = False
+    vip.tier = 'basic'
+    vip.vip_expire = None
+    vip.save()
+    messages.success(request, f"{vip.user.username} obunasi bekor qilindi!")
+    return redirect('admin_premium_list')
