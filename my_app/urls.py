@@ -193,6 +193,12 @@ urlpatterns = [
     path('imkon/musiqa/yoqish/', imkon_toggle_music, name='imkon_toggle_music'),
     path('imkon/musiqa/<int:pk>/tanlash/', imkon_select_music, name='imkon_select_music'),
     path('imkon/musiqa/balandlik/', imkon_set_music_volume, name='imkon_set_music_volume'),
+
+    # PREMIUM AZOLAR (admin)
+    path('control-panel/premium/', admin_premium_list, name='admin_premium_list'),
+    path('control-panel/premium/<int:pk>/edit/', admin_premium_form, name='admin_premium_form'),
+    path('control-panel/premium/<int:pk>/bekor/', admin_premium_cancel, name='admin_premium_cancel'),    
+    
 ]
 
 
