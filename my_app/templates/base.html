@@ -1420,7 +1420,7 @@
         {% endif %}
 
     </style>
-    {% if s.premium_bg_on and s.premium_bg %}
+    {% if s.premium_bg_on and s.premium_bg and s.premium_bg.image %}
     <style id="premiumBgVars">
         .premium-bg-layer {
             background-image: url('{{ s.premium_bg.image.url }}');
@@ -1467,7 +1467,7 @@
 
         <!-- 3) PROFIL (rasm bilan) -->
         <div class="action-icon profile-btn" onclick="toggleProfileMenu()" style="overflow: hidden; padding: 0;" role="button" aria-label="Profil">
-            {% if request.user.is_authenticated and request.user.avatar %}
+            {% if request.user.is_authenticated and request.user.avatar and request.user.avatar.image %}
                 <img src="{{ request.user.avatar.image.url }}" alt="profile"
                      style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
             {% else %}
@@ -1500,7 +1500,7 @@
 
         <div class="mobile-profile-summary">
             <div class="mobile-profile-avatar" id="mobileProfileAvatarBtn" onclick="toggleAvatarPicker()" role="button" aria-label="Profil rasmini tanlash">
-                {% if request.user.is_authenticated and request.user.avatar %}
+                {% if request.user.is_authenticated and request.user.avatar and request.user.avatar.image %}
                     <img src="{{ request.user.avatar.image.url }}" alt="avatar">
                 {% else %}
                     <i class='bx bx-user'></i>
@@ -1531,11 +1531,13 @@
                     {% csrf_token %}
                     <div class="inline-avatar-picker-grid">
                         {% for av in avatars %}
+                        {% if av.image %}
                         <label class="inline-avatar-picker-item" title="{{ av.name|default:'Avatar' }}">
                             <input type="radio" name="avatar_id" value="{{ av.id }}"
                                 {% if request.user.is_authenticated and request.user.avatar and request.user.avatar.id == av.id %}checked{% endif %}>
                             <img class="inline-avatar-picker-img" src="{{ av.image.url }}" alt="{{ av.name|default:'avatar' }}">
                         </label>
+                        {% endif %}
                         {% empty %}
                         <p class="inline-avatar-picker-empty">Admin hali profil rasmi yuklamagan.</p>
                         {% endfor %}
@@ -1666,7 +1668,7 @@
     {% if request.user.is_authenticated %}
     <div class="user-info-section">
         <div class="avatar-large" style="overflow: hidden;">
-            {% if request.user.avatar %}
+            {% if request.user.avatar and request.user.avatar.image %}
                 <img src="{{ request.user.avatar.image.url }}" alt="avatar"
                      style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
             {% else %}

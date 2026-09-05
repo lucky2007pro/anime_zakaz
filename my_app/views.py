@@ -683,7 +683,8 @@ def chat(request):
 
     messages_list = list(
         ChatMessage.objects.select_related(
-            'user', 'reply_to', 'reply_to_news', 'user__avatar', 'user__vip_data'
+            'user', 'reply_to', 'reply_to_news', 'user__avatar', 'user__vip_data',
+            'reply_to__user', 'reply_to__user__vip_data', 'reply_to__user__avatar'
         ).order_by('-created_at')[:40])
     messages_list.reverse()
 
@@ -725,21 +726,28 @@ def chat(request):
                 reply_to_news=reply_to_news,                      # YANGI
             )
             if reply_to_msg and reply_to_msg.user != request.user:
-                Notice.objects.create(
-                    notice_type='reply',
-                    created_by=request.user,
-                    target_user=reply_to_msg.user,
-                    title=f"{request.user.username} sizga javob berdi",
-                    message=text,
-                    related_chat_message=new_msg,
-                )
+                try:
+                    Notice.objects.create(
+                        notice_type='reply',
+                        created_by=request.user,
+                        target_user=reply_to_msg.user,
+                        title=f"{request.user.username} sizga javob berdi",
+                        message=text,
+                        related_chat_message=new_msg,
+                    )
+                except Exception:
+                    pass
+
                 # YANGI — push notification yuborish
-                send_push_notification(
-                    user=reply_to_msg.user,
-                    title=f"{request.user.username} sizga javob berdi",
-                    body=text[:100],
-                    url='/chat/'
-                )
+                try:
+                    send_push_notification(
+                        user=reply_to_msg.user,
+                        title=f"{request.user.username} sizga javob berdi",
+                        body=text[:100],
+                        url='/chat/'
+                    )
+                except Exception:
+                    pass
         return redirect('chat')
 
     return render(request, 'chat.html', {
