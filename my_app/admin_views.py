@@ -26,11 +26,13 @@ def admin_dashboard(request):
         'total_episodes': MovieEpisode.objects.count(),
         'total_genres': Category.objects.count(),
         'total_users': CustomUser.objects.count(),
+        'total_messages': ChatMessage.objects.count(),
+        'total_comments': MovieComment.objects.count(),
         'total_receipts': SubscriptionReceipt.objects.filter(is_approved=False, is_rejected=False).count(),
         'latest_animes': Movie.objects.all().order_by('-created_at')[:5],
         'latest_users': CustomUser.objects.all().order_by('-date_joined')[:5],
         'latest_messages': ChatMessage.objects.all().order_by('-created_at')[:10],
-        'latest_topics': SubscriptionReceipt.objects.all().order_by('-created_at')[:5], # latest_receipts o'rniga latest_topics dan foydalansak
+        'latest_topics': SubscriptionReceipt.objects.all().order_by('-created_at')[:5],
     }
     return render(request, 'custom_admin/dashboard.html', context)
 
