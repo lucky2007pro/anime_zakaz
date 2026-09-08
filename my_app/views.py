@@ -685,7 +685,7 @@ def chat(request):
         ChatMessage.objects.select_related(
             'user', 'reply_to', 'reply_to_news', 'user__avatar', 'user__vip_data',
             'reply_to__user', 'reply_to__user__vip_data', 'reply_to__user__avatar'
-        ).order_by('-created_at')[:40])
+        ).order_by('-created_at')[:300])
     messages_list.reverse()
 
     for msg in messages_list:
