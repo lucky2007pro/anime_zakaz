@@ -1798,8 +1798,87 @@ def jackpot_redeem(request):
 
 @login_required
 def statistika_page(request):
-    return render(request, 'statistika.html', {})
+    from .models import Poll, PollVote
 
+    polls_qs = (
+        Poll.objects.filter(is_active=True)
+        .prefetch_related('options__votes')
+        .order_by('-created_at')
+    )
+
+    # Foydalanuvchi qaysi variantlarga ovoz berganini olib qo'yamiz
+    user_votes = {}
+    voted_options = PollVote.objects.filter(
+        user=request.user, option__poll__in=polls_qs
+    ).select_related('option')
+    for v in voted_options:
+        user_votes.setdefault(v.option.poll_id, set()).add(v.option_id)
+
+    polls = []
+    for poll in polls_qs:
+        options = list(poll.options.all())
+        total = sum(o.votes_count() for o in options)
+        opts_data = []
+        for o in options:
+            count = o.votes_count()
+            percent = round((count / total) * 100) if total else 0
+            opts_data.append({
+                'id': o.id,
+                'text': o.text,
+                'count': count,
+                'percent': percent,
+                'checked': o.id in user_votes.get(poll.id, set()),
+            })
+        polls.append({
+            'id': poll.id,
+            'question': poll.question,
+            'subtitle': poll.subtitle,
+            'multiple_choice': poll.multiple_choice,
+            'options': opts_data,
+            'voted': poll.id in user_votes,
+            'total_votes': total,
+        })
+
+    return render(request, 'statistika.html', {'polls': polls})
+
+
+@login_required
+def poll_vote(request, poll_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+
+    from .models import Poll, PollOption, PollVote
+
+    poll = get_object_or_404(Poll, id=poll_id, is_active=True)
+    option_ids = request.POST.getlist('option_ids[]') or request.POST.getlist('option_ids')
+
+    if not option_ids:
+        return JsonResponse({'error': "Kamida bitta variant tanlang"}, status=400)
+
+    if not poll.multiple_choice:
+        option_ids = option_ids[:1]
+
+    valid_options = PollOption.objects.filter(poll=poll, id__in=option_ids)
+    if not valid_options.exists():
+        return JsonResponse({'error': "Noto'g'ri variant"}, status=400)
+
+    # Eski ovozlarini o'chirib, yangisini yozamiz (qayta ovoz berish = yangilash)
+    PollVote.objects.filter(user=request.user, option__poll=poll).delete()
+    PollVote.objects.bulk_create([
+        PollVote(user=request.user, option=opt) for opt in valid_options
+    ])
+
+    options = poll.options.all()
+    total = sum(o.votes_count() for o in options)
+    opts_data = [{
+        'id': o.id,
+        'text': o.text,
+        'count': o.votes_count(),
+        'percent': round((o.votes_count() / total) * 100) if total else 0,
+        'checked': o.id in option_ids or str(o.id) in option_ids,
+    } for o in options]
+
+    return JsonResponse({'ok': True, 'options': opts_data, 'total_votes': total})
 @login_required
 def imkon_page(request):
     from .models import (
