@@ -1089,3 +1089,77 @@ def admin_premium_cancel(request, pk):
     vip.save()
     messages.success(request, f"{vip.user.username} obunasi bekor qilindi!")
     return redirect('admin_premium_list')
+
+# =======================
+# SO'ROVNOMALAR (POLL)
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_polls(request):
+    polls = Poll.objects.all().order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': "So'rovnomalar",
+        'items': polls,
+        'type': 'poll'
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_poll_form(request, pk=None):
+    poll = get_object_or_404(Poll, pk=pk) if pk else None
+    options = poll.options.all().order_by('order', 'id') if poll else []
+
+    if request.method == 'POST':
+        if not poll:
+            poll = Poll()
+
+        poll.question = request.POST.get('question', '').strip()
+        poll.subtitle = request.POST.get('subtitle', '').strip() or "So'rovnoma"
+        poll.multiple_choice = request.POST.get('multiple_choice') == 'on'
+        poll.vip_only = request.POST.get('vip_only') == 'on'
+        poll.is_active = request.POST.get('is_active') == 'on'
+        if not poll.created_by_id:
+            poll.created_by = request.user
+
+        if not poll.question:
+            messages.error(request, "Savol matni bo'sh bo'lmasin.")
+            return render(request, 'custom_admin/statistika_form.html', {'poll': poll, 'options': options})
+
+        poll.save()
+
+        # ================= VARIANTLARNI SAQLASH =================
+        option_ids = request.POST.getlist('option_id[]')
+        option_texts = request.POST.getlist('option_text[]')
+
+        kept_ids = []
+        order = 0
+        for i, text in enumerate(option_texts):
+            text = text.strip()
+            if not text:
+                continue
+            opt_id = option_ids[i] if i < len(option_ids) else ''
+            if opt_id and opt_id.isdigit():
+                PollOption.objects.filter(id=opt_id, poll=poll).update(text=text, order=order)
+                kept_ids.append(int(opt_id))
+            else:
+                new_opt = PollOption.objects.create(poll=poll, text=text, order=order)
+                kept_ids.append(new_opt.id)
+            order += 1
+
+        # ro'yxatda bo'lmay qolgan eski variantlarni o'chirish
+        PollOption.objects.filter(poll=poll).exclude(id__in=kept_ids).delete()
+
+        if PollOption.objects.filter(poll=poll).count() < 2:
+            messages.warning(request, "Diqqat: so'rovnomada kamida 2 ta variant bo'lishi tavsiya etiladi.")
+
+        messages.success(request, "So'rovnoma muvaffaqiyatli saqlandi!")
+        return redirect('admin_polls')
+
+    return render(request, 'custom_admin/statistika_form.html', {'poll': poll, 'options': options})
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_poll_delete(request, pk):
+    poll = get_object_or_404(Poll, pk=pk)
+    poll.delete()
+    messages.success(request, "So'rovnoma o'chirildi!")
+    return redirect('admin_polls')
