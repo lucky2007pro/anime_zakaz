@@ -284,7 +284,12 @@
             <a href="{% url 'admin_premium_list' %}" class="{% if 'premium' in request.resolver_match.url_name %}active{% endif %}">
                 <i class='bx bxs-crown'></i> Premium azolar
             </a>
-        </li>       
+        </li> 
+        <li>
+            <a href="{% url 'admin_polls' %}" class="{% if 'poll' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-poll'></i> So'rovnomalar
+            </a>
+        </li>   
         <li>
             <a href="{% url 'admin_notices' %}" class="{% if 'notice' in request.resolver_match.url_name %}active{% endif %}">
                 <i class='bx bx-bell'></i> E'lonlar
