@@ -1097,3 +1097,64 @@ class PremiumMusic(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# =======================
+# SO'ROVNOMA (POLL) TIZIMI
+# =======================
+class Poll(models.Model):
+    question = models.CharField(max_length=255, help_text="So'rovnoma savoli, masalan: Anime tanlang")
+    subtitle = models.CharField(
+        max_length=255, blank=True, null=True, default="So'rovnoma",
+        help_text="Savol tagida chiqadigan kichik matn"
+    )
+    multiple_choice = models.BooleanField(
+        default=False,
+        help_text="Yoqilsa — foydalanuvchi bir nechta variant tanlay oladi (checkbox), o'chirilsa — faqat bitta (radio)"
+    )
+    created_by = models.ForeignKey(
+        CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='polls_created'
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "So'rovnoma"
+        verbose_name_plural = "So'rovnomalar"
+
+    def total_votes(self):
+        """Nechta noyob foydalanuvchi ovoz bergani"""
+        return PollVote.objects.filter(option__poll=self).values('user').distinct().count()
+
+    def __str__(self):
+        return self.question
+
+
+class PollOption(models.Model):
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name='options')
+    text = models.CharField(max_length=200)
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+    def votes_count(self):
+        return self.votes.count()
+
+    def __str__(self):
+        return f"{self.poll.question} — {self.text}"
+
+
+class PollVote(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='poll_votes')
+    option = models.ForeignKey(PollOption, on_delete=models.CASCADE, related_name='votes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'option')
+        verbose_name = "So'rovnoma ovozi"
+        verbose_name_plural = "So'rovnoma ovozlari"
+
+    def __str__(self):
+        return f"{self.user.username} → {self.option.text}"
