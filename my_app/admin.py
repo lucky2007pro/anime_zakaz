@@ -401,6 +401,39 @@ class PremiumMusicAdmin(admin.ModelAdmin):
     list_editable = ('order', 'is_active')
     ordering = ('order', '-created_at')
 
+# =======================
+# SO'ROVNOMA (POLL)
+# =======================
+class PollOptionInline(admin.TabularInline):
+    model = PollOption
+    extra = 2
+    fields = ('text', 'order')
+    ordering = ('order',)
+
+
+@admin.register(Poll)
+class PollAdmin(admin.ModelAdmin):
+    list_display = ('question', 'multiple_choice', 'is_active', 'total_votes_display', 'created_by', 'created_at')
+    list_filter = ('is_active', 'multiple_choice')
+    search_fields = ('question',)
+    inlines = [PollOptionInline]
+
+    def save_model(self, request, obj, form, change):
+        if not obj.created_by_id:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
+    def total_votes_display(self, obj):
+        return obj.total_votes()
+    total_votes_display.short_description = "Ovozlar (noyob)"
+
+
+@admin.register(PollVote)
+class PollVoteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'option', 'created_at')
+    search_fields = ('user__username', 'option__text')
+    list_filter = ('created_at',)
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
 # admin.site.register(MovieEpisode)  # Alohida ko‘rish shart emas, inline orqali boshqariladi
