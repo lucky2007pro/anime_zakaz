@@ -200,6 +200,10 @@ urlpatterns = [
     path('control-panel/premium/<int:pk>/bekor/', admin_premium_cancel, name='admin_premium_cancel'),  
     path('statistika/', statistika_page, name='statistika_page'),
     path('poll/vote/<int:poll_id>/', poll_vote, name='poll_vote'),
+    path('control-panel/polls/', admin_polls, name='admin_polls'),
+    path('control-panel/polls/add/', admin_poll_form, name='admin_poll_form'),
+    path('control-panel/polls/<int:pk>/edit/', admin_poll_form, name='admin_poll_form'),
+    path('control-panel/polls/<int:pk>/delete/',admin_poll_delete, name='admin_poll_delete'),
     
 ]
 
