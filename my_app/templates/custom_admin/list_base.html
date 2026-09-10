@@ -86,6 +86,8 @@
                 <a href="{% url 'admin_jackpot_form' %}" class="btn">+ Yangi jackpot kod</a>
             {% elif type == 'reelbest' %}
                 <a href="{% url 'admin_reelbest_form' %}" class="btn">+ Qo'shish</a>
+            {% elif type == 'poll' %}
+                <a href="{% url 'admin_poll_form' %}" class="btn">+ Qo'shish</a>
             {% elif type == 'hisob' %}
                 <form method="get" action="{% url 'admin_hisob_form_lookup' %}">
                     <input type="text" name="user_id" placeholder="Foydalanuvchi ID">
@@ -117,6 +119,8 @@
                     <th>Foydalanuvchi</th><th>Reja</th><th>Chek</th><th>Holat</th><th>Harakatlar</th>
                 {% elif type == 'avatar' %}
                     <th>Nomi</th><th>Rasm</th><th>Sana</th><th>Harakatlar</th>
+                {% elif type == 'poll' %}
+                    <th>Savol</th><th>Turi</th><th>Variantlar</th><th>Ovozlar</th><th>Holat</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'comment' %}
                     <th>Foydalanuvchi</th><th>Anime</th><th>Izoh</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'news' %}
@@ -169,7 +173,22 @@
                     <td style="font-weight:600;">{{ item.movie.title }}</td>
                     <td>{{ item.episode_number }}</td>
                     <td>{{ item.title|default:"-" }}</td>
-
+                {% elif type == 'poll' %}
+                    <td style="font-weight:700; color:#fff;">
+                        {{ item.question|truncatechars:45 }}
+                        <div style="font-size:0.78rem; color:var(--text-dim); font-weight:400;">{{ item.subtitle|default:"" }}</div>
+                    </td>
+                    <td>
+                        {% if item.vip_only %}<span class="badge badge-purple">VIP</span>{% else %}<span class="badge badge-blue">Umumiy</span>{% endif %}
+                        {% if item.multiple_choice %}<span class="badge badge-yellow">Ko'p tanlov</span>{% else %}<span class="badge badge-green">Bitta tanlov</span>{% endif %}
+                    </td>
+                    <td style="color:var(--text-dim);">{{ item.options.count }} ta</td>
+                    <td style="color:var(--accent); font-weight:800;">{{ item.total_votes }}</td>
+                    <td>
+                        {% if item.is_active %}<span class="badge badge-green">Faol</span>
+                        {% else %}<span class="badge badge-red">Nofaol</span>{% endif %}
+                    </td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">{{ item.created_at|date:"d.m.Y H:i" }}</td>
                 {% elif type == 'chat' %}
                     <td style="font-weight:600;">{{ item.user.username }}</td>
                     <td>{{ item.message|truncatechars:50 }}</td>
@@ -391,7 +410,9 @@
                         <a href="{% url 'admin_animehaqida_form' item.id %}" class="action-btn">Anime haqida</a>
                         <a href="{% url 'admin_kadrlar_form' item.id %}" class="action-btn">Kadrlar</a>
                         <a href="{% url 'admin_movie_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
-
+                    {% elif type == 'poll' %}
+                        <a href="{% url 'admin_poll_form' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_poll_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
                     {% elif type == 'genre' %}
                         <a href="{% url 'admin_genre_form' item.id %}" class="action-btn">Tahrirlash</a>
                         <a href="{% url 'admin_genre_delete' item.id %}" class="action-btn delete" onclick="return confirm('O\'chirilsinmi?');">O'chirish</a>
