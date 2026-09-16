@@ -45,20 +45,25 @@
           {% if reel.description %}<div class="rb-caption-desc">{{ reel.description }}</div>{% endif %}
         </div>
         {% endif %}
+
+        <!-- "Animeni ko'rish" — endi kichik pill-tugma -->
+        {% if reel.movie %}
+        <a class="rb-anime-btn" href="{% url 'movie_detail' reel.movie.id %}">
+          <span class="rb-anime-btn-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </span>
+          <span class="rb-anime-btn-text">
+            <span class="rb-anime-btn-title">Animeni ko'rish</span>
+            <span class="rb-anime-btn-sub">{{ reel.movie.title }}</span>
+          </span>
+        </a>
+        {% endif %}
       </div>
 
       <div class="rb-spacer"></div>
     </div>
-
-    <!-- pastki panel — animeni ko'rish -->
-    {% if reel.movie %}
-    <a class="rb-anime-bar" href="{% url 'movie_detail' reel.movie.id %}">
-      <svg viewBox="0 0 24 24" class="rb-icon-svg small">
-        <path d="M8 5v14l11-7z"/>
-      </svg>
-      <span>{{ reel.movie.title }} — Animeni ko'rish</span>
-    </a>
-    {% endif %}
 
   </section>
   {% empty %}
@@ -127,11 +132,11 @@
     object-fit: contain;
   }
 
-  /* ===== O'NG TOMONDAGI IKONKALAR — biroz teparoq ko'tarildi ===== */
+  /* ===== O'NG TOMONDAGI IKONKALAR ===== */
   .rb-icons {
     position: absolute;
     right: 10px;
-    bottom: 150px; /* edi: 100px */
+    bottom: 150px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -165,18 +170,13 @@
     text-shadow: 0 1px 3px rgba(0,0,0,.7);
   }
 
-  /* ===== CAPTION — mobilda ko'rinmay qolish muammosi tuzatildi =====
-     - z-index qo'shildi (ikonkalar ostida qolib ketmasligi uchun)
-     - pastki chegara animeni-ko'rish panelidan tepaga chiqarildi
-     - fon gradienti bilan o'qilishi yaxshilandi
-     - safe-area (notch/home-indicator) hisobga olindi
-  */
+  /* ===== CAPTION — mobilda yana biroz tepaga ko'tarildi ===== */
   .rb-caption {
     position: absolute;
     left: 12px;
     right: 70px;
-    bottom: 56px;
-    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+    bottom: 92px; /* edi: 56px */
+    bottom: calc(92px + env(safe-area-inset-bottom, 0px));
     color: #fff;
     z-index: 6;
     padding: 8px 8px 8px 0;
@@ -196,21 +196,51 @@
     text-shadow: 0 1px 3px rgba(0,0,0,.8);
   }
 
-  .rb-anime-bar {
+  /* ===== "ANIMENI KO'RISH" TUGMASI (endi to'liq kenglikdagi panel emas) ===== */
+  .rb-anime-btn {
     position: absolute;
-    left: 0; right: 0; bottom: 0;
+    left: 12px;
+    bottom: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: calc(100% - 90px);
+    padding: 9px 16px 9px 10px;
+    background: linear-gradient(135deg, rgba(255,59,92,.95), rgba(255,90,60,.9));
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    z-index: 7;
+    box-shadow: 0 4px 14px rgba(0,0,0,.45);
+  }
+  .rb-anime-btn-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.25);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 10px 12px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-    background: linear-gradient(0deg, rgba(0,0,0,.85), transparent);
-    color: #fff;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    z-index: 7;
+    flex-shrink: 0;
+  }
+  .rb-anime-btn-icon svg { width: 15px; height: 15px; fill: #fff; }
+  .rb-anime-btn-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+    overflow: hidden;
+  }
+  .rb-anime-btn-title {
+    font-weight: 800;
+    font-size: 13px;
+  }
+  .rb-anime-btn-sub {
+    font-size: 11px;
+    opacity: .85;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .rb-empty { color: #fff; text-align: center; padding-top: 40vh; }
@@ -304,6 +334,7 @@
     .rb-icons { right: 24px; bottom: 170px; }
     .rb-icon-svg { width: 32px; height: 32px; }
     .rb-caption { bottom: 60px; }
+    .rb-anime-btn { bottom: 24px; }
   }
 </style>
 
@@ -323,6 +354,16 @@
       body,
     }).then(r => r.json());
   }
+
+  // ===== Agar /reels/<id>/ orqali ochilgan bo'lsa — o'sha reelga scroll qilamiz =====
+  {% if initial_reel_id %}
+  (function () {
+    const targetSlide = document.querySelector('.rb-slide[data-reel-id="{{ initial_reel_id }}"]');
+    if (targetSlide) {
+      targetSlide.scrollIntoView({ block: 'start' });
+    }
+  })();
+  {% endif %}
 
   // ===== Video autoplay faqat ekranda ko'rinayotgan reelda =====
   const videos = document.querySelectorAll('.rb-video');
