@@ -1141,16 +1141,22 @@ def prev_story_view(request, story_id):
 # REELBEST — YAGONA FEED SAHIFA (video shu yerning o'zida ijro bo'ladi)
 # =======================
 @login_required
-def reelbest_page(request):
+def reelbest_page(request, reel_id=None):
     reels = ReelBest.objects.select_related('movie', 'user').order_by('-created_at')
     liked_ids = set(
         ReelBestLike.objects.filter(user=request.user).values_list('reel_id', flat=True)
     )
+
+    # Agar /reels/<id>/ orqali kirilgan bo'lsa — feed o'sha reelga scroll bo'ladi
+    initial_reel_id = None
+    if reel_id and reels.filter(id=reel_id).exists():
+        initial_reel_id = reel_id
+
     return render(request, 'reelbest.html', {
         'reels': reels,
         'liked_ids': liked_ids,
+        'initial_reel_id': initial_reel_id,
     })
-
 
 @login_required
 def reelbest_toggle_like(request, reel_id):
