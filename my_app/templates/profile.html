@@ -56,8 +56,6 @@
         inset 0 1px 0 rgba(255,255,255,0.035),
         0 10px 35px rgba(0,0,0,0.12);
 
-    /* perf: har bir kartani alohida layer sifatida izolyatsiya qilish,
-       skroll paytida boshqa elementlarni qayta chizishga majburlamaydi */
     contain: content;
 }
 
@@ -162,7 +160,7 @@
 
 
 /* =========================================================
-   PROFILE TOP — avatar / ism / ID bir qatorda
+   PROFILE TOP
    ========================================================= */
 
 .pv-top-row {
@@ -222,7 +220,7 @@
 
 
 /* =========================================================
-   ISM (avatar yonida, o'rtada)
+   ISM
    ========================================================= */
 
 .pv-name-block {
@@ -260,7 +258,7 @@
 
 
 /* =========================================================
-   ID (o'ng tomonda)
+   ID
    ========================================================= */
 
 .pv-id-value-block {
@@ -300,7 +298,7 @@
 
 
 /* =========================================================
-   BADGE — o'rtada
+   BADGE
    ========================================================= */
 
 .pv-badge-center {
@@ -478,6 +476,24 @@
 
 
 /* =========================================================
+   PROFIL TAHRIRLASH BOX
+   ========================================================= */
+
+.pv-edit-box {
+    display: none;
+    margin-top: 10px;
+}
+
+.pv-edit-box.pv-edit-open {
+    display: block;
+}
+
+.pv-menu-arrow.pv-edit-rotated {
+    transform: rotate(180deg);
+}
+
+
+/* =========================================================
    MENU
    ========================================================= */
 
@@ -532,6 +548,7 @@
         background .2s ease;
 
     contain: content;
+    cursor: pointer;
 }
 
 .pv-menu-box:hover {
@@ -602,7 +619,8 @@
     font-size: 18px;
 
     transition:
-        color .2s ease;
+        color .2s ease,
+        transform .2s ease;
 }
 
 .pv-menu-box:hover .pv-menu-arrow {
@@ -894,8 +912,6 @@
 
     min-width: 0;
 
-    /* perf: uzun ro'yxatda skroll paytida ekrandan tashqaridagi
-       qatorlarni render qilishni brauzerga optimallashtirish uchun belgi */
     content-visibility: auto;
     contain-intrinsic-size: 64px;
 }
@@ -995,7 +1011,7 @@
 
 
 /* =========================================================
-   MOBILE — LAYOUT MOSLASHTIRISH
+   MOBILE
    ========================================================= */
 
 @media (max-width: 560px) {
@@ -1018,9 +1034,6 @@
 
         border-radius: 14px;
     }
-
-
-    /* Top row: avatar / ism / ID */
 
     .pv-top-row {
         gap: 8px;
@@ -1062,9 +1075,6 @@
         padding: 3px 11px;
     }
 
-
-    /* Level */
-
     .pv-level-row {
         padding-top: 12px;
     }
@@ -1078,17 +1088,11 @@
         font-size: 14px;
     }
 
-
-    /* Total users */
-
     .p-footer {
         font-size: 11px;
 
         padding: 9px 10px;
     }
-
-
-    /* Menu */
 
     .pv-menu-box {
         padding: 11px 12px;
@@ -1119,9 +1123,6 @@
     .pv-menu-amount {
         font-size: 12px;
     }
-
-
-    /* Form */
 
     .p-form-row {
         width: 100%;
@@ -1161,9 +1162,6 @@
         font-size: 10px;
     }
 
-
-    /* Avatar mobile */
-
     .p-av-grid {
         grid-template-columns:
             repeat(auto-fill, minmax(45px, 1fr));
@@ -1175,9 +1173,6 @@
         width: 100%;
     }
 
-
-    /* Save */
-
     .p-save-btn {
         height: 41px;
 
@@ -1185,9 +1180,6 @@
 
         border-radius: 10px;
     }
-
-
-    /* Watched */
 
     .p-watched-row {
         gap: 8px;
@@ -1215,16 +1207,6 @@
 
         font-size: 10px;
     }
-
-
-    /* =====================================================
-       PERFORMANCE FIX — SKROLL OG'IRLIGINI YO'QOTISH
-       Sabab: backdrop-filter (blur) mobil GPU uchun juda
-       og'ir — har freymda qayta hisoblanadi va skroll
-       paytida "qotish"/lag hissi beradi. Mobilda uni butunlay
-       o'chiramiz va o'rniga quyuqroq fon bilan xuddi shunday
-       ko'rinishni saqlaymiz.
-       ===================================================== */
 
     .pcard,
     .pv-card,
@@ -1255,8 +1237,6 @@
         background: rgba(0, 40, 45, 0.55);
     }
 
-    /* Og'ir ko'p qatlamli soyalarni yengillashtirish */
-
     .pcard,
     .pv-card {
         box-shadow: 0 6px 16px rgba(0,0,0,0.18);
@@ -1270,8 +1250,6 @@
     .pv-level-circle {
         box-shadow: 0 0 10px var(--tier-glow, rgba(180,92,255,0.2));
     }
-
-    /* Hover-only effektlarni mobilda o'chirish (touch'da yopishib qolmasin) */
 
     .pv-menu-box:hover {
         transform: none;
@@ -1360,7 +1338,7 @@
 
 
 /* =========================================================
-   REDUCED MOTION — animatsiyaga sezgir foydalanuvchilar uchun
+   REDUCED MOTION
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1380,43 +1358,22 @@
 
 <div class="profile-wrap">
 
-
     <h2 class="pv-title">Profil</h2>
-
-
-    <!-- =====================================================
-         PROFILE CARD — avatar / ism / ID bitta qatorda, badge o'rtada
-         ===================================================== -->
 
     <div class="pv-card tier-{{ user_tier|default:'basic' }}">
 
         <div class="pv-top-row">
 
             <div class="pv-avatar">
-
                 {% if user.avatar %}
-
-                    <img
-                        src="{{ user.avatar.image.url }}"
-                        alt="avatar"
-                        loading="lazy"
-                    >
-
+                    <img src="{{ user.avatar.image.url }}" alt="avatar" loading="lazy">
                 {% else %}
-
                     {{ user.username|make_list|first|upper }}
-
                 {% endif %}
-
             </div>
 
-
             <div class="pv-name-block">
-
-                <span class="pv-name-label">
-                    Ism
-                </span>
-
+                <span class="pv-name-label">Ism</span>
                 <span class="pv-name-value">
                     {% if user.first_name %}
                         {{ user.first_name }} {{ user.last_name }}
@@ -1424,423 +1381,189 @@
                         {{ user.username }}
                     {% endif %}
                 </span>
-
             </div>
-
 
             <div class="pv-id-value-block">
-
-                <span class="pv-id-label">
-                    ID
-                </span>
-
-                <span class="pv-id-value">
-                    {{ user.id }}
-                </span>
-
+                <span class="pv-id-label">ID</span>
+                <span class="pv-id-value">{{ user.id }}</span>
             </div>
 
         </div>
-
-
-        <!-- =================================================
-             BADGE — o'rtada
-             ================================================= -->
 
         <div class="pv-badge-center">
-
             {% if user_tier == 'vip' %}
-
-                <span class="pv-tier-badge vip">
-                    <i class='bx bxs-crown'></i>
-                    VIP
-                </span>
-
+                <span class="pv-tier-badge vip"><i class='bx bxs-crown'></i> VIP</span>
             {% elif user_tier == 'premium' %}
-
-                <span class="pv-tier-badge premium">
-                    <i class='bx bx-crown'></i>
-                    Premium
-                </span>
-
+                <span class="pv-tier-badge premium"><i class='bx bx-crown'></i> Premium</span>
             {% else %}
-
-                <span class="pv-tier-badge normal">
-                    <i class='bx bx-user'></i>
-                    Oddiy
-                </span>
-
+                <span class="pv-tier-badge normal"><i class='bx bx-user'></i> Oddiy</span>
             {% endif %}
-
         </div>
 
-
-        <!-- =================================================
-             LEVEL
-             ================================================= -->
-
         <div class="pv-level-row">
-
-            <div class="pv-level-title">
-                Daraja
-            </div>
-
+            <div class="pv-level-title">Daraja</div>
             <div class="pv-level-circle tier-{{ user_tier|default:'basic' }}">
-
-                <div class="pv-level-num">
-                    {{ user_level }}
-                </div>
-
-                <div class="pv-level-label">
-                    LEVEL
-                </div>
-
+                <div class="pv-level-num">{{ user_level }}</div>
+                <div class="pv-level-label">LEVEL</div>
             </div>
-
         </div>
 
     </div>
-
-
-    <!-- =====================================================
-         TOTAL USERS
-         ===================================================== -->
 
     <div class="p-footer">
         Saytdagi jami foydalanuvchilar: {{ total_users }}
     </div>
 
-
-    <!-- =====================================================
-         MENU
-         ===================================================== -->
-
-    <p class="pv-menu-title">
-        Menyu
-    </p>
+    <p class="pv-menu-title">Menyu</p>
 
     <div class="pv-menu-list">
 
-
-        <a
-            href="{% url 'hisobim_page' %}"
-            class="pv-menu-box pv-menu-hisobim"
-        >
-
+        <a href="{% url 'hisobim_page' %}" class="pv-menu-box pv-menu-hisobim">
             <span class="pv-menu-left">
-
                 <i class='bx bx-wallet'></i>
-
-                <span>
-                    Hisobim
-                </span>
-
+                <span>Hisobim</span>
             </span>
-
-
             <span class="pv-menu-right">
-
-                <span class="pv-menu-amount">
-                    {{ balance.amount }}
-                </span>
-
+                <span class="pv-menu-amount">{{ balance.amount }}</span>
                 <i class='bx bx-chevron-right'></i>
-
             </span>
-
         </a>
 
-
-        <a
-            href="{% url 'favorites_page' %}"
-            class="pv-menu-box"
-        >
-
+        <a href="{% url 'favorites_page' %}" class="pv-menu-box">
             <span class="pv-menu-left">
-
                 <i class='bx bx-heart'></i>
-
-                <span>
-                    Saqlanganlar
-                </span>
-
+                <span>Saqlanganlar</span>
             </span>
-
             <i class='bx bx-chevron-right pv-menu-arrow'></i>
-
         </a>
 
-
-        <a
-            href="{% url 'statistika_page' %}"
-            class="pv-menu-box"
-        >
-
+        <a href="{% url 'statistika_page' %}" class="pv-menu-box">
             <span class="pv-menu-left">
-
                 <i class='bx bx-bar-chart-alt-2'></i>
-
-                <span>
-                    Statistika
-                </span>
-
+                <span>Statistika</span>
             </span>
-
             <i class='bx bx-chevron-right pv-menu-arrow'></i>
-
         </a>
 
-
-        <a
-            href="{% url 'imkon_page' %}"
-            class="pv-menu-box"
-        >
-
+        <a href="{% url 'imkon_page' %}" class="pv-menu-box">
             <span class="pv-menu-left">
-
                 <i class='bx bxs-crown'></i>
-
-                <span>
-                    Premium imkonlar
-                </span>
-
+                <span>Premium imkonlar</span>
             </span>
-
             <i class='bx bx-chevron-right pv-menu-arrow'></i>
-
         </a>
 
-
-        <a
-            href="{% url 'settings_general' %}"
-            class="pv-menu-box"
-        >
-
+        <a href="{% url 'settings_general' %}" class="pv-menu-box">
             <span class="pv-menu-left">
-
                 <i class='bx bx-cog'></i>
-
-                <span>
-                    Sozlamalar
-                </span>
-
+                <span>Sozlamalar</span>
             </span>
-
             <i class='bx bx-chevron-right pv-menu-arrow'></i>
-
         </a>
+
+        <div class="pv-menu-box" id="profilTahrirlashBtn" role="button" tabindex="0">
+            <span class="pv-menu-left">
+                <i class='bx bx-edit-alt'></i>
+                <span>Profil tahrirlash</span>
+            </span>
+            <i class='bx bx-chevron-down pv-menu-arrow' id="profilTahrirlashArrow"></i>
+        </div>
 
     </div>
 
-
     <!-- =====================================================
-         PROFILE EDIT
+         PROFIL TAHRIRLASH BOX — menyudan keyin, eski joyida.
+         Default holatda yopiq, faqat tugma bosilganda ochiladi.
          ===================================================== -->
 
-    <div
-        class="pcard"
-        style="margin-top:16px;"
-    >
+    <div class="pcard pv-edit-box" id="profilTahrirlashBox">
 
-        <p class="p-section-title">
-            Profilni tahrirlash
-        </p>
+        <p class="p-section-title">Profilni tahrirlash</p>
 
-
-        <form
-            method="POST"
-            action="{% url 'profile' %}"
-        >
-
+        <form method="POST" action="{% url 'profile' %}">
             {% csrf_token %}
 
-
-            <!-- =============================================
-                 NAME / LAST NAME
-                 ============================================= -->
-
             <div class="p-form-row">
-
-
                 <div class="p-field">
-
-                    <label for="id_first_name">
-                        Ism
-                    </label>
-
-                    <input
-                        type="text"
-                        id="id_first_name"
-                        name="first_name"
-                        value="{{ user.first_name }}"
-                        placeholder="Ismingiz"
-                    >
-
+                    <label for="id_first_name">Ism</label>
+                    <input type="text" id="id_first_name" name="first_name" value="{{ user.first_name }}" placeholder="Ismingiz">
                 </div>
-
-
                 <div class="p-field">
-
-                    <label for="id_last_name">
-                        Familiya
-                    </label>
-
-                    <input
-                        type="text"
-                        id="id_last_name"
-                        name="last_name"
-                        value="{{ user.last_name }}"
-                        placeholder="Familiyangiz"
-                    >
-
+                    <label for="id_last_name">Familiya</label>
+                    <input type="text" id="id_last_name" name="last_name" value="{{ user.last_name }}" placeholder="Familiyangiz">
                 </div>
-
-
             </div>
 
-
-            <!-- =============================================
-                 AVATAR
-                 ============================================= -->
-
-            <p class="p-av-label">
-                Profil rasmi
-            </p>
-
+            <p class="p-av-label">Profil rasmi</p>
 
             <div class="p-av-grid">
-
                 {% for av in avatars %}
-
-                    <label
-                        class="p-av-item"
-                        title="{{ av.name|default:'Avatar' }}"
-                    >
-
-                        <input
-                            type="radio"
-                            name="avatar_id"
-                            value="{{ av.id }}"
-
-                            {% if user.avatar and user.avatar.id == av.id %}
-                                checked
-                            {% endif %}
-                        >
-
-                        <img
-                            class="p-av-img"
-                            src="{{ av.image.url }}"
-                            alt="{{ av.name|default:'avatar' }}"
-                            loading="lazy"
-                        >
-
+                    <label class="p-av-item" title="{{ av.name|default:'Avatar' }}">
+                        <input type="radio" name="avatar_id" value="{{ av.id }}" {% if user.avatar and user.avatar.id == av.id %}checked{% endif %}>
+                        <img class="p-av-img" src="{{ av.image.url }}" alt="{{ av.name|default:'avatar' }}" loading="lazy">
                     </label>
-
                 {% empty %}
-
-                    <p class="p-av-empty">
-                        Admin hali profil rasmi yuklamagan.
-                    </p>
-
+                    <p class="p-av-empty">Admin hali profil rasmi yuklamagan.</p>
                 {% endfor %}
-
             </div>
 
-
-            <!-- =============================================
-                 SAVE
-                 ============================================= -->
-
-            <button
-                type="submit"
-                class="p-save-btn"
-            >
-                O'zgarishlarni saqlash
-            </button>
+            <button type="submit" class="p-save-btn">O'zgarishlarni saqlash</button>
 
         </form>
 
     </div>
 
-
-    <!-- =====================================================
-         LAST WATCHED
-         ===================================================== -->
-
-    <p
-        class="p-section-title"
-        style="margin:16px 0 8px 4px;"
-    >
-        Oxirgi ko'rilganlar
-    </p>
-
+    <p class="p-section-title" style="margin:16px 0 8px 4px;">Oxirgi ko'rilganlar</p>
 
     <div class="pcard p-watched-list">
-
         {% for w in last_watched_history %}
-
-            <a
-                href="{% url 'movie_detail' w.movie.id %}"
-                class="p-watched-row"
-            >
-
-
+            <a href="{% url 'movie_detail' w.movie.id %}" class="p-watched-row">
                 <div class="p-watched-row-img">
-
-                    <img
-                        src="{% if w.movie.image %}{{ w.movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}"
-                        alt="{{ w.movie.title }}"
-                        loading="lazy"
-                    >
-
+                    <img src="{% if w.movie.image %}{{ w.movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ w.movie.title }}" loading="lazy">
                 </div>
-
-
                 <div class="p-watched-row-info">
-
-                    <div class="p-watched-row-title">
-                        {{ w.movie.title }}
-                    </div>
-
-
+                    <div class="p-watched-row-title">{{ w.movie.title }}</div>
                     <div class="p-watched-row-meta">
-
-                        <span>
-                            {{ w.local_time|time:"H:i" }}
-                        </span>
-
+                        <span>{{ w.local_time|time:"H:i" }}</span>
                         {% if w.last_episode %}
-
-                            <span>
-                                {{ w.last_episode.episode_number }}-qism
-                            </span>
-
+                            <span>{{ w.last_episode.episode_number }}-qism</span>
                         {% endif %}
-
                     </div>
-
                 </div>
-
-
-                <div class="p-watched-row-btn">
-                    Ko'rish
-                </div>
-
-
+                <div class="p-watched-row-btn">Ko'rish</div>
             </a>
-
         {% empty %}
-
-            <p class="p-av-empty">
-                Hali hech qanday anime ko'rilmagan.
-            </p>
-
+            <p class="p-av-empty">Hali hech qanday anime ko'rilmagan.</p>
         {% endfor %}
-
     </div>
-
 
 </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('profilTahrirlashBtn');
+    var box = document.getElementById('profilTahrirlashBox');
+    var arrow = document.getElementById('profilTahrirlashArrow');
+
+    if (btn && box) {
+        btn.addEventListener('click', function () {
+            box.classList.toggle('pv-edit-open');
+            if (arrow) {
+                arrow.classList.toggle('pv-edit-rotated');
+            }
+        });
+
+        btn.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                box.classList.toggle('pv-edit-open');
+                if (arrow) {
+                    arrow.classList.toggle('pv-edit-rotated');
+                }
+            }
+        });
+    }
+});
+</script>
 
 {% endblock %}
