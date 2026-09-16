@@ -204,6 +204,7 @@ urlpatterns = [
     path('control-panel/polls/add/', admin_poll_form, name='admin_poll_form'),
     path('control-panel/polls/<int:pk>/edit/', admin_poll_form, name='admin_poll_form'),
     path('control-panel/polls/<int:pk>/delete/',admin_poll_delete, name='admin_poll_delete'),
+    path('reels/<int:reel_id>/', reelbest_page, name='reels_detail'),  # YANGI — masalan /reels/4/
     
 ]
 
