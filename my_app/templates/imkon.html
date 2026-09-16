@@ -138,7 +138,7 @@
     }
 
     .imkon-bg-box.open {
-        max-height: 500px;
+        max-height: 1000px;
         opacity: 1;
         margin-top: 16px;
     }
@@ -194,6 +194,51 @@
         text-align: center;
         padding: 20px 0;
     }
+
+    /* ===== FON PAGINATION ===== */
+    .imkon-bg-pager {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        margin-top: 14px;
+    }
+
+    .imkon-bg-pager-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid var(--glass-border);
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: 0.2s;
+    }
+
+    .imkon-bg-pager-btn:hover:not(:disabled) {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+    }
+
+    .imkon-bg-pager-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .imkon-bg-page-info {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: var(--text-dim);
+        min-width: 46px;
+        text-align: center;
+    }
+
+    .imkon-bg-page-info b { color: var(--accent); }
 
     /* ===== SO'ROVNOMA ===== */
     .imkon-vote-input-row {
@@ -540,20 +585,31 @@
         </div>
 
         <div class="imkon-bg-box {% if settings.premium_bg_on %}open{% endif %}" id="bgBox">
-            <div class="imkon-bg-grid">
+            <div class="imkon-bg-grid" id="bgGrid">
                 {% for bg in backgrounds %}
                 <div class="imkon-bg-item {% if settings.premium_bg_id == bg.id %}active{% endif %}"
                      data-id="{{ bg.id }}" onclick="selectBg({{ bg.id }}, this)">
-                    <img src="{{ bg.image.url }}" alt="{{ bg.name|default:'fon' }}">
+                    <img src="{{ bg.image.url }}" alt="{{ bg.name|default:'fon' }}" loading="lazy">
                 </div>
                 {% empty %}
                 <p class="imkon-bg-empty">Admin hali premium fon yuklamagan.</p>
                 {% endfor %}
             </div>
+
+            <!-- Sahifalash: 9 tadan ortiq fon bo'lsa avtomatik ko'rinadi -->
+            <div class="imkon-bg-pager" id="bgPager">
+                <button type="button" class="imkon-bg-pager-btn" id="bgPrevBtn" onclick="bgPrevPage()">
+                    <i class='bx bx-chevron-left'></i>
+                </button>
+                <span class="imkon-bg-page-info" id="bgPageInfo"></span>
+                <button type="button" class="imkon-bg-pager-btn" id="bgNextBtn" onclick="bgNextPage()">
+                    <i class='bx bx-chevron-right'></i>
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- ================= 3) PREMIUM MUZIKALAR (YANGI) ================= -->
+    <!-- ================= 3) PREMIUM MUZIKALAR ================= -->
     <div class="imkon-card">
         <div class="imkon-card-head">
             <div>
@@ -715,8 +771,7 @@ function toggleBg() {
         if (data.error) { alert(data.error); return; }
         document.getElementById('bgToggle').classList.toggle('on', data.premium_bg_on);
         document.getElementById('bgBox').classList.toggle('open', data.premium_bg_on);
-        if (data.premium_bg_on) location.reload();
-        else location.reload();
+        location.reload();
     });
 }
 
@@ -730,6 +785,71 @@ function selectBg(id, el) {
         el.classList.add('active');
         location.reload();
     });
+}
+
+/* ============================================
+   PREMIUM FON — SAHIFALASH (9 tadan)
+   9 tadan ko'p rasm bo'lsa "<  1/2  >" chiqadi.
+   Admin 10, 11, 12... ta rasm qo'shsa ham
+   hech narsa o'zgartirish shart emas.
+   ============================================ */
+const BG_PER_PAGE = 9;
+let bgItems = [];
+let bgPage = 1;
+let bgTotalPages = 1;
+
+function initBgPager() {
+    const grid = document.getElementById('bgGrid');
+    if (!grid) return;
+
+    bgItems = Array.prototype.slice.call(grid.querySelectorAll('.imkon-bg-item'));
+    bgTotalPages = Math.max(1, Math.ceil(bgItems.length / BG_PER_PAGE));
+
+    // Tanlangan fon qaysi sahifada bo'lsa, o'sha sahifadan ochiladi
+    let activeIndex = -1;
+    bgItems.forEach((item, i) => {
+        if (item.classList.contains('active')) activeIndex = i;
+    });
+    bgPage = activeIndex >= 0 ? Math.floor(activeIndex / BG_PER_PAGE) + 1 : 1;
+
+    renderBgPage();
+}
+
+function renderBgPage() {
+    const pager = document.getElementById('bgPager');
+    const info = document.getElementById('bgPageInfo');
+    const prevBtn = document.getElementById('bgPrevBtn');
+    const nextBtn = document.getElementById('bgNextBtn');
+
+    bgItems.forEach((item, i) => {
+        const page = Math.floor(i / BG_PER_PAGE) + 1;
+        item.style.display = (page === bgPage) ? '' : 'none';
+    });
+
+    if (!pager) return;
+
+    if (bgItems.length > BG_PER_PAGE) {
+        pager.style.display = 'flex';
+        info.innerHTML = "<b>" + bgPage + "</b> / " + bgTotalPages;
+        prevBtn.disabled = (bgPage === 1);
+        nextBtn.disabled = (bgPage === bgTotalPages);
+    } else {
+        pager.style.display = 'none';
+    }
+}
+
+function bgPrevPage() {
+    if (bgPage > 1) {
+        bgPage--;
+        renderBgPage();
+    }
+}
+
+function bgNextPage() {
+    if (bgPage < bgTotalPages) {
+        bgPage++;
+        renderBgPage();
+    }
 }
 
 function toggleTelegramDownload() {
@@ -817,10 +937,7 @@ function submitAnimeRequest() {
 }
 
 /* ============================================
-   PREMIUM MUZIKA (YANGI)
-   - previewAudio: shu sahifada ijro etayotgan musiqa
-   - Faqat balandlik boshqariladi, vaqt/pozitsiya boshqarilmaydi
-   - Bir vaqtning o'zida faqat 1 ta musiqa ijro bo'ladi
+   PREMIUM MUZIKA
    ============================================ */
 let previewAudio = new Audio();
 previewAudio.loop = true;
@@ -828,8 +945,9 @@ previewAudio.volume = document.getElementById('musicVolume')
     ? document.getElementById('musicVolume').value / 100
     : 0.5;
 
-// Sahifa ochilganda, agar musiqa yoqilgan bo'lsa — davom ettiramiz
 document.addEventListener('DOMContentLoaded', () => {
+    initBgPager();
+
     const playingRow = document.querySelector('.imkon-music-row.playing');
     if (playingRow) {
         const btn = playingRow.querySelector('.imkon-music-play-btn');
@@ -884,7 +1002,6 @@ function toggleTrack(id, url, btn) {
     const isPlaying = row.classList.contains('playing');
 
     if (isPlaying) {
-        // Shu musiqani to'xtatish = umuman musiqani o'chirish
         previewAudio.pause();
         row.classList.remove('playing');
         btn.innerHTML = "<i class='bx bx-play'></i>";
@@ -898,7 +1015,6 @@ function toggleTrack(id, url, btn) {
         return;
     }
 
-    // Bittasi ijro bo'lganda — qolganlarini albatta to'xtatamiz (faqat 1 ta ijro)
     document.querySelectorAll('.imkon-music-row').forEach(r => r.classList.remove('playing'));
     document.querySelectorAll('.imkon-music-play-btn').forEach(b => b.innerHTML = "<i class='bx bx-play'></i>");
 
