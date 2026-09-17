@@ -2203,3 +2203,21 @@ def imkon_anime_request_add(request):
     AnimeRequestSuggestion.objects.create(user=request.user, name=name)
     return JsonResponse({'ok': True, 'name': name})
 
+@login_required
+def mark_episode_watched(request, episode_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+
+    from .models import MovieEpisode, WatchedEpisode, WatchHistory
+    episode = get_object_or_404(MovieEpisode, id=episode_id)
+
+    WatchedEpisode.objects.get_or_create(
+        user=request.user, movie=episode.movie, episode=episode
+    )
+    WatchHistory.objects.update_or_create(
+        user=request.user, movie=episode.movie,
+        defaults={'last_watched': timezone.now(), 'last_episode': episode}
+    )
+    return JsonResponse({'ok': True})
+
+
