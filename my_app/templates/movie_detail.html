@@ -436,6 +436,64 @@
 .movie-info p  { font-size: .95rem; color: var(--text-dim); }
 
 /* =====================================================================
+   QISM HAJMI (MB) — izohlar tepasida
+===================================================================== */
+.ep-size-box {
+    background: rgba(17,17,24,.88);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: 0 18px 42px rgba(0,0,0,.42);
+    padding: 16px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: nowrap;
+}
+.ep-size-left {
+    display: flex; align-items: center; gap: 12px; min-width: 0;
+}
+.ep-size-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(220,38,38,.15);
+    border: 1px solid rgba(220,38,38,.30);
+    color: #f87171; font-size: 1.35rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.ep-size-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ep-size-title {
+    font-size: .75rem; font-weight: 800; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: .05em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ep-size-value {
+    font-size: 1.15rem; font-weight: 900; color: #fff;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ep-size-more {
+    display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none; color: #e5e7eb;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 10px 18px; border-radius: 999px;
+    font-weight: 800; font-size: .85rem;
+    transition: .2s; flex-shrink: 0; white-space: nowrap;
+}
+.ep-size-more:hover {
+    background: rgba(220,38,38,.18);
+    border-color: rgba(220,38,38,.35);
+    color: #f87171;
+    transform: translateY(-2px);
+}
+.ep-size-more i { font-size: 1.1rem; }
+
+@media (max-width: 520px) {
+    .ep-size-box { padding: 14px; gap: 10px; }
+    .ep-size-icon { width: 38px; height: 38px; font-size: 1.1rem; }
+    .ep-size-title { font-size: .64rem; }
+    .ep-size-value { font-size: .98rem; }
+    .ep-size-more { padding: 8px 13px; font-size: .78rem; }
+}
+
+/* =====================================================================
    QUICK ACTIONS: ULASHISH / ANIME HAQIDA / INTRONI UTQAZISH / ANIME
    KADRLAR / REYTING
 ===================================================================== */
@@ -1062,6 +1120,7 @@
 <script>
 const BM_MOVIE_TITLE = "{{ movie.title|escapejs }}";
 const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
+const BM_MOVIE_SIZE  = "{{ movie.size_display|escapejs }}";
 </script>
 
 <main class="main-content">
@@ -1202,6 +1261,7 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
                 data-video-src="{{ episode.video_file.url }}"
                 data-description="{{ episode.description|default:''|striptags|escape }}"
                 data-intro="{{ episode.intro_time|default:''|escape }}"
+                data-size="{{ episode.size_display|escape }}"
                 data-episode-id="{{ episode.id }}">
                 {{ forloop.counter }}-qism
               </button>
@@ -1211,6 +1271,7 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
                 data-video-src="{{ episode.video_url }}"
                 data-description="{{ episode.description|default:''|striptags|escape }}"
                 data-intro="{{ episode.intro_time|default:''|escape }}"
+                data-size="{{ episode.size_display|escape }}"
                 data-episode-id="{{ episode.id }}">
                 {{ forloop.counter }}-qism
               </button>
@@ -1220,6 +1281,7 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
                 data-video-src=""
                 data-description="{{ episode.description|default:''|striptags|escape }}"
                 data-intro="{{ episode.intro_time|default:''|escape }}"
+                data-size="{{ episode.size_display|escape }}"
                 data-episode-id="{{ episode.id }}">
                 {{ forloop.counter }}-qism
               </button>
@@ -1319,6 +1381,20 @@ const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
     <span class="qa-lightbox-close" id="qa-lightbox-close">&times;</span>
     <img id="qa-lightbox-img" src="" alt="">
   </div>
+
+  <!-- ================= QISM HAJMI (MB) — IZOHLAR TEPASIDA ================= -->
+  <section class="ep-size-box" id="ep-size-box">
+    <div class="ep-size-left">
+      <div class="ep-size-icon"><i class='bx bx-hdd'></i></div>
+      <div class="ep-size-text">
+        <span class="ep-size-title">Bu anime qismning hajmi</span>
+        <span class="ep-size-value" id="ep-size-value">{{ current_episode_size|default:"Noma'lum" }}</span>
+      </div>
+    </div>
+    <a href="{% url 'statistika_page' %}" class="ep-size-more">
+      Batafsil <i class='bx bx-chevron-right'></i>
+    </a>
+  </section>
 
   <!-- ================= COMMENTS ================= -->
   <section class="comments-section" id="comments">
@@ -1708,11 +1784,20 @@ function buildInner(title){
 var episodeBtns      = document.querySelectorAll('.episode-btn');
 var videoContainerEl = document.getElementById('video-container');
 var episodeDescEl    = document.getElementById('episode-description');
+var epSizeValueEl    = document.getElementById('ep-size-value');
 
 function setEpDesc(btn){
   if(!episodeDescEl) return;
   var d = btn ? ((btn.dataset.description || '').trim() || 'Bu qism uchun izoh kiritilmagan.') : 'Bu qism uchun izoh kiritilmagan.';
   episodeDescEl.textContent = d;
+}
+
+/* QISM HAJMI (MB) — izohlar tepasidagi box uchun */
+function setEpSize(btn){
+  if(!epSizeValueEl) return;
+  var s = btn ? (btn.dataset.size || '').trim() : '';
+  if(!s && typeof BM_MOVIE_SIZE !== 'undefined') s = BM_MOVIE_SIZE;
+  epSizeValueEl.textContent = s || "Noma'lum";
 }
 
 function buildBmHTML(src){
@@ -1756,6 +1841,7 @@ episodeBtns.forEach(function(b){
     episodeBtns.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
     b.setAttribute('aria-pressed','true');
     setEpDesc(b);
+    setEpSize(b);
     updateIntroToggleUi();
     if(typeof window.refreshIntroSkipButton === 'function') window.refreshIntroSkipButton();
 
@@ -1764,7 +1850,8 @@ episodeBtns.forEach(function(b){
     }
   });
 });
-if(episodeBtns.length){ setEpDesc(episodeBtns[0]); }
+if(episodeBtns.length){ setEpDesc(episodeBtns[0]); setEpSize(episodeBtns[0]); }
+else { setEpSize(null); }
 
 /* ---------------------------------------------------------------
    INTRONI UTQAZIB YUBORISH — holat va vaqt oralig'ini aniqlash
