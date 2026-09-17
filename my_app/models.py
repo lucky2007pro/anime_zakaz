@@ -1213,3 +1213,26 @@ class PollVote(models.Model):
 
     def __str__(self):
         return f"{self.user.username} → {self.option.text}"
+
+# =======================
+# KO'RILGAN QISMLAR (statistika uchun — MB hisoblash)
+# =======================
+class WatchedEpisode(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='watched_episodes')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='watched_episodes')
+    episode = models.ForeignKey(
+        MovieEpisode, on_delete=models.CASCADE, null=True, blank=True,
+        related_name='watched_by_users'
+    )
+    watched_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # episode=None holatlar takrorlanmasin desangiz, buni faqat
+        # qism mavjud bo'lgan animelar uchun ishlatamiz (view'da tekshiriladi)
+        unique_together = ('user', 'movie', 'episode')
+        verbose_name = "Ko'rilgan qism"
+        verbose_name_plural = "Ko'rilgan qismlar"
+
+    def __str__(self):
+        ep = f"{self.episode.episode_number}-qism" if self.episode else "Film"
+        return f"{self.user.username} — {self.movie.title} ({ep})"
