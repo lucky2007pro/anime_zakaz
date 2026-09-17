@@ -1845,6 +1845,9 @@ episodeBtns.forEach(function(b){
     updateIntroToggleUi();
     if(typeof window.refreshIntroSkipButton === 'function') window.refreshIntroSkipButton();
 
+    // ⬇️ MANA SHU QATORNI QO'SHING
+    markEpisodeWatched(b.dataset.episodeId);
+      
     if(window.innerWidth <= 1024){
       videoContainerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -1852,7 +1855,13 @@ episodeBtns.forEach(function(b){
 });
 if(episodeBtns.length){ setEpDesc(episodeBtns[0]); setEpSize(episodeBtns[0]); }
 else { setEpSize(null); }
-
+if(episodeBtns.length){
+    setEpDesc(episodeBtns[0]);
+    setEpSize(episodeBtns[0]);
+    markEpisodeWatched(episodeBtns[0].dataset.episodeId);   // ⬅️ YANGI
+}
+else { setEpSize(null); }
+    
 /* ---------------------------------------------------------------
    INTRONI UTQAZIB YUBORISH — holat va vaqt oralig'ini aniqlash
 --------------------------------------------------------------- */
@@ -1963,6 +1972,27 @@ updateIntroToggleUi();
 /* ---------------------------------------------------------------
    UTILITY
 --------------------------------------------------------------- */
+function getCookie(name) {
+    let value = null;
+    if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(function (c) {
+            c = c.trim();
+            if (c.substring(0, name.length + 1) === (name + '=')) {
+                value = decodeURIComponent(c.substring(name.length + 1));
+            }
+        });
+    }
+    return value;
+}
+
+function markEpisodeWatched(episodeId) {
+    if (!episodeId) return;
+    fetch("{% url 'mark_episode_watched' 0 %}".replace('0', episodeId), {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCookie('csrftoken') }
+    }).catch(function(){});
+}
+    
 function fmtTime(s){
   if(!isFinite(s) || isNaN(s)) return '0:00';
   var m   = Math.floor(s / 60);
