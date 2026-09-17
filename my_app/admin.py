@@ -41,9 +41,13 @@ class CustomUserAdmin(UserAdmin):
 class MovieEpisodeInline(admin.TabularInline):
     model = MovieEpisode
     extra = 1
-    fields = ('episode_number', 'title', 'video_url', 'video_file', 'description','intro_time')
+    fields = (
+        'episode_number', 'title',
+        'video_url', 'video_file',
+        'video_size',            # ⬅️ YANGI — MB (masalan: 265.4)
+        'description', 'intro_time',
+    )
     show_change_link = True
-
 
 class MovieFrameInline(admin.TabularInline):
     model = MovieFrame
@@ -54,15 +58,15 @@ class MovieFrameInline(admin.TabularInline):
 
 
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'rating', 'minimum_tier', 'created_at')
+    list_display = ('title', 'category', 'rating', 'minimum_tier', 'size_column', 'created_at')
     search_fields = ('title',)
-    inlines = [MovieFrameInline]
+    inlines = [MovieEpisodeInline, MovieFrameInline]   # ⬅️ qismlar ham shu yerda
     fieldsets = (
         (None, {
             'fields': ('title', 'image', 'description', 'category', 'release_year')
         }),
         ("Video", {
-            'fields': ('video_url', 'video_file', 'telegram_link')
+            'fields': ('video_url', 'video_file', 'video_size', 'telegram_link')   # ⬅️ video_size
         }),
         ("Kirish huquqi", {
             'fields': ('is_premium', 'minimum_tier')
@@ -75,6 +79,29 @@ class MovieAdmin(admin.ModelAdmin):
         }),
     )
 
+    # ⬅️ YANGI — ro'yxatda hajmni ko'rsatish
+    def size_column(self, obj):
+        return obj.size_display()
+    size_column.short_description = "Hajmi"
+
+
+
+@admin.register(MovieEpisode)
+class MovieEpisodeAdmin(admin.ModelAdmin):
+    list_display  = ('movie', 'episode_number', 'title', 'size_column', 'created_at')
+    list_filter   = ('movie',)
+    search_fields = ('title', 'movie__title')
+    ordering      = ('movie', 'episode_number')
+    fields = (
+        'movie', 'episode_number', 'title',
+        'video_url', 'video_file',
+        'video_size',
+        'intro_time', 'description',
+    )
+
+    def size_column(self, obj):
+        return obj.size_display()
+    size_column.short_description = "Hajmi"
 
 
 class SiteSettingsAdmin(admin.ModelAdmin):
