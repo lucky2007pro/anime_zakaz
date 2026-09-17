@@ -347,6 +347,13 @@ def movie_detail(request, id):
     )
     random_movies = random.sample(random_pool, min(2, len(random_pool)))
 
+    # ===== QISM HAJMI (MB) =====   ⬅️ MANA SHU 5 QATOR YETISHMAYAPTI
+    first_ep = episodes.first()
+    if first_ep:
+        current_episode_size = first_ep.size_display()
+    else:
+        current_episode_size = movie.size_display()
+
     return render(request, 'movie_detail.html', {
         'movie': movie,
         'episodes': episodes,
@@ -359,7 +366,9 @@ def movie_detail(request, id):
         'user_tier': tier,
         'comments': comments,
         'random_movies': random_movies,
+        'current_episode_size': current_episode_size,
     })
+
 
 
 # =======================
