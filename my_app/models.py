@@ -186,6 +186,32 @@ class Movie(models.Model):
         help_text="Intro oralig'i (faqat qismsiz film uchun), masalan: 2:55 | 3:17"
     )
 
+    # ⬇️ YANGI — qismsiz film uchun hajm
+    video_size = models.DecimalField(
+        max_digits=9, decimal_places=2, blank=True, null=True,
+        help_text="Video hajmi (MB). Bo'sh qoldirilsa — yuklangan fayldan avtomatik hisoblanadi"
+    )
+
+    # ⬇️ YANGI — hajmni hisoblash
+    def get_size_mb(self):
+        if self.video_size:
+            return float(self.video_size)
+        if self.video_file:
+            try:
+                return round(self.video_file.size / (1024 * 1024), 1)
+            except Exception:
+                return None
+        return None
+
+    def size_display(self):
+        s = self.get_size_mb()
+        if not s:
+            return "Noma'lum"
+        return f"{s:.1f} MB"
+
+    def __str__(self):
+        return self.title
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -211,6 +237,35 @@ class MovieEpisode(models.Model):
 
     class Meta:
         ordering = ['episode_number']  # Episode raqam bo‘yicha tartiblanadi
+
+    def __str__(self):
+        return f"{self.movie.title} - {self.episode_number}-qism - {self.title}"
+
+ # ⬇️ YANGI — admin kiritadigan / avtomatik hisoblanadigan hajm
+    video_size = models.DecimalField(
+        max_digits=9, decimal_places=2, blank=True, null=True,
+        help_text="Qism hajmi (MB), masalan: 265.4. Bo'sh qoldirilsa — yuklangan fayldan avtomatik olinadi"
+    )
+
+    class Meta:
+        ordering = ['episode_number']
+
+    # ⬇️ YANGI
+    def get_size_mb(self):
+        if self.video_size:
+            return float(self.video_size)
+        if self.video_file:
+            try:
+                return round(self.video_file.size / (1024 * 1024), 1)
+            except Exception:
+                return None
+        return None
+
+    def size_display(self):
+        s = self.get_size_mb()
+        if not s:
+            return "Noma'lum"
+        return f"{s:.1f} MB"
 
     def __str__(self):
         return f"{self.movie.title} - {self.episode_number}-qism - {self.title}"
