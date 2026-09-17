@@ -10,7 +10,7 @@ from .models import (
     ReelBest, ReelBestLike, ReelBestComment,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,NoResultsMedia,
     PremiumBackground, AnimeVoteRequest, AnimeVote, AnimeRequestSuggestion,
     AccountHistory, DebtRequest, JackpotCode, JackpotCodeUse,
-    BalanceTopupRequest, UserBalance,PushSubscription,PremiumMusic,Poll, PollOption, PollVote
+    BalanceTopupRequest, UserBalance,PushSubscription,PremiumMusic,Poll, PollOption, PollVote,WatchedEpisode
 )
 
 
@@ -454,6 +454,12 @@ class PollAdmin(admin.ModelAdmin):
         return obj.total_votes()
     total_votes_display.short_description = "Ovozlar (noyob)"
 
+@admin.register(WatchedEpisode)
+class WatchedEpisodeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'movie', 'episode', 'watched_at')
+    list_filter = ('watched_at', 'movie')
+    search_fields = ('user__username', 'movie__title')
+    readonly_fields = ('watched_at',)
 
 @admin.register(PollVote)
 class PollVoteAdmin(admin.ModelAdmin):
