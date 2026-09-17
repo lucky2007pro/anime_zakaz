@@ -30,7 +30,8 @@ from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
     Story, StoryView, ReelBest, ReelBestLike, ReelBestComment,
     UserSettings, AnimeSchedule, AnimeSectionItem, Notice, NoticeRead, WatchHistory, FavoriteAnime, NoResultsMedia,
-    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse, UserBalance, PushSubscription, PremiumMusic
+    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse, UserBalance, PushSubscription, PremiumMusic,
+    WatchedEpisode,
 )
 
 User = get_user_model()
@@ -301,6 +302,12 @@ def movie_detail(request, id):
         defaults={'last_watched': timezone.now(), 'last_episode': selected_episode}
     )
 
+    # ⬇️ YANGI — statistika uchun ko'rilgan qismni saqlaymiz
+    if selected_episode:
+        WatchedEpisode.objects.get_or_create(
+            user=request.user, movie=movie, episode=selected_episode
+        )
+    
     # Check if favorited
     is_favorited = FavoriteAnime.objects.filter(user=request.user, movie=movie).exists()
 
@@ -1813,15 +1820,15 @@ def jackpot_redeem(request):
 
 @login_required
 def statistika_page(request):
-    from .models import Poll, PollVote
+    from .models import Poll, PollVote, WatchedEpisode, WatchHistory
 
+    # ================= SO'ROVNOMALAR =================
     polls_qs = (
         Poll.objects.filter(is_active=True)
         .prefetch_related('options__votes')
         .order_by('-created_at')
     )
 
-    # Foydalanuvchi qaysi variantlarga ovoz berganini olib qo'yamiz
     user_votes = {}
     voted_options = PollVote.objects.filter(
         user=request.user, option__poll__in=polls_qs
@@ -1854,8 +1861,53 @@ def statistika_page(request):
             'total_votes': total,
         })
 
-    return render(request, 'statistika.html', {'polls': polls})
+    # ================= KO'RILGAN HAJM STATISTIKASI =================
+    watched_map = {}
 
+    # 1) Qismli animelar — WatchedEpisode orqali
+    ep_watches = (
+        WatchedEpisode.objects
+        .filter(user=request.user, episode__isnull=False)
+        .select_related('movie', 'episode')
+        .order_by('movie_id', 'episode__episode_number')
+    )
+    for w in ep_watches:
+        m = w.movie
+        entry = watched_map.setdefault(m.id, {
+            'movie': m,
+            'episode_numbers': [],
+            'total_mb': 0.0,
+        })
+        entry['episode_numbers'].append(w.episode.episode_number)
+        entry['total_mb'] += w.episode.get_size_mb() or 0
+
+    # 2) Qismsiz filmlar — WatchHistory orqali (episode'lari yo'q animelar)
+    history_no_ep = (
+        WatchHistory.objects
+        .filter(user=request.user, movie__episodes__isnull=True)
+        .select_related('movie')
+    )
+    for h in history_no_ep:
+        m = h.movie
+        if m.id in watched_map:
+            continue
+        watched_map[m.id] = {
+            'movie': m,
+            'episode_numbers': [],
+            'total_mb': m.get_size_mb() or 0,
+        }
+
+    watched_stats = []
+    for data in watched_map.values():
+        data['episode_numbers'].sort()
+        data['total_mb_display'] = f"{data['total_mb']:.2f}"
+        watched_stats.append(data)
+    watched_stats.sort(key=lambda d: -d['total_mb'])
+
+    return render(request, 'statistika.html', {
+        'polls': polls,
+        'watched_stats': watched_stats,
+    })
 
 @login_required
 def poll_vote(request, poll_id):
