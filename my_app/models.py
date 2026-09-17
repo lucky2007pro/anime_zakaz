@@ -1227,8 +1227,6 @@ class WatchedEpisode(models.Model):
     watched_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        # episode=None holatlar takrorlanmasin desangiz, buni faqat
-        # qism mavjud bo'lgan animelar uchun ishlatamiz (view'da tekshiriladi)
         unique_together = ('user', 'movie', 'episode')
         verbose_name = "Ko'rilgan qism"
         verbose_name_plural = "Ko'rilgan qismlar"
