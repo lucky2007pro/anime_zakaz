@@ -1864,7 +1864,7 @@ def statistika_page(request):
     # ================= KO'RILGAN HAJM STATISTIKASI =================
     watched_map = {}
 
-    # 1) Qismli animelar — WatchedEpisode orqali
+    # 1) Qismli animelar — WatchedEpisode orqali (bir nechta qism = jamlanadi)
     ep_watches = (
         WatchedEpisode.objects
         .filter(user=request.user, episode__isnull=False)
