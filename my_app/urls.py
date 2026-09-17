@@ -11,7 +11,7 @@ from .views import (
     hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
     imkon_vote_request_add, imkon_vote, imkon_anime_request_add, check_username,
     news_load_more, vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem, imkon_toggle_beta_home,
-    save_push_subscription, send_test_push_api,imkon_set_music_volume,imkon_select_music,imkon_toggle_music,poll_vote
+    save_push_subscription, send_test_push_api,imkon_set_music_volume,imkon_select_music,imkon_toggle_music,poll_vote,mark_episode_watched,
 
 )
 from .admin_views import *
@@ -205,7 +205,8 @@ urlpatterns = [
     path('control-panel/polls/<int:pk>/edit/', admin_poll_form, name='admin_poll_form'),
     path('control-panel/polls/<int:pk>/delete/',admin_poll_delete, name='admin_poll_delete'),
     path('reels/<int:reel_id>/', reelbest_page, name='reels_detail'),  # YANGI — masalan /reels/4/
-    
+
+    path('episode/<int:episode_id>/watched/', mark_episode_watched, name='mark_episode_watched'),    
 ]
 
 
