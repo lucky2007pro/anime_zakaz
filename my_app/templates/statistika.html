@@ -162,7 +162,7 @@
         background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
     }
 
-    /* ===== SO'ROVNOMALAR (mavjud) ===== */
+    /* ===== SO'ROVNOMALAR ===== */
     .polls-wrap {
         max-width: 620px;
         margin: 0 auto;
@@ -235,7 +235,7 @@
         flex-shrink: 0;
         width: 24px;
         height: 24px;
-        border: 2px solid rgba(255,255,255,0.85);
+        border: 2px solid rgba(255,255,255,.85);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -511,7 +511,7 @@
 
     document.querySelectorAll('.poll-card').forEach(function (card) {
         const isMultiple = card.dataset.multiple === '1';
-        const pollId = card.dataset.poll_id || card.getAttribute('data-poll-id');
+        const pollId = card.dataset.pollId || card.getAttribute('data-poll-id');
         const voteBtn = card.querySelector('.poll-vote-btn');
         let originalSelection = new Set();
 
