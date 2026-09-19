@@ -128,6 +128,21 @@
         transform: translateX(22px);
     }
 
+    /* Kichik toggle (Premium VIP box ichidagi sub-sozlamalar uchun) */
+    .imkon-toggle.small {
+        width: 42px;
+        height: 24px;
+    }
+    .imkon-toggle.small::after {
+        width: 18px;
+        height: 18px;
+        top: 3px;
+        left: 3px;
+    }
+    .imkon-toggle.small.on::after {
+        transform: translateX(18px);
+    }
+
     /* ===== FON PICKER ===== */
     .imkon-bg-box {
         max-height: 0;
@@ -239,6 +254,54 @@
     }
 
     .imkon-bg-page-info b { color: var(--accent); }
+
+    /* ===== PREMIUM VIP BOX ===== */
+    .imkon-vipbox-box {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease, margin 0.4s ease;
+        margin-top: 0;
+    }
+
+    .imkon-vipbox-box.open {
+        max-height: 520px;
+        opacity: 1;
+        margin-top: 16px;
+    }
+
+    .imkon-vipbox-preview {
+        width: 140px;
+        max-width: 100%;
+        margin: 0 auto 16px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(255,193,7,0.35);
+        box-shadow: 0 0 18px rgba(255,193,7,0.12);
+    }
+
+    .imkon-vipbox-preview img {
+        width: 100%;
+        display: block;
+        aspect-ratio: 3/4;
+        object-fit: cover;
+    }
+
+    .imkon-vipbox-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 0;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        font-size: 0.85rem;
+        color: var(--text-light, #fff);
+        font-weight: 600;
+    }
+
+    .imkon-vipbox-option:first-of-type {
+        border-top: none;
+    }
 
     /* ===== SO'ROVNOMA ===== */
     .imkon-vote-input-row {
@@ -609,6 +672,35 @@
         </div>
     </div>
 
+    <!-- ================= 2.5) PREMIUM VIP BOX ================= -->
+    <div class="imkon-card">
+        <div class="imkon-card-head">
+            <div>
+                <div class="imkon-card-title"><i class='bx bxs-crown'></i> Premium VIP box</div>
+                <div class="imkon-card-desc">Yoqsangiz, chatda boshqalar sizning avataringizga bosganda oddiy profil o'rniga maxsus VIP box ochiladi.</div>
+            </div>
+            <div class="imkon-toggle {% if settings.premium_vip_box_on %}on{% endif %}" id="vipBoxToggle" onclick="toggleVipBox()"></div>
+        </div>
+
+        <div class="imkon-vipbox-box {% if settings.premium_vip_box_on %}open{% endif %}" id="vipBoxBox">
+
+            <div class="imkon-vipbox-preview">
+                <img src="https://i.pinimg.com/736x/4e/1c/7b/4e1c7b9b437f08367f2118bd5c544c3a.jpg" alt="VIP box ko'rinishi" loading="lazy">
+            </div>
+
+            <div class="imkon-vipbox-option">
+                <span>Oxirgi animelarni ko'rsatish</span>
+                <div class="imkon-toggle small {% if settings.vip_box_show_recent_anime %}on{% endif %}" id="vipBoxRecentToggle" onclick="toggleVipBoxRecent()"></div>
+            </div>
+
+            <div class="imkon-vipbox-option">
+                <span>VIP obuna tugash vaqtini ko'rsatish</span>
+                <div class="imkon-toggle small {% if settings.vip_box_show_vip_expire %}on{% endif %}" id="vipBoxExpireToggle" onclick="toggleVipBoxExpire()"></div>
+            </div>
+
+        </div>
+    </div>
+
     <!-- ================= 3) PREMIUM MUZIKALAR ================= -->
     <div class="imkon-card">
         <div class="imkon-card-head">
@@ -789,9 +881,6 @@ function selectBg(id, el) {
 
 /* ============================================
    PREMIUM FON — SAHIFALASH (9 tadan)
-   9 tadan ko'p rasm bo'lsa "<  1/2  >" chiqadi.
-   Admin 10, 11, 12... ta rasm qo'shsa ham
-   hech narsa o'zgartirish shart emas.
    ============================================ */
 const BG_PER_PAGE = 9;
 let bgItems = [];
@@ -805,7 +894,6 @@ function initBgPager() {
     bgItems = Array.prototype.slice.call(grid.querySelectorAll('.imkon-bg-item'));
     bgTotalPages = Math.max(1, Math.ceil(bgItems.length / BG_PER_PAGE));
 
-    // Tanlangan fon qaysi sahifada bo'lsa, o'sha sahifadan ochiladi
     let activeIndex = -1;
     bgItems.forEach((item, i) => {
         if (item.classList.contains('active')) activeIndex = i;
@@ -850,6 +938,40 @@ function bgNextPage() {
         bgPage++;
         renderBgPage();
     }
+}
+
+/* ============================================
+   PREMIUM VIP BOX
+   ============================================ */
+function toggleVipBox() {
+    fetch("{% url 'imkon_toggle_vip_box' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+        document.getElementById('vipBoxToggle').classList.toggle('on', data.premium_vip_box_on);
+        document.getElementById('vipBoxBox').classList.toggle('open', data.premium_vip_box_on);
+    });
+}
+
+function toggleVipBoxRecent() {
+    fetch("{% url 'imkon_toggle_vip_box_recent' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+        document.getElementById('vipBoxRecentToggle').classList.toggle('on', data.vip_box_show_recent_anime);
+    });
+}
+
+function toggleVipBoxExpire() {
+    fetch("{% url 'imkon_toggle_vip_box_expire' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+        document.getElementById('vipBoxExpireToggle').classList.toggle('on', data.vip_box_show_vip_expire);
+    });
 }
 
 function toggleTelegramDownload() {
