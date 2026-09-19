@@ -357,6 +357,375 @@
     }
 }
 
+
+/* =====================================================
+   YANGI — "SIZ VIP OBUNACHISIZ" KARTASI
+   (VIP faol bo'lganda narxlar va chek boxlari o'rniga chiqadi)
+   ===================================================== */
+.vd-card {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 24px 16px 18px;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(255,193,7,0.14), transparent 55%),
+        radial-gradient(circle at 92% 100%, rgba(180,92,255,0.14), transparent 40%),
+        linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025));
+    border: 1px solid rgba(255,193,7,0.28);
+}
+
+.vd-card-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: #ffc107;
+    background: rgba(255,193,7,0.10);
+    border: 1px solid rgba(255,193,7,0.35);
+    box-shadow: 0 0 24px rgba(255,193,7,0.18);
+}
+
+.vd-card-title {
+    font-size: 19px;
+    font-weight: 900;
+    color: #ffd54f;
+    margin: 0 0 6px;
+}
+
+.vd-card-sub {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+    margin: 0 0 18px;
+}
+
+.vd-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.vd-btn {
+    flex: 1;
+    height: 43px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 11px;
+    font-weight: 800;
+    font-size: 13px;
+    font-family: 'Outfit', sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    letter-spacing: .02em;
+    box-sizing: border-box;
+}
+.vd-btn:active { opacity: .9; }
+
+.vd-btn.primary {
+    border: 1px solid rgba(255,255,255,0.10);
+    background: linear-gradient(90deg, #b45cff, #9c4cff);
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(180,92,255,0.18);
+}
+
+.vd-btn.ghost {
+    background: rgba(255,193,7,0.08);
+    border: 1px solid rgba(255,193,7,0.4);
+    color: #ffc107;
+}
+.vd-btn.ghost:hover { background: rgba(255,193,7,0.15); }
+
+
+/* =====================================================
+   YANGI — "BATAFSIL" OYNASI (modal)
+   ===================================================== */
+.vd-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    padding: 16px;
+    overflow-y: auto;
+    background: #05050a;
+}
+.vd-overlay.open {
+    display: flex;
+    animation: vdFade .25s ease;
+}
+
+/* Box orqasidagi fon rasmi + qorong'ilashtirish qatlami */
+.vd-bg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+}
+.vd-bg-dim {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(4,4,10,0.45), rgba(4,4,10,0.78));
+}
+
+.vd-modal {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 360px;
+    margin: auto;
+    padding: 20px 20px 20px;
+    box-sizing: border-box;
+    background: linear-gradient(160deg, rgba(24,24,38,0.93), rgba(15,15,24,0.95));
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 22px;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+    animation: vdPop .3s cubic-bezier(.2,.9,.3,1.15);
+}
+
+@keyframes vdFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes vdPop  { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
+
+.vd-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.07);
+    color: #fff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+}
+.vd-close:hover { background: rgba(255,255,255,0.14); }
+
+/* --- Video (16:9, ixcham) --- */
+.vd-video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin-top: 38px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #08080d;
+    border: 1px solid rgba(255,193,7,0.35);
+    box-shadow: 0 0 26px rgba(255,193,7,0.10);
+}
+.vd-video-wrap video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+.vd-video-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    color: rgba(255,193,7,0.55);
+    background: radial-gradient(circle at 50% 40%, rgba(255,193,7,0.12), transparent 65%);
+}
+
+.vd-mute {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* --- Ism va VIP belgisi --- */
+.vd-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.vd-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px 8px 16px;
+    border-radius: 14px;
+    background: rgba(255,193,7,0.08);
+    border: 1px solid rgba(255,193,7,0.4);
+    color: #ffc107;
+    font-weight: 900;
+    font-size: 17px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.vd-name span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* username yonidagi rasm (galichka o'rniga) */
+.vd-name img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.35);
+}
+
+.vd-vip-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(255,193,7,0.08);
+    border: 1px solid rgba(255,193,7,0.5);
+    color: #ffc107;
+    font-size: 11.5px;
+    font-weight: 900;
+    box-shadow: 0 0 14px rgba(255,193,7,0.14);
+}
+.vd-vip-badge i { color: #b45cff; font-size: 14px; }
+
+/* --- Ma'lumotlar jadvali --- */
+.vd-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 18px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+.vd-info-cell {
+    padding: 12px 4px 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    min-width: 0;
+}
+.vd-info-cell:nth-child(even) {
+    padding-left: 16px;
+    border-left: 1px solid rgba(255,255,255,0.08);
+}
+.vd-info-label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 4px;
+}
+.vd-info-value {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.vd-info-value.gold { color: #ffc107; }
+
+/* --- Bo'lim sarlavhasi --- */
+.vd-sec-title {
+    margin: 18px 0 10px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: rgba(255,255,255,0.4);
+}
+
+/* --- Oltin yozuv (typing animatsiya) --- */
+.vd-thanks {
+    display: flex;
+    align-items: center;
+    min-height: 78px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, rgba(255,193,7,0.09), rgba(255,193,7,0.03));
+    border: 1px solid rgba(255,193,7,0.28);
+}
+.vd-typed {
+    font-size: 14.5px;
+    font-weight: 800;
+    line-height: 1.5;
+    color: #ffc107;
+    text-shadow: 0 0 14px rgba(255,193,7,0.35);
+}
+.vd-typed::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-left: 3px;
+    vertical-align: -2px;
+    background: #ffc107;
+    animation: vdBlink 1s steps(1) infinite;
+}
+@keyframes vdBlink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+/* --- Daraja --- */
+.vd-level {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.vd-level p {
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.5);
+}
+.vd-level-ring {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 3px solid #b45cff;
+    box-shadow: 0 0 16px rgba(180,92,255,0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.vd-level-ring b { font-size: 22px; font-weight: 900; color: #c77dff; }
+.vd-level-ring small { margin-top: 3px; font-size: 7.5px; font-weight: 900; letter-spacing: .1em; color: #00d5e8; }
+
+@media (prefers-reduced-motion: reduce) {
+    .vd-overlay.open, .vd-modal { animation: none; }
+}
+
 </style>
 {% endblock %}
 
@@ -398,6 +767,29 @@
         {% endif %}
     </div>
 
+
+    {% if vip_data.vip_active %}
+
+    <!-- =====================================================
+         SIZ VIP OBUNACHISIZ
+         (VIP faol bo'lsa narxlar va chek boxlari shu bilan almashadi)
+         ===================================================== -->
+    <div class="pcard vd-card">
+        <div class="vd-card-icon"><i class='bx bxs-crown'></i></div>
+        <h3 class="vd-card-title">Siz VIP obunachisiz</h3>
+        <p class="vd-card-sub">VIP obuna imkoniyatlaridan foydalaning</p>
+
+        <div class="vd-actions">
+            <a href="{% url 'imkon_page' %}" class="vd-btn primary">
+                <i class='bx bx-rocket'></i> Foydalanish
+            </a>
+            <button type="button" id="vdOpenBtn" class="vd-btn ghost">
+                <i class='bx bx-info-circle'></i> Batafsil
+            </button>
+        </div>
+    </div>
+
+    {% else %}
 
     <!-- =====================================================
          VIP REJALAR
@@ -456,6 +848,8 @@
             <button type="submit" class="hs-submit-btn">Chekni yuborish va tasdiqlash</button>
         </form>
     </div>
+
+    {% endif %}
 
 
     <!-- =====================================================
@@ -532,6 +926,89 @@
 </div>
 </main>
 
+
+{% if vip_data.vip_active %}
+<!-- =====================================================
+     "BATAFSIL" OYNASI
+     (.pcard ichida emas — contain: content position:fixed ni buzmasligi uchun tashqarida)
+     ===================================================== -->
+<div class="vd-overlay" id="vdOverlay" aria-hidden="true">
+
+    <!-- Box orqasidagi fon -->
+    <img class="vd-bg"
+         src="https://i.pinimg.com/1200x/10/fc/d7/10fcd7f9b1457e25223a2f6ee6c9bc5d.jpg"
+         alt="" referrerpolicy="no-referrer">
+    <div class="vd-bg-dim"></div>
+
+    <div class="vd-modal" role="dialog" aria-modal="true" aria-label="VIP obuna haqida batafsil">
+
+        <button type="button" class="vd-close" id="vdClose" aria-label="Yopish">
+            <i class='bx bx-x'></i>
+        </button>
+
+        <!-- Avatar o'rniga admin yuklagan video (16:9), ovozi yoqiq -->
+        <div class="vd-video-wrap">
+            {% if vip_thank_video %}
+                <video id="vdVideo" src="{{ vip_thank_video.video.url }}" loop playsinline preload="none"></video>
+                <button type="button" class="vd-mute" id="vdMute" aria-label="Ovozni yoqish / o'chirish">
+                    <i class='bx bx-volume-full'></i>
+                </button>
+            {% else %}
+                <div class="vd-video-empty"><i class='bx bxs-crown'></i></div>
+            {% endif %}
+        </div>
+
+        <div class="vd-head">
+            <!-- username yonida galichka o'rniga rasm -->
+            <div class="vd-name">
+                <span>@{{ user.username }}</span>
+                <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg"
+                     alt="" referrerpolicy="no-referrer">
+            </div>
+            <div class="vd-vip-badge"><i class='bx bxs-crown'></i> VIP</div>
+        </div>
+
+        <div class="vd-info">
+            <div class="vd-info-cell">
+                <div class="vd-info-label">ID</div>
+                <div class="vd-info-value">{{ user.id }}</div>
+            </div>
+            <div class="vd-info-cell">
+                <div class="vd-info-label">Ism</div>
+                <div class="vd-info-value">{{ user.display_name }}</div>
+            </div>
+            <!-- Familiya o'rniga VIP tugash sanasi -->
+            <div class="vd-info-cell">
+                <div class="vd-info-label">VIP tugash sanasi</div>
+                <div class="vd-info-value gold">{{ vip_expire_local|date:"d.m.Y" }}</div>
+            </div>
+            <div class="vd-info-cell">
+                <div class="vd-info-label">Ro'yxatdan o'tgan</div>
+                <div class="vd-info-value">{{ joined_local|date:"d.m.Y" }}</div>
+            </div>
+        </div>
+
+        <!-- Ko'rilgan animelar o'rniga oltin rangli, "yozilayotgan" matn -->
+        <div class="vd-sec-title">Minnatdorchilik</div>
+        <div class="vd-thanks">
+            <span class="vd-typed" id="vdTyped"
+                  data-text="AniBest fandubi VIP obuna sotib olganingiz uchun tashakkur bildiradi"></span>
+        </div>
+
+        <div class="vd-sec-title">Daraja</div>
+        <div class="vd-level">
+            <p>Saytdagi faollik va ko'rilgan animelar soniga qarab daraja oshadi.</p>
+            <div class="vd-level-ring">
+                <b>{{ user_level }}</b>
+                <small>LEVEL</small>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endif %}
+
+
 <script>
     function copyCardInfo() {
         const text = "https://t.me/ani_best_uzb_anime";
@@ -540,4 +1017,123 @@
         });
     }
 </script>
+
+{% if vip_data.vip_active %}
+<script>
+(function () {
+    var overlay = document.getElementById('vdOverlay');
+    var openBtn = document.getElementById('vdOpenBtn');
+    if (!overlay || !openBtn) return;
+
+    var closeBtn = document.getElementById('vdClose');
+    var video    = document.getElementById('vdVideo');
+    var muteBtn  = document.getElementById('vdMute');
+    var typedEl  = document.getElementById('vdTyped');
+    var fullText = typedEl.getAttribute('data-text') || '';
+    var typeTimer = null;
+    var unmuteHandler = null;
+
+    // Yozilayotgandek harf-harf chiqarish (typing animatsiya)
+    function startTyping() {
+        clearTimeout(typeTimer);
+        typedEl.textContent = '';
+        var i = 0;
+        (function tick() {
+            if (i > fullText.length) return;
+            typedEl.textContent = fullText.slice(0, i);
+            var ch = fullText.charAt(i);
+            i++;
+            var delay = (ch === ' ') ? 80 : 38 + Math.random() * 62;
+            typeTimer = setTimeout(tick, delay);
+        })();
+    }
+
+    function syncMuteIcon() {
+        if (!muteBtn || !video) return;
+        muteBtn.innerHTML = video.muted
+            ? "<i class='bx bx-volume-mute'></i>"
+            : "<i class='bx bx-volume-full'></i>";
+    }
+
+    function removeUnmuteHandler() {
+        if (unmuteHandler) {
+            overlay.removeEventListener('pointerdown', unmuteHandler, true);
+            unmuteHandler = null;
+        }
+    }
+
+    // Video OVOZ BILAN ijro etiladi.
+    // Agar brauzer avtomatik ovozli ijroga ruxsat bermasa (masalan sahifa o'zi ochilganda),
+    // video ovozsiz boshlanadi va foydalanuvchi oynaga birinchi tegishi bilan ovoz yoqiladi.
+    function playVideo() {
+        if (!video) return;
+        video.currentTime = 0;
+        video.muted = false;
+        syncMuteIcon();
+
+        var p = video.play();
+        if (p && p.catch) {
+            p.catch(function () {
+                video.muted = true;
+                syncMuteIcon();
+                var p2 = video.play();
+                if (p2 && p2.catch) p2.catch(function () {});
+
+                removeUnmuteHandler();
+                unmuteHandler = function (e) {
+                    // ovoz tugmasining o'zi bosilsa, o'sha tugma o'zi hal qiladi
+                    if (muteBtn && muteBtn.contains(e.target)) { removeUnmuteHandler(); return; }
+                    video.muted = false;
+                    syncMuteIcon();
+                    removeUnmuteHandler();
+                };
+                overlay.addEventListener('pointerdown', unmuteHandler, true);
+            });
+        }
+    }
+
+    function openModal() {
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        startTyping();
+        playVideo();
+    }
+
+    function closeModal() {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        clearTimeout(typeTimer);
+        removeUnmuteHandler();
+        if (video) video.pause();
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+
+    // Fon (qorong'i joy) bosilsa yopiladi
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+    });
+
+    // Ovozni yoqish / o'chirish
+    if (video && muteBtn) {
+        muteBtn.addEventListener('click', function () {
+            video.muted = !video.muted;
+            syncMuteIcon();
+        });
+    }
+
+    {% if open_vip_detail %}
+    // VIP yangi faollashtirilgan (jackpot kod yoki xarid) — "Batafsil" o'zi ochiladi
+    openModal();
+    {% endif %}
+})();
+</script>
+{% endif %}
 {% endblock %}
