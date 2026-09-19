@@ -754,6 +754,32 @@
     .tier-premium .upm-level-num { color: var(--tier-color); }
     .tier-vip .upm-level-num { background: linear-gradient(90deg, var(--tier-color), var(--tier-color-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .upm-level-label { font-size: 8px; font-weight: 800; letter-spacing: .1em; color: rgba(0,243,255,0.6); }
+    /* ===== PREMIUM VIP BOX (chat'da boshqa profilni ko'rish) ===== */
+    .pvb-banner {
+        width: 100%;
+        max-width: 220px;
+        aspect-ratio: 3/4;
+        margin: 0 auto 14px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(255,193,7,0.4);
+        box-shadow: 0 0 22px rgba(255,193,7,0.15);
+    }
+    .pvb-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pvb-badge-row { display: flex; justify-content: center; margin-bottom: 14px; }
+    .pvb-thanks {
+        margin-top: 10px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, rgba(255,193,7,0.10), rgba(255,193,7,0.04));
+        border: 1px solid rgba(255,193,7,0.3);
+        color: #ffc107;
+        font-weight: 800;
+        font-size: 13px;
+        line-height: 1.5;
+        text-align: center;
+    }
+
 
     @media (min-width: 769px) {
         .chat-nav {
@@ -1781,6 +1807,149 @@ function openUserProfileModal(userId) {
 function closeUserProfileModal() {
     const overlay = document.getElementById("userProfileOverlay");
     if (overlay) overlay.classList.remove("open");
+}
+
+function renderUserProfileModal(data) {
+    const body = document.getElementById("upmBody");
+    const card = document.getElementById("userProfileModalCard");
+    const tier = data.tier || "basic";
+    const isVip = tier === "vip";
+    card.classList.add("tier-" + tier);
+
+    // YANGI — agar bu foydalanuvchi "Premium VIP box"ni yoqqan bo'lsa,
+    // oddiy profil o'rniga maxsus VIP box ko'rsatiladi
+    if (data.vip_box_on) {
+        renderPremiumVipBoxModal(data, card);
+        return;
+    }
+
+    let badgeHtml = '<span class="upm-badge"><i class="bx bx-user"></i> Oddiy</span>';
+    if (tier === "vip") badgeHtml = '<span class="upm-badge upm-badge-vip-pulse"><i class="bx bxs-crown"></i> VIP</span>';
+    else if (tier === "premium") badgeHtml = '<span class="upm-badge"><i class="bx bx-crown"></i> Premium</span>';
+
+    const avatarHtml = data.avatar_url
+        ? `<img src="${escHtml(data.avatar_url)}" alt="avatar">`
+        : escHtml((data.display_name || "?")[0].toUpperCase());
+
+    let watchedHtml = '';
+    if (data.last_watched && data.last_watched.length) {
+        watchedHtml = data.last_watched.map(m => `
+            <div class="upm-watched-card">
+                ${m.image_url ? `<img src="${escHtml(m.image_url)}" alt="${escHtml(m.title)}">` : ''}
+                <span class="upm-watched-title">${escHtml(m.title)}</span>
+            </div>
+        `).join('');
+    } else {
+        watchedHtml = '<div class="upm-empty">Hali hech qanday anime ko\'rilmagan.</div>';
+    }
+
+    const adminIconHtml = data.is_admin
+        ? `<img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" class="admin-icon-badge" style="margin-left:4px;" alt="Admin">`
+        : '';
+
+    const nameClass    = isVip ? "upm-name upm-name-vip" : "upm-name";
+    const idValClass   = isVip ? "upm-info-val upm-info-val-vip" : "upm-info-val";
+    const ismValClass  = isVip ? "upm-info-val upm-info-val-vip" : "upm-info-val";
+    const dateValClass = isVip ? "upm-info-val upm-date-wave" : "upm-info-val";
+
+    body.innerHTML = `
+        <div class="upm-hero">
+            <div class="upm-avatar">${avatarHtml}</div>
+            <div class="${nameClass}">@${escHtml(data.username)} ${adminIconHtml}</div>
+            ${badgeHtml}
+        </div>
+        <div class="upm-info-grid">
+            <div class="upm-info-cell"><div class="upm-info-label">ID</div><div class="${idValClass}">${escHtml(data.id)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Ism</div><div class="${ismValClass}">${escHtml(data.first_name)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Familiya</div><div class="upm-info-val">${escHtml(data.last_name)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Ro'yxatdan o'tgan</div><div class="${dateValClass}">${escHtml(data.date_joined)}</div></div>
+        </div>
+        <p class="upm-section-title">Ko'rilgan animelar</p>
+        <div class="upm-watched-grid">${watchedHtml}</div>
+        <p class="upm-section-title">Daraja</p>
+        <div class="upm-level-box">
+            <div>
+                <div style="font-size:12px;color:var(--text-dim);">Saytdagi faollik va ko'rilgan animelar soniga qarab daraja oshadi.</div>
+            </div>
+            <div class="upm-level-circle">
+                <div class="upm-level-num">${escHtml(data.level)}</div>
+                <div class="upm-level-label">LEVEL</div>
+            </div>
+        </div>
+    `;
+}
+
+// YANGI — Premium VIP box ko'rinishi (faqat "Premium VIP box"ni yoqqan VIP foydalanuvchilar uchun)
+function renderPremiumVipBoxModal(data, card) {
+    const body = document.getElementById("upmBody");
+    card.classList.add("tier-vip");
+
+    const avatarHtml = data.avatar_url
+        ? `<img src="${escHtml(data.avatar_url)}" alt="avatar">`
+        : escHtml((data.display_name || "?")[0].toUpperCase());
+
+    const adminIconHtml = data.is_admin
+        ? `<img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" class="admin-icon-badge" style="margin-left:4px;" alt="Admin">`
+        : '';
+
+    let watchedHtml = '';
+    if (data.vip_box_show_recent_anime) {
+        if (data.last_watched && data.last_watched.length) {
+            watchedHtml = `
+                <p class="upm-section-title" style="margin-top:16px;">Ko'rilgan animelar</p>
+                <div class="upm-watched-grid">
+                    ${data.last_watched.map(m => `
+                        <div class="upm-watched-card">
+                            ${m.image_url ? `<img src="${escHtml(m.image_url)}" alt="${escHtml(m.title)}">` : ''}
+                            <span class="upm-watched-title">${escHtml(m.title)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            watchedHtml = `<p class="upm-section-title" style="margin-top:16px;">Ko'rilgan animelar</p><div class="upm-empty">Hali hech qanday anime ko'rilmagan.</div>`;
+        }
+    }
+
+    let expireHtml = '';
+    if (data.vip_expire_text) {
+        expireHtml = `
+            <div class="upm-info-cell">
+                <div class="upm-info-label">VIP tugash sanasi</div>
+                <div class="upm-info-val upm-info-val-vip">${escHtml(data.vip_expire_text)}</div>
+            </div>
+        `;
+    }
+
+    body.innerHTML = `
+        <div class="pvb-banner">
+            <img src="https://i.pinimg.com/736x/4e/1c/7b/4e1c7b9b437f08367f2118bd5c544c3a.jpg" alt="VIP box">
+        </div>
+        <div class="upm-hero">
+            <div class="upm-avatar">${avatarHtml}</div>
+            <div class="upm-name upm-name-vip">@${escHtml(data.username)} ${adminIconHtml}</div>
+        </div>
+        <div class="pvb-badge-row">
+            <span class="upm-badge upm-badge-vip-pulse"><i class="bx bxs-crown"></i> VIP</span>
+        </div>
+        <div class="upm-info-grid">
+            <div class="upm-info-cell"><div class="upm-info-label">ID</div><div class="upm-info-val upm-info-val-vip">${escHtml(data.id)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Ism</div><div class="upm-info-val upm-info-val-vip">${escHtml(data.first_name)}</div></div>
+            <div class="upm-info-cell"><div class="upm-info-label">Ro'yxatdan o'tgan</div><div class="upm-info-val upm-date-wave">${escHtml(data.date_joined)}</div></div>
+            ${expireHtml}
+        </div>
+        ${watchedHtml}
+        <p class="upm-section-title" style="margin-top:16px;">Minnatdorchilik</p>
+        <div class="pvb-thanks">AniBest fandubi VIP obuna sotib olganingiz uchun tashakkur bildiradi</div>
+        <p class="upm-section-title" style="margin-top:16px;">Daraja</p>
+        <div class="upm-level-box">
+            <div><div style="font-size:12px;color:var(--text-dim);">Saytdagi faollik va ko'rilgan animelar soniga qarab daraja oshadi.</div></div>
+            <div class="upm-level-circle">
+                <div class="upm-level-num">${escHtml(data.level)}</div>
+                <div class="upm-level-label">LEVEL</div>
+            </div>
+        </div>
+    `;
 }
 
 function renderUserProfileModal(data) {
