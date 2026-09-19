@@ -10,7 +10,7 @@ from .models import (
     ReelBest, ReelBestLike, ReelBestComment,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,NoResultsMedia,
     PremiumBackground, AnimeVoteRequest, AnimeVote, AnimeRequestSuggestion,
     AccountHistory, DebtRequest, JackpotCode, JackpotCodeUse,
-    BalanceTopupRequest, UserBalance,PushSubscription,PremiumMusic,Poll, PollOption, PollVote,WatchedEpisode
+    BalanceTopupRequest, UserBalance,PushSubscription,PremiumMusic,Poll, PollOption, PollVote,WatchedEpisode,VipThankVideo
 )
 
 
@@ -466,6 +466,13 @@ class PollVoteAdmin(admin.ModelAdmin):
     list_display = ('user', 'option', 'created_at')
     search_fields = ('user__username', 'option__text')
     list_filter = ('created_at',)
+
+@admin.register(VipThankVideo)
+class VipThankVideoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'is_active', 'created_at')
+    list_editable = ('is_active',)
+    list_filter = ('is_active',)
+
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
