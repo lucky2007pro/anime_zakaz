@@ -443,6 +443,66 @@
 
 
 /* =====================================================
+   OBUNANI UZAYTIRISH BOXI (Qarz so'rash tepasida)
+   ===================================================== */
+.vd-extend {
+    text-align: center;
+    padding: 20px 16px 18px;
+    border: 1px solid rgba(180,92,255,0.25);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(180,92,255,0.12), transparent 60%),
+        linear-gradient(145deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+}
+
+.vd-extend-text {
+    font-size: 14px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.5;
+    margin: 0 0 6px;
+}
+
+.vd-extend-hint {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.5;
+    margin: 0 0 14px;
+}
+
+.vd-extend-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 200px;
+    height: 43px;
+    padding: 0 22px;
+    border-radius: 11px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: linear-gradient(90deg, #b45cff, #9c4cff);
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: .02em;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(180,92,255,0.18);
+}
+.vd-extend-btn:active { opacity: .9; }
+
+/* VIP narxlari boxi ochilganda yumshoq paydo bo'ladi */
+.vd-reveal { animation: vdReveal .35s ease; }
+@keyframes vdReveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .vd-reveal { animation: none; }
+}
+
+
+/* =====================================================
    "BATAFSIL" OYNASI (modal)
    ===================================================== */
 .vd-overlay {
@@ -503,11 +563,27 @@
 @keyframes vdFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes vdPop  { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
 
+/* Yuqori qator: chapda "VIP box" nomi, o'rtada bo'shliq, o'ngda yopish (X) */
+.vd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.vd-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 16px;
+    font-weight: 900;
+    color: #ffc107;
+    text-shadow: 0 0 14px rgba(255,193,7,0.30);
+}
+.vd-title i { font-size: 19px; color: #b45cff; text-shadow: none; }
+
 .vd-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 3;
+    flex-shrink: 0;
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -528,7 +604,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    margin-top: 38px;
+    margin-top: 16px;
     border-radius: 14px;
     overflow: hidden;
     background: #08080d;
@@ -797,12 +873,13 @@
         </div>
     </div>
 
-    {% else %}
+    {% endif %}
 
     <!-- =====================================================
          VIP REJALAR
+         (VIP faol bo'lsa yashirin turadi — "Obunani uzaytirish" bosilganda ochiladi)
          ===================================================== -->
-    <div class="pcard">
+    <div class="pcard" id="vdPlansBox"{% if vip_data.vip_active %} style="display:none;"{% endif %}>
         <p class="hs-section-title"><i class='bx bxs-crown'></i> VIP obuna narxlari</p>
 
         <div class="hs-plans-grid">
@@ -824,6 +901,22 @@
         </p>
     </div>
 
+
+    {% if vip_data.vip_active %}
+
+    <!-- =====================================================
+         OBUNANI UZAYTIRISH
+         (Qarz so'rash tepasida; bosilsa VIP narxlari boxi ochiladi, bu box yopiladi)
+         ===================================================== -->
+    <div class="pcard vd-extend" id="vdExtendBox">
+        <p class="vd-extend-text">Yana obunani cho'zishni istaysizmi?</p>
+        <p class="vd-extend-hint">Yangi muddat hozirgi tugash sanangiz ustiga qo'shiladi.</p>
+        <button type="button" id="vdExtendBtn" class="vd-extend-btn">
+            <i class='bx bx-refresh'></i> Obunani uzaytirish
+        </button>
+    </div>
+
+    {% else %}
 
     <!-- =====================================================
          CHEK ORQALI TO'LOV (ISTALGAN SUMMA)
@@ -951,9 +1044,12 @@
 
         <div class="vd-inner">
 
-            <button type="button" class="vd-close" id="vdClose" aria-label="Yopish">
-                <i class='bx bx-x'></i>
-            </button>
+            <div class="vd-header">
+                <div class="vd-title"><i class='bx bxs-crown'></i> VIP box</div>
+                <button type="button" class="vd-close" id="vdClose" aria-label="Yopish">
+                    <i class='bx bx-x'></i>
+                </button>
+            </div>
 
             <!-- Avatar o'rniga admin yuklagan video (16:9), ovozi yoqiq -->
             <div class="vd-video-wrap">
@@ -1155,6 +1251,19 @@
         muteBtn.addEventListener('click', function () {
             video.muted = !video.muted;
             syncMuteIcon();
+        });
+    }
+
+    // "Obunani uzaytirish" bosilsa: VIP narxlari boxi ochiladi, bu box yopiladi
+    var extendBtn = document.getElementById('vdExtendBtn');
+    var extendBox = document.getElementById('vdExtendBox');
+    var plansBox  = document.getElementById('vdPlansBox');
+    if (extendBtn && extendBox && plansBox) {
+        extendBtn.addEventListener('click', function () {
+            extendBox.style.display = 'none';
+            plansBox.style.display = '';
+            plansBox.classList.add('vd-reveal');
+            plansBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     }
 
