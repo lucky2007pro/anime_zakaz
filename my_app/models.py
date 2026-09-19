@@ -614,6 +614,20 @@ class UserSettings(models.Model):
     )
     telegram_download_on = models.BooleanField(default=False)
 
+    # YANGI — PREMIUM VIP BOX (chat'da avatar bosilganda maxsus oyna)
+    premium_vip_box_on = models.BooleanField(
+        default=False,
+        help_text="Yoqilsa, chatda boshqalar sizning avataringizga bosganda oddiy profil o'rniga maxsus VIP box ochiladi"
+    )
+    vip_box_show_recent_anime = models.BooleanField(
+        default=True,
+        help_text="VIP box ichida oxirgi ko'rilgan animelarni ko'rsatish"
+    )
+    vip_box_show_vip_expire = models.BooleanField(
+        default=True,
+        help_text="VIP box ichida VIP obuna tugash sanasini ko'rsatish"
+    )
+    
     # PREMIUM MUZIKALAR
     premium_music_on = models.BooleanField(default=False)
     premium_music = models.ForeignKey(
