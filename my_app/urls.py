@@ -206,7 +206,11 @@ urlpatterns = [
     path('control-panel/polls/<int:pk>/delete/',admin_poll_delete, name='admin_poll_delete'),
     path('reels/<int:reel_id>/', reelbest_page, name='reels_detail'),  # YANGI — masalan /reels/4/
 
-    path('episode/<int:episode_id>/watched/', mark_episode_watched, name='mark_episode_watched'),    
+    path('episode/<int:episode_id>/watched/', mark_episode_watched, name='mark_episode_watched'),  
+    path('imkon/vip-box/yoqish/', imkon_toggle_vip_box, name='imkon_toggle_vip_box'),
+    path('imkon/vip-box/oxirgi-anime/', imkon_toggle_vip_box_recent, name='imkon_toggle_vip_box_recent'),
+    path('imkon/vip-box/tugash-vaqti/', imkon_toggle_vip_box_expire, name='imkon_toggle_vip_box_expire'),
+
 ]
 
 
