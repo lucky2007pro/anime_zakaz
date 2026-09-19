@@ -359,7 +359,7 @@
 
 
 /* =====================================================
-   YANGI — "SIZ VIP OBUNACHISIZ" KARTASI
+   "SIZ VIP OBUNACHISIZ" KARTASI
    (VIP faol bo'lganda narxlar va chek boxlari o'rniga chiqadi)
    ===================================================== */
 .vd-card {
@@ -443,7 +443,7 @@
 
 
 /* =====================================================
-   YANGI — "BATAFSIL" OYNASI (modal)
+   "BATAFSIL" OYNASI (modal)
    ===================================================== */
 .vd-overlay {
     position: fixed;
@@ -452,16 +452,31 @@
     display: none;
     padding: 16px;
     overflow-y: auto;
-    background: #05050a;
+    background: rgba(4,4,10,0.82);
 }
 .vd-overlay.open {
     display: flex;
     animation: vdFade .25s ease;
 }
 
-/* Box orqasidagi fon rasmi + qorong'ilashtirish qatlami */
-.vd-bg {
-    position: fixed;
+/* Box — fon rasmi FAQAT shu boxning ichida */
+.vd-modal {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    margin: auto;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: #0f0f18;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 22px;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+    animation: vdPop .3s cubic-bezier(.2,.9,.3,1.15);
+}
+
+/* box fon rasmi */
+.vd-mbg {
+    position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
@@ -469,27 +484,20 @@
     z-index: 0;
     pointer-events: none;
 }
-.vd-bg-dim {
-    position: fixed;
+/* rasm ustidagi qorong'ilashtirish (yozuvlar o'qilishi uchun) — kerak bo'lsa 0.5 / 0.8 ni o'zgartiring */
+.vd-mdim {
+    position: absolute;
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    background: linear-gradient(180deg, rgba(4,4,10,0.45), rgba(4,4,10,0.78));
+    background: linear-gradient(180deg, rgba(8,8,14,0.50), rgba(8,8,14,0.80));
 }
 
-.vd-modal {
+/* box ichidagi barcha kontent rasm ustida turadi */
+.vd-inner {
     position: relative;
     z-index: 2;
-    width: 100%;
-    max-width: 360px;
-    margin: auto;
-    padding: 20px 20px 20px;
-    box-sizing: border-box;
-    background: linear-gradient(160deg, rgba(24,24,38,0.93), rgba(15,15,24,0.95));
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 22px;
-    box-shadow: 0 25px 70px rgba(0,0,0,0.6);
-    animation: vdPop .3s cubic-bezier(.2,.9,.3,1.15);
+    padding: 20px;
 }
 
 @keyframes vdFade { from { opacity: 0; } to { opacity: 1; } }
@@ -590,7 +598,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-/* username yonidagi rasm (galichka o'rniga) */
+/* username yonidagi rasm */
 .vd-name img {
     width: 24px;
     height: 24px;
@@ -620,23 +628,23 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     margin-top: 18px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.10);
 }
 .vd-info-cell {
     padding: 12px 4px 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.10);
     min-width: 0;
 }
 .vd-info-cell:nth-child(even) {
     padding-left: 16px;
-    border-left: 1px solid rgba(255,255,255,0.08);
+    border-left: 1px solid rgba(255,255,255,0.10);
 }
 .vd-info-label {
     font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: .05em;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.5);
     margin-bottom: 4px;
 }
 .vd-info-value {
@@ -656,7 +664,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: .05em;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.5);
 }
 
 /* --- Oltin yozuv (typing animatsiya) --- */
@@ -666,8 +674,8 @@
     min-height: 78px;
     padding: 14px 16px;
     border-radius: 14px;
-    background: linear-gradient(145deg, rgba(255,193,7,0.09), rgba(255,193,7,0.03));
-    border: 1px solid rgba(255,193,7,0.28);
+    background: linear-gradient(145deg, rgba(255,193,7,0.10), rgba(255,193,7,0.04));
+    border: 1px solid rgba(255,193,7,0.30);
 }
 .vd-typed {
     font-size: 14.5px;
@@ -696,15 +704,15 @@
     gap: 14px;
     padding: 16px;
     border-radius: 14px;
-    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025));
+    border: 1px solid rgba(255,255,255,0.10);
 }
 .vd-level p {
     margin: 0;
     font-size: 12.5px;
     font-weight: 600;
     line-height: 1.5;
-    color: rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.6);
 }
 .vd-level-ring {
     width: 58px;
@@ -803,7 +811,7 @@
                     <div class="hs-plan-price">{{ plan.price|floatformat:0 }} <span>so'm</span></div>
                     <div class="hs-plan-period">{{ plan.label }}</div>
 
-                    <form method="POST" action="{% url 'vip_buy_balance' plan.key %}" style="width:100%;">
+                    <form method="POST" action="{% url 'vip_buy_balance' plan.key %}" style="width:100%;" data-vd-auto>
                         {% csrf_token %}
                         <button type="submit" class="hs-plan-btn">Aktivlashtirish</button>
                     </form>
@@ -891,7 +899,7 @@
             Admin bergan maxsus kodni kiriting — kod turi bo'yicha sizga bepul VIP kunlari yoki balansga pul tushishi mumkin.
         </p>
 
-        <form method="POST" action="{% url 'jackpot_redeem' %}">
+        <form method="POST" action="{% url 'jackpot_redeem' %}" data-vd-auto>
             {% csrf_token %}
 
             <div class="hs-field">
@@ -933,77 +941,78 @@
      (.pcard ichida emas — contain: content position:fixed ni buzmasligi uchun tashqarida)
      ===================================================== -->
 <div class="vd-overlay" id="vdOverlay" aria-hidden="true">
-
-    <!-- Box orqasidagi fon -->
-    <img class="vd-bg"
-         src="https://i.pinimg.com/1200x/10/fc/d7/10fcd7f9b1457e25223a2f6ee6c9bc5d.jpg"
-         alt="" referrerpolicy="no-referrer">
-    <div class="vd-bg-dim"></div>
-
     <div class="vd-modal" role="dialog" aria-modal="true" aria-label="VIP obuna haqida batafsil">
 
-        <button type="button" class="vd-close" id="vdClose" aria-label="Yopish">
-            <i class='bx bx-x'></i>
-        </button>
+        <!-- Box orqa foni (faqat shu box ichida) -->
+        <img class="vd-mbg"
+             src="https://i.pinimg.com/1200x/10/fc/d7/10fcd7f9b1457e25223a2f6ee6c9bc5d.jpg"
+             alt="" referrerpolicy="no-referrer">
+        <div class="vd-mdim"></div>
 
-        <!-- Avatar o'rniga admin yuklagan video (16:9), ovozi yoqiq -->
-        <div class="vd-video-wrap">
-            {% if vip_thank_video %}
-                <video id="vdVideo" src="{{ vip_thank_video.video.url }}" loop playsinline preload="none"></video>
-                <button type="button" class="vd-mute" id="vdMute" aria-label="Ovozni yoqish / o'chirish">
-                    <i class='bx bx-volume-full'></i>
-                </button>
-            {% else %}
-                <div class="vd-video-empty"><i class='bx bxs-crown'></i></div>
-            {% endif %}
+        <div class="vd-inner">
+
+            <button type="button" class="vd-close" id="vdClose" aria-label="Yopish">
+                <i class='bx bx-x'></i>
+            </button>
+
+            <!-- Avatar o'rniga admin yuklagan video (16:9), ovozi yoqiq -->
+            <div class="vd-video-wrap">
+                {% if vip_thank_video %}
+                    <video id="vdVideo" src="{{ vip_thank_video.video.url }}" loop playsinline preload="none"></video>
+                    <button type="button" class="vd-mute" id="vdMute" aria-label="Ovozni yoqish / o'chirish">
+                        <i class='bx bx-volume-full'></i>
+                    </button>
+                {% else %}
+                    <div class="vd-video-empty"><i class='bx bxs-crown'></i></div>
+                {% endif %}
+            </div>
+
+            <div class="vd-head">
+                <div class="vd-name">
+                    <span>@{{ user.username }}</span>
+                    <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg"
+                         alt="" referrerpolicy="no-referrer">
+                </div>
+                <div class="vd-vip-badge"><i class='bx bxs-crown'></i> VIP</div>
+            </div>
+
+            <div class="vd-info">
+                <div class="vd-info-cell">
+                    <div class="vd-info-label">ID</div>
+                    <div class="vd-info-value">{{ user.id }}</div>
+                </div>
+                <div class="vd-info-cell">
+                    <div class="vd-info-label">Ism</div>
+                    <div class="vd-info-value">{{ user.display_name }}</div>
+                </div>
+                <!-- Familiya o'rniga VIP tugash sanasi -->
+                <div class="vd-info-cell">
+                    <div class="vd-info-label">VIP tugash sanasi</div>
+                    <div class="vd-info-value gold">{{ vip_expire_local|date:"d.m.Y" }}</div>
+                </div>
+                <div class="vd-info-cell">
+                    <div class="vd-info-label">Ro'yxatdan o'tgan</div>
+                    <div class="vd-info-value">{{ joined_local|date:"d.m.Y" }}</div>
+                </div>
+            </div>
+
+            <!-- Ko'rilgan animelar o'rniga oltin rangli, "yozilayotgan" matn -->
+            <div class="vd-sec-title">Minnatdorchilik</div>
+            <div class="vd-thanks">
+                <span class="vd-typed" id="vdTyped"
+                      data-text="AniBest fandubi VIP obuna sotib olganingiz uchun tashakkur bildiradi"></span>
+            </div>
+
+            <div class="vd-sec-title">Daraja</div>
+            <div class="vd-level">
+                <p>Saytdagi faollik va ko'rilgan animelar soniga qarab daraja oshadi.</p>
+                <div class="vd-level-ring">
+                    <b>{{ user_level }}</b>
+                    <small>LEVEL</small>
+                </div>
+            </div>
+
         </div>
-
-        <div class="vd-head">
-            <!-- username yonida galichka o'rniga rasm -->
-            <div class="vd-name">
-                <span>@{{ user.username }}</span>
-                <img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg"
-                     alt="" referrerpolicy="no-referrer">
-            </div>
-            <div class="vd-vip-badge"><i class='bx bxs-crown'></i> VIP</div>
-        </div>
-
-        <div class="vd-info">
-            <div class="vd-info-cell">
-                <div class="vd-info-label">ID</div>
-                <div class="vd-info-value">{{ user.id }}</div>
-            </div>
-            <div class="vd-info-cell">
-                <div class="vd-info-label">Ism</div>
-                <div class="vd-info-value">{{ user.display_name }}</div>
-            </div>
-            <!-- Familiya o'rniga VIP tugash sanasi -->
-            <div class="vd-info-cell">
-                <div class="vd-info-label">VIP tugash sanasi</div>
-                <div class="vd-info-value gold">{{ vip_expire_local|date:"d.m.Y" }}</div>
-            </div>
-            <div class="vd-info-cell">
-                <div class="vd-info-label">Ro'yxatdan o'tgan</div>
-                <div class="vd-info-value">{{ joined_local|date:"d.m.Y" }}</div>
-            </div>
-        </div>
-
-        <!-- Ko'rilgan animelar o'rniga oltin rangli, "yozilayotgan" matn -->
-        <div class="vd-sec-title">Minnatdorchilik</div>
-        <div class="vd-thanks">
-            <span class="vd-typed" id="vdTyped"
-                  data-text="AniBest fandubi VIP obuna sotib olganingiz uchun tashakkur bildiradi"></span>
-        </div>
-
-        <div class="vd-sec-title">Daraja</div>
-        <div class="vd-level">
-            <p>Saytdagi faollik va ko'rilgan animelar soniga qarab daraja oshadi.</p>
-            <div class="vd-level-ring">
-                <b>{{ user_level }}</b>
-                <small>LEVEL</small>
-            </div>
-        </div>
-
     </div>
 </div>
 {% endif %}
@@ -1016,6 +1025,27 @@
             alert("Havola nusxalandi: " + text);
         });
     }
+</script>
+
+<!-- =====================================================
+     AVTO-OCHILISH BELGISI
+     "Aktivlashtirish" yoki "Kodni faollashtirish" bosilganda belgi qo'yiladi,
+     sahifa qayta yuklangach (VIP faol bo'lsa) Batafsil oynasi o'zi ochiladi.
+     ===================================================== -->
+<script>
+(function () {
+    document.querySelectorAll('form[data-vd-auto]').forEach(function (f) {
+        f.addEventListener('submit', function () {
+            try { sessionStorage.setItem('vdAutoOpen', '1'); } catch (e) {}
+        });
+    });
+
+    window.__vdAutoOpen = false;
+    try {
+        if (sessionStorage.getItem('vdAutoOpen') === '1') window.__vdAutoOpen = true;
+        sessionStorage.removeItem('vdAutoOpen');   // bir martalik
+    } catch (e) {}
+})();
 </script>
 
 {% if vip_data.vip_active %}
@@ -1063,7 +1093,7 @@
     }
 
     // Video OVOZ BILAN ijro etiladi.
-    // Agar brauzer avtomatik ovozli ijroga ruxsat bermasa (masalan sahifa o'zi ochilganda),
+    // Agar brauzer avtomatik ovozli ijroga ruxsat bermasa (sahifa o'zi ochilganda),
     // video ovozsiz boshlanadi va foydalanuvchi oynaga birinchi tegishi bilan ovoz yoqiladi.
     function playVideo() {
         if (!video) return;
@@ -1081,7 +1111,6 @@
 
                 removeUnmuteHandler();
                 unmuteHandler = function (e) {
-                    // ovoz tugmasining o'zi bosilsa, o'sha tugma o'zi hal qiladi
                     if (muteBtn && muteBtn.contains(e.target)) { removeUnmuteHandler(); return; }
                     video.muted = false;
                     syncMuteIcon();
@@ -1129,10 +1158,10 @@
         });
     }
 
-    {% if open_vip_detail %}
-    // VIP yangi faollashtirilgan (jackpot kod yoki xarid) — "Batafsil" o'zi ochiladi
-    openModal();
-    {% endif %}
+    // Aktivlashtirish / kod bosilgandan keyin Batafsil o'zi ochiladi
+    var autoOpen = (window.__vdAutoOpen === true);
+    {% if open_vip_detail %}autoOpen = true;{% endif %}
+    if (autoOpen) openModal();
 })();
 </script>
 {% endif %}
