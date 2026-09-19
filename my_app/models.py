@@ -1234,3 +1234,21 @@ class WatchedEpisode(models.Model):
     def __str__(self):
         ep = f"{self.episode.episode_number}-qism" if self.episode else "Film"
         return f"{self.user.username} — {self.movie.title} ({ep})"
+
+# =======================
+# VIP TASHAKKUR VIDEOSI (hisobim.html -> "Batafsil" oynasi)
+# =======================
+class VipThankVideo(models.Model):
+    title = models.CharField(max_length=200, blank=True, null=True, help_text="Ichki nom (ixtiyoriy)")
+    video = models.FileField(upload_to='vip_thanks/', help_text="16:9 formatdagi ixcham video (mp4)")
+    is_active = models.BooleanField(default=True, help_text="Faol videolardan eng oxirgisi ko'rsatiladi")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "VIP tashakkur videosi"
+        verbose_name_plural = "VIP tashakkur videolari"
+
+    def __str__(self):
+        return self.title or f"VIP video #{self.id}"
+
