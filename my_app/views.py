@@ -31,7 +31,7 @@ from .models import (
     Story, StoryView, ReelBest, ReelBestLike, ReelBestComment,
     UserSettings, AnimeSchedule, AnimeSectionItem, Notice, NoticeRead, WatchHistory, FavoriteAnime, NoResultsMedia,
     AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse, UserBalance, PushSubscription, PremiumMusic,
-    WatchedEpisode,
+    WatchedEpisode,VipThankVideo,
 )
 
 User = get_user_model()
@@ -1655,6 +1655,7 @@ VIP_PLANS = [
 ]
 VIP_PLANS_DICT = {p['key']: p for p in VIP_PLANS}
 
+
 @login_required
 def hisobim_page(request):
     from .models import UserBalance
@@ -1672,6 +1673,11 @@ def hisobim_page(request):
     if vip_data.vip_active():
         vip_expire_local = localtime(vip_data.vip_expire, tz)
 
+    # YANGI — "Batafsil" oynasi uchun
+    vip_thank_video = VipThankVideo.objects.filter(is_active=True).first()
+    joined_local = localtime(request.user.date_joined, tz)
+    user_level = request.user.get_level()
+
     return render(request, 'hisobim.html', {
         'balance': balance,
         'vip_data': vip_data,
@@ -1679,6 +1685,9 @@ def hisobim_page(request):
         'vip_plans': VIP_PLANS,
         'history': history,
         'my_debt_pending': my_debt_pending,
+        'vip_thank_video': vip_thank_video,   # YANGI
+        'joined_local': joined_local,         # YANGI
+        'user_level': user_level,             # YANGI
     })
 
 
