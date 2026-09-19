@@ -29,9 +29,9 @@ from django.conf import settings
 from .models import (
     CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
     Story, StoryView, ReelBest, ReelBestLike, ReelBestComment,
-    UserSettings, AnimeSchedule, AnimeSectionItem, Notice, NoticeRead, WatchHistory, FavoriteAnime, NoResultsMedia,
-    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse, UserBalance, PushSubscription, PremiumMusic,
-    WatchedEpisode,VipThankVideo,
+    UserSettings,AnimeSchedule,AnimeSectionItem, Notice, NoticeRead,WatchHistory, FavoriteAnime,NoResultsMedia,
+    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse,UserBalance,PushSubscription,
+    WatchedEpisode,VipThankVideo
 )
 
 User = get_user_model()
@@ -307,7 +307,7 @@ def movie_detail(request, id):
         WatchedEpisode.objects.get_or_create(
             user=request.user, movie=movie, episode=selected_episode
         )
-    
+
     # Check if favorited
     is_favorited = FavoriteAnime.objects.filter(user=request.user, movie=movie).exists()
 
@@ -375,7 +375,6 @@ def movie_detail(request, id):
         'random_movies': random_movies,
         'current_episode_size': current_episode_size,
     })
-
 
 
 # =======================
@@ -504,7 +503,7 @@ def save_push_subscription(request):
 
 
 def send_push_notification(user, title, body, url='/notice/'):
-    """Bitta foydalanuvchining barcha qurilmalariga push yuborish"""
+    """Bitta foydalanuvchining barcha qurilmalariga (Chrome/telefon) push yuborish"""
     payload = json.dumps({"title": title, "body": body, "url": url})
     subs = list(PushSubscription.objects.filter(user=user).values('id', 'endpoint', 'p256dh', 'auth'))
     for s in subs:
@@ -514,7 +513,6 @@ def send_push_notification(user, title, body, url='/notice/'):
             daemon=True
         )
         t.start()
-    return len(subs)
 
 
 def send_broadcast_push_notification(title, body, url='/notice/'):
@@ -528,7 +526,6 @@ def send_broadcast_push_notification(title, body, url='/notice/'):
             daemon=True
         )
         t.start()
-    return len(subs)
 
 
 @login_required
@@ -699,9 +696,8 @@ def chat(request):
 
     messages_list = list(
         ChatMessage.objects.select_related(
-            'user', 'reply_to', 'reply_to_news', 'user__avatar', 'user__vip_data',
-            'reply_to__user', 'reply_to__user__vip_data', 'reply_to__user__avatar'
-        ).order_by('-created_at')[:300])
+            'user', 'reply_to', 'reply_to_news', 'user__avatar', 'user__vip_data'
+        ).order_by('-created_at')[:200])
     messages_list.reverse()
 
     for msg in messages_list:
@@ -742,28 +738,21 @@ def chat(request):
                 reply_to_news=reply_to_news,                      # YANGI
             )
             if reply_to_msg and reply_to_msg.user != request.user:
-                try:
-                    Notice.objects.create(
-                        notice_type='reply',
-                        created_by=request.user,
-                        target_user=reply_to_msg.user,
-                        title=f"{request.user.username} sizga javob berdi",
-                        message=text,
-                        related_chat_message=new_msg,
-                    )
-                except Exception:
-                    pass
-
+                Notice.objects.create(
+                    notice_type='reply',
+                    created_by=request.user,
+                    target_user=reply_to_msg.user,
+                    title=f"{request.user.username} sizga javob berdi",
+                    message=text,
+                    related_chat_message=new_msg,
+                )
                 # YANGI — push notification yuborish
-                try:
-                    send_push_notification(
-                        user=reply_to_msg.user,
-                        title=f"{request.user.username} sizga javob berdi",
-                        body=text[:100],
-                        url='/chat/'
-                    )
-                except Exception:
-                    pass
+                send_push_notification(
+                    user=reply_to_msg.user,
+                    title=f"{request.user.username} sizga javob berdi",
+                    body=text[:100],
+                    url='/chat/'
+                )
         return redirect('chat')
 
     return render(request, 'chat.html', {
@@ -844,10 +833,11 @@ def chat_messages_api(request):
 # =======================
 @login_required
 def user_mini_profile_api(request, user_id):
-    from .models import WatchHistory
+    from .models import WatchHistory, UserSettings
 
     target_user = get_object_or_404(CustomUser, id=user_id)
     vip_data, _ = VipUser.objects.get_or_create(user=target_user)
+    target_settings, _ = UserSettings.objects.get_or_create(user=target_user)
 
     last_watched_qs = (
         WatchHistory.objects
@@ -869,6 +859,15 @@ def user_mini_profile_api(request, user_id):
     if getattr(target_user, 'avatar', None) and target_user.avatar.image:
         avatar_url = target_user.avatar.image.url
 
+    # YANGI — PREMIUM VIP BOX
+    vip_box_on = target_settings.premium_vip_box_on and vip_data.vip_active()
+
+    vip_expire_text = None
+    if vip_box_on and target_settings.vip_box_show_vip_expire and vip_data.vip_expire:
+        vip_expire_text = localtime(
+            vip_data.vip_expire, ZoneInfo('Asia/Tashkent')
+        ).strftime('%d.%m.%Y %H:%M')
+
     return JsonResponse({
         'id': target_user.id,
         'username': target_user.username,
@@ -882,6 +881,11 @@ def user_mini_profile_api(request, user_id):
         'level': target_user.get_level(),
         'watched_count': target_user.watched_count(),
         'last_watched': last_watched,
+
+        # YANGI
+        'vip_box_on': vip_box_on,
+        'vip_box_show_recent_anime': target_settings.vip_box_show_recent_anime,
+        'vip_expire_text': vip_expire_text,
     })
 
 
@@ -1078,7 +1082,6 @@ def toggle_like(request, pk):
 
 
 
-
 # =======================
 # STORY OCHISH (VIEW PAGE)
 # =======================
@@ -1151,8 +1154,6 @@ def prev_story_view(request, story_id):
 
 
 
-
-
 # =======================
 # REELBEST — YAGONA FEED SAHIFA (video shu yerning o'zida ijro bo'ladi)
 # =======================
@@ -1173,6 +1174,7 @@ def reelbest_page(request, reel_id=None):
         'liked_ids': liked_ids,
         'initial_reel_id': initial_reel_id,
     })
+
 
 @login_required
 def reelbest_toggle_like(request, reel_id):
@@ -1538,7 +1540,7 @@ def anime_category(request):
 @login_required
 def notice(request):
     # Admin tomonidan yangi ommaviy xabar yuborish
-    if request.method == "POST" and (request.user.is_staff or request.user.is_superuser or getattr(request.user, 'is_admin_user', False)):
+    if request.method == "POST" and (request.user.is_staff or request.user.is_superuser):
         title = request.POST.get('title', '').strip()
         message = request.POST.get('message', '').strip()
         send_push = request.POST.get('send_push') == '1' or 'send_push' in request.POST
@@ -1551,17 +1553,13 @@ def notice(request):
                 created_by=request.user,
                 is_active=True
             )
-            sent_count = 0
             if send_push:
-                sent_count = send_broadcast_push_notification(
+                send_broadcast_push_notification(
                     title=new_notice.title,
                     body=message[:150],
                     url='/notice/'
                 )
-            if sent_count > 0:
-                messages.success(request, f"Ommaviy e'lon saqlandi va {sent_count} ta foydalanuvchi qurilmasiga Push bildirishnoma yuborildi!")
-            else:
-                messages.success(request, "Ommaviy e'lon muvaffaqiyatli saqlandi!")
+            messages.success(request, "Ommaviy e'lon va Push bildirishnoma barcha qurilmalarga yuborildi!")
         else:
             messages.error(request, "Xabar matni bo'sh bo'lishi mumkin emas!")
         return redirect('notice')
@@ -1614,16 +1612,11 @@ def notice(request):
     admin_unread_count = sum(1 for n in admin_notices if not n.is_read)
     reply_unread_count = sum(1 for n in reply_notices if not n.is_read)
 
-    push_subscribers_count = PushSubscription.objects.count()
-    unique_push_users = PushSubscription.objects.values('user').distinct().count()
-
     return render(request, 'notice.html', {
         'admin_notices': admin_notices,
         'reply_notices': reply_notices,
         'admin_unread_count': admin_unread_count,
         'reply_unread_count': reply_unread_count,
-        'push_subscribers_count': push_subscribers_count,
-        'unique_push_users': unique_push_users,
     })
 
 # =======================
@@ -1647,6 +1640,26 @@ def manifest_view(request):
 def offline_view(request):
     return render(request, 'offline.html')
 
+def activate_vip_premium_perks(user):
+    """
+    VIP obuna sotib olinganda (balans yoki jackpot orqali) avtomatik:
+    - 'Oxirgi versiyani sinab ko'rish' (beta home) yoqiladi
+    - 'Premium fon' yoqiladi va admin yuklagan ENG OXIRGI fon o'rnatiladi
+    """
+    from .models import UserSettings, PremiumBackground
+    settings_obj, _ = UserSettings.objects.get_or_create(user=user)
+
+    settings_obj.beta_home_on = True
+    settings_obj.beta_home_expire = timezone.now() + timedelta(days=BETA_HOME_TRIAL_DAYS)
+
+    latest_bg = PremiumBackground.objects.order_by('-created_at').first()
+    if latest_bg:
+        settings_obj.premium_bg = latest_bg
+        settings_obj.premium_bg_on = True
+
+    settings_obj.save()
+
+
 VIP_PLANS = [
     {'key': '1_5week', 'label': "1.5 haftalik", 'price': 5000, 'days': 11},
     {'key': '1_month', 'label': "1 oylik", 'price': 10000, 'days': 30},
@@ -1654,7 +1667,6 @@ VIP_PLANS = [
     {'key': '6_month', 'label': "6 oylik", 'price': 51000, 'days': 180},
 ]
 VIP_PLANS_DICT = {p['key']: p for p in VIP_PLANS}
-
 
 @login_required
 def hisobim_page(request):
@@ -1713,6 +1725,8 @@ def vip_buy_balance(request, plan_key):
         vip_data.tier = 'vip'
         vip_data.vip_expire = base + timedelta(days=plan['days'])
         vip_data.save()
+
+        activate_vip_premium_perks(request.user)   # YANGI — beta home + premium fon avtomatik yoqiladi
 
         AccountHistory.objects.create(
             user=request.user,
@@ -1798,6 +1812,7 @@ def jackpot_redeem(request):
                 vip_data.tier = 'vip'
                 vip_data.vip_expire = base + timedelta(hours=jackpot.vip_hours)
                 vip_data.save()
+                activate_vip_premium_perks(request.user)
                 AccountHistory.objects.create(
                     user=request.user,
                     text=f"Jackpot: {jackpot.vip_hours} soatlik VIP obuna aktivlashtirildi 🎉"
@@ -1812,6 +1827,7 @@ def jackpot_redeem(request):
                 vip_data.tier = 'vip'
                 vip_data.vip_expire = base + timedelta(days=jackpot.vip_days)
                 vip_data.save()
+                activate_vip_premium_perks(request.user)
                 AccountHistory.objects.create(
                     user=request.user,
                     text=f"Jackpot: {jackpot.vip_days} kunlik VIP obuna aktivlashtirildi 🎉"
@@ -1827,134 +1843,7 @@ def jackpot_redeem(request):
                 messages.success(request, f"Tabriklaymiz! Hisobingizga {jackpot.balance_amount:,} so'm tushdi.".replace(',', '.'))
     return redirect('hisobim_page')
 
-@login_required
-def statistika_page(request):
-    from .models import Poll, PollVote, WatchedEpisode, WatchHistory
 
-    # ================= SO'ROVNOMALAR =================
-    polls_qs = (
-        Poll.objects.filter(is_active=True)
-        .prefetch_related('options__votes')
-        .order_by('-created_at')
-    )
-
-    user_votes = {}
-    voted_options = PollVote.objects.filter(
-        user=request.user, option__poll__in=polls_qs
-    ).select_related('option')
-    for v in voted_options:
-        user_votes.setdefault(v.option.poll_id, set()).add(v.option_id)
-
-    polls = []
-    for poll in polls_qs:
-        options = list(poll.options.all())
-        total = sum(o.votes_count() for o in options)
-        opts_data = []
-        for o in options:
-            count = o.votes_count()
-            percent = round((count / total) * 100) if total else 0
-            opts_data.append({
-                'id': o.id,
-                'text': o.text,
-                'count': count,
-                'percent': percent,
-                'checked': o.id in user_votes.get(poll.id, set()),
-            })
-        polls.append({
-            'id': poll.id,
-            'question': poll.question,
-            'subtitle': poll.subtitle,
-            'multiple_choice': poll.multiple_choice,
-            'options': opts_data,
-            'voted': poll.id in user_votes,
-            'total_votes': total,
-        })
-
-    # ================= KO'RILGAN HAJM STATISTIKASI =================
-    watched_map = {}
-
-    # 1) Qismli animelar — WatchedEpisode orqali (bir nechta qism = jamlanadi)
-    ep_watches = (
-        WatchedEpisode.objects
-        .filter(user=request.user, episode__isnull=False)
-        .select_related('movie', 'episode')
-        .order_by('movie_id', 'episode__episode_number')
-    )
-    for w in ep_watches:
-        m = w.movie
-        entry = watched_map.setdefault(m.id, {
-            'movie': m,
-            'episode_numbers': [],
-            'total_mb': 0.0,
-        })
-        entry['episode_numbers'].append(w.episode.episode_number)
-        entry['total_mb'] += w.episode.get_size_mb() or 0
-
-    # 2) Qismsiz filmlar — WatchHistory orqali (episode'lari yo'q animelar)
-    history_no_ep = (
-        WatchHistory.objects
-        .filter(user=request.user, movie__episodes__isnull=True)
-        .select_related('movie')
-    )
-    for h in history_no_ep:
-        m = h.movie
-        if m.id in watched_map:
-            continue
-        watched_map[m.id] = {
-            'movie': m,
-            'episode_numbers': [],
-            'total_mb': m.get_size_mb() or 0,
-        }
-
-    watched_stats = []
-    for data in watched_map.values():
-        data['episode_numbers'].sort()
-        data['total_mb_display'] = f"{data['total_mb']:.2f}"
-        watched_stats.append(data)
-    watched_stats.sort(key=lambda d: -d['total_mb'])
-
-    return render(request, 'statistika.html', {
-        'polls': polls,
-        'watched_stats': watched_stats,
-    })
-
-@login_required
-def poll_vote(request, poll_id):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
-
-    from .models import Poll, PollOption, PollVote
-
-    poll = get_object_or_404(Poll, id=poll_id, is_active=True)
-    option_ids = request.POST.getlist('option_ids[]') or request.POST.getlist('option_ids')
-
-    if not option_ids:
-        return JsonResponse({'error': "Kamida bitta variant tanlang"}, status=400)
-
-    if not poll.multiple_choice:
-        option_ids = option_ids[:1]
-
-    valid_options = PollOption.objects.filter(poll=poll, id__in=option_ids)
-    if not valid_options.exists():
-        return JsonResponse({'error': "Noto'g'ri variant"}, status=400)
-
-    # Eski ovozlarini o'chirib, yangisini yozamiz (qayta ovoz berish = yangilash)
-    PollVote.objects.filter(user=request.user, option__poll=poll).delete()
-    PollVote.objects.bulk_create([
-        PollVote(user=request.user, option=opt) for opt in valid_options
-    ])
-
-    options = poll.options.all()
-    total = sum(o.votes_count() for o in options)
-    opts_data = [{
-        'id': o.id,
-        'text': o.text,
-        'count': o.votes_count(),
-        'percent': round((o.votes_count() / total) * 100) if total else 0,
-        'checked': o.id in option_ids or str(o.id) in option_ids,
-    } for o in options]
-
-    return JsonResponse({'ok': True, 'options': opts_data, 'total_votes': total})
 @login_required
 def imkon_page(request):
     from .models import (
@@ -2148,6 +2037,41 @@ def imkon_toggle_telegram_download(request):
     settings_obj.save()
     return JsonResponse({'telegram_download_on': settings_obj.telegram_download_on})
 
+@login_required
+def imkon_toggle_vip_box(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import UserSettings, VipUser
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    if vip_data.get_tier() not in ['premium', 'vip'] and not (request.user.is_staff or request.user.is_admin_user):
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.premium_vip_box_on = not settings_obj.premium_vip_box_on
+    settings_obj.save()
+    return JsonResponse({'premium_vip_box_on': settings_obj.premium_vip_box_on})
+
+
+@login_required
+def imkon_toggle_vip_box_recent(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import UserSettings
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.vip_box_show_recent_anime = not settings_obj.vip_box_show_recent_anime
+    settings_obj.save()
+    return JsonResponse({'vip_box_show_recent_anime': settings_obj.vip_box_show_recent_anime})
+
+
+@login_required
+def imkon_toggle_vip_box_expire(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import UserSettings
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.vip_box_show_vip_expire = not settings_obj.vip_box_show_vip_expire
+    settings_obj.save()
+    return JsonResponse({'vip_box_show_vip_expire': settings_obj.vip_box_show_vip_expire})
 
 @login_required
 def imkon_vote_request_add(request):
@@ -2213,20 +2137,144 @@ def imkon_anime_request_add(request):
     return JsonResponse({'ok': True, 'name': name})
 
 @login_required
-def mark_episode_watched(request, episode_id):
+def statistika_page(request):
+    from .models import Poll, PollVote, WatchedEpisode, WatchHistory
+
+    # ================= SO'ROVNOMALAR =================
+    polls_qs = (
+        Poll.objects.filter(is_active=True)
+        .prefetch_related('options__votes')
+        .order_by('-created_at')
+    )
+
+    user_votes = {}
+    voted_options = PollVote.objects.filter(
+        user=request.user, option__poll__in=polls_qs
+    ).select_related('option')
+    for v in voted_options:
+        user_votes.setdefault(v.option.poll_id, set()).add(v.option_id)
+
+    polls = []
+    for poll in polls_qs:
+        options = list(poll.options.all())
+        total = sum(o.votes_count() for o in options)
+        opts_data = []
+        for o in options:
+            count = o.votes_count()
+            percent = round((count / total) * 100) if total else 0
+            opts_data.append({
+                'id': o.id,
+                'text': o.text,
+                'count': count,
+                'percent': percent,
+                'checked': o.id in user_votes.get(poll.id, set()),
+            })
+        polls.append({
+            'id': poll.id,
+            'question': poll.question,
+            'subtitle': poll.subtitle,
+            'multiple_choice': poll.multiple_choice,
+            'options': opts_data,
+            'voted': poll.id in user_votes,
+            'total_votes': total,
+        })
+
+    # ================= KO'RILGAN HAJM STATISTIKASI =================
+    watched_map = {}
+
+    # 1) Qismli animelar — WatchedEpisode orqali (bir nechta qism = jamlanadi)
+    ep_watches = (
+        WatchedEpisode.objects
+        .filter(user=request.user, episode__isnull=False)
+        .select_related('movie', 'episode')
+        .order_by('movie_id', 'episode__episode_number')
+    )
+    for w in ep_watches:
+        m = w.movie
+        entry = watched_map.setdefault(m.id, {
+            'movie': m,
+            'episode_numbers': [],
+            'total_mb': 0.0,
+        })
+        entry['episode_numbers'].append(w.episode.episode_number)
+        entry['total_mb'] += w.episode.get_size_mb() or 0
+
+    # 2) Qismsiz filmlar — WatchHistory orqali (episode'lari yo'q animelar)
+    history_no_ep = (
+        WatchHistory.objects
+        .filter(user=request.user, movie__episodes__isnull=True)
+        .select_related('movie')
+    )
+    for h in history_no_ep:
+        m = h.movie
+        if m.id in watched_map:
+            continue
+        watched_map[m.id] = {
+            'movie': m,
+            'episode_numbers': [],
+            'total_mb': m.get_size_mb() or 0,
+        }
+
+    watched_stats = []
+    for data in watched_map.values():
+        data['episode_numbers'].sort()
+        data['total_mb_display'] = f"{data['total_mb']:.2f}"
+        watched_stats.append(data)
+    watched_stats.sort(key=lambda d: -d['total_mb'])
+
+    return render(request, 'statistika.html', {
+        'polls': polls,
+        'watched_stats': watched_stats,
+    })
+
+@login_required
+def poll_vote(request, poll_id):
     if request.method != 'POST':
         return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
 
-    from .models import MovieEpisode, WatchedEpisode, WatchHistory
-    episode = get_object_or_404(MovieEpisode, id=episode_id)
+    from .models import Poll, PollOption, PollVote
 
-    WatchedEpisode.objects.get_or_create(
-        user=request.user, movie=episode.movie, episode=episode
-    )
-    WatchHistory.objects.update_or_create(
-        user=request.user, movie=episode.movie,
-        defaults={'last_watched': timezone.now(), 'last_episode': episode}
-    )
-    return JsonResponse({'ok': True})
+    poll = get_object_or_404(Poll, id=poll_id, is_active=True)
+    option_ids = request.POST.getlist('option_ids[]') or request.POST.getlist('option_ids')
+
+    if not option_ids:
+        return JsonResponse({'error': "Kamida bitta variant tanlang"}, status=400)
+
+    if not poll.multiple_choice:
+        option_ids = option_ids[:1]
+
+    valid_options = PollOption.objects.filter(poll=poll, id__in=option_ids)
+    if not valid_options.exists():
+        return JsonResponse({'error': "Noto'g'ri variant"}, status=400)
+
+    # Eski ovozlarini o'chirib, yangisini yozamiz (qayta ovoz berish = yangilash)
+    PollVote.objects.filter(user=request.user, option__poll=poll).delete()
+    PollVote.objects.bulk_create([
+        PollVote(user=request.user, option=opt) for opt in valid_options
+    ])
+
+    options = poll.options.all()
+    total = sum(o.votes_count() for o in options)
+    opts_data = [{
+        'id': o.id,
+        'text': o.text,
+        'count': o.votes_count(),
+        'percent': round((o.votes_count() / total) * 100) if total else 0,
+        'checked': o.id in option_ids or str(o.id) in option_ids,
+    } for o in options]
+
+    return JsonResponse({'ok': True, 'options': opts_data, 'total_votes': total})
+
+@login_required(login_url='login')
+def telegram_connect(request):
+    from .models import UserSettings
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    return render(request, 'telegram.html', {
+        'username': request.user.username,
+        'settings': settings_obj,
+    })
+
+
+
 
 
