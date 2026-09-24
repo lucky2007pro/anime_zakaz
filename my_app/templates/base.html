@@ -2338,5 +2338,50 @@ if ('serviceWorker' in navigator) {
 
 </script>
 
+{% if request.user.is_authenticated %}
+<audio id="globalBgMusic" {% if global_music_url %}src="{{ global_music_url }}"{% endif %} loop preload="auto"></audio>
+<script>
+window.globalBgAudio = document.getElementById('globalBgMusic');
+(function() {
+    var audio = window.globalBgAudio;
+    if (!audio) return;
+    audio.volume = Math.max(0, Math.min(1, ({{ global_music_volume|default:50 }} / 100)));
+
+    var savedPos = sessionStorage.getItem('globalMusicPos');
+    if (savedPos && audio.src) {
+        audio.currentTime = parseFloat(savedPos) || 0;
+    }
+
+    window.addEventListener('beforeunload', function() {
+        try {
+            if (audio.src && !audio.paused) {
+                sessionStorage.setItem('globalMusicPos', audio.currentTime);
+            }
+        } catch(e){}
+    });
+
+    {% if global_music_on and global_music_url %}
+    function tryPlay() {
+        var p = audio.play();
+        if (p !== undefined) {
+            p.catch(function() {
+                var playOnce = function() {
+                    audio.play();
+                    document.removeEventListener('click', playOnce);
+                    document.removeEventListener('keydown', playOnce);
+                    document.removeEventListener('touchstart', playOnce);
+                };
+                document.addEventListener('click', playOnce, { once: true });
+                document.addEventListener('keydown', playOnce, { once: true });
+                document.addEventListener('touchstart', playOnce, { once: true });
+            });
+        }
+    }
+    tryPlay();
+    {% endif %}
+})();
+</script>
+{% endif %}
+
 </body>
 </html>

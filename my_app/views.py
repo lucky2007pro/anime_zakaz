@@ -866,7 +866,15 @@ def user_mini_profile_api(request, user_id):
     if vip_box_on and target_settings.vip_box_show_vip_expire and vip_data.vip_expire:
         vip_expire_text = localtime(
             vip_data.vip_expire, ZoneInfo('Asia/Tashkent')
-        ).strftime('%d.%m.%Y %H:%M')
+        ).strftime('%d.%m.%Y')
+
+    vip_video = None
+    if vip_box_on:
+        if target_settings.vip_box_video and target_settings.vip_box_video.is_active and target_settings.vip_box_video.video:
+            vip_video = target_settings.vip_box_video
+        else:
+            vip_video = VipThankVideo.objects.filter(is_active=True).first()
+    vip_video_url = vip_video.video.url if (vip_box_on and vip_video and vip_video.video) else None
 
     return JsonResponse({
         'id': target_user.id,
@@ -886,6 +894,7 @@ def user_mini_profile_api(request, user_id):
         'vip_box_on': vip_box_on,
         'vip_box_show_recent_anime': target_settings.vip_box_show_recent_anime,
         'vip_expire_text': vip_expire_text,
+        'vip_video_url': vip_video_url,
     })
 
 
@@ -1848,9 +1857,10 @@ def jackpot_redeem(request):
 def imkon_page(request):
     from .models import (
         UserSettings, PremiumBackground, AnimeVoteRequest, AnimeVote,
-        AnimeRequestSuggestion, VipUser, PremiumMusic
+        AnimeRequestSuggestion, VipUser, PremiumMusic, VipThankVideo
     )
     musics = PremiumMusic.objects.filter(is_active=True)
+    vip_videos = VipThankVideo.objects.filter(is_active=True).order_by('-created_at')
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     tier = vip_data.get_tier()
     is_premium = tier in ['premium', 'vip'] or request.user.is_staff or request.user.is_admin_user
@@ -1904,6 +1914,7 @@ def imkon_page(request):
         'beta_home_active': beta_home_active,      # YANGI
         'beta_expire_local': beta_expire_local,    # YANGI
         'musics': musics,
+        'vip_videos': vip_videos,
     }
     return render(request, 'imkon.html', context)
 
@@ -2072,6 +2083,28 @@ def imkon_toggle_vip_box_expire(request):
     settings_obj.vip_box_show_vip_expire = not settings_obj.vip_box_show_vip_expire
     settings_obj.save()
     return JsonResponse({'vip_box_show_vip_expire': settings_obj.vip_box_show_vip_expire})
+
+
+@login_required
+def imkon_select_vip_box_video(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    from .models import VipUser, VipThankVideo, UserSettings
+    vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+    if vip_data.get_tier() not in ['premium', 'vip'] and not (request.user.is_staff or request.user.is_admin_user):
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+
+    video_obj = get_object_or_404(VipThankVideo, pk=pk, is_active=True)
+    settings_obj, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings_obj.vip_box_video = video_obj
+    settings_obj.save()
+
+    return JsonResponse({
+        'ok': True,
+        'video_id': video_obj.id,
+        'video_url': video_obj.video.url if video_obj.video else '',
+    })
+
 
 @login_required
 def imkon_vote_request_add(request):
@@ -2275,6 +2308,19 @@ def telegram_connect(request):
     })
 
 
+@login_required
+def mark_episode_watched(request, episode_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
 
+    from .models import MovieEpisode, WatchedEpisode, WatchHistory
+    episode = get_object_or_404(MovieEpisode, id=episode_id)
 
-
+    WatchedEpisode.objects.get_or_create(
+        user=request.user, movie=episode.movie, episode=episode
+    )
+    WatchHistory.objects.update_or_create(
+        user=request.user, movie=episode.movie,
+        defaults={'last_watched': timezone.now(), 'last_episode': episode}
+    )
+    return JsonResponse({'ok': True})

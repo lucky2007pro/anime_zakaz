@@ -661,6 +661,7 @@
         background: rgba(0,0,0,0.65);
         backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
         padding: 20px;
+        overflow-y: auto;
     }
     .user-profile-overlay.open { display: flex; }
     .user-profile-modal {
@@ -668,6 +669,7 @@
         background: rgba(15,15,28,0.97); border: 1px solid var(--glass-border);
         border-radius: 20px; padding: 22px; position: relative;
         box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+        margin: auto;
     }
     .user-profile-modal::-webkit-scrollbar { width: 4px; }
     .user-profile-modal::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
@@ -734,7 +736,7 @@
     .upm-watched-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
     .upm-watched-card { border-radius: 10px; overflow: hidden; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); }
     .upm-watched-card img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; background: rgba(255,255,255,0.05); }
-    .upm-watched-title { display: block; padding: 7px 8px; font-size: 11.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .upm-watched-title { display: block; padding: 7px 8px; font-size: 11.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-light); }
     .upm-empty { font-size: 12px; color: rgba(255,255,255,0.35); grid-column: 1/-1; }
 
     .upm-level-box {
@@ -743,41 +745,407 @@
         border-radius: 14px; padding: 14px 16px;
     }
     .upm-level-circle {
-        width: 56px; height: 56px; border-radius: 50%;
-        background: radial-gradient(circle at 30% 30%, rgba(0,243,255,0.18), rgba(0,243,255,0.03));
-        border: 2px solid rgba(0,243,255,0.4);
-        display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;
+        width: 50px; height: 50px; border-radius: 50%;
+        border: 2px solid var(--accent); display: flex; flex-direction: column;
+        align-items: center; justify-content: center; flex-shrink: 0;
+        box-shadow: 0 0 14px var(--accent-glow);
     }
-    .tier-premium .upm-level-circle { border-color: var(--tier-color); background: radial-gradient(circle at 30% 30%, var(--tier-glow), transparent); }
-    .tier-vip .upm-level-circle { border-color: var(--tier-color); background: radial-gradient(circle at 30% 30%, var(--tier-glow), transparent); }
-    .upm-level-num { font-size: 18px; font-weight: 900; color: var(--accent); line-height: 1; }
-    .tier-premium .upm-level-num { color: var(--tier-color); }
+    .tier-premium .upm-level-circle { border-color: #ffc107; box-shadow: 0 0 14px rgba(255,193,7,0.3); }
+    .tier-vip .upm-level-circle { border-color: #b45cff; box-shadow: 0 0 14px rgba(180,92,255,0.4); }
+    .upm-level-num { font-size: 18px; font-weight: 900; line-height: 1; color: var(--accent); }
+    .tier-premium .upm-level-num { color: #ffc107; }
     .tier-vip .upm-level-num { background: linear-gradient(90deg, var(--tier-color), var(--tier-color-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .upm-level-label { font-size: 8px; font-weight: 800; letter-spacing: .1em; color: rgba(0,243,255,0.6); }
     /* ===== PREMIUM VIP BOX (chat'da boshqa profilni ko'rish) ===== */
-    .pvb-banner {
+    .user-profile-modal.is-vip-box {
+        max-width: 380px !important;
+        max-height: 88vh !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        background: #0d0d14 !important;
+        border: 2px solid #ffd700 !important;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 35px rgba(255, 193, 7, 0.3) !important;
+        border-radius: 22px !important;
+        padding: 0 !important;
+        position: relative !important;
+        margin: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 215, 0, 0.45) transparent;
+    }
+    .user-profile-modal.is-vip-box::-webkit-scrollbar {
+        width: 5px;
+    }
+    .user-profile-modal.is-vip-box::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .user-profile-modal.is-vip-box::-webkit-scrollbar-thumb {
+        background: rgba(255, 215, 0, 0.45);
+        border-radius: 6px;
+    }
+    .user-profile-modal.is-vip-box::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 215, 0, 0.7);
+    }
+    .user-profile-modal.is-vip-box .upm-close {
+        display: none !important;
+    }
+    .vd-modal-wrap {
+        position: relative;
         width: 100%;
-        max-width: 220px;
-        aspect-ratio: 3/4;
-        margin: 0 auto 14px;
+        min-height: 100%;
+    }
+    .vd-mbg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        pointer-events: none;
+    }
+    .vd-mdim {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(8,8,14,0.45) 0%, rgba(8,8,14,0.70) 40%, rgba(8,8,14,0.88) 100%);
+    }
+    .vd-inner {
+        position: relative;
+        z-index: 2;
+        padding: 18px 18px 22px;
+        box-sizing: border-box;
+    }
+    .vd-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+    .vd-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 15px;
+        font-weight: 900;
+        color: #ffc107;
+        text-shadow: 0 0 14px rgba(255,193,7,0.30);
+    }
+    .vd-title i { font-size: 18px; color: #b45cff; text-shadow: none; }
+    .vd-close {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.07);
+        color: #fff;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .vd-close:hover { background: rgba(255,255,255,0.18); }
+    .vd-video-wrap {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
         border-radius: 14px;
         overflow: hidden;
+        background: #08080d;
         border: 1px solid rgba(255,193,7,0.4);
-        box-shadow: 0 0 22px rgba(255,193,7,0.15);
+        box-shadow: 0 0 24px rgba(255,193,7,0.15);
     }
-    .pvb-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .pvb-badge-row { display: flex; justify-content: center; margin-bottom: 14px; }
-    .pvb-thanks {
-        margin-top: 10px;
-        padding: 12px 14px;
-        border-radius: 12px;
-        background: linear-gradient(145deg, rgba(255,193,7,0.10), rgba(255,193,7,0.04));
-        border: 1px solid rgba(255,193,7,0.3);
+    .vd-video-wrap video {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+    }
+    .vd-video-empty {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: rgba(255,193,7,0.6);
+        background: radial-gradient(circle at 50% 40%, rgba(255,193,7,0.15), transparent 65%);
+    }
+    .vd-mute {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(0,0,0,0.65);
+        color: #fff;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .vd-mute:hover { transform: scale(1.1); background: rgba(0,0,0,0.85); }
+    .vd-head {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+    }
+    .vd-name {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px 6px 16px;
+        border-radius: 14px;
+        background: rgba(255,193,7,0.09);
+        border: 1px solid rgba(255,193,7,0.45);
         color: #ffc107;
+        font-weight: 900;
+        font-size: 16px;
+    }
+    .vd-name img {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(255,255,255,0.35);
+    }
+    .vd-vip-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 14px;
+        border-radius: 999px;
+        background: rgba(255,193,7,0.08);
+        border: 1px solid rgba(255,193,7,0.5);
+        color: #ffc107;
+        font-size: 11.5px;
+        font-weight: 900;
+        box-shadow: 0 0 14px rgba(255,193,7,0.18);
+    }
+    .vd-vip-badge i { color: #b45cff; font-size: 14px; }
+    .vd-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        margin-top: 16px;
+        border-top: 1px solid rgba(255,255,255,0.10);
+    }
+    .vd-info-cell {
+        padding: 10px 4px 10px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        min-width: 0;
+    }
+    .vd-info-cell:nth-child(even) {
+        padding-left: 14px;
+        border-left: 1px solid rgba(255,255,255,0.10);
+    }
+    .vd-info-label {
+        font-size: 9.5px;
         font-weight: 800;
-        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: rgba(255,255,255,0.5);
+        margin-bottom: 3px;
+    }
+    .vd-info-value {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: #fff;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .vd-info-value.gold { color: #ffc107; }
+    .vd-sec-title {
+        margin: 16px 0 8px;
+        font-size: 10.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: rgba(255,255,255,0.5);
+    }
+    .vd-thanks {
+        display: flex;
+        align-items: center;
+        min-height: 68px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: linear-gradient(145deg, rgba(255,193,7,0.12), rgba(255,193,7,0.04));
+        border: 1px solid rgba(255,193,7,0.35);
+        box-sizing: border-box;
+    }
+    .vd-typed {
+        font-size: 13.5px;
+        font-weight: 800;
         line-height: 1.5;
-        text-align: center;
+        color: #ffc107;
+        text-shadow: 0 0 12px rgba(255,193,7,0.35);
+    }
+    .vd-typed::after {
+        content: '';
+        display: inline-block;
+        width: 2px;
+        height: 1.05em;
+        margin-left: 3px;
+        vertical-align: -2px;
+        background: #ffc107;
+        animation: vdBlink 1s steps(1) infinite;
+    }
+    @keyframes vdBlink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+    .vd-level {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 14px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025));
+        border: 1px solid rgba(255,255,255,0.10);
+    }
+    .vd-level p {
+        margin: 0;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.45;
+        color: rgba(255,255,255,0.6);
+    }
+    .vd-level-ring {
+        width: 52px;
+        height: 52px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        border: 3px solid #b45cff;
+        box-shadow: 0 0 16px rgba(180,92,255,0.35);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .vd-level-ring b {
+        font-size: 17px;
+        font-weight: 900;
+        color: #fff;
+        line-height: 1;
+    }
+    .vd-level-ring small {
+        font-size: 8px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        color: #b45cff;
+    }
+
+    @media (max-width: 480px) {
+        .user-profile-overlay {
+            padding: 12px;
+        }
+        .user-profile-modal.is-vip-box {
+            max-width: 320px !important;
+            max-height: 84vh !important;
+            border-radius: 18px !important;
+        }
+        .vd-inner {
+            padding: 12px 14px 16px !important;
+        }
+        .vd-header {
+            margin-bottom: 8px !important;
+        }
+        .vd-title {
+            font-size: 13.5px !important;
+            gap: 5px !important;
+        }
+        .vd-title i { font-size: 16px !important; }
+        .vd-close {
+            width: 28px !important;
+            height: 28px !important;
+            font-size: 16px !important;
+        }
+        .vd-video-wrap {
+            border-radius: 10px !important;
+        }
+        .vd-head {
+            margin-top: 10px !important;
+            gap: 6px !important;
+        }
+        .vd-name {
+            font-size: 13.5px !important;
+            padding: 4px 12px !important;
+            border-radius: 10px !important;
+        }
+        .vd-name img {
+            width: 20px !important;
+            height: 20px !important;
+        }
+        .vd-vip-badge {
+            font-size: 10px !important;
+            padding: 2px 10px !important;
+        }
+        .vd-info {
+            margin-top: 10px !important;
+        }
+        .vd-info-cell {
+            padding: 7px 4px 7px 0 !important;
+        }
+        .vd-info-cell:nth-child(even) {
+            padding-left: 10px !important;
+        }
+        .vd-info-label {
+            font-size: 8.5px !important;
+            margin-bottom: 2px !important;
+        }
+        .vd-info-value {
+            font-size: 12px !important;
+        }
+        .vd-sec-title {
+            margin: 10px 0 6px !important;
+            font-size: 9px !important;
+        }
+        .vd-thanks {
+            min-height: 52px !important;
+            padding: 8px 12px !important;
+            border-radius: 10px !important;
+        }
+        .vd-typed {
+            font-size: 12px !important;
+            line-height: 1.4 !important;
+        }
+        .vd-level {
+            padding: 10px 12px !important;
+            border-radius: 10px !important;
+            gap: 8px !important;
+        }
+        .vd-level p {
+            font-size: 10.5px !important;
+            line-height: 1.35 !important;
+        }
+        .vd-level-ring {
+            width: 44px !important;
+            height: 44px !important;
+            border-width: 2.5px !important;
+        }
+        .vd-level-ring b {
+            font-size: 15px !important;
+        }
+        .vd-level-ring small {
+            font-size: 7.5px !important;
+        }
+        .upm-watched-grid {
+            gap: 6px !important;
+            margin-bottom: 8px !important;
+        }
+        .upm-watched-card {
+            border-radius: 8px !important;
+        }
+        .upm-watched-title {
+            font-size: 10.5px !important;
+            padding: 5px 6px !important;
+        }
     }
 
 
@@ -1807,6 +2175,13 @@ function openUserProfileModal(userId) {
 function closeUserProfileModal() {
     const overlay = document.getElementById("userProfileOverlay");
     if (overlay) overlay.classList.remove("open");
+    const vid = document.getElementById("vdVideo");
+    if (vid) {
+        vid.pause();
+        vid.src = "";
+    }
+    const card = document.getElementById("userProfileModalCard");
+    if (card) card.classList.remove("is-vip-box");
 }
 
 function renderUserProfileModal(data) {
@@ -1816,12 +2191,14 @@ function renderUserProfileModal(data) {
     const isVip = tier === "vip";
     card.classList.add("tier-" + tier);
 
-    // YANGI — agar bu foydalanuvchi "Premium VIP box"ni yoqqan bo'lsa,
-    // oddiy profil o'rniga maxsus VIP box ko'rsatiladi
+    // Agar bu foydalanuvchi "Premium VIP box"ni yoqqan bo'lsa,
+    // oddiy profil o'rniga maxsus VIP box ochiladi
     if (data.vip_box_on) {
         renderPremiumVipBoxModal(data, card);
         return;
     }
+
+    card.classList.remove("is-vip-box");
 
     let badgeHtml = '<span class="upm-badge"><i class="bx bx-user"></i> Oddiy</span>';
     if (tier === "vip") badgeHtml = '<span class="upm-badge upm-badge-vip-pulse"><i class="bx bxs-crown"></i> VIP</span>';
@@ -1879,24 +2256,20 @@ function renderUserProfileModal(data) {
     `;
 }
 
-// YANGI — Premium VIP box ko'rinishi (faqat "Premium VIP box"ni yoqqan VIP foydalanuvchilar uchun)
+// Premium VIP box ko'rinishi (faqat "Premium VIP box"ni yoqqan VIP foydalanuvchilar uchun)
 function renderPremiumVipBoxModal(data, card) {
     const body = document.getElementById("upmBody");
-    card.classList.add("tier-vip");
+    card.classList.add("tier-vip", "is-vip-box");
 
     const avatarHtml = data.avatar_url
         ? `<img src="${escHtml(data.avatar_url)}" alt="avatar">`
-        : escHtml((data.display_name || "?")[0].toUpperCase());
-
-    const adminIconHtml = data.is_admin
-        ? `<img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" class="admin-icon-badge" style="margin-left:4px;" alt="Admin">`
         : '';
 
     let watchedHtml = '';
     if (data.vip_box_show_recent_anime) {
         if (data.last_watched && data.last_watched.length) {
             watchedHtml = `
-                <p class="upm-section-title" style="margin-top:16px;">Ko'rilgan animelar</p>
+                <div class="vd-sec-title">KO'RILGAN ANIMELAR</div>
                 <div class="upm-watched-grid">
                     ${data.last_watched.map(m => `
                         <div class="upm-watched-card">
@@ -1907,112 +2280,121 @@ function renderPremiumVipBoxModal(data, card) {
                 </div>
             `;
         } else {
-            watchedHtml = `<p class="upm-section-title" style="margin-top:16px;">Ko'rilgan animelar</p><div class="upm-empty">Hali hech qanday anime ko'rilmagan.</div>`;
+            watchedHtml = `<div class="vd-sec-title">KO'RILGAN ANIMELAR</div><div class="upm-empty">Hali hech qanday anime ko'rilmagan.</div>`;
         }
     }
 
-    let expireHtml = '';
-    if (data.vip_expire_text) {
-        expireHtml = `
-            <div class="upm-info-cell">
-                <div class="upm-info-label">VIP tugash sanasi</div>
-                <div class="upm-info-val upm-info-val-vip">${escHtml(data.vip_expire_text)}</div>
-            </div>
-        `;
-    }
+    const videoHtml = data.vip_video_url ? `
+        <video id="vdVideo" src="${escHtml(data.vip_video_url)}" loop playsinline autoplay></video>
+        <button type="button" class="vd-mute" id="vdMute" aria-label="Ovozni yoqish / o'chirish">
+            <i class='bx bx-volume-full' id="vdMuteIcon"></i>
+        </button>
+    ` : `
+        <div class="vd-video-empty"><i class='bx bxs-crown'></i></div>
+    `;
 
     body.innerHTML = `
-        <div class="pvb-banner">
-            <img src="https://i.pinimg.com/736x/4e/1c/7b/4e1c7b9b437f08367f2118bd5c544c3a.jpg" alt="VIP box">
-        </div>
-        <div class="upm-hero">
-            <div class="upm-avatar">${avatarHtml}</div>
-            <div class="upm-name upm-name-vip">@${escHtml(data.username)} ${adminIconHtml}</div>
-        </div>
-        <div class="pvb-badge-row">
-            <span class="upm-badge upm-badge-vip-pulse"><i class="bx bxs-crown"></i> VIP</span>
-        </div>
-        <div class="upm-info-grid">
-            <div class="upm-info-cell"><div class="upm-info-label">ID</div><div class="upm-info-val upm-info-val-vip">${escHtml(data.id)}</div></div>
-            <div class="upm-info-cell"><div class="upm-info-label">Ism</div><div class="upm-info-val upm-info-val-vip">${escHtml(data.first_name)}</div></div>
-            <div class="upm-info-cell"><div class="upm-info-label">Ro'yxatdan o'tgan</div><div class="upm-info-val upm-date-wave">${escHtml(data.date_joined)}</div></div>
-            ${expireHtml}
-        </div>
-        ${watchedHtml}
-        <p class="upm-section-title" style="margin-top:16px;">Minnatdorchilik</p>
-        <div class="pvb-thanks">AniBest fandubi VIP obuna sotib olganingiz uchun tashakkur bildiradi</div>
-        <p class="upm-section-title" style="margin-top:16px;">Daraja</p>
-        <div class="upm-level-box">
-            <div><div style="font-size:12px;color:var(--text-dim);">Saytdagi faollik va ko'rilgan animelar soniga qarab daraja oshadi.</div></div>
-            <div class="upm-level-circle">
-                <div class="upm-level-num">${escHtml(data.level)}</div>
-                <div class="upm-level-label">LEVEL</div>
+        <div class="vd-modal-wrap">
+            <img class="vd-mbg"
+                 src="/static/images/vip_box_bg.jpg"
+                 onerror="this.src='https://i.pinimg.com/1200x/10/fc/d7/10fcd7f9b1457e25223a2f6ee6c9bc5d.jpg'"
+                 alt="" referrerpolicy="no-referrer">
+            <div class="vd-mdim"></div>
+
+            <div class="vd-inner">
+                <div class="vd-header">
+                    <div class="vd-title"><i class='bx bxs-crown'></i> VIP box</div>
+                    <button type="button" class="vd-close" onclick="closeUserProfileModal()"><i class='bx bx-x'></i></button>
+                </div>
+
+                <div class="vd-video-wrap">
+                    ${videoHtml}
+                </div>
+
+                <div class="vd-head">
+                    <div class="vd-name">
+                        <span>@${escHtml(data.username)}</span>
+                        ${avatarHtml}
+                    </div>
+                    <div class="vd-vip-badge"><i class='bx bxs-crown'></i> VIP</div>
+                </div>
+
+                <div class="vd-info">
+                    <div class="vd-info-cell">
+                        <div class="vd-info-label">ID</div>
+                        <div class="vd-info-value">${escHtml(data.id)}</div>
+                    </div>
+                    <div class="vd-info-cell">
+                        <div class="vd-info-label">ISM</div>
+                        <div class="vd-info-value">${escHtml(data.first_name || data.display_name)}</div>
+                    </div>
+                    <div class="vd-info-cell">
+                        <div class="vd-info-label">VIP TUGASH SANASI</div>
+                        <div class="vd-info-value gold">${escHtml(data.vip_expire_text || "Muddatsiz")}</div>
+                    </div>
+                    <div class="vd-info-cell">
+                        <div class="vd-info-label">RO'YXATDAN O'TGAN</div>
+                        <div class="vd-info-value">${escHtml(data.date_joined)}</div>
+                    </div>
+                </div>
+
+                <div class="vd-sec-title">MINNATDORCHILIK</div>
+                <div class="vd-thanks">
+                    <span class="vd-typed" id="vdTyped" data-text="AniBest fandubi VIP obuna sotib olganingiz uchun tashakkur bildiradi"></span>
+                </div>
+
+                <div class="vd-sec-title">DARAJA</div>
+                <div class="vd-level">
+                    <p>Saytdagi faollik va ko'rilgan animelar soniga qarab daraja oshadi.</p>
+                    <div class="vd-level-ring">
+                        <b>${escHtml(data.level)}</b>
+                        <small>LEVEL</small>
+                    </div>
+                </div>
+
+                ${watchedHtml}
             </div>
         </div>
     `;
-}
 
-function renderUserProfileModal(data) {
-    const body = document.getElementById("upmBody");
-    const card = document.getElementById("userProfileModalCard");
-    const tier = data.tier || "basic";
-    const isVip = tier === "vip";
-    card.classList.add("tier-" + tier);
-
-    let badgeHtml = '<span class="upm-badge"><i class="bx bx-user"></i> Oddiy</span>';
-    if (tier === "vip") badgeHtml = '<span class="upm-badge upm-badge-vip-pulse"><i class="bx bxs-crown"></i> VIP</span>';
-    else if (tier === "premium") badgeHtml = '<span class="upm-badge"><i class="bx bx-crown"></i> Premium</span>';
-
-    const avatarHtml = data.avatar_url
-        ? `<img src="${escHtml(data.avatar_url)}" alt="avatar">`
-        : escHtml((data.display_name || "?")[0].toUpperCase());
-
-    let watchedHtml = '';
-    if (data.last_watched && data.last_watched.length) {
-        watchedHtml = data.last_watched.map(m => `
-            <div class="upm-watched-card">
-                ${m.image_url ? `<img src="${escHtml(m.image_url)}" alt="${escHtml(m.title)}">` : ''}
-                <span class="upm-watched-title">${escHtml(m.title)}</span>
-            </div>
-        `).join('');
-    } else {
-        watchedHtml = '<div class="upm-empty">Hali hech qanday anime ko\'rilmagan.</div>';
+    // Video boshqaruvi (default ovozli)
+    const vid = document.getElementById("vdVideo");
+    const muteBtn = document.getElementById("vdMute");
+    const muteIcon = document.getElementById("vdMuteIcon");
+    if (vid && muteBtn) {
+        vid.muted = false;
+        const playPromise = vid.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(function() {
+                vid.muted = true;
+                if (muteIcon) muteIcon.className = 'bx bx-volume-mute';
+                vid.play().catch(function(){});
+            });
+        }
+        if (!vid.muted && muteIcon) {
+            muteIcon.className = 'bx bx-volume-full';
+        }
+        muteBtn.onclick = function(e) {
+            e.stopPropagation();
+            vid.muted = !vid.muted;
+            if (muteIcon) {
+                muteIcon.className = vid.muted ? 'bx bx-volume-mute' : 'bx bx-volume-full';
+            }
+        };
     }
 
-    const adminIconHtml = data.is_admin
-        ? `<img src="https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg" class="admin-icon-badge" style="margin-left:4px;" alt="Admin">`
-        : '';
-
-    const nameClass    = isVip ? "upm-name upm-name-vip" : "upm-name";
-    const idValClass   = isVip ? "upm-info-val upm-info-val-vip" : "upm-info-val";
-    const ismValClass  = isVip ? "upm-info-val upm-info-val-vip" : "upm-info-val";
-    const dateValClass = isVip ? "upm-info-val upm-date-wave" : "upm-info-val";
-
-    body.innerHTML = `
-        <div class="upm-hero">
-            <div class="upm-avatar">${avatarHtml}</div>
-            <div class="${nameClass}">@${escHtml(data.username)} ${adminIconHtml}</div>
-            ${badgeHtml}
-        </div>
-        <div class="upm-info-grid">
-            <div class="upm-info-cell"><div class="upm-info-label">ID</div><div class="${idValClass}">${escHtml(data.id)}</div></div>
-            <div class="upm-info-cell"><div class="upm-info-label">Ism</div><div class="${ismValClass}">${escHtml(data.first_name)}</div></div>
-            <div class="upm-info-cell"><div class="upm-info-label">Familiya</div><div class="upm-info-val">${escHtml(data.last_name)}</div></div>
-            <div class="upm-info-cell"><div class="upm-info-label">Ro'yxatdan o'tgan</div><div class="${dateValClass}">${escHtml(data.date_joined)}</div></div>
-        </div>
-        <p class="upm-section-title">Ko'rilgan animelar</p>
-        <div class="upm-watched-grid">${watchedHtml}</div>
-        <p class="upm-section-title">Daraja</p>
-        <div class="upm-level-box">
-            <div>
-                <div style="font-size:12px;color:var(--text-dim);">Saytdagi faollik va ko'rilgan animelar soniga qarab daraja oshadi.</div>
-            </div>
-            <div class="upm-level-circle">
-                <div class="upm-level-num">${escHtml(data.level)}</div>
-                <div class="upm-level-label">LEVEL</div>
-            </div>
-        </div>
-    `;
+    // Yozilish (typing) animatsiyasi
+    const typedEl = document.getElementById("vdTyped");
+    if (typedEl) {
+        const fullText = typedEl.dataset.text || '';
+        typedEl.textContent = '';
+        let charIdx = 0;
+        const typingInterval = setInterval(function() {
+            charIdx++;
+            typedEl.textContent = fullText.slice(0, charIdx);
+            if (charIdx >= fullText.length) clearInterval(typingInterval);
+        }, 35);
+    }
 }
 
 (function() {

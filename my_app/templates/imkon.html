@@ -265,7 +265,7 @@
     }
 
     .imkon-vipbox-box.open {
-        max-height: 520px;
+        max-height: 2000px;
         opacity: 1;
         margin-top: 16px;
     }
@@ -285,6 +285,92 @@
         display: block;
         aspect-ratio: 3/4;
         object-fit: cover;
+    }
+
+    .imkon-vipbox-sec-title {
+        font-size: 0.82rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #ffc107;
+        margin: 14px 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .imkon-vip-videos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .imkon-vip-video-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 8px;
+        cursor: pointer;
+        transition: 0.25s;
+        text-align: center;
+        position: relative;
+    }
+
+    .imkon-vip-video-card:hover {
+        border-color: rgba(255,193,7,0.5);
+        transform: translateY(-2px);
+    }
+
+    .imkon-vip-video-card.selected {
+        border-color: #ffd700;
+        background: rgba(255,215,0,0.08);
+        box-shadow: 0 0 16px rgba(255,193,7,0.25);
+    }
+
+    .imkon-vip-video-thumb {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #000;
+        margin-bottom: 6px;
+    }
+
+    .imkon-vip-video-thumb video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .imkon-vip-video-badge {
+        display: none;
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        background: #ffd700;
+        color: #000;
+        font-size: 9px;
+        font-weight: 900;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .imkon-vip-video-card.selected .imkon-vip-video-badge {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .imkon-vip-video-title {
+        font-size: 11px;
+        font-weight: 700;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .imkon-vipbox-option {
@@ -688,6 +774,22 @@
                 <img src="https://i.pinimg.com/736x/4e/1c/7b/4e1c7b9b437f08367f2118bd5c544c3a.jpg" alt="VIP box ko'rinishi" loading="lazy">
             </div>
 
+            <div class="imkon-vipbox-sec-title"><i class='bx bxs-video'></i> VIP box videosini tanlash</div>
+            <div class="imkon-vip-videos-grid">
+                {% for vitem in vip_videos %}
+                <div class="imkon-vip-video-card {% if settings.vip_box_video_id == vitem.id or not settings.vip_box_video and forloop.first %}selected{% endif %}"
+                     onclick="selectVipVideo({{ vitem.id }}, this)">
+                    <div class="imkon-vip-video-thumb">
+                        <video src="{{ vitem.video.url }}" muted playsinline preload="metadata"></video>
+                        <div class="imkon-vip-video-badge"><i class='bx bx-check'></i> Tanlangan</div>
+                    </div>
+                    <div class="imkon-vip-video-title">{{ vitem.title|default:"VIP video" }}</div>
+                </div>
+                {% empty %}
+                <div class="imkon-bg-empty" style="padding:10px 0; font-size:0.8rem; grid-column:1/-1;">Hozircha admin tomonidan boshqa video yuklanmagan.</div>
+                {% endfor %}
+            </div>
+
             <div class="imkon-vipbox-option">
                 <span>Oxirgi animelarni ko'rsatish</span>
                 <div class="imkon-toggle small {% if settings.vip_box_show_recent_anime %}on{% endif %}" id="vipBoxRecentToggle" onclick="toggleVipBoxRecent()"></div>
@@ -974,6 +1076,17 @@ function toggleVipBoxExpire() {
     });
 }
 
+function selectVipVideo(id, card) {
+    fetch(`/imkon/vip-box/video/${id}/tanlash/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+        document.querySelectorAll('.imkon-vip-video-card').forEach(c => c.classList.remove('selected'));
+        if (card) card.classList.add('selected');
+    });
+}
+
 function toggleTelegramDownload() {
     fetch("{% url 'imkon_toggle_telegram_download' %}", {
         method: 'POST',
@@ -1059,13 +1172,14 @@ function submitAnimeRequest() {
 }
 
 /* ============================================
+/* ============================================
    PREMIUM MUZIKA
    ============================================ */
-let previewAudio = new Audio();
+let previewAudio = window.globalBgAudio || new Audio();
 previewAudio.loop = true;
-previewAudio.volume = document.getElementById('musicVolume')
-    ? document.getElementById('musicVolume').value / 100
-    : 0.5;
+if (document.getElementById('musicVolume')) {
+    previewAudio.volume = document.getElementById('musicVolume').value / 100;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     initBgPager();
@@ -1073,11 +1187,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const playingRow = document.querySelector('.imkon-music-row.playing');
     if (playingRow) {
         const btn = playingRow.querySelector('.imkon-music-play-btn');
-        const onclickAttr = btn.getAttribute('onclick');
-        const match = onclickAttr.match(/toggleTrack\((\d+),\s*'([^']+)'/);
+        const onclickAttr = btn ? btn.getAttribute('onclick') : '';
+        const match = onclickAttr ? onclickAttr.match(/toggleTrack\((\d+),\s*'([^']+)'/) : null;
         if (match) {
-            previewAudio.src = match[2];
-            previewAudio.play().catch(()=>{});
+            // Agar globalBgMusic hali o'ynamayotgan bo'lsa yoki boshqa trek bo'lsa
+            if (!previewAudio.src || !previewAudio.src.includes(match[2])) {
+                previewAudio.src = match[2];
+            }
+            if (previewAudio.paused) {
+                previewAudio.play().catch(()=>{});
+            }
+            if (btn) btn.innerHTML = "<i class='bx bx-pause'></i>";
         }
     }
 });
@@ -1094,8 +1214,23 @@ function toggleMusic() {
 
         if (!data.premium_music_on) {
             previewAudio.pause();
+            try { sessionStorage.removeItem('globalMusicPos'); } catch(e){}
             document.querySelectorAll('.imkon-music-row').forEach(r => r.classList.remove('playing'));
             document.querySelectorAll('.imkon-music-play-btn').forEach(b => b.innerHTML = "<i class='bx bx-play'></i>");
+        } else {
+            // Agar yoqilsa, tanlangan trekni o'ynatish
+            const playingRow = document.querySelector('.imkon-music-row.playing') || document.querySelector('.imkon-music-row');
+            if (playingRow) {
+                const btn = playingRow.querySelector('.imkon-music-play-btn');
+                const onclickAttr = btn ? btn.getAttribute('onclick') : '';
+                const match = onclickAttr ? onclickAttr.match(/toggleTrack\((\d+),\s*'([^']+)'/) : null;
+                if (match) {
+                    playingRow.classList.add('playing');
+                    if (btn) btn.innerHTML = "<i class='bx bx-pause'></i>";
+                    previewAudio.src = match[2];
+                    previewAudio.play().catch(()=>{});
+                }
+            }
         }
     });
 }
@@ -1121,7 +1256,7 @@ function saveVolume(val) {
 
 function toggleTrack(id, url, btn) {
     const row = btn.closest('.imkon-music-row');
-    const isPlaying = row.classList.contains('playing');
+    const isPlaying = row.classList.contains('playing') && !previewAudio.paused;
 
     if (isPlaying) {
         previewAudio.pause();

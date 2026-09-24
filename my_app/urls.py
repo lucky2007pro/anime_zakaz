@@ -11,8 +11,8 @@ from .views import (
     hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
     imkon_vote_request_add, imkon_vote, imkon_anime_request_add, check_username,
     news_load_more, vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem, imkon_toggle_beta_home,
-    save_push_subscription, send_test_push_api,imkon_set_music_volume,imkon_select_music,imkon_toggle_music,poll_vote,mark_episode_watched,imkon_toggle_vip_box_expire,imkon_toggle_vip_box_recent,imkon_toggle_vip_box
-
+    save_push_subscription, send_test_push_api,imkon_set_music_volume,imkon_select_music,imkon_toggle_music,poll_vote,mark_episode_watched,imkon_toggle_vip_box_expire,imkon_toggle_vip_box_recent,imkon_toggle_vip_box,
+    imkon_select_vip_box_video
 )
 from .admin_views import *
 from django.conf import settings
@@ -210,7 +210,13 @@ urlpatterns = [
     path('imkon/vip-box/yoqish/', imkon_toggle_vip_box, name='imkon_toggle_vip_box'),
     path('imkon/vip-box/oxirgi-anime/', imkon_toggle_vip_box_recent, name='imkon_toggle_vip_box_recent'),
     path('imkon/vip-box/tugash-vaqti/', imkon_toggle_vip_box_expire, name='imkon_toggle_vip_box_expire'),
+    path('imkon/vip-box/video/<int:pk>/tanlash/', imkon_select_vip_box_video, name='imkon_select_vip_box_video'),
 
+    # VIP VIDEOLAR (admin)
+    path('control-panel/vip-videos/', admin_vip_videos, name='admin_vip_videos'),
+    path('control-panel/vip-videos/add/', admin_vip_video_form, name='admin_vip_video_form'),
+    path('control-panel/vip-videos/<int:pk>/edit/', admin_vip_video_form, name='admin_vip_video_edit'),
+    path('control-panel/vip-videos/<int:pk>/delete/', admin_vip_video_delete, name='admin_vip_video_delete'),
 ]
 
 

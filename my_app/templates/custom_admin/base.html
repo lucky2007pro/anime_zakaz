@@ -286,6 +286,11 @@
             </a>
         </li> 
         <li>
+            <a href="{% url 'admin_vip_videos' %}" class="{% if 'vip_video' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bxs-video-recording'></i> VIP Videolar
+            </a>
+        </li> 
+        <li>
             <a href="{% url 'admin_polls' %}" class="{% if 'poll' in request.resolver_match.url_name %}active{% endif %}">
                 <i class='bx bx-poll'></i> So'rovnomalar
             </a>

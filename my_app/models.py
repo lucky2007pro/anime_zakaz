@@ -412,18 +412,6 @@ class MovieComment(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.movie.title} - {self.text[:20]}"
 
-# =======================
-# ACTIVE SESSIONS (DEVICE LIMITS)
-# =======================
-class ActiveSession(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='active_sessions')
-    session_key = models.CharField(max_length=40, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.session_key}"
-
-
 
 class AnimeNews(models.Model):
     title = models.CharField(max_length=255)
@@ -626,6 +614,10 @@ class UserSettings(models.Model):
     vip_box_show_vip_expire = models.BooleanField(
         default=True,
         help_text="VIP box ichida VIP obuna tugash sanasini ko'rsatish"
+    )
+    vip_box_video = models.ForeignKey(
+        'VipThankVideo', on_delete=models.SET_NULL, null=True, blank=True, related_name='+',
+        help_text="VIP foydalanuvchi tanlagan maxsus VIP box videosi"
     )
     
     # PREMIUM MUZIKALAR

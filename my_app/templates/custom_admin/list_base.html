@@ -95,6 +95,8 @@
                 </form>
             {% elif type == 'premium' %}
                 <div class="stat-pill"><i class='bx bxs-crown'></i> Jami VIP: <b>{{ total_vip }}</b></div>
+            {% elif type == 'vip_video' %}
+                <a href="{% url 'admin_vip_video_form' %}" class="btn">+ Yangi video yuklash</a>
             {% else %}
                 <button class="btn" style="opacity:0.5; pointer-events:none;">+ Qo'shish</button>
             {% endif %}
@@ -145,6 +147,8 @@
                     <th>Video</th><th>Sarlavha</th><th>Anime</th><th>Muallif</th><th>Like/Izoh</th><th>Ko'rishlar</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'premium' %}
                     <th>ID</th><th>Foydalanuvchi</th><th>Reja</th><th>Tugash sanasi</th><th>Holat</th><th>Harakatlar</th>
+                {% elif type == 'vip_video' %}
+                    <th>Sarlavha</th><th>Video</th><th>Holat</th><th>Yuklangan sana</th><th>Harakatlar</th>
                 {% endif %}
             </tr>
         </thead>
@@ -401,6 +405,23 @@
                             <span class="badge badge-red">Tugagan</span>
                         {% endif %}
                     </td>
+                {% elif type == 'vip_video' %}
+                    <td style="font-weight:700; color:#fff;">{{ item.title|default:"VIP video" }}</td>
+                    <td>
+                        {% if item.video %}
+                            <video src="{{ item.video.url }}" style="width:120px; aspect-ratio:16/9; object-fit:cover; border-radius:6px; border:1px solid var(--border-line);" muted controls></video>
+                        {% else %}
+                            <span style="color:var(--text-dim);">Fayl yo'q</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.is_active %}
+                            <span class="badge badge-green">Faol</span>
+                        {% else %}
+                            <span class="badge badge-red">Nofaol</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">{{ item.created_at|date:"d.m.Y H:i" }}</td>
                 {% endif %}
 
                 <!-- HARAKATLAR -->
@@ -497,6 +518,10 @@
                     {% elif type == 'premium' %}
                         <a href="{% url 'admin_premium_form' item.id %}" class="action-btn">Tahrirlash obunani</a>
                         <a href="{% url 'admin_premium_cancel' item.id %}" class="action-btn delete" onclick="return confirm('{{ item.user.username }} obunasini bekor qilishni tasdiqlaysizmi?');">Obunani bekor qilish</a>
+
+                    {% elif type == 'vip_video' %}
+                        <a href="{% url 'admin_vip_video_edit' item.id %}" class="action-btn">Tahrirlash</a>
+                        <a href="{% url 'admin_vip_video_delete' item.id %}" class="action-btn delete" onclick="return confirm('Bu VIP videoni o\'chirishni tasdiqlaysizmi?');">O'chirish</a>
 
                     {% elif type == 'newslike' or type == 'storyview' %}
                         <span style="color:var(--text-dim); font-size:0.82rem;">—</span>

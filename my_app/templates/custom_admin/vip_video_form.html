@@ -1,0 +1,114 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}{% if video_obj %}VIP Videoni Tahrirlash{% else %}Yangi VIP Video Qo'shish{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container { max-width: 600px; margin: 0 auto; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--text-dim); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+    .form-control {
+        width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-line);
+        color: white; border-radius: 6px; font-family: 'Outfit', sans-serif; font-size: 1rem; transition: 0.3s;
+        box-sizing: border-box;
+    }
+    .form-control:focus { outline: none; border-color: #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+
+    .preview-box {
+        margin-top: 10px;
+        margin-bottom: 15px;
+        width: 100%;
+        max-width: 320px;
+        aspect-ratio: 16 / 9;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255,215,0,0.4);
+        background: #000;
+    }
+    .preview-box video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255,255,255,0.03);
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border-line);
+        cursor: pointer;
+    }
+    .checkbox-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #ffd700;
+        cursor: pointer;
+    }
+    .checkbox-group label {
+        margin: 0;
+        cursor: pointer;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #ffd700, #ff9800);
+        color: #000; border: none; padding: 14px 20px; border-radius: 6px;
+        width: 100%; font-weight: 900; font-size: 1rem; cursor: pointer; transition: 0.3s;
+        text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+    .btn-submit:hover { background: #fff; color: #000; box-shadow: 0 0 25px rgba(255,255,255,0.8); }
+
+    @media (max-width: 768px) {
+        .form-container { max-width: 100%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel form-container">
+    <h2 style="margin-bottom: 25px; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--border-line); padding-bottom: 10px; color: #ffd700;">
+        <i class='bx bxs-crown'></i> {% if video_obj %}VIP Videoni Tahrirlash{% else %}Yangi VIP Video Qo'shish{% endif %}
+    </h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="video-title">Sarlavha / Nomi (Ixtiyoriy)</label>
+            <input id="video-title" type="text" name="title" class="form-control"
+                   value="{{ video_obj.title|default:'' }}" placeholder="Masalan: Daffy Duck pul sanayapti...">
+        </div>
+
+        {% if video_obj and video_obj.video %}
+        <div class="form-group">
+            <label>Hozirgi Video</label>
+            <div class="preview-box">
+                <video src="{{ video_obj.video.url }}" controls></video>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="video-file">Video Fayli (MP4, 16:9 tavsiya etiladi) {% if not video_obj %}<span style="color:#f87171;">*</span>{% endif %}</label>
+            <input id="video-file" type="file" name="video" class="form-control" accept="video/mp4,video/*" {% if not video_obj %}required{% endif %}>
+            <small style="color:var(--text-dim); display:block; margin-top:6px; font-size:0.8rem;">
+                Hajmi kichik (1-5 MB) va 16:9 nisbatdagi qisqa video yuklash tavsiya etiladi.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="is_active" name="is_active" {% if not video_obj or video_obj.is_active %}checked{% endif %}>
+                <label for="is_active">Faol holatda (VIP foydalanuvchilar tanlashi mumkin)</label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">SAQLASH <i class='bx bx-save'></i></button>
+    </form>
+</div>
+{% endblock %}

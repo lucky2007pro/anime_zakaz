@@ -96,6 +96,7 @@ TEMPLATES = [
 
                 'my_app.context_processors.notices_context',
                 'my_app.context_processors.navbar_extra',
+                'my_app.context_processors.premium_music_context',
             ],
         },
     },

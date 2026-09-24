@@ -1163,3 +1163,56 @@ def admin_poll_delete(request, pk):
     poll.delete()
     messages.success(request, "So'rovnoma o'chirildi!")
     return redirect('admin_polls')
+
+
+# =======================
+# VIP TASHAKKUR VIDEOLARI
+# =======================
+@user_passes_test(is_admin, login_url='/')
+def admin_vip_videos(request):
+    videos = VipThankVideo.objects.all().order_by('-created_at')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'VIP Box Videolari',
+        'items': videos,
+        'type': 'vip_video',
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_vip_video_form(request, pk=None):
+    video_obj = get_object_or_404(VipThankVideo, pk=pk) if pk else None
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        is_active = request.POST.get('is_active') == 'on'
+        video_file = request.FILES.get('video')
+
+        if not video_obj and not video_file:
+            messages.error(request, "Video faylini yuklash shart!")
+            return render(request, 'custom_admin/vip_video_form.html', {'video_obj': video_obj})
+
+        if video_obj:
+            video_obj.title = title
+            video_obj.is_active = is_active
+            if video_file:
+                video_obj.video = video_file
+            video_obj.save()
+            messages.success(request, "VIP video muvaffaqiyatli yangilandi!")
+        else:
+            VipThankVideo.objects.create(
+                title=title,
+                video=video_file,
+                is_active=is_active
+            )
+            messages.success(request, "Yangi VIP video muvaffaqiyatli qo'shildi!")
+        return redirect('admin_vip_videos')
+
+    return render(request, 'custom_admin/vip_video_form.html', {'video_obj': video_obj})
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_vip_video_delete(request, pk):
+    video_obj = get_object_or_404(VipThankVideo, pk=pk)
+    video_obj.delete()
+    messages.success(request, "VIP video o'chirildi!")
+    return redirect('admin_vip_videos')
+
