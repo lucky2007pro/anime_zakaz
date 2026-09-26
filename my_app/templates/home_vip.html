@@ -667,6 +667,94 @@
     }
     .beta-panel-empty i { font-size: 2.6rem; display: block; margin-bottom: 12px; opacity: 0.4; }
 
+    /* ================= TV / PULT UCHUN FOKUS STILLARI =================
+       Smart TV remote (D-pad) bilan boshqarilganda sichqoncha ":hover" ishlamaydi,
+       shuning uchun har bir bosiladigan elementga aniq ko'rinadigan ":focus" stili
+       qo'shildi (odatda ":hover" bilan bir xil effekt). Bu telefon/PC'dagi
+       hover-based dizaynga hech qanday ta'sir qilmaydi. */
+
+    .card-wrapper:focus-within .card-inner-overlay { opacity: 1; }
+    .card-wrapper:focus-within .card-title { color: var(--accent); }
+
+    .anime-card:focus,
+    .anime-card:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+        transform: scale(1.035);
+        transition: transform 0.2s ease;
+        z-index: 5;
+    }
+
+    .btn-main:focus,
+    .btn-main:focus-visible {
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 12px 30px rgba(255, 0, 60, 0.5);
+        outline: 3px solid #fff;
+        outline-offset: 3px;
+    }
+
+    .fav-badge:focus,
+    .fav-badge:focus-visible {
+        background: rgba(255,255,255,0.2);
+        color: #ff3366;
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+    }
+
+    .day-pill:focus,
+    .day-pill:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+    .day-pill:not(.active):focus {
+        background: rgba(255,255,255,0.1);
+        color: var(--text-light);
+    }
+
+    .beta-tab-btn:focus,
+    .beta-tab-btn:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+    .beta-tab-btn:not(.active):focus {
+        border-color: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.08);
+    }
+
+    .dot:focus,
+    .dot:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 3px;
+    }
+
+    .quick-icon-btn:focus,
+    .quick-icon-btn:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+    }
+
+    .schedule-mini-card:focus,
+    .schedule-mini-card:focus-visible {
+        border-color: rgba(255, 0, 60, 0.3);
+        background: rgba(255,255,255,0.055);
+        transform: translateY(-2px);
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    .story-item:focus,
+    .story-item:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 14px;
+    }
+
+    .schedule-panel-close:focus,
+    .schedule-panel-close:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+    }
+
     /* ----- STORY TOP SPACE ----- */
     .story-top-space { margin-top: 75px; }
 
@@ -1354,7 +1442,7 @@
                 {% for anime in daily_movies %}
                 {% if anime.id %}
                 <div class="card-wrapper">
-                    <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
+                    <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;" tabindex="0" data-tv-clickable="true" aria-label="{{ anime.title }}">
                         <div class="top-badge-group">
                             {% if anime.release_year %}<div class="top-badge-year">{{ anime.release_year }}</div>{% endif %}
                             {% if anime.episodes.count > 0 %}
@@ -1415,7 +1503,7 @@
                 {% for anime in all_movies_beta %}
                 {% if anime.id %}
                 <div class="card-wrapper">
-                    <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;">
+                    <div class="anime-card" onclick="window.location.href='{% url 'movie_detail' anime.id %}'" style="cursor:pointer;" tabindex="0" data-tv-clickable="true" aria-label="{{ anime.title }}">
                         <div class="top-badge-group">
                             {% if anime.release_year %}<div class="top-badge-year">{{ anime.release_year }}</div>{% endif %}
                             {% if anime.episodes.count > 0 %}
@@ -1677,6 +1765,14 @@ function toggleStoriesPanel() {
     closeSchedulePanel();
     panel.classList.toggle('open', willOpen);
     btn.classList.toggle('active-icon', willOpen);
+
+    // TV pult uchun: panel ochilganda fokusni ichkariga, yopilganda tugmaga qaytaramiz
+    if (willOpen) {
+        var firstItem = panel.querySelector('a, button, [tabindex]');
+        if (firstItem) setTimeout(function() { firstItem.focus(); }, 60);
+    } else {
+        btn.focus();
+    }
 }
 
 function toggleSchedulePanel() {
@@ -1687,6 +1783,14 @@ function toggleSchedulePanel() {
     closeStoriesPanel();
     overlay.classList.toggle('open', willOpen);
     btn.classList.toggle('active-icon', willOpen);
+
+    // TV pult uchun: modal ochilganda fokusni yopish (X) tugmasiga, yopilganda ortga qaytaramiz
+    if (willOpen) {
+        var closeBtn = overlay.querySelector('.schedule-panel-close');
+        if (closeBtn) setTimeout(function() { closeBtn.focus(); }, 60);
+    } else {
+        btn.focus();
+    }
 }
 
 function closeScheduleOnBackdrop(e) {
@@ -1804,6 +1908,159 @@ function switchBetaTab(btn) {
     }
 
     setInterval(showNextMessage, 5000);
+})();
+
+/* ================= TV / PULT NAVIGATSIYASI (Smart TV remote uchun) =================
+   D-pad (yo'nalish tugmalari) bosilganda fokus joriy elementdan o'sha tomonda turgan
+   eng yaqin bosiladigan elementga o'tkaziladi (chapdan o'ngga, tepadan pastga va h.k.).
+   Mobil/PC uchun mavjud sichqoncha va tach bilan ishlash butunlay o'zgarishsiz qoladi —
+   bu faqat klaviatura/pult orqali kelayotgan ArrowLeft/Right/Up/Down va Enter
+   tugmalarini qo'shimcha ishlov beradi. */
+(function() {
+    var FOCUSABLE_SELECTOR = [
+        'a[href]',
+        'button:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])'
+    ].join(',');
+
+    var KEY_DIRECTIONS = {
+        'ArrowLeft': 'left',
+        'ArrowRight': 'right',
+        'ArrowUp': 'up',
+        'ArrowDown': 'down'
+    };
+
+    function isTypingField(el) {
+        if (!el) return false;
+        var tag = el.tagName;
+        return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
+    }
+
+    function isVisible(el) {
+        if (!el) return false;
+        var rect = el.getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) return false;
+        var style = window.getComputedStyle(el);
+        if (style.visibility === 'hidden' || style.display === 'none') return false;
+        return true;
+    }
+
+    function getFocusScopeEl() {
+        // Modal/popup ochiq bo'lsa, navigatsiya faqat o'sha modal ichida bo'ladi
+        var scheduleOverlay = document.getElementById('scheduleOverlay');
+        if (scheduleOverlay && scheduleOverlay.classList.contains('open')) {
+            return scheduleOverlay;
+        }
+        var storiesPanel = document.getElementById('storiesPanel');
+        if (storiesPanel && storiesPanel.classList.contains('open')) {
+            return storiesPanel;
+        }
+        return document.body;
+    }
+
+    function getFocusableElements() {
+        var scopeEl = getFocusScopeEl();
+        var list = Array.prototype.slice.call(scopeEl.querySelectorAll(FOCUSABLE_SELECTOR));
+        return list.filter(isVisible);
+    }
+
+    function rectCenter(rect) {
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }
+
+    function findNextFocus(direction) {
+        var current = document.activeElement;
+        var focusables = getFocusableElements();
+        if (!focusables.length) return null;
+
+        if (!current || focusables.indexOf(current) === -1) {
+            return focusables[0];
+        }
+
+        var currentCenter = rectCenter(current.getBoundingClientRect());
+        var best = null;
+        var bestScore = Infinity;
+
+        focusables.forEach(function(el) {
+            if (el === current) return;
+            var center = rectCenter(el.getBoundingClientRect());
+            var dx = center.x - currentCenter.x;
+            var dy = center.y - currentCenter.y;
+
+            var primaryOk = false;
+            var primaryDist = 0;
+            var secondaryDist = 0;
+
+            if (direction === 'right' && dx > 4) { primaryOk = true; primaryDist = dx; secondaryDist = Math.abs(dy); }
+            else if (direction === 'left' && dx < -4) { primaryOk = true; primaryDist = -dx; secondaryDist = Math.abs(dy); }
+            else if (direction === 'down' && dy > 4) { primaryOk = true; primaryDist = dy; secondaryDist = Math.abs(dx); }
+            else if (direction === 'up' && dy < -4) { primaryOk = true; primaryDist = -dy; secondaryDist = Math.abs(dx); }
+
+            if (!primaryOk) return;
+
+            // Bir xil qator/ustunda turgan elementlarga ustunlik beriladi
+            var score = primaryDist + secondaryDist * 2.2;
+            if (score < bestScore) {
+                bestScore = score;
+                best = el;
+            }
+        });
+
+        return best;
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (isTypingField(e.target)) return; // qidiruv va boshqa maydonlarda oddiy klaviatura buzilmasin
+
+        var direction = KEY_DIRECTIONS[e.key];
+        if (direction) {
+            var next = findNextFocus(direction);
+            if (next) {
+                e.preventDefault();
+                next.focus();
+                if (next.scrollIntoView) {
+                    next.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+                }
+            }
+            return;
+        }
+
+        // Enter / OK: onclick bilan ishlaydigan card (div) uchun ham ishlashi kerak
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+            var active = document.activeElement;
+            if (active && active.hasAttribute('data-tv-clickable')) {
+                e.preventDefault();
+                active.click();
+            }
+            return;
+        }
+
+        // Orqaga qaytish (pultning "Back"/"Return" tugmasi ko'pincha Escape yoki Backspace sifatida keladi)
+        if (e.key === 'Escape' || e.key === 'Backspace') {
+            var scheduleOverlay = document.getElementById('scheduleOverlay');
+            var storiesPanel = document.getElementById('storiesPanel');
+            if (scheduleOverlay && scheduleOverlay.classList.contains('open')) {
+                e.preventDefault();
+                closeSchedulePanel();
+                return;
+            }
+            if (storiesPanel && storiesPanel.classList.contains('open')) {
+                e.preventDefault();
+                closeStoriesPanel();
+                return;
+            }
+        }
+    });
+
+    // Pult birinchi marta bosilganda hech narsa fokusda bo'lmasa, birinchi elementga fokus beramiz
+    document.addEventListener('keydown', function(e) {
+        if (isTypingField(e.target)) return;
+        if (!KEY_DIRECTIONS[e.key]) return;
+        if (document.activeElement === document.body || !document.activeElement) {
+            var focusables = getFocusableElements();
+            if (focusables.length) focusables[0].focus();
+        }
+    }, true);
 })();
 </script>
 
