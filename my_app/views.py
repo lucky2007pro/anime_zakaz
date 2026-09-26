@@ -102,6 +102,9 @@ def logout_view(request):
 # =======================
 # HOME
 # =======================
+# =======================
+# HOME
+# =======================
 def home(request):
     template_name = 'home.html'
 
@@ -184,14 +187,12 @@ def home(request):
         show_welcome = request.session.get('show_welcome', False)
         request.session['show_welcome'] = False
 
-        # Agar hali ham eski VIP-shablonni saqlab qolmoqchi bo'lsangiz,
-        # bu qismni template_name ni almashtirish uchun qoldiring.
-        # Aks holda butunlay olib tashlashingiz mumkin, chunki
-        # yangi home.html allaqachon shu cardlarni o'zida ko'rsatadi.
+        # BETA HOME (oxirgi versiyani sinab ko'rish) — yoqilgan va muddati
+        # tugamagan bo'lsa, home_vip.html shabloni ishlatiladi
         user_settings, _ = UserSettings.objects.get_or_create(user=request.user)
         if user_settings.beta_home_on:
             if user_settings.beta_home_expire and user_settings.beta_home_expire > timezone.now():
-                pass  # template_name = 'home_vip.html'  # kerak bo'lsa qayta yoqing
+                template_name = 'home_vip.html'
             else:
                 user_settings.beta_home_on = False
                 user_settings.save(update_fields=['beta_home_on'])
@@ -221,6 +222,8 @@ def home(request):
     }
 
     return render(request, template_name, context)
+
+
 
 # =======================
 # MOVIE DETAIL
