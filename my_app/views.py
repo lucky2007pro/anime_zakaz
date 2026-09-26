@@ -136,16 +136,33 @@ def home(request):
             .values_list('story_id', flat=True)
         )
 
+    # ================= KUNLIK / BARCHA ANIMELAR (endi HAR DOIM hisoblanadi) =================
+    daily_movies = list(
+        Movie.objects.select_related('category').prefetch_related('episodes')
+        .filter(section_items__section='daily')
+        .annotate(last_episode_at=Max('episodes__created_at'))
+        .order_by(
+            'section_items__order',
+            F('last_episode_at').desc(nulls_last=True),
+            '-created_at',
+        )
+    )
+
+    all_movies_beta = list(
+        Movie.objects.select_related('category').prefetch_related('episodes')
+        .annotate(last_episode_at=Max('episodes__created_at'))
+        .order_by(
+            F('last_episode_at').desc(nulls_last=True),
+            '-created_at',
+        )[:20]
+    )
+
     # ================= MP3 =================
     mp3_to_play = None
     fav_ids = []
 
     # ================= WELCOME TOAST =================
     show_welcome = False
-
-    # YANGI — beta home uchun qo'shimcha ma'lumotlar
-    daily_movies = None
-    all_movies_beta = None
 
     if request.user.is_authenticated:
         from .models import FavoriteAnime
@@ -167,48 +184,14 @@ def home(request):
         show_welcome = request.session.get('show_welcome', False)
         request.session['show_welcome'] = False
 
-        # YANGI — BETA HOME TEKSHIRUVI
+        # Agar hali ham eski VIP-shablonni saqlab qolmoqchi bo'lsangiz,
+        # bu qismni template_name ni almashtirish uchun qoldiring.
+        # Aks holda butunlay olib tashlashingiz mumkin, chunki
+        # yangi home.html allaqachon shu cardlarni o'zida ko'rsatadi.
         user_settings, _ = UserSettings.objects.get_or_create(user=request.user)
         if user_settings.beta_home_on:
             if user_settings.beta_home_expire and user_settings.beta_home_expire > timezone.now():
-                template_name = 'home_vip.html'
-
-                # Beta home uchun qo'shimcha ma'lumotlar (kunlik / barcha animelar)
-                #
-                # MUHIM O'ZGARISH:
-                # Avval bu ro'yxatlar faqat "-created_at" (anime birinchi
-                # marta qo'shilgan sana) bo'yicha saralangan edi. Shu sabab
-                # admin biror animega (masalan Shiki) yangi qism qo'shsa ham,
-                # u ro'yxatda joyini o'zgartirmasdi va tartib "tasodifiy"
-                # ko'rinardi.
-                #
-                # Endi har bir anime uchun "oxirgi qism qachon qo'shilgani"
-                # (episodes__created_at ning eng kattasi) hisoblanadi va
-                # ro'yxat aynan shu bo'yicha kamayish tartibida saralanadi —
-                # xuddi yuqoridagi asosiy "movies" ro'yxati kabi. Natijada:
-                # kimga yangi qism tushsa — o'sha eng tepaga chiqadi,
-                # qolganlari o'z navbati bilan pastga suriladi.
-                from .models import AnimeSectionItem
-
-                daily_movies = list(
-                    Movie.objects.select_related('category').prefetch_related('episodes')
-                    .filter(section_items__section='daily')
-                    .annotate(last_episode_at=Max('episodes__created_at'))
-                    .order_by(
-                        'section_items__order',
-                        F('last_episode_at').desc(nulls_last=True),
-                        '-created_at',
-                    )
-                )
-
-                all_movies_beta = list(
-                    Movie.objects.select_related('category').prefetch_related('episodes')
-                    .annotate(last_episode_at=Max('episodes__created_at'))
-                    .order_by(
-                        F('last_episode_at').desc(nulls_last=True),
-                        '-created_at',
-                    )[:20]
-                )
+                pass  # template_name = 'home_vip.html'  # kerak bo'lsa qayta yoqing
             else:
                 user_settings.beta_home_on = False
                 user_settings.save(update_fields=['beta_home_on'])
@@ -223,11 +206,9 @@ def home(request):
         'recommended_movies': recommended_movies,
         'categories': categories,
 
-        # STORY
         'stories': stories,
         'seen_stories': seen_stories,
 
-        # OTHER
         'mp3_file': mp3_to_play,
         'total_users': User.objects.count(),
         'user_id': request.user.id if request.user.is_authenticated else None,
@@ -235,7 +216,6 @@ def home(request):
         'schedule_list': schedule_list,
         'show_welcome': show_welcome,
 
-        # BETA HOME
         'daily_movies': daily_movies,
         'all_movies_beta': all_movies_beta,
     }
