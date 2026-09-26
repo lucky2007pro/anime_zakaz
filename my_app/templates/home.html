@@ -942,13 +942,6 @@
 
 <div class="story-top-space">
 
-    <!-- BETA BADGE -->
-    <div class="beta-top-bar">
-        <span class="beta-badge-pill">
-            <i class='bx bx-hand' id="betaBadgeIcon"></i>
-            <span id="betaBadgeText" class="beta-badge-text">Xush kelibsiz!</span>
-        </span>
-    </div>
 
     <!-- ================= YUQORI IKKI USTUN: HIKOYALAR (chap) + CHIQISH KUNLARI (o'ng) ================= -->
     <div class="top-split-grid">
@@ -1414,52 +1407,7 @@ function switchBetaTab(btn) {
     document.getElementById(btn.dataset.target).classList.add('active');
 }
 
-/* ================= BETA BADGE — 3 TA XABAR AYLANMA (har 5 soniyada) ================= */
-(function() {
-    var textEl = document.getElementById('betaBadgeText');
-    var iconEl = document.getElementById('betaBadgeIcon');
-    if (!textEl) return;
 
-    var betaMessages = [
-        { icon: 'bx bx-hand',        text: 'Xush kelibsiz!' },
-        { icon: 'bx bx-rocket',      text: 'Siz oxirgi versiyani sinamoqdasiz' },
-        { icon: 'bx bxs-crown',      text: 'VIP bilan cheksiz imkoniyat' }
-    ];
-
-    var currentIndex = 0; // 0-index hozir ko'rinib turgan "Xush kelibsiz!"
-
-    function showNextMessage() {
-        currentIndex = (currentIndex + 1) % betaMessages.length;
-        var msg = betaMessages[currentIndex];
-
-        // chiqib ketish animatsiyasi
-        textEl.style.opacity = '0';
-        textEl.style.transform = 'translateY(-6px)';
-
-        setTimeout(function() {
-            textEl.textContent = msg.text;
-
-            if (iconEl) {
-                var newIcon = document.createElement('i');
-                newIcon.id = 'betaBadgeIcon';
-                newIcon.className = msg.icon;
-                iconEl.replaceWith(newIcon);
-                iconEl = newIcon; // yangi elementni referens sifatida saqlab qolamiz
-            }
-
-            // kirish animatsiyasi
-            textEl.style.transform = 'translateY(6px)';
-            requestAnimationFrame(function() {
-                requestAnimationFrame(function() {
-                    textEl.style.opacity = '1';
-                    textEl.style.transform = 'translateY(0)';
-                });
-            });
-        }, 400);
-    }
-
-    setInterval(showNextMessage, 5000);
-})();
 </script>
 
 
