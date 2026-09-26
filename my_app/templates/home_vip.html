@@ -290,31 +290,62 @@
         opacity: 0;
         z-index: 1;
         pointer-events: none;
-        transition: opacity 0.7s ease;
+        transform: scale(1);
+        transition: opacity 0.8s ease, transform 0.8s ease;
     }
 
     .slide.active {
         opacity: 1;
         z-index: 2;
         pointer-events: auto;
+        transform: scale(1);
     }
 
     .slide.outgoing {
         opacity: 0;
         z-index: 1;
-        transition: opacity 0.5s ease;
+        transform: scale(0.96);
+        transition: opacity 0.7s ease, transform 0.9s ease;
     }
 
-    /* Rasm/video zoom-in animatsiyasi, faqat active bo'lganda ishga tushadi */
+    /* ---- KEN BURNS ZOOM: rasm/video butun slayd davomida sekin va tekis kattalashadi (zoom OUT emas, zoom IN) ---- */
     .slide.active .slide-bg img,
     .slide.active .slide-bg-video {
-        animation: slideZoomIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation: kenBurnsZoom 6.5s ease-out both;
         transform-origin: center center;
+        will-change: transform;
     }
 
-    @keyframes slideZoomIn {
-        from { transform: scale(1.18); }
-        to   { transform: scale(1); }
+    @keyframes kenBurnsZoom {
+        from { transform: scale(1); }
+        to   { transform: scale(1.09); }
+    }
+
+    /* ---- KONTENT: teglar / sarlavha / meta / tugma bosqichma-bosqich (staggered) paydo bo'ladi ---- */
+    .slide-content > * {
+        opacity: 0;
+    }
+
+    .slide.active .tags {
+        animation: contentRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-delay: 0.15s;
+    }
+    .slide.active .slide-title {
+        animation: contentRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-delay: 0.3s;
+    }
+    .slide.active .slide-meta-row {
+        animation: contentRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-delay: 0.45s;
+    }
+    .slide.active .hero-buttons {
+        animation: contentRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-delay: 0.6s;
+    }
+
+    @keyframes contentRise {
+        from { opacity: 0; transform: translateY(26px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
     .slide-bg {
@@ -1492,11 +1523,11 @@
         const currentEl = slides[currentSlide];
         const nextEl = slides[nextIndex];
 
-        // Eski slaydni sekin xiralashtirib chiqarish
+        // Eski slaydni sekin xiralashtirib va biroz kichraytirib chiqarish
         currentEl.classList.remove('active');
         currentEl.classList.add('outgoing');
 
-        // Zoom animatsiyasi qaytadan ishga tushishi uchun eski animatsiyani tozalaymiz
+        // Ken Burns zoom animatsiyasi qaytadan ishga tushishi uchun eski animatsiyani tozalaymiz
         const media = nextEl.querySelector('.slide-bg img, .slide-bg-video');
         if (media) {
             media.style.animation = 'none';
@@ -1504,11 +1535,19 @@
             media.style.animation = '';
         }
 
+        // Kontent (teglar, sarlavha, meta, tugma) bosqichma-bosqich animatsiyasini qayta ishga tushirish
+        const contentChildren = nextEl.querySelectorAll('.slide-content > *');
+        contentChildren.forEach(function(el) {
+            el.style.animation = 'none';
+            void el.offsetWidth; // reflow
+            el.style.animation = '';
+        });
+
         nextEl.classList.add('active');
 
         setTimeout(function() {
             currentEl.classList.remove('outgoing');
-        }, 500);
+        }, 900);
 
         currentSlide = nextIndex;
         updateDots();
