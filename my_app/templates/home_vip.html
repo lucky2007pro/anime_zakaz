@@ -639,11 +639,170 @@
     /* ----- STORY TOP SPACE ----- */
     .story-top-space { margin-top: 75px; }
 
+    /* ================= MOBIL: KOMPAKT ICON BAR + HIKOYALAR/CHIQISH KUNLARI POPUP ================= */
+    /* Bu blok faqat mobil ekranda ko'rinadi (pastdagi @media max-width:600px orqali ochiladi).
+       Desktopda hech narsa o'zgarmaydi, .top-split-grid odatdagidek ko'rinadi. */
+    .mobile-quick-panel-wrap {
+        position: relative;
+        display: block;
+    }
+
+    .quick-icons-bar {
+        display: none; /* faqat mobilda ko'rinadi */
+    }
+
+    .quick-icon-btn {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: var(--text-light);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+    .quick-icon-btn:active { transform: scale(0.92); }
+    .quick-icon-btn.active-icon {
+        background: linear-gradient(135deg, #ff003c, #ff4d6d);
+        border-color: transparent;
+        color: #fff;
+    }
+
+    /* Hikoyalar popup — chap chetga yopishgan, rasmga o'xshash ixcham vertikal box */
+    .stories-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        z-index: 60;
+        width: 190px;
+        max-height: 196px;
+        overflow-y: auto;
+        background: rgba(15,15,19,0.92);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-left: none;
+        border-radius: 0 20px 20px 0;
+        padding: 12px 12px 12px 10px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+    .stories-panel.open { display: block; }
+    .stories-panel::-webkit-scrollbar { width: 4px; }
+    .stories-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+    /* Popup ichida story-container ustunga aylanadi, har bir item rasm+matn qator bo'lib chiqadi */
+    .stories-panel .story-container {
+        flex-direction: column;
+        overflow: visible;
+        gap: 12px;
+        padding: 0;
+    }
+    .stories-panel .story-item {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        width: 100%;
+    }
+    .stories-panel .story-ring {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+    }
+    .stories-panel .story-item span {
+        max-width: 110px;
+        text-align: left;
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .stories-panel .split-col-title { display: none; }
+
+    /* Chiqish kunlari popup — markazga yaqin modal, tepada X yopish tugmasi */
+    .schedule-panel-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 200;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 90px 16px 16px;
+    }
+    .schedule-panel-overlay.open { display: flex; }
+
+    .schedule-panel-box {
+        width: 100%;
+        max-width: 420px;
+        max-height: 72vh;
+        overflow-y: auto;
+        background: #14141a;
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .schedule-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .schedule-panel-close {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #fff;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        flex-shrink: 0;
+    }
+    .schedule-panel-close:active { transform: scale(0.9); }
+
+    .schedule-panel-box .split-col-title { margin: 0; }
+
     /* ----- MOBILE ----- */
     @media (max-width: 600px) {
         /* FIX: beta-badge navbar (base.html) ostida qolib ketmasligi uchun
            top-space navbar balandligidan sezilarli katta qilindi. */
         .story-top-space { margin-top: 82px !important; }
+
+        /* Eski Hikoyalar/Chiqish kunlari ustunlarini mobilda yashiramiz,
+           o'rniga kompakt icon bar + popuplar ishlatiladi. */
+        .top-split-grid {
+            display: none;
+        }
+
+        /* Kompakt icon bar: chap chetga yopishgan, ixcham */
+        .quick-icons-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            margin: 10px 0 0 0;
+            padding: 8px 12px 8px 10px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: none;
+            border-radius: 0 22px 22px 0;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
 
         /* HERO */
         .slide-content {
@@ -950,7 +1109,40 @@
         </span>
     </div>
 
+    <!-- ================= MOBIL: KOMPAKT ICON BAR (HIKOYALAR + CHIQISH KUNLARI) ================= -->
+    <!-- Faqat mobil ekranda ko'rinadi. Bosilganda pastdagi popuplar ochiladi. -->
+    <div class="mobile-quick-panel-wrap">
+        <div class="quick-icons-bar">
+            <button type="button" class="quick-icon-btn" id="storiesIconBtn" onclick="toggleStoriesPanel()" aria-label="Hikoyalar">
+                <i class='bx bx-images'></i>
+            </button>
+            <button type="button" class="quick-icon-btn" id="scheduleIconBtn" onclick="toggleSchedulePanel()" aria-label="Chiqish kunlari">
+                <i class='bx bx-calendar-star'></i>
+            </button>
+        </div>
+
+        <!-- HIKOYALAR POPUP: rasmga o'xshab chap chetga yopishgan, 3 tasi ko'rinadi, ortig'i skroll -->
+        <div class="stories-panel" id="storiesPanel">
+            <div id="storiesPanelContent"></div>
+        </div>
+    </div>
+
+    <!-- CHIQISH KUNLARI POPUP: tepasida X (yopish) tugmasi bor modal -->
+    <div class="schedule-panel-overlay" id="scheduleOverlay" onclick="closeScheduleOnBackdrop(event)">
+        <div class="schedule-panel-box">
+            <div class="schedule-panel-header">
+                <p class="split-col-title"><i class='bx bx-calendar-star'></i> Chiqish kunlari</p>
+                <button type="button" class="schedule-panel-close" onclick="toggleSchedulePanel()" aria-label="Yopish">
+                    <i class='bx bx-x'></i>
+                </button>
+            </div>
+            <div id="schedulePanelContent"></div>
+        </div>
+    </div>
+
     <!-- ================= YUQORI IKKI USTUN: HIKOYALAR (chap) + CHIQISH KUNLARI (o'ng) ================= -->
+    <!-- Desktopda shu joyida ko'rinadi. Mobilda CSS orqali yashiriladi va JS bu ustunlarni
+         yuqoridagi popuplar ichiga ko'chiradi (nusxa emas, xuddi shu elementlar). -->
     <div class="top-split-grid">
 
         <!-- CHAP: HIKOYALAR -->
@@ -1361,6 +1553,109 @@
     });
 })();
 
+/* ================= MOBIL: HIKOYALAR/CHIQISH KUNLARI ELEMENTLARINI POPUPGA KO'CHIRISH =================
+   Asl .top-split-grid ichidagi ikkita ustun (Hikoyalar va Chiqish kunlari) nusxalanmaydi —
+   xuddi shu DOM elementlar mobil ekranda popup ichiga ko'chiriladi, desktopga qaytilganda
+   o'z joyiga qaytariladi. Shu tufayli id/kontent takrorlanmaydi va struktura buzilmaydi. */
+(function() {
+    const topSplitGrid = document.querySelector('.top-split-grid');
+    const storiesPanelContent = document.getElementById('storiesPanelContent');
+    const schedulePanelContent = document.getElementById('schedulePanelContent');
+    if (!topSplitGrid || !storiesPanelContent || !schedulePanelContent) return;
+
+    const cols = topSplitGrid.querySelectorAll(':scope > .split-col');
+    const storiesCol = cols[0] || null;
+    const scheduleCol = cols[1] || null;
+
+    const storiesOriginalParent = storiesCol ? storiesCol.parentNode : null;
+    const scheduleOriginalParent = scheduleCol ? scheduleCol.parentNode : null;
+    const storiesNextSibling = storiesCol ? storiesCol.nextSibling : null;
+    const scheduleNextSibling = scheduleCol ? scheduleCol.nextSibling : null;
+
+    const mq = window.matchMedia('(max-width: 600px)');
+
+    function applyLayout(isMobile) {
+        if (isMobile) {
+            if (storiesCol && storiesCol.parentNode !== storiesPanelContent) {
+                storiesPanelContent.appendChild(storiesCol);
+            }
+            if (scheduleCol && scheduleCol.parentNode !== schedulePanelContent) {
+                schedulePanelContent.appendChild(scheduleCol);
+            }
+        } else {
+            if (storiesCol && storiesOriginalParent && storiesCol.parentNode !== storiesOriginalParent) {
+                storiesOriginalParent.insertBefore(storiesCol, storiesNextSibling);
+            }
+            if (scheduleCol && scheduleOriginalParent && scheduleCol.parentNode !== scheduleOriginalParent) {
+                scheduleOriginalParent.insertBefore(scheduleCol, scheduleNextSibling);
+            }
+            // Desktopga qaytganda popuplar ochiq qolib ketmasin
+            closeStoriesPanel();
+            closeSchedulePanel();
+        }
+    }
+
+    applyLayout(mq.matches);
+    if (mq.addEventListener) {
+        mq.addEventListener('change', function(e) { applyLayout(e.matches); });
+    } else if (mq.addListener) {
+        // eski brauzerlar uchun fallback
+        mq.addListener(function(e) { applyLayout(e.matches); });
+    }
+})();
+
+/* ================= POPUPLARNI OCH/YOP ================= */
+function closeStoriesPanel() {
+    const panel = document.getElementById('storiesPanel');
+    const btn = document.getElementById('storiesIconBtn');
+    if (panel) panel.classList.remove('open');
+    if (btn) btn.classList.remove('active-icon');
+}
+
+function closeSchedulePanel() {
+    const overlay = document.getElementById('scheduleOverlay');
+    const btn = document.getElementById('scheduleIconBtn');
+    if (overlay) overlay.classList.remove('open');
+    if (btn) btn.classList.remove('active-icon');
+}
+
+function toggleStoriesPanel() {
+    const panel = document.getElementById('storiesPanel');
+    const btn = document.getElementById('storiesIconBtn');
+    if (!panel || !btn) return;
+    const willOpen = !panel.classList.contains('open');
+    closeSchedulePanel();
+    panel.classList.toggle('open', willOpen);
+    btn.classList.toggle('active-icon', willOpen);
+}
+
+function toggleSchedulePanel() {
+    const overlay = document.getElementById('scheduleOverlay');
+    const btn = document.getElementById('scheduleIconBtn');
+    if (!overlay || !btn) return;
+    const willOpen = !overlay.classList.contains('open');
+    closeStoriesPanel();
+    overlay.classList.toggle('open', willOpen);
+    btn.classList.toggle('active-icon', willOpen);
+}
+
+function closeScheduleOnBackdrop(e) {
+    // Faqat qora fon (overlay)ga bosilganda yopiladi, box ichiga bosilganda yopilmaydi
+    if (e.target && e.target.id === 'scheduleOverlay') {
+        closeSchedulePanel();
+    }
+}
+
+// Hikoyalar popup tashqarisiga bosilsa yopilsin
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('storiesPanel');
+    const btn = document.getElementById('storiesIconBtn');
+    if (!panel || !btn) return;
+    if (panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) {
+        closeStoriesPanel();
+    }
+});
+
 /* ================= ANIME CHIQISH KUNLARI — KUN PILLARI ================= */
 (function() {
     const DAYS_UZ = ['yakshanba','dushanba','seshanba','chorshanba','payshanba','juma','shanba'];
@@ -1461,7 +1756,5 @@ function switchBetaTab(btn) {
     setInterval(showNextMessage, 5000);
 })();
 </script>
-
-
 
 {% endblock %}
