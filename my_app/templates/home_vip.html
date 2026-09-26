@@ -797,18 +797,21 @@
             display: none;
         }
 
-        /* BETA BADGE QATORI: chapda icon bar, o'ngda "Xush kelibsiz" bir qatorda */
+        /* BETA BADGE QATORI: chapda icon bar (ekran chetiga yopishgan), o'ngda "Xush kelibsiz" */
         .beta-top-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
+            padding: 10px 5% 0 0; /* chap padding olib tashlandi, icon bar chetga tegib tursin */
         }
 
-        /* Kompakt icon bar: chapda, ixcham pill ko'rinishida */
+        /* Kompakt icon bar: ekran chap chetiga yopishgan, faqat o'ng tomoni yumaloq */
         .quick-icons-bar {
             display: flex;
             flex-shrink: 0;
+            border-left: none;
+            border-radius: 0 22px 22px 0;
         }
 
         /* HERO */
