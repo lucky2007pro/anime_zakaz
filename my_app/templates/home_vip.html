@@ -649,6 +649,15 @@
 
     .quick-icons-bar {
         display: none; /* faqat mobilda ko'rinadi */
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 30px;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        width: fit-content;
     }
 
     .quick-icon-btn {
@@ -788,20 +797,18 @@
             display: none;
         }
 
-        /* Kompakt icon bar: chap chetga yopishgan, ixcham */
-        .quick-icons-bar {
+        /* BETA BADGE QATORI: chapda icon bar, o'ngda "Xush kelibsiz" bir qatorda */
+        .beta-top-bar {
             display: flex;
             align-items: center;
-            gap: 8px;
-            width: fit-content;
-            margin: 10px 0 0 0;
-            padding: 8px 12px 8px 10px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-left: none;
-            border-radius: 0 22px 22px 0;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        /* Kompakt icon bar: chapda, ixcham pill ko'rinishida */
+        .quick-icons-bar {
+            display: flex;
+            flex-shrink: 0;
         }
 
         /* HERO */
@@ -1101,30 +1108,31 @@
 
 <div class="story-top-space">
 
-    <!-- BETA BADGE -->
+    <!-- BETA BADGE + MOBIL KOMPAKT ICON BAR (bitta qatorda: chapda iconlar, o'ngda "Xush kelibsiz") -->
     <div class="beta-top-bar">
+
+        <!-- ================= MOBIL: KOMPAKT ICON BAR (HIKOYALAR + CHIQISH KUNLARI) ================= -->
+        <!-- Faqat mobil ekranda ko'rinadi (chap tomonda). Bosilganda popuplar ochiladi. -->
+        <div class="mobile-quick-panel-wrap">
+            <div class="quick-icons-bar">
+                <button type="button" class="quick-icon-btn" id="storiesIconBtn" onclick="toggleStoriesPanel()" aria-label="Hikoyalar">
+                    <i class='bx bx-images'></i>
+                </button>
+                <button type="button" class="quick-icon-btn" id="scheduleIconBtn" onclick="toggleSchedulePanel()" aria-label="Chiqish kunlari">
+                    <i class='bx bx-calendar-star'></i>
+                </button>
+            </div>
+
+            <!-- HIKOYALAR POPUP: 3 tasi ko'rinadi, ortig'i skroll -->
+            <div class="stories-panel" id="storiesPanel">
+                <div id="storiesPanelContent"></div>
+            </div>
+        </div>
+
         <span class="beta-badge-pill">
             <i class='bx bx-hand' id="betaBadgeIcon"></i>
             <span id="betaBadgeText" class="beta-badge-text">Xush kelibsiz!</span>
         </span>
-    </div>
-
-    <!-- ================= MOBIL: KOMPAKT ICON BAR (HIKOYALAR + CHIQISH KUNLARI) ================= -->
-    <!-- Faqat mobil ekranda ko'rinadi. Bosilganda pastdagi popuplar ochiladi. -->
-    <div class="mobile-quick-panel-wrap">
-        <div class="quick-icons-bar">
-            <button type="button" class="quick-icon-btn" id="storiesIconBtn" onclick="toggleStoriesPanel()" aria-label="Hikoyalar">
-                <i class='bx bx-images'></i>
-            </button>
-            <button type="button" class="quick-icon-btn" id="scheduleIconBtn" onclick="toggleSchedulePanel()" aria-label="Chiqish kunlari">
-                <i class='bx bx-calendar-star'></i>
-            </button>
-        </div>
-
-        <!-- HIKOYALAR POPUP: rasmga o'xshab chap chetga yopishgan, 3 tasi ko'rinadi, ortig'i skroll -->
-        <div class="stories-panel" id="storiesPanel">
-            <div id="storiesPanelContent"></div>
-        </div>
     </div>
 
     <!-- CHIQISH KUNLARI POPUP: tepasida X (yopish) tugmasi bor modal -->
