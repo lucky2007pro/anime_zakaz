@@ -259,6 +259,22 @@
 }
 
 /* =====================================================================
+   +90 DAQIQA TUGMASI (faqat to'liq ekranda, 1x tugmasidan oldin)
+===================================================================== */
+.bm-skip90-btn {
+    display: none;
+    align-items: center; justify-content: center;
+    font-size: .72rem; font-weight: 900; padding: 4px 9px; border-radius: 6px;
+    background: rgba(255,193,7,.14); border: 1px solid rgba(255,193,7,.40);
+    color: #ffc107; cursor: pointer; letter-spacing: .04em; white-space: nowrap;
+    flex-shrink: 0; min-height: 30px;
+    transition: background .18s, border-color .18s, color .18s;
+}
+.bm-player.is-fs .bm-skip90-btn { display: inline-flex; }
+.bm-skip90-btn:hover  { background: rgba(255,193,7,.28); border-color: rgba(255,193,7,.65); color: #ffd54f; }
+.bm-skip90-btn:active { background: rgba(255,193,7,.42); }
+
+/* =====================================================================
    SPEED BUTTON + POPUP MENU
 ===================================================================== */
 .bm-speed-wrap {
@@ -948,7 +964,7 @@
 .tier-vip     { --tier-color:#b45cff; --tier-color-2:#ff5cd6; --tier-glow: rgba(180,92,255,0.28); }
 
 .user-profile-overlay {
-    position: fixed; inset: 0; z-index: 500; display: none;
+    position: fixed; inset: 0; z-index: 5000; display: none;
     align-items: center; justify-content: center;
     background: rgba(0,0,0,0.65);
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
@@ -1035,6 +1051,7 @@
 .user-profile-modal.is-vip-box {
     max-width: 380px !important;
     max-height: 88vh !important;
+    max-height: 88dvh !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
@@ -1091,11 +1108,20 @@
     padding: 18px 18px 22px;
     box-sizing: border-box;
 }
+/* "VIP box ........ X" qatori — pastga skrool bo'lganda ham tepada qotib turadi */
 .vd-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin: -18px -18px 12px;
+    padding: 12px 18px;
+    background: rgba(10,10,16,0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255,193,7,0.18);
 }
 .vd-title {
     display: inline-flex;
@@ -1323,13 +1349,15 @@
     .user-profile-modal.is-vip-box {
         max-width: 320px !important;
         max-height: 84vh !important;
+        max-height: 84dvh !important;
         border-radius: 18px !important;
     }
     .vd-inner {
         padding: 12px 14px 16px !important;
     }
     .vd-header {
-        margin-bottom: 8px !important;
+        margin: -12px -14px 8px !important;
+        padding: 10px 14px !important;
     }
     .vd-title {
         font-size: 13.5px !important;
@@ -1552,7 +1580,7 @@ const BM_MOVIE_SIZE  = "{{ movie.size_display|escapejs }}";
           <i class='bx bx-lock-alt' style="font-size:3.5rem;color:#ffc107;margin-bottom:12px;display:block;"></i>
           <h3 style="font-size:1.4rem;font-weight:900;margin-bottom:10px;">PREMIUM KONTEKT</h3>
           <p style="color:var(--text-dim);margin-bottom:20px;">Ushbu animeni ko'rish uchun Premium obuna bo'lishi kerak.</p>
-          <a href="{% url 'premium_page' %}" class="btn-back"
+          <a href="{% url 'hisobim_page' %}" class="btn-back"
              style="background:#dc2626;color:white;border-color:#dc2626;display:inline-flex;">
             Obuna bo'lish
           </a>
@@ -1633,7 +1661,7 @@ const BM_MOVIE_SIZE  = "{{ movie.size_display|escapejs }}";
             <i class='bx bxs-lock-alt' style="color:#ffc107;font-size:1.4rem;"></i>
             <p style="margin:6px 0 0;font-size:.9rem;color:var(--text-dim);">
               Offline yuklab olish uchun
-              <a href="{% url 'premium_page' %}" style="color:#f87171;text-decoration:none;font-weight:700;">Premium</a>
+              <a href="{% url 'hisobim_page' %}" style="color:#f87171;text-decoration:none;font-weight:700;">Premium</a>
               obuna oling.
             </p>
           </div>
@@ -2149,6 +2177,7 @@ function buildInner(title){
     ${btn('bm-fwd10','+10s','fwd')}
     <span class="bm-time" id="bm-time-display">0:00 / 0:00</span>
     <div class="bm-spacer"></div>
+    <button type="button" class="bm-skip90-btn" id="bm-skip90-btn" title="90 daqiqa oldinga">90+</button>
     <div class="bm-speed-wrap" id="bm-speed-wrap">
       <button class="bm-speed-btn" id="bm-speed-btn" title="Tezlik">1x</button>
       ${buildSpeedMenu()}
@@ -2242,7 +2271,7 @@ episodeBtns.forEach(function(b){
 
     // ⬇️ MANA SHU QATORNI QO'SHING
     markEpisodeWatched(b.dataset.episodeId);
-      
+
     if(window.innerWidth <= 1024){
       videoContainerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -2256,7 +2285,7 @@ if(episodeBtns.length){
     markEpisodeWatched(episodeBtns[0].dataset.episodeId);   // ⬅️ YANGI
 }
 else { setEpSize(null); }
-    
+
 /* ---------------------------------------------------------------
    INTRONI UTQAZIB YUBORISH — holat va vaqt oralig'ini aniqlash
 --------------------------------------------------------------- */
@@ -2387,7 +2416,7 @@ function markEpisodeWatched(episodeId) {
         headers: { 'X-CSRFToken': getCookie('csrftoken') }
     }).catch(function(){});
 }
-    
+
 function fmtTime(s){
   if(!isFinite(s) || isNaN(s)) return '0:00';
   var m   = Math.floor(s / 60);
@@ -2498,6 +2527,7 @@ function initBmPlayer(){
   var playBtn   = $id('bm-play-btn');
   var back10    = $id('bm-back10');
   var fwd10     = $id('bm-fwd10');
+  var skip90Btn = $id('bm-skip90-btn');
   var timeEl    = $id('bm-time-display');
   var progress  = $id('bm-progress');
   var fill      = $id('bm-fill');
@@ -2688,6 +2718,25 @@ function initBmPlayer(){
     showRipple(rippleR, '+10 son');
   }, sig);
 
+  /* +90 DAQIQA — faqat VIP; VIP bo'lmasa /hisobim/ sahifasiga yo'naltiriladi */
+  if(skip90Btn) skip90Btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault();
+
+    if(typeof BM_IS_VIP === 'undefined' || !BM_IS_VIP){
+      window.location.href = BM_HISOBIM_URL;
+      return;
+    }
+
+    var target = video.currentTime + 90 * 60;
+    if(isFinite(video.duration) && video.duration > 0){
+      target = Math.min(target, video.duration - 1);
+    }
+    video.currentTime = Math.max(0, target);
+    showRipple(rippleR, '+90 daq');
+    showControls(3000);
+  }, sig);
+
   var seeking = false;
 
   function seekFromMouse(e){
@@ -2760,6 +2809,8 @@ function initBmPlayer(){
   function onFsChange(){
     var inFs = !!getFSElement();
     if(fsBtn) fsBtn.innerHTML = svgIcon(inFs ? SVG.collapse : SVG.expand);
+    /* +90 daq tugmasi faqat to'liq ekranda ko'rinadi (CSS: .bm-player.is-fs) */
+    player.classList.toggle('is-fs', inFs);
     if(!inFs) unlockOrientation();
   }
   document.addEventListener('fullscreenchange',       onFsChange, sig);
@@ -2799,6 +2850,7 @@ function initBmPlayer(){
          e.target.closest('.bm-back-link') ||
          e.target.closest('#bm-exit-fs') ||
          e.target.closest('.bm-speed-wrap') ||
+         e.target.closest('.bm-skip90-btn') ||
          e.target.closest('#bm-lock-btn')) return;
       togglePlay();
       showControls(2500);
@@ -2832,6 +2884,7 @@ function initBmPlayer(){
            e.target.closest('.bm-btn') ||
            e.target.closest('.bm-back-link') ||
            e.target.closest('#bm-exit-fs') ||
+           e.target.closest('.bm-skip90-btn') ||
            e.target.closest('.bm-speed-wrap')) return;
 
         if(isDbl){
@@ -2859,6 +2912,7 @@ function initBmPlayer(){
          e.target.closest('.bm-btn') ||
          e.target.closest('.bm-back-link') ||
          e.target.closest('#bm-exit-fs') ||
+         e.target.closest('.bm-skip90-btn') ||
          e.target.closest('.bm-speed-wrap')) return;
 
       if(isDbl){
