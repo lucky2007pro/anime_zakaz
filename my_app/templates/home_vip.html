@@ -104,7 +104,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        transition: transform 0.3s ease;
         flex-shrink: 0;
     }
     .story-ring.seen { background: #444; }
@@ -126,8 +125,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
-    .story-item:active .story-ring { transform: scale(0.94); }
 
     .split-empty-msg {
         color: var(--text-dim);
@@ -160,7 +157,7 @@
         font-weight: 800;
         cursor: pointer;
         white-space: nowrap;
-        transition: all 0.2s ease;
+        transition: background 0.2s ease, color 0.2s ease;
         -webkit-tap-highlight-color: transparent;
     }
 
@@ -185,13 +182,14 @@
         border: 1px solid rgba(255,255,255,0.07);
         border-radius: 12px;
         padding: 7px;
-        transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        transition: border-color 0.2s ease, background 0.2s ease;
         min-width: 0;
     }
-    .schedule-mini-card:hover {
-        border-color: rgba(255, 0, 60, 0.3);
-        background: rgba(255,255,255,0.055);
-        transform: translateY(-2px);
+    @media (hover: hover) {
+        .schedule-mini-card:hover {
+            border-color: rgba(255, 0, 60, 0.3);
+            background: rgba(255,255,255,0.055);
+        }
     }
 
     .schedule-mini-poster {
@@ -273,6 +271,7 @@
         height: 100%;
         cursor: grab;
         user-select: none;
+        touch-action: pan-y;
     }
     .slides-wrapper.dragging { cursor: grabbing; }
 
@@ -308,7 +307,7 @@
         transition: opacity 0.7s ease, transform 0.9s ease;
     }
 
-    /* ---- KEN BURNS ZOOM: rasm/video butun slayd davomida sekin va tekis kattalashadi (zoom OUT emas, zoom IN) ---- */
+    /* ---- KEN BURNS ZOOM: rasm/video butun slayd davomida sekin va tekis kattalashadi ---- */
     .slide.active .slide-bg img,
     .slide.active .slide-bg-video {
         animation: kenBurnsZoom 6.5s ease-out both;
@@ -446,13 +445,26 @@
         border: none;
         padding: 0;
         outline: none;
+        -webkit-tap-highlight-color: transparent;
         transition: width 0.35s ease, border-radius 0.35s ease, background 0.3s ease;
     }
-    .dot-fill { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--accent); border-radius: inherit; display: block; }
+    /* width o'rniga transform: scaleX — layout hisoblanmaydi, yengilroq */
+    .dot-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: var(--accent);
+        border-radius: inherit;
+        display: block;
+        transform: scaleX(0);
+        transform-origin: left center;
+    }
     .dot.viewed { background: var(--accent); }
     .dot.active { width: 26px; border-radius: 999px; background: rgba(255,255,255,0.25); }
     .dot.active .dot-fill { animation: dotFillProgress 5s linear forwards; }
-    @keyframes dotFillProgress { from { width: 0%; } to { width: 100%; } }
+    @keyframes dotFillProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
     .slider-controls .dot:only-child { width: 8px !important; border-radius: 50% !important; background: var(--accent) !important; }
     .slider-controls .dot:only-child .dot-fill { display: none; }
 
@@ -472,11 +484,12 @@
         font-weight: 600;
         text-decoration: none;
         box-shadow: 0 8px 25px rgba(255, 0, 60, 0.35);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: box-shadow 0.3s ease;
         -webkit-tap-highlight-color: transparent;
     }
-    .btn-main:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 12px 30px rgba(255, 0, 60, 0.5); }
-    .btn-main:active { transform: scale(0.96); }
+    @media (hover: hover) {
+        .btn-main:hover { box-shadow: 0 12px 30px rgba(255, 0, 60, 0.5); }
+    }
 
     /* ================= KATEGORIYA: KICHIK PILL TUGMALAR, BITTA QATOR ================= */
     .beta-category-section {
@@ -512,7 +525,7 @@
         border: 1.5px solid rgba(255,255,255,0.09);
         background: rgba(255,255,255,0.04);
         cursor: pointer;
-        transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+        transition: background 0.25s ease, border-color 0.25s ease;
         white-space: nowrap;
         flex-shrink: 0;
         -webkit-tap-highlight-color: transparent;
@@ -590,6 +603,9 @@
         overflow: hidden;
         cursor: pointer;
         background: var(--bg-surface);
+        contain: layout paint;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
     }
     .anime-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -645,6 +661,8 @@
         color: #fff; font-size: 1.1rem; z-index: 10;
         transition: background 0.2s, color 0.2s;
         border: none; cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
     }
     .fav-badge:hover { background: rgba(255,255,255,0.2); color: #ff3366; }
     .fav-badge i.bxs-star { color: #ff3366; }
@@ -667,100 +685,41 @@
     }
     .beta-panel-empty i { font-size: 2.6rem; display: block; margin-bottom: 12px; opacity: 0.4; }
 
-    /* ================= TV / PULT UCHUN FOKUS STILLARI =================
-       Smart TV remote (D-pad) bilan boshqarilganda sichqoncha ":hover" ishlamaydi,
-       shuning uchun har bir bosiladigan elementga aniq ko'rinadigan ":focus" stili
-       qo'shildi (odatda ":hover" bilan bir xil effekt). Bu telefon/PC'dagi
-       hover-based dizaynga hech qanday ta'sir qilmaydi. */
-
-    .card-wrapper:focus-within .card-inner-overlay { opacity: 1; }
-    .card-wrapper:focus-within .card-title { color: var(--accent); }
-
+    /* ================= FOKUS: oq/ko'k chet (outline) va zoom olib tashlandi =================
+       Bosganda hech qanday ramka, ko'k chiziq yoki kattalashish bo'lmaydi.
+       Pult (TV) navigatsiyasi JS orqali ishlashda davom etadi. */
+    .anime-card,
     .anime-card:focus,
-    .anime-card:focus-visible {
-        outline: 3px solid var(--accent);
-        outline-offset: 3px;
-        transform: scale(1.035);
-        transition: transform 0.2s ease;
-        z-index: 5;
-    }
-
+    .anime-card:focus-visible,
+    .card-wrapper a,
+    .card-wrapper a:focus,
+    .card-wrapper a:focus-visible,
     .btn-main:focus,
-    .btn-main:focus-visible {
-        transform: translateY(-3px) scale(1.03);
-        box-shadow: 0 12px 30px rgba(255, 0, 60, 0.5);
-        outline: 3px solid #fff;
-        outline-offset: 3px;
-    }
-
+    .btn-main:focus-visible,
     .fav-badge:focus,
-    .fav-badge:focus-visible {
-        background: rgba(255,255,255,0.2);
-        color: #ff3366;
-        outline: 2px solid #fff;
-        outline-offset: 2px;
-    }
-
+    .fav-badge:focus-visible,
     .day-pill:focus,
-    .day-pill:focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 2px;
-    }
-    .day-pill:not(.active):focus {
-        background: rgba(255,255,255,0.1);
-        color: var(--text-light);
-    }
-
+    .day-pill:focus-visible,
     .beta-tab-btn:focus,
-    .beta-tab-btn:focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 2px;
-    }
-    .beta-tab-btn:not(.active):focus {
-        border-color: rgba(255,255,255,0.2);
-        background: rgba(255,255,255,0.08);
-    }
-
+    .beta-tab-btn:focus-visible,
     .dot:focus,
-    .dot:focus-visible {
-        outline: 2px solid #fff;
-        outline-offset: 3px;
-    }
-
+    .dot:focus-visible,
     .quick-icon-btn:focus,
-    .quick-icon-btn:focus-visible {
-        outline: 2px solid #fff;
-        outline-offset: 2px;
-    }
-
+    .quick-icon-btn:focus-visible,
     .schedule-mini-card:focus,
-    .schedule-mini-card:focus-visible {
-        border-color: rgba(255, 0, 60, 0.3);
-        background: rgba(255,255,255,0.055);
-        transform: translateY(-2px);
-        outline: 2px solid var(--accent);
-        outline-offset: 2px;
-    }
-
+    .schedule-mini-card:focus-visible,
     .story-item:focus,
-    .story-item:focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 3px;
-        border-radius: 14px;
-    }
-
+    .story-item:focus-visible,
     .schedule-panel-close:focus,
     .schedule-panel-close:focus-visible {
-        outline: 2px solid #fff;
-        outline-offset: 2px;
+        outline: none !important;
+        box-shadow: none;
     }
 
     /* ----- STORY TOP SPACE ----- */
     .story-top-space { margin-top: 75px; }
 
     /* ================= MOBIL: KOMPAKT ICON BAR + HIKOYALAR/CHIQISH KUNLARI POPUP ================= */
-    /* Bu blok faqat mobil ekranda ko'rinadi (pastdagi @media max-width:600px orqali ochiladi).
-       Desktopda hech narsa o'zgarmaydi, .top-split-grid odatdagidek ko'rinadi. */
     .mobile-quick-panel-wrap {
         position: relative;
         display: block;
@@ -792,16 +751,16 @@
         font-size: 1.1rem;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
-        transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+        touch-action: manipulation;
+        transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     }
-    .quick-icon-btn:active { transform: scale(0.92); }
     .quick-icon-btn.active-icon {
         background: linear-gradient(135deg, #ff003c, #ff4d6d);
         border-color: transparent;
         color: #fff;
     }
 
-    /* Hikoyalar popup — chap chetga yopishgan, rasmga o'xshash ixcham vertikal box */
+    /* Hikoyalar popup — chap chetga yopishgan, ixcham vertikal box */
     .stories-panel {
         display: none;
         position: absolute;
@@ -811,6 +770,8 @@
         width: 190px;
         max-height: 196px;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
         background: rgba(15,15,19,0.92);
         border: 1px solid rgba(255,255,255,0.12);
         border-left: none;
@@ -824,7 +785,6 @@
     .stories-panel::-webkit-scrollbar { width: 4px; }
     .stories-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 
-    /* Popup ichida story-container ustunga aylanadi, har bir item rasm+matn qator bo'lib chiqadi */
     .stories-panel .story-container {
         flex-direction: column;
         overflow: visible;
@@ -853,7 +813,7 @@
     }
     .stories-panel .split-col-title { display: none; }
 
-    /* Chiqish kunlari popup — markazga yaqin modal, tepada X yopish tugmasi */
+    /* Chiqish kunlari popup */
     .schedule-panel-overlay {
         display: none;
         position: fixed;
@@ -871,6 +831,8 @@
         max-width: 420px;
         max-height: 72vh;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
         background: #14141a;
         border: 1px solid rgba(255,255,255,0.12);
         border-radius: 16px;
@@ -898,39 +860,43 @@
         font-size: 1.15rem;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
         flex-shrink: 0;
     }
-    .schedule-panel-close:active { transform: scale(0.9); }
 
     .schedule-panel-box .split-col-title { margin: 0; }
 
     /* ----- MOBILE ----- */
     @media (max-width: 600px) {
-        /* FIX: beta-badge navbar (base.html) ostida qolib ketmasligi uchun
-           top-space navbar balandligidan sezilarli katta qilindi. */
         .story-top-space { margin-top: 82px !important; }
 
-        /* Eski Hikoyalar/Chiqish kunlari ustunlarini mobilda yashiramiz,
-           o'rniga kompakt icon bar + popuplar ishlatiladi. */
         .top-split-grid {
             display: none;
         }
 
-        /* BETA BADGE QATORI: chapda icon bar (ekran chetiga yopishgan), o'ngda "Xush kelibsiz" */
         .beta-top-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            padding: 10px 5% 0 0; /* chap padding olib tashlandi, icon bar chetga tegib tursin */
+            padding: 10px 5% 0 0;
         }
 
-        /* Kompakt icon bar: ekran chap chetiga yopishgan, faqat o'ng tomoni yumaloq */
         .quick-icons-bar {
             display: flex;
             flex-shrink: 0;
             border-left: none;
             border-radius: 0 22px 22px 0;
+            /* OPTIMIZATSIYA: blur mobilda qotishga sabab bo'ladi, olib tashlandi */
+            background: rgba(30,30,38,0.92);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .stories-panel {
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            background: rgba(15,15,19,0.97);
         }
 
         /* HERO */
@@ -944,6 +910,7 @@
             font-size: 1.5rem !important;
             text-align: left !important;
             line-height: 1.2;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
         }
 
         .tags {
@@ -971,12 +938,16 @@
             width: auto;
         }
 
-        /* MOBIL: box va rasm bir-biriga to'liq mos, chiqib ketmaydi */
         .slider-container {
             aspect-ratio: 16 / 9;
             min-height: 220px;
             border-radius: 10px;
             width: 100%;
+            /* OPTIMIZATSIYA: og'ir mask-image o'rniga yengil clip-path */
+            -webkit-mask-image: none;
+            mask-image: none;
+            clip-path: inset(0 round 10px);
+            box-shadow: none;
         }
 
         .slide { padding: 16px 14px 18px; }
@@ -1021,7 +992,6 @@
             font-size: 0.9rem;
         }
 
-        /* STORY — mobilda biroz kattaroq */
         .story-container {
             gap: 9px;
             padding: 1px 0 7px;
@@ -1050,7 +1020,6 @@
             line-height: 1.15;
         }
 
-        /* SCHEDULE — rasm va title mobilda kattaroq */
         .day-pills-row {
             gap: 5px;
             padding: 0 0 7px;
@@ -1107,13 +1076,14 @@
             margin-bottom: 3px;
         }
 
-        /* KATEGORIYALAR — MOBIL: karta rasmi kattaroq */
+        /* KATEGORIYALAR — MOBIL */
         .beta-category-section { padding: 0 4%; }
         .beta-category-heading { font-size: 1.2rem; }
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         .anime-card { height: 300px; }
-        .card-inner-overlay { opacity: 1; }
+        .card-inner-overlay { opacity: 1; transition: none; }
         .slides-wrapper { will-change: auto; }
+        .card-title { transition: none; }
     }
 
     @media (max-width: 1024px) { .slide-title { font-size: 2.8rem; } }
@@ -1129,8 +1099,17 @@
         .beta-category-heading { font-size: 1.2rem; }
         .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         .anime-card { height: 270px; }
-        .card-inner-overlay { opacity: 1; }
+        .card-inner-overlay { opacity: 1; transition: none; }
         .slides-wrapper { will-change: auto; }
+
+        /* OPTIMIZATSIYA: mobil/planshetda og'ir Ken Burns zoom o'chirildi (GPU yuklamasi) */
+        .slide.active .slide-bg img,
+        .slide.active .slide-bg-video {
+            animation: none;
+            will-change: auto;
+        }
+        .slide { transition: opacity 0.6s ease; }
+        .slide.outgoing { transform: none; transition: opacity 0.5s ease; }
     }
 
     @media (max-width: 480px) {
@@ -1142,6 +1121,7 @@
             border-radius: 0;
             box-shadow: none;
             margin-top: 0;
+            clip-path: none;
         }
 
         .slide {
@@ -1154,7 +1134,6 @@
         .tags { gap: 6px; margin-bottom: 8px; }
         .slide-title { font-size: 1.5rem; line-height: 1.2; }
 
-        /* Story / Schedule: tetap two-column on small phones */
         .top-split-grid {
             grid-template-columns: minmax(0, 1.15fr) minmax(112px, 0.85fr);
             gap: 10px;
@@ -1219,7 +1198,6 @@
             gap: 10px;
         }
 
-        /* KICHIK EKRAN — karta rasmi ham kattaroq */
         .anime-card { height: 255px; }
         .card-title { font-size: 0.88rem; }
     }
@@ -1234,7 +1212,6 @@
     <div class="beta-top-bar">
 
         <!-- ================= MOBIL: KOMPAKT ICON BAR (HIKOYALAR + CHIQISH KUNLARI) ================= -->
-        <!-- Faqat mobil ekranda ko'rinadi (chap tomonda). Bosilganda popuplar ochiladi. -->
         <div class="mobile-quick-panel-wrap">
             <div class="quick-icons-bar">
                 <button type="button" class="quick-icon-btn" id="storiesIconBtn" onclick="toggleStoriesPanel()" aria-label="Hikoyalar">
@@ -1271,8 +1248,6 @@
     </div>
 
     <!-- ================= YUQORI IKKI USTUN: HIKOYALAR (chap) + CHIQISH KUNLARI (o'ng) ================= -->
-    <!-- Desktopda shu joyida ko'rinadi. Mobilda CSS orqali yashiriladi va JS bu ustunlarni
-         yuqoridagi popuplar ichiga ko'chiradi (nusxa emas, xuddi shu elementlar). -->
     <div class="top-split-grid">
 
         <!-- CHAP: HIKOYALAR -->
@@ -1341,16 +1316,16 @@
                 <div class="slide">
 
                     {% if anime.hero_media and anime.hero_media.url|slice:"-4:" == ".mp4" or anime.hero_media and anime.hero_media.url|slice:"-4:" == "webm" %}
-                        <video class="slide-bg-video" autoplay loop muted playsinline preload="metadata">
+                        <video class="slide-bg-video" loop muted playsinline preload="metadata"{% if forloop.first %} autoplay{% endif %}>
                             <source src="{{ anime.hero_media.url }}">
                         </video>
                     {% elif anime.hero_media %}
                         <div class="slide-bg">
-                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}" loading="eager" decoding="async">
+                            <img src="{{ anime.hero_media.url }}" alt="{{ anime.title }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async">
                         </div>
                     {% else %}
                         <div class="slide-bg">
-                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="eager" decoding="async">
+                            <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async">
                         </div>
                     {% endif %}
 
@@ -1575,9 +1550,34 @@
     let autoPlayTimer = null;
     let heroStartX = 0;
     let heroDragging = false;
+    let heroInView = true;
 
     // Boshlang'ich holat — birinchi slayd active
     slides[0].classList.add('active');
+
+    // OPTIMIZATSIYA: faqat aktiv slaydning videosi o'ynaydi, qolganlari to'xtatiladi
+    function playCurrentVideo() {
+        const v = slides[currentSlide].querySelector('.slide-bg-video');
+        if (v) {
+            const p = v.play();
+            if (p && p.catch) p.catch(function() {});
+        }
+    }
+
+    function pauseInactiveVideos() {
+        slides.forEach(function(s, i) {
+            if (i === currentSlide) return;
+            const v = s.querySelector('.slide-bg-video');
+            if (v && !v.paused) v.pause();
+        });
+    }
+
+    function pauseAllVideos() {
+        slides.forEach(function(s) {
+            const v = s.querySelector('.slide-bg-video');
+            if (v && !v.paused) v.pause();
+        });
+    }
 
     function updateDots() {
         const dots = document.querySelectorAll('#sliderControls .dot');
@@ -1611,7 +1611,7 @@
         const currentEl = slides[currentSlide];
         const nextEl = slides[nextIndex];
 
-        // Eski slaydni sekin xiralashtirib va biroz kichraytirib chiqarish
+        // Eski slaydni sekin xiralashtirib chiqarish
         currentEl.classList.remove('active');
         currentEl.classList.add('outgoing');
 
@@ -1623,7 +1623,7 @@
             media.style.animation = '';
         }
 
-        // Kontent (teglar, sarlavha, meta, tugma) bosqichma-bosqich animatsiyasini qayta ishga tushirish
+        // Kontent bosqichma-bosqich animatsiyasini qayta ishga tushirish
         const contentChildren = nextEl.querySelectorAll('.slide-content > *');
         contentChildren.forEach(function(el) {
             el.style.animation = 'none';
@@ -1633,11 +1633,14 @@
 
         nextEl.classList.add('active');
 
+        currentSlide = nextIndex;
+        playCurrentVideo();
+
         setTimeout(function() {
             currentEl.classList.remove('outgoing');
+            pauseInactiveVideos();
         }, 900);
 
-        currentSlide = nextIndex;
         updateDots();
     }
 
@@ -1645,6 +1648,7 @@
 
     function resetAutoPlay() {
         if (autoPlayTimer) clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
         if (totalSlides > 1) {
             autoPlayTimer = setInterval(function() {
                 goToSlide(currentSlide + 1);
@@ -1652,8 +1656,49 @@
         }
     }
 
+    function stopAuto() {
+        if (autoPlayTimer) clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+        pauseDotFill();
+    }
+
+    function startAuto() {
+        updateDots();
+        resetAutoPlay();
+    }
+
+    pauseInactiveVideos();
     updateDots();
     resetAutoPlay();
+
+    // OPTIMIZATSIYA: slayder ekrandan chiqib ketsa (pastga skroll) avtoplay va video to'xtaydi
+    const heroEl = document.getElementById('heroSlider');
+    if (heroEl && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                heroInView = entry.isIntersecting;
+                if (heroInView && !document.hidden) {
+                    startAuto();
+                    playCurrentVideo();
+                } else {
+                    stopAuto();
+                    pauseAllVideos();
+                }
+            });
+        }, { threshold: 0.1 });
+        io.observe(heroEl);
+    }
+
+    // OPTIMIZATSIYA: brauzer tabi/ilova fonga o'tganda to'xtatish
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            stopAuto();
+            pauseAllVideos();
+        } else if (heroInView) {
+            startAuto();
+            playCurrentVideo();
+        }
+    });
 
     // Swipe — faqat yo'nalishni aniqlash uchun
     wrapper.addEventListener('touchstart', function(e) {
@@ -1670,7 +1715,7 @@
         if (diff < -50) goToSlide(currentSlide + 1);
         else if (diff > 50) goToSlide(currentSlide - 1);
         resetAutoPlay();
-    });
+    }, { passive: true });
 
     wrapper.addEventListener('mousedown', function(e) {
         heroStartX = e.clientX;
@@ -1694,7 +1739,7 @@
 /* ================= MOBIL: HIKOYALAR/CHIQISH KUNLARI ELEMENTLARINI POPUPGA KO'CHIRISH =================
    Asl .top-split-grid ichidagi ikkita ustun (Hikoyalar va Chiqish kunlari) nusxalanmaydi —
    xuddi shu DOM elementlar mobil ekranda popup ichiga ko'chiriladi, desktopga qaytilganda
-   o'z joyiga qaytariladi. Shu tufayli id/kontent takrorlanmaydi va struktura buzilmaydi. */
+   o'z joyiga qaytariladi. */
 (function() {
     const topSplitGrid = document.querySelector('.top-split-grid');
     const storiesPanelContent = document.getElementById('storiesPanelContent');
@@ -1727,7 +1772,6 @@
             if (scheduleCol && scheduleOriginalParent && scheduleCol.parentNode !== scheduleOriginalParent) {
                 scheduleOriginalParent.insertBefore(scheduleCol, scheduleNextSibling);
             }
-            // Desktopga qaytganda popuplar ochiq qolib ketmasin
             closeStoriesPanel();
             closeSchedulePanel();
         }
@@ -1737,7 +1781,6 @@
     if (mq.addEventListener) {
         mq.addEventListener('change', function(e) { applyLayout(e.matches); });
     } else if (mq.addListener) {
-        // eski brauzerlar uchun fallback
         mq.addListener(function(e) { applyLayout(e.matches); });
     }
 })();
@@ -1794,7 +1837,6 @@ function toggleSchedulePanel() {
 }
 
 function closeScheduleOnBackdrop(e) {
-    // Faqat qora fon (overlay)ga bosilganda yopiladi, box ichiga bosilganda yopilmaydi
     if (e.target && e.target.id === 'scheduleOverlay') {
         closeSchedulePanel();
     }
@@ -1875,13 +1917,14 @@ function switchBetaTab(btn) {
         { icon: 'bx bxs-crown',      text: 'VIP bilan cheksiz imkoniyat' }
     ];
 
-    var currentIndex = 0; // 0-index hozir ko'rinib turgan "Xush kelibsiz!"
+    var currentIndex = 0;
 
     function showNextMessage() {
+        if (document.hidden) return; // fon rejimida bekorga ishlamasin
+
         currentIndex = (currentIndex + 1) % betaMessages.length;
         var msg = betaMessages[currentIndex];
 
-        // chiqib ketish animatsiyasi
         textEl.style.opacity = '0';
         textEl.style.transform = 'translateY(-6px)';
 
@@ -1893,10 +1936,9 @@ function switchBetaTab(btn) {
                 newIcon.id = 'betaBadgeIcon';
                 newIcon.className = msg.icon;
                 iconEl.replaceWith(newIcon);
-                iconEl = newIcon; // yangi elementni referens sifatida saqlab qolamiz
+                iconEl = newIcon;
             }
 
-            // kirish animatsiyasi
             textEl.style.transform = 'translateY(6px)';
             requestAnimationFrame(function() {
                 requestAnimationFrame(function() {
@@ -1911,11 +1953,8 @@ function switchBetaTab(btn) {
 })();
 
 /* ================= TV / PULT NAVIGATSIYASI (Smart TV remote uchun) =================
-   D-pad (yo'nalish tugmalari) bosilganda fokus joriy elementdan o'sha tomonda turgan
-   eng yaqin bosiladigan elementga o'tkaziladi (chapdan o'ngga, tepadan pastga va h.k.).
-   Mobil/PC uchun mavjud sichqoncha va tach bilan ishlash butunlay o'zgarishsiz qoladi —
-   bu faqat klaviatura/pult orqali kelayotgan ArrowLeft/Right/Up/Down va Enter
-   tugmalarini qo'shimcha ishlov beradi. */
+   D-pad bosilganda fokus joriy elementdan o'sha tomondagi eng yaqin bosiladigan
+   elementga o'tkaziladi. Mobil/PC uchun sichqoncha va tach o'zgarishsiz qoladi. */
 (function() {
     var FOCUSABLE_SELECTOR = [
         'a[href]',
@@ -1946,7 +1985,6 @@ function switchBetaTab(btn) {
     }
 
     function getFocusScopeEl() {
-        // Modal/popup ochiq bo'lsa, navigatsiya faqat o'sha modal ichida bo'ladi
         var scheduleOverlay = document.getElementById('scheduleOverlay');
         if (scheduleOverlay && scheduleOverlay.classList.contains('open')) {
             return scheduleOverlay;
@@ -1998,7 +2036,6 @@ function switchBetaTab(btn) {
 
             if (!primaryOk) return;
 
-            // Bir xil qator/ustunda turgan elementlarga ustunlik beriladi
             var score = primaryDist + secondaryDist * 2.2;
             if (score < bestScore) {
                 bestScore = score;
@@ -2010,7 +2047,7 @@ function switchBetaTab(btn) {
     }
 
     document.addEventListener('keydown', function(e) {
-        if (isTypingField(e.target)) return; // qidiruv va boshqa maydonlarda oddiy klaviatura buzilmasin
+        if (isTypingField(e.target)) return;
 
         var direction = KEY_DIRECTIONS[e.key];
         if (direction) {
@@ -2025,7 +2062,6 @@ function switchBetaTab(btn) {
             return;
         }
 
-        // Enter / OK: onclick bilan ishlaydigan card (div) uchun ham ishlashi kerak
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
             var active = document.activeElement;
             if (active && active.hasAttribute('data-tv-clickable')) {
@@ -2035,7 +2071,6 @@ function switchBetaTab(btn) {
             return;
         }
 
-        // Orqaga qaytish (pultning "Back"/"Return" tugmasi ko'pincha Escape yoki Backspace sifatida keladi)
         if (e.key === 'Escape' || e.key === 'Backspace') {
             var scheduleOverlay = document.getElementById('scheduleOverlay');
             var storiesPanel = document.getElementById('storiesPanel');
@@ -2052,7 +2087,6 @@ function switchBetaTab(btn) {
         }
     });
 
-    // Pult birinchi marta bosilganda hech narsa fokusda bo'lmasa, birinchi elementga fokus beramiz
     document.addEventListener('keydown', function(e) {
         if (isTypingField(e.target)) return;
         if (!KEY_DIRECTIONS[e.key]) return;
