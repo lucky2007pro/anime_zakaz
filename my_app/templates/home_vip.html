@@ -695,6 +695,60 @@
     }
     .beta-panel-empty i { font-size: 2.6rem; display: block; margin-bottom: 12px; opacity: 0.4; }
 
+    /* ================= SKELETON LOADING (shimmer + blur-up + reveal) =================
+       Rasm yuklanayotganda host elementga .skel (yoki rasmning o'ziga .skel-img) qo'shiladi,
+       yuklangach olib tashlanadi — rasm blur'dan tiniqlikka silliq o'tadi. */
+    .anime-card.skel,
+    .slide-bg.skel,
+    img.skel-img {
+        background-color: #15151c;
+        background-image: linear-gradient(100deg,
+            rgba(255,255,255,0) 20%,
+            rgba(255,255,255,0.09) 42%,
+            rgba(255,255,255,0.15) 50%,
+            rgba(255,255,255,0.09) 58%,
+            rgba(255,255,255,0) 80%);
+        background-size: 250% 100%;
+        background-repeat: no-repeat;
+        animation: skelShimmer 1.5s ease-in-out infinite;
+    }
+    @keyframes skelShimmer {
+        from { background-position: 150% 0; }
+        to   { background-position: -150% 0; }
+    }
+    img.skel-img { color: transparent; }
+
+    .anime-card img {
+        transition: opacity 0.55s ease, filter 0.6s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .slide-bg img {
+        transition: opacity 0.6s ease, filter 0.6s ease;
+    }
+    .anime-card.skel img,
+    .slide-bg.skel img { opacity: 0; }
+    .anime-card.skel img { filter: blur(14px); transform: scale(1.08); }
+    .slide-bg.skel img { filter: blur(16px); }
+
+    /* Yuklanayotganda karta ichidagi matn yashirin, yuklangach silliq paydo bo'ladi */
+    .anime-card.skel .card-inner-overlay { opacity: 0; }
+
+    /* Kartalar ekranga kirganda ketma-ket (stagger) paydo bo'ladi */
+    .reveal-hidden { opacity: 0; transform: translateY(18px); }
+    .reveal-hidden.reveal-in {
+        opacity: 1;
+        transform: none;
+        transition: opacity 0.55s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .anime-card.skel,
+        .slide-bg.skel,
+        img.skel-img { animation: none; }
+        .reveal-hidden { opacity: 1; transform: none; }
+        .anime-card img,
+        .slide-bg img { transition: none; }
+    }
+
     /* ================= FOKUS: outline va zoom olib tashlandi ================= */
     .anime-card,
     .anime-card:focus,
@@ -1211,10 +1265,65 @@
         .anime-card { height: 255px; }
         .card-title { font-size: 0.88rem; }
     }
+
+    /* ================= MOBIL: ILOVA (APP) USLUBIDAGI KATTA KARTALAR =================
+       Eng oxirida turadi — yuqoridagi mobil qoidalarni bosib o'tadi.
+       Kartalar kengroq (chetlarga yaqin), balandroq (2:3.1 poster nisbati),
+       yumaloqroq burchaklar va bosilganda yengil "press" effekti. */
+    @media (max-width: 768px) {
+        .beta-category-section { padding: 0 10px; }
+        .beta-category-heading { padding: 0 2px; }
+        .beta-tab-buttons { padding: 0 2px; }
+
+        .cards-grid { gap: 10px; padding-bottom: 40px; }
+        .card-wrapper { contain-intrinsic-size: 190px 290px; }
+
+        .anime-card {
+            height: auto;
+            aspect-ratio: 2 / 3.1;
+            border-radius: 16px;
+        }
+        .anime-card img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .card-inner-overlay {
+            padding: 14px 12px;
+            padding-right: 50px;
+            background: linear-gradient(to top, rgba(10,10,15,0.96) 0%, rgba(10,10,15,0.55) 38%, transparent 68%);
+            opacity: 1;
+            transition: opacity 0.45s ease;
+        }
+        .card-inner-title { font-size: 0.95rem; margin-bottom: 6px; }
+
+        .top-badge-group { top: 10px; left: 10px; }
+        .top-badge-episode,
+        .top-badge-year { font-size: 0.68rem; padding: 3px 7px; border-radius: 7px; }
+        .tier-badge { top: 10px; right: 10px; }
+
+        .fav-badge {
+            width: 36px;
+            height: 36px;
+            bottom: 10px;
+            right: 10px;
+            font-size: 1.2rem;
+            background: rgba(0,0,0,0.55);
+        }
+        .fav-badge.is-fav { background: rgba(255, 51, 102, 0.25); }
+    }
+
+    /* Sensorli ekranlarda bosilganda karta yengil kichrayadi (app hissi) */
+    @media (hover: none) {
+        .anime-card:active { transform: scale(0.97); }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
+{% static 'images/default.svg' as default_movie_poster %}
 
 <div class="story-top-space">
 
@@ -2126,6 +2235,93 @@ function switchBetaTab(btn) {
             if (focusables.length) focusables[0].focus();
         }
     }, true);
+})();
+
+/* ================= SKELETON LOADING: rasm yuklanishini kuzatish =================
+   - Yuklanayotgan rasm tagida shimmer (yaltirovchi skeleton) ko'rinadi.
+   - Rasm yuklangach blur'dan tiniqlikka silliq o'tadi.
+   - Rasm yuklanmasa, standart poster qo'yiladi (yoki skeleton olib tashlanadi).
+   - 15 soniyadan keyin skeleton har holda yopiladi. */
+window.DEFAULT_POSTER = '{{ default_movie_poster }}';
+
+(function() {
+    function track(img, host, cls) {
+        if (!img) return;
+        var target = host || img;
+        if (img.complete) return; // allaqachon yuklangan (yoki xato) — skeleton kerak emas
+
+        target.classList.add(cls);
+
+        var timer = setTimeout(finish, 15000);
+
+        function finish() {
+            clearTimeout(timer);
+            target.classList.remove(cls);
+            img.removeEventListener('load', finish);
+            img.removeEventListener('error', fail);
+        }
+
+        function fail() {
+            var fb = window.DEFAULT_POSTER;
+            if (!img.dataset.fb && fb && img.src.indexOf(fb) === -1) {
+                img.dataset.fb = '1';
+                img.src = fb;
+            } else {
+                finish();
+            }
+        }
+
+        img.addEventListener('load', finish);
+        img.addEventListener('error', fail);
+    }
+
+    // Anime kartalari (Kunlik + Barcha)
+    document.querySelectorAll('.anime-card').forEach(function(card) {
+        track(card.querySelector(':scope > img'), card, 'skel');
+    });
+
+    // Hero slayder rasmlari
+    document.querySelectorAll('.slide-bg').forEach(function(bg) {
+        track(bg.querySelector('img'), bg, 'skel');
+    });
+
+    // Hikoyalar (dumaloq rasmlar)
+    document.querySelectorAll('.story-ring img').forEach(function(img) {
+        track(img, null, 'skel-img');
+    });
+
+    // Chiqish kunlari mini-posterlari
+    document.querySelectorAll('.schedule-mini-poster').forEach(function(img) {
+        track(img, null, 'skel-img');
+    });
+})();
+
+/* ================= KARTALAR EKRANGA KIRGANDA KETMA-KET PAYDO BO'LISH ================= */
+(function() {
+    if (!('IntersectionObserver' in window)) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var items = document.querySelectorAll('.card-wrapper');
+    if (!items.length) return;
+
+    var io = new IntersectionObserver(function(entries) {
+        var visible = entries.filter(function(en) { return en.isIntersecting; });
+        visible.forEach(function(en, i) {
+            var el = en.target;
+            el.style.transitionDelay = (i * 55) + 'ms';
+            el.classList.add('reveal-in');
+            io.unobserve(el);
+            setTimeout(function() {
+                el.classList.remove('reveal-hidden', 'reveal-in');
+                el.style.transitionDelay = '';
+            }, 1000 + i * 55);
+        });
+    }, { rootMargin: '0px 0px 60px 0px', threshold: 0.05 });
+
+    items.forEach(function(el) {
+        el.classList.add('reveal-hidden');
+        io.observe(el);
+    });
 })();
 </script>
 
