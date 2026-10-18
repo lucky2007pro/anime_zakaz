@@ -4,11 +4,11 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
 from .models import *
-from django.db.models import F, Q
+from django.db.models import F, Q, Max
 from django.utils import timezone as tz_utils
 from .admin_access import SECTIONS, SECTION_KEYS
 from datetime import timedelta
-
+from collections import defaultdict
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
@@ -215,10 +215,48 @@ def admin_episodes(request):
         'type': 'episode'
     })
 
+
+def _episode_map():
+    """
+    {movie_id: [{'id': episode_id, 'n': qism_raqami}, ...]}
+    Formadagi avto-raqam va ogohlantirishlar uchun.
+    """
+    data = defaultdict(list)
+    rows = MovieEpisode.objects.values_list('id', 'movie_id', 'episode_number').order_by('episode_number', 'id')
+    for ep_id, m_id, num in rows:
+        try:
+            n = int(num)
+        except (TypeError, ValueError):
+            continue
+        data[str(m_id)].append({'id': ep_id, 'n': n})
+    return dict(data)
+ 
+ 
 @user_passes_test(is_admin, login_url='/')
 def admin_episode_form(request, pk=None):
     episode = get_object_or_404(MovieEpisode, pk=pk) if pk else None
     movies = Movie.objects.all().order_by('-created_at')
+    episode_map = _episode_map()
+ 
+    def form_context():
+        selected = (
+            request.POST.get('movie')
+            or (episode.movie_id if episode is not None and episode.movie_id else '')
+            or request.GET.get('movie', '')
+        )
+        return {
+            'episode': episode,
+            'movies': movies,
+            'episode_map': episode_map,
+            'selected_movie_id': selected,
+        }
+ 
+    def fail(err_msg):
+        if _is_ajax(request):
+            return JsonResponse({'ok': False, 'error': err_msg}, status=400)
+        messages.error(request, err_msg)
+        return render(request, 'custom_admin/episode_form.html', form_context())
+ 
     if request.method == 'POST':
         movie_id = request.POST.get('movie')
         ep_num = request.POST.get('episode_number')
@@ -227,35 +265,68 @@ def admin_episode_form(request, pk=None):
         description = request.POST.get('description')
         intro_time = request.POST.get('intro_time')
         video_file = request.FILES.get('video_file')
-
-
+ 
+        # --- Tekshiruvlar (saqlashdan oldin) ---
+        if not movie_id or not str(movie_id).isdigit():
+            return fail("Anime tanlanmadi! Avval animeni tanlang.")
+ 
+        try:
+            ep_num_int = int(ep_num)
+        except (TypeError, ValueError):
+            ep_num_int = 0
+        if ep_num_int < 1:
+            return fail("Qism raqami noto'g'ri kiritildi.")
+ 
+        movie_obj = get_object_or_404(Movie, id=movie_id)
+ 
+        # Shu animeda boshqa qismlar (tahrirda o'zi hisobga olinmaydi)
+        others = MovieEpisode.objects.filter(movie_id=movie_obj.id)
+        if episode is not None:
+            others = others.exclude(pk=episode.pk)
+ 
+        # 1) Takroriy qism — saqlanmaydi
+        if others.filter(episode_number=ep_num_int).exists():
+            return fail(f"Bu animada {ep_num_int}-qism allaqachon mavjud! Boshqa raqam kiriting.")
+ 
+        # 2) Tartib buzilishi — saqlanadi, lekin ogohlantiriladi
+        last_number = others.aggregate(m=Max('episode_number'))['m'] or 0
+ 
         if not episode:
             episode = MovieEpisode()
-        
-        episode.movie = Movie.objects.get(id=movie_id)
-        episode.episode_number = ep_num
+ 
+        episode.movie = movie_obj
+        episode.episode_number = ep_num_int
         episode.title = title
         episode.video_url = vid_url
         episode.description = description
         episode.intro_time = intro_time
         if video_file:
             episode.video_file = video_file
+ 
         try:
             episode.save()
         except Exception:
-            err_msg = "Video yuklanmadi. Video URL kiriting yoki to'g'ri video formatini yuklang."
-            if _is_ajax(request):
-                return JsonResponse({'ok': False, 'error': err_msg}, status=400)
-            messages.error(request, err_msg)
-            return render(request, 'custom_admin/episode_form.html', {'episode': episode, 'movies': movies})
-
+            return fail("Video yuklanmadi. Video URL kiriting yoki to'g'ri video formatini yuklang.")
+ 
+        if ep_num_int > last_number + 1:
+            first_missing = last_number + 1
+            if ep_num_int - first_missing == 1:
+                missing_text = f"{first_missing}"
+            else:
+                missing_text = f"{first_missing}–{ep_num_int - 1}"
+            messages.warning(
+                request,
+                f"Diqqat: {ep_num_int}-qism saqlandi, lekin {missing_text}-qism(lar) yo'q. "
+                f"Qismlar tartibi buzilgan!"
+            )
+ 
         if _is_ajax(request):
             return JsonResponse({'ok': True, 'redirect_url': reverse('admin_episodes')})
-        
+ 
         messages.success(request, "Qism muvaffaqiyatli saqlandi!")
         return redirect('admin_episodes')
-        
-    return render(request, 'custom_admin/episode_form.html', {'episode': episode, 'movies': movies})
+ 
+    return render(request, 'custom_admin/episode_form.html', form_context())
 
 @user_passes_test(is_admin, login_url='/')
 def admin_episode_delete(request, pk):
