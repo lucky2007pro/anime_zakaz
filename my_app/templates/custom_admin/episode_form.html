@@ -15,7 +15,25 @@
     }
     .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
 
-    .select-control { appearance: none; }
+    /* Qidiruvli anime tanlash */
+    .movie-picker { position: relative; }
+    .movie-list {
+        display: none;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        margin-top: 4px;
+        max-height: 240px;
+        overflow-y: auto;
+        background: #0a0a0f;
+        border: 1px solid var(--border-line);
+        border-radius: 4px;
+        z-index: 50;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    }
+    .movie-list.open { display: block; }
+    .movie-option { padding: 10px 15px; cursor: pointer; font-size: 0.95rem; }
+    .movie-option:hover { background: var(--accent); color: #000; }
+    .movie-empty { display: none; padding: 10px 15px; color: var(--text-dim); font-size: 0.9rem; }
 
     .btn-submit {
         background: var(--accent); color: black; border: none; padding: 14px 20px; border-radius: 4px;
@@ -75,14 +93,19 @@
     </h2>
     <form method="post" enctype="multipart/form-data" id="video-upload-form">
         {% csrf_token %}
+
         <div class="form-group">
-            <label for="episode-movie">Qaysi Animaga tegishli?</label>
-            <select id="episode-movie" name="movie" class="form-control select-control" required>
-                <option value="">Anima tanlang...</option>
-                {% for m in movies %}
-                <option value="{{ m.id }}" {% if episode and episode.movie_id == m.id %}selected{% endif %}>{{ m.title }}</option>
-                {% endfor %}
-            </select>
+            <label for="movie-search">Qaysi Animaga tegishli?</label>
+            <div class="movie-picker">
+                <input type="hidden" name="movie" id="episode-movie" value="{% if episode %}{{ episode.movie_id }}{% endif %}">
+                <input type="text" id="movie-search" class="form-control" placeholder="Anime nomini yozing..." autocomplete="off" value="{% if episode %}{{ episode.movie.title }}{% endif %}">
+                <div class="movie-list" id="movie-list">
+                    {% for m in movies %}
+                    <div class="movie-option" data-id="{{ m.id }}">{{ m.title }}</div>
+                    {% endfor %}
+                    <div class="movie-empty" id="movie-empty">Hech narsa topilmadi</div>
+                </div>
+            </div>
         </div>
 
         <div class="form-group inline-row" style="display:flex; gap: 20px;">
@@ -135,6 +158,74 @@
         <button type="submit" class="btn-submit">SAQLASH <i class='bx bx-save'></i></button>
     </form>
 </div>
+
+<!-- Anime qidiruvli tanlash (admin_upload_progress.js dan OLDIN turishi shart) -->
+<script>
+(function () {
+    const search = document.getElementById('movie-search');
+    const hidden = document.getElementById('episode-movie');
+    const list = document.getElementById('movie-list');
+    const empty = document.getElementById('movie-empty');
+    const form = document.getElementById('video-upload-form');
+    const options = Array.from(list.querySelectorAll('.movie-option'));
+
+    function open()  { list.classList.add('open'); }
+    function close() { list.classList.remove('open'); }
+
+    function filter() {
+        const q = search.value.trim().toLowerCase();
+        let shown = 0;
+        options.forEach(o => {
+            const ok = o.textContent.toLowerCase().includes(q);
+            o.style.display = ok ? '' : 'none';
+            if (ok) shown++;
+        });
+        empty.style.display = shown ? 'none' : 'block';
+    }
+
+    function showAll() {
+        options.forEach(o => o.style.display = '');
+        empty.style.display = 'none';
+    }
+
+    search.addEventListener('focus', function () {
+        search.select();
+        showAll();
+        open();
+    });
+
+    search.addEventListener('input', function () {
+        hidden.value = '';      // yozilsa, eski tanlov bekor bo'ladi
+        filter();
+        open();
+    });
+
+    options.forEach(o => {
+        o.addEventListener('click', function () {
+            hidden.value = o.dataset.id;
+            search.value = o.textContent.trim();
+            close();
+        });
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.movie-picker')) {
+            close();
+            if (!hidden.value) search.value = '';
+        }
+    });
+
+    form.addEventListener('submit', function (e) {
+        if (!hidden.value) {
+            e.preventDefault();
+            e.stopImmediatePropagation();   // yuklash progressi boshlanib ketmasin
+            search.focus();
+            showAll();
+            open();
+        }
+    });
+})();
+</script>
 
 <script src="{% static 'js/admin_upload_progress.js' %}"></script>
 <script>
