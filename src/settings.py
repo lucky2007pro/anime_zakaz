@@ -78,7 +78,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
     # Custom Device Session Limits
-    'my_app.middleware.DeviceLimitMiddleware',
+    'my_app.middleware.DeviceLimitMiddleware',  
+    'my_app.middleware.AdminPanelMiddleware',
 ]
 
 ROOT_URLCONF = 'src.urls'
