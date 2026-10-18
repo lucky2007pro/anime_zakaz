@@ -222,7 +222,7 @@ urlpatterns = [
     path('control-panel/admins/lookup/', admin_admin_lookup, name='admin_admin_lookup'),
     path('control-panel/admins/<int:pk>/', admin_admin_form, name='admin_admin_form'),
     path('control-panel/admins/<int:pk>/remove/', admin_admin_remove, name='admin_admin_remove'),
-
+    path('control-panel/admins/<int:pk>/permissions/', admin_admin_perms, name='admin_admin_perms'),
 ]
 
 
