@@ -1118,6 +1118,171 @@
             display: none;
         }
 
+        /* ==================== BO'LIMLAR (+) — BOX ==================== */
+        .tab-item.tab-more-btn {
+            font-family: inherit;
+            -webkit-appearance: none;
+            appearance: none;
+            touch-action: manipulation;
+            /* ixcham: matn uzun bo'lgani uchun tabbar kengayib ketmasin */
+            min-width: 52px;
+            padding: 8px 6px;
+            flex: 0 0 auto;
+            letter-spacing: 0;
+        }
+
+        .tab-item.tab-more-btn span {
+            font-size: 0.54rem;
+            letter-spacing: 0;
+            line-height: 1.2;
+        }
+
+        .tab-item.tab-more-btn i {
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease;
+        }
+
+        .tab-item.tab-more-btn.more-open {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .tab-item.tab-more-btn.more-open i {
+            transform: rotate(45deg);
+            color: #fff;
+        }
+
+        .more-box {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            z-index: 999;
+            min-width: 210px;
+            max-width: calc(100vw - 20px);
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(20, 20, 30, 0.94);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(12px) scale(0.92);
+            transform-origin: bottom center;
+            transition: opacity 0.22s ease,
+                        transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                        visibility 0.22s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .more-box.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        .more-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            color: #e8e8f0;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .more-item i {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            flex-shrink: 0;
+            transition: color 0.2s ease;
+        }
+
+        .more-item:hover,
+        .more-item:active {
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--accent);
+        }
+
+        .more-item:hover i,
+        .more-item:active i { color: var(--accent); }
+
+        .more-item.more-item-admin,
+        .more-item.more-item-admin i { color: var(--accent); }
+
+        .more-arrow {
+            position: absolute;
+            bottom: -7px;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            margin-left: -6px;
+            background: rgba(20, 20, 30, 0.94);
+            border-right: 1px solid rgba(255, 255, 255, 0.12);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            transform: rotate(45deg);
+            pointer-events: none;
+        }
+
+        /* ==================== IMKON TOAST — network toast joyidan chiqadi ==================== */
+        .imkon-toast {
+            position: fixed;
+            bottom: 96px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            z-index: 99998;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px 10px 12px;
+            border-radius: 30px;
+            background: rgba(20, 20, 30, 0.94);
+            border: 1px solid rgba(0, 243, 255, 0.35);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 243, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            opacity: 0;
+            pointer-events: none;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: pan-y;
+            transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .imkon-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        .imkon-toast { max-width: calc(100vw - 24px); }
+        .imkon-toast span { overflow: hidden; text-overflow: ellipsis; }
+        .imkon-toast i { font-size: 1.15rem; line-height: 1; flex-shrink: 0; }
+        .imkon-toast .imkon-toast-icon { color: var(--accent); }
+        .imkon-toast .imkon-toast-arrow { color: var(--text-dim); margin-left: 2px; }
+
         /* Faqat mobil qurilmalarda ko'rsatish */
         @media (min-width: 769px) {
             .bottom-tab-bar { display: none; }
@@ -1186,6 +1351,11 @@
             }
 
             .bottom-tab-bar {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+
+            .more-box {
                 backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
             }
@@ -1801,10 +1971,11 @@
      id="bottomTabBar"
      aria-label="Pastki navigatsiya">
 
-    <a href="{% url 'aloqa' %}" class="tab-item" data-tab="aloqa">
-        <i class='bx bx-support'></i>
-        <span>Aloqa</span>
-    </a>
+    <!-- BO'LIMLAR (+): 1 marta bosilsa box ochiladi (JS: BO'LIMLAR BOX) -->
+    <button type="button" class="tab-item tab-more-btn" data-tab="bolimlar" id="moreTab" aria-haspopup="menu" aria-expanded="false" aria-controls="moreBox">
+        <i class='bx bx-plus'></i>
+        <span>Bo'limlar</span>
+    </button>
 
     <a href="{% url 'chat' %}" class="tab-item" data-tab="chat">
         <i class='bx bx-message-dots'></i>
@@ -1829,8 +2000,38 @@
 </nav>
 {% endblock bottom_tabbar %}
 
+<!-- ==================== BO'LIMLAR BOXI (tab bar tashqarisida — fixed to'g'ri ishlashi uchun) ==================== -->
+<div class="more-box" id="moreBox" role="menu" aria-label="Bo'limlar menyusi" aria-hidden="true">
+    <a href="{% url 'news_feed' %}" class="more-item" role="menuitem">
+        <i class='bx bx-news'></i>
+        Yangiliklar
+    </a>
+    <a href="{% url 'reels' %}" class="more-item" role="menuitem">
+        <i class='bx bx-video'></i>
+        Reels
+    </a>
+    <a href="{% url 'aloqa' %}" class="more-item" role="menuitem">
+        <i class='bx bx-support'></i>
+        Aloqa
+    </a>
+    {% if request.user.is_staff or request.user.is_superuser or request.user.is_admin_user %}
+    <a href="{% url 'admin_dashboard' %}" class="more-item more-item-admin" role="menuitem">
+        <i class='bx bx-shield-quarter'></i>
+        Admin dashboard
+    </a>
+    {% endif %}
+    <span class="more-arrow"></span>
+</div>
+
 <!-- ==================== NETWORK TOAST — tab bar ustidan chiqadi ==================== -->
 <div id="networkToast"></div>
+
+<!-- ==================== IMKON TOAST — saytga kirganda 1 marta, network toast joyidan chiqadi ==================== -->
+<a href="{% url 'imkon_page' %}" class="imkon-toast" id="imkonToast" draggable="false" aria-label="VIP imkoniyatlar sahifasi">
+    <i class='bx bxs-crown imkon-toast-icon'></i>
+    <span>VIP imkoniyatlardan foydalaning</span>
+    <i class='bx bx-chevron-right imkon-toast-arrow'></i>
+</a>
 
 {% block footer %}
 <footer style="
@@ -2187,6 +2388,108 @@ function markActiveTab() {
 })();
 
 
+/* ================= BO'LIMLAR (+) — 1 marta bosilsa box ochiladi; tashqariga bosilsa yoki scroll bo'lsa yopiladi ================= */
+(function () {
+    var tab = document.getElementById('moreTab');
+    var box = document.getElementById('moreBox');
+    if (!tab || !box) return;
+
+    var isOpen = false;
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var lastW = window.innerWidth;
+
+    function positionBox() {
+        var bar     = document.getElementById('bottomTabBar');
+        var tabRect = tab.getBoundingClientRect();
+        var barRect = bar ? bar.getBoundingClientRect() : tabRect;
+
+        var vw      = document.documentElement.clientWidth || window.innerWidth;
+        var vh      = window.innerHeight;
+        var boxW    = box.offsetWidth;
+        var centerX = tabRect.left + tabRect.width / 2;
+
+        var left = Math.round(centerX - boxW / 2);
+        left = Math.max(10, Math.min(left, vw - boxW - 10));
+
+        box.style.left   = left + 'px';
+        box.style.bottom = Math.round(vh - barRect.top + 14) + 'px';
+
+        var arrow = box.querySelector('.more-arrow');
+        if (arrow) {
+            var ax = centerX - left;
+            ax = Math.max(18, Math.min(ax, boxW - 18));
+            arrow.style.left = ax + 'px';
+        }
+    }
+
+    function openBox() {
+        if (isOpen) return;
+        isOpen = true;
+        positionBox();
+        box.classList.add('open');
+        tab.classList.add('more-open');
+        box.setAttribute('aria-hidden', 'false');
+        tab.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeBox() {
+        if (!isOpen) return;
+        isOpen = false;
+        box.classList.remove('open');
+        tab.classList.remove('more-open');
+        box.setAttribute('aria-hidden', 'true');
+        tab.setAttribute('aria-expanded', 'false');
+    }
+
+    /* --- "+" bosilsa: ochiladi / yopiladi --- */
+    tab.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (isOpen) closeBox(); else openBox();
+    });
+
+    /* --- box yoki "+" dan tashqariga bosilsa — yopiladi (tasodifiy click) --- */
+    document.addEventListener('pointerdown', function (e) {
+        if (!isOpen) return;
+        if (box.contains(e.target) || tab.contains(e.target)) return;
+        closeBox();
+    }, true);
+
+    /* --- scroll bo'lsa — yopiladi --- */
+    document.addEventListener('scroll', closeBox, { capture: true, passive: true });
+    window.addEventListener('wheel', closeBox, { passive: true });
+
+    document.addEventListener('touchstart', function (e) {
+        var t = e.touches[0];
+        if (!t) return;
+        touchStartX = t.clientX;
+        touchStartY = t.clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function (e) {
+        if (!isOpen) return;
+        if (box.contains(e.target)) return;
+        var t = e.touches[0];
+        if (!t) return;
+        if (Math.abs(t.clientX - touchStartX) > 10 || Math.abs(t.clientY - touchStartY) > 10) closeBox();
+    }, { passive: true });
+
+    /* --- box ichidagi tugma bosilganda yopiladi --- */
+    box.addEventListener('click', function (e) {
+        if (e.target.closest('a')) closeBox();
+    });
+
+    /* --- boshqa holatlar --- */
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeBox(); });
+    window.addEventListener('resize', function () {
+        if (window.innerWidth !== lastW) { lastW = window.innerWidth; closeBox(); }
+    });
+    window.addEventListener('orientationchange', closeBox);
+    window.addEventListener('pageshow', closeBox);
+    document.addEventListener('visibilitychange', function () { if (document.hidden) closeBox(); });
+})();
+
+
 /* ================= NETWORK TOAST — tab bar ustidan, faqat mobil ================= */
 (function () {
     var toast = document.getElementById('networkToast');
@@ -2320,6 +2623,179 @@ function markActiveTab() {
     window.addEventListener('offline', function () { showToast(false); });
     window.addEventListener('online',  function () { showToast(true);  });
 
+})();
+
+/* ================= IMKON TOAST — har kirishda 1 marta; surib yuborish yoki 7 soniyadan keyin "Tanos" animatsiyasi bilan yo'qoladi ================= */
+(function () {
+    var toast = document.getElementById('imkonToast');
+    if (!toast) return;
+
+    var STORAGE_KEY = 'anibest_imkon_shown';
+    var SHOW_DELAY  = 1200;   // sahifa ochilgach shuncha ms dan keyin chiqadi
+    var VISIBLE_MS  = 7000;   // shuncha ms (7 soniya) turadi, keyin chang bo'lib uchadi
+    var SLICES      = 18;     // chang bo'laklari soni
+
+    // imkon sahifasining o'zida ko'rsatilmaydi
+    if (window.location.pathname.indexOf('/imkon') === 0) return;
+
+    // shu kirishda (tab/session) allaqachon ko'rsatilgan bo'lsa — qayta chiqmaydi
+    try {
+        if (sessionStorage.getItem(STORAGE_KEY)) return;
+    } catch (e) { return; }
+
+    var hideTimer = null;
+    var done      = false;
+    var dragging  = false;
+    var moved     = false;
+    var startX    = 0;
+    var dx        = 0;
+    var reduced   = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function finish() {
+        done = true;
+        clearTimeout(hideTimer);
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }
+
+    function scheduleHide() {
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(disintegrate, VISIBLE_MS);
+    }
+
+    /* --- surib yuborilganda: yon tomonga uchib ketadi --- */
+    function swipeAway(dir) {
+        done = true;
+        clearTimeout(hideTimer);
+        toast.style.transition    = 'opacity 0.25s ease, transform 0.25s ease';
+        toast.style.transform     = 'translateX(calc(-50% + ' + (dir * 320) + 'px)) translateY(0)';
+        toast.style.opacity       = '0';
+        toast.style.pointerEvents = 'none';
+        setTimeout(finish, 300);
+    }
+
+    /* --- 7 soniyadan keyin: Tanos "snap" — bo'laklarga bo'linib, chang bo'lib uchadi --- */
+    function disintegrate() {
+        if (done) return;
+        done = true;
+
+        if (reduced || !toast.animate) {
+            toast.style.transition = 'opacity 0.4s ease';
+            toast.style.opacity    = '0';
+            toast.style.pointerEvents = 'none';
+            setTimeout(finish, 450);
+            return;
+        }
+
+        var rect   = toast.getBoundingClientRect();
+        var clones = [];
+        var maxEnd = 0;
+
+        for (var i = 0; i < SLICES; i++) {
+            var c = toast.cloneNode(true);
+            c.removeAttribute('id');
+            c.removeAttribute('href');
+            c.setAttribute('aria-hidden', 'true');
+
+            var leftPct  = (i * 100 / SLICES).toFixed(3);
+            var rightPct = (100 - (i + 1) * 100 / SLICES).toFixed(3);
+
+            c.style.cssText =
+                'position:fixed;margin:0;bottom:auto;' +
+                'left:' + rect.left + 'px;top:' + rect.top + 'px;' +
+                'width:' + rect.width + 'px;height:' + rect.height + 'px;' +
+                'transform:none;opacity:1;transition:none;pointer-events:none;z-index:99999;' +
+                'backdrop-filter:none;-webkit-backdrop-filter:none;' +
+                'clip-path:inset(0 ' + rightPct + '% 0 ' + leftPct + '%);';
+
+            document.body.appendChild(c);
+            clones.push(c);
+
+            var prog  = i / (SLICES - 1);
+            var moveX = 30 + Math.random() * 70 + prog * 40;
+            var moveY = -(10 + Math.random() * 60);
+            var rot   = Math.random() * 50 - 25;
+            var delay = i * 45;
+            var dur   = 900 + Math.random() * 500;
+            maxEnd = Math.max(maxEnd, delay + dur);
+
+            c.animate([
+                { transform: 'translate(0px,0px) rotate(0deg)', opacity: 1, filter: 'blur(0px)' },
+                { transform: 'translate(' + moveX + 'px,' + moveY + 'px) rotate(' + rot + 'deg)', opacity: 0, filter: 'blur(4px)' }
+            ], {
+                duration: dur,
+                delay:    delay,
+                easing:   'cubic-bezier(0.25, 0.6, 0.3, 1)',
+                fill:     'both'
+            });
+        }
+
+        // asl toast darhol yashiriladi (bo'laklar uning o'rnida)
+        toast.style.visibility = 'hidden';
+
+        setTimeout(function () {
+            clones.forEach(function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
+            finish();
+        }, maxEnd + 150);
+    }
+
+    /* --- surish (drag) --- */
+    toast.addEventListener('pointerdown', function (e) {
+        if (done) return;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        dragging = true;
+        moved    = false;
+        startX   = e.clientX;
+        dx       = 0;
+        clearTimeout(hideTimer);
+        toast.style.transition = 'none';
+        try { toast.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+
+    toast.addEventListener('pointermove', function (e) {
+        if (!dragging || done) return;
+        dx = e.clientX - startX;
+        if (Math.abs(dx) > 6) moved = true;
+        if (!moved) return;
+        toast.style.transform = 'translateX(calc(-50% + ' + dx + 'px)) translateY(0)';
+        toast.style.opacity   = String(Math.max(0, 1 - Math.abs(dx) / 160));
+    });
+
+    function endDrag(cancelled) {
+        if (!dragging || done) { dragging = false; return; }
+        dragging = false;
+
+        if (moved && Math.abs(dx) > 80) {
+            swipeAway(dx > 0 ? 1 : -1);
+            return;
+        }
+
+        // qaytarib joyiga qo'yish
+        toast.style.transition = 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1)';
+        toast.style.transform  = 'translateX(-50%) translateY(0)';
+        toast.style.opacity    = '1';
+        scheduleHide();
+    }
+
+    toast.addEventListener('pointerup',     function () { endDrag(false); });
+    toast.addEventListener('pointercancel', function () { endDrag(true);  });
+
+    /* --- surilgan bo'lsa link ochilmasin; oddiy bosilsa imkon sahifasiga o'tadi --- */
+    toast.addEventListener('click', function (e) {
+        if (moved) {
+            e.preventDefault();
+            moved = false;
+        }
+    });
+    toast.addEventListener('dragstart',   function (e) { e.preventDefault(); });
+    toast.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+    /* --- chiqarish --- */
+    setTimeout(function () {
+        if (done) return;
+        try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch (e) {}
+        toast.classList.add('show');
+        scheduleHide();
+    }, SHOW_DELAY);
 })();
 
 /* ================= SERVICE WORKER — OFFLINE & PUSH ================= */
