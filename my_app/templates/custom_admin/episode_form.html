@@ -1,7 +1,7 @@
 {% extends 'custom_admin/base.html' %}
 {% load static %}
 
-{% block page_title %}{% if episode %}Qismni Tahrirlash{% else %}Yangi Qism Qo'shish{% endif %}{% endblock %}
+{% block page_title %}{% if episode.pk %}Qismni Tahrirlash{% else %}Yangi Qism Qo'shish{% endif %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -15,25 +15,94 @@
     }
     .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
 
-    /* Qidiruvli anime tanlash */
-    .movie-picker { position: relative; }
-    .movie-list {
-        display: none;
-        position: absolute;
-        top: 100%; left: 0; right: 0;
-        margin-top: 4px;
-        max-height: 240px;
-        overflow-y: auto;
-        background: #0a0a0f;
-        border: 1px solid var(--border-line);
-        border-radius: 4px;
-        z-index: 50;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    /* ===== Anime kartalari (1 qator, yon tomonga surish) ===== */
+    .movie-search { padding: 8px 12px; font-size: 0.9rem; margin-bottom: 8px; }
+
+    .movie-row {
+        position: relative;
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 6px 2px 10px;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) transparent;
     }
-    .movie-list.open { display: block; }
-    .movie-option { padding: 10px 15px; cursor: pointer; font-size: 0.95rem; }
-    .movie-option:hover { background: var(--accent); color: #000; }
-    .movie-empty { display: none; padding: 10px 15px; color: var(--text-dim); font-size: 0.9rem; }
+    .movie-row::-webkit-scrollbar { height: 6px; }
+    .movie-row::-webkit-scrollbar-thumb { background: var(--border-line); border-radius: 3px; }
+
+    .movie-card {
+        position: relative;
+        flex: 0 0 78px;
+        cursor: pointer;
+        text-align: center;
+        scroll-snap-align: start;
+        outline: none;
+    }
+    .movie-thumb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 78px;
+        height: 108px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 2px solid var(--border-line);
+        background: #111;
+        color: var(--text-dim);
+        font-size: 1.6rem;
+        transition: 0.2s;
+    }
+    .movie-card:hover .movie-thumb,
+    .movie-card:focus-visible .movie-thumb { border-color: #fff; }
+    .movie-card.selected .movie-thumb { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+
+    .movie-card.selected::after {
+        content: '✓';
+        position: absolute;
+        top: 5px; right: 5px;
+        width: 18px; height: 18px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #000;
+        font-size: 0.7rem;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .movie-name {
+        margin-top: 5px;
+        font-size: 0.68rem;
+        line-height: 1.25;
+        color: var(--text-dim);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-break: break-word;
+    }
+    .movie-card.selected .movie-name { color: var(--accent); font-weight: 700; }
+
+    .movie-selected-line { margin-top: 4px; font-size: 0.85rem; color: var(--text-dim); }
+    .movie-selected-line b { color: var(--accent); }
+    .movie-msg { display: none; margin-top: 6px; font-size: 0.85rem; }
+    .movie-msg.err { color: #f87171; font-weight: 700; }
+    .movie-msg.dim { color: var(--text-dim); }
+
+    /* ===== Qism ogohlantirishlari ===== */
+    .ep-alerts { margin: -6px 0 20px; display: flex; flex-direction: column; gap: 6px; }
+    .ep-alert {
+        display: flex; align-items: flex-start; gap: 8px;
+        padding: 9px 12px; border-radius: 6px; font-size: 0.85rem; line-height: 1.4;
+        border: 1px solid transparent;
+    }
+    .ep-alert i { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .ep-info  { background: rgba(0,243,255,0.08);  border-color: rgba(0,243,255,0.25);  color: var(--accent); }
+    .ep-warn  { background: rgba(251,191,36,0.1);  border-color: rgba(251,191,36,0.4);  color: #fbbf24; }
+    .ep-error { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.45); color: #f87171; font-weight: 700; }
 
     .btn-submit {
         background: var(--accent); color: black; border: none; padding: 14px 20px; border-radius: 4px;
@@ -82,6 +151,10 @@
     @media (max-width: 768px) {
         .form-container { max-width: 100%; }
         .inline-row { display: block !important; }
+        .inline-row > div { margin-bottom: 14px; }
+        .movie-card { flex-basis: 64px; }
+        .movie-thumb { width: 64px; height: 90px; font-size: 1.3rem; }
+        .movie-name { font-size: 0.62rem; }
     }
 </style>
 {% endblock %}
@@ -89,23 +162,32 @@
 {% block content %}
 <div class="glass-panel form-container">
     <h2 style="margin-bottom: 25px; font-size: 1.8rem; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid var(--border-line); padding-bottom: 10px;">
-        {% if episode %}Qismni Tahrirlash ({{ episode.episode_number }}){% else %}Yangi Qism Qo'shish{% endif %}
+        {% if episode.pk %}Qismni Tahrirlash ({{ episode.episode_number }}){% else %}Yangi Qism Qo'shish{% endif %}
     </h2>
-    <form method="post" enctype="multipart/form-data" id="video-upload-form">
+    <form method="post" enctype="multipart/form-data" id="video-upload-form" data-edit-id="{{ episode.pk|default:'' }}">
         {% csrf_token %}
 
-        <div class="form-group">
+        <div class="form-group" id="movie-picker">
             <label for="movie-search">Qaysi Animaga tegishli?</label>
-            <div class="movie-picker">
-                <input type="hidden" name="movie" id="episode-movie" value="{% if episode %}{{ episode.movie_id }}{% endif %}">
-                <input type="text" id="movie-search" class="form-control" placeholder="Anime nomini yozing..." autocomplete="off" value="{% if episode %}{{ episode.movie.title }}{% endif %}">
-                <div class="movie-list" id="movie-list">
-                    {% for m in movies %}
-                    <div class="movie-option" data-id="{{ m.id }}">{{ m.title }}</div>
-                    {% endfor %}
-                    <div class="movie-empty" id="movie-empty">Hech narsa topilmadi</div>
+            <input type="hidden" name="movie" id="episode-movie" value="{{ selected_movie_id }}">
+            <input type="text" id="movie-search" class="form-control movie-search" placeholder="Anime nomini qidiring..." autocomplete="off">
+
+            <div class="movie-row" id="movie-row">
+                {% for m in movies %}
+                <div class="movie-card" data-id="{{ m.id }}" data-name="{{ m.title }}" data-title="{{ m.title|lower }}" role="button" tabindex="0" title="{{ m.title }}">
+                    {% if m.image %}
+                        <img class="movie-thumb" src="{{ m.image.url }}" alt="{{ m.title }}" loading="lazy">
+                    {% else %}
+                        <div class="movie-thumb"><i class='bx bx-movie-play'></i></div>
+                    {% endif %}
+                    <div class="movie-name">{{ m.title }}</div>
                 </div>
+                {% endfor %}
             </div>
+
+            <div class="movie-selected-line" id="movie-selected-line" style="display:none;">Tanlangan: <b id="movie-selected-name"></b></div>
+            <div class="movie-msg err" id="movie-none">Avval animeni tanlang!</div>
+            <div class="movie-msg dim" id="movie-empty">Hech narsa topilmadi</div>
         </div>
 
         <div class="form-group inline-row" style="display:flex; gap: 20px;">
@@ -118,6 +200,8 @@
                 <input id="episode-title" type="text" name="title" class="form-control" value="{{ episode.title|default:'' }}" placeholder="Masalan: Qahramonning uyg'onishi">
             </div>
         </div>
+
+        <div class="ep-alerts" id="episode-alerts"></div>
 
         <div class="form-group">
             <label for="episode-video-url">Video URL (Bunny.net/CDN linki) - Ixtiyoriy</label>
@@ -159,71 +243,168 @@
     </form>
 </div>
 
-<!-- Anime qidiruvli tanlash (admin_upload_progress.js dan OLDIN turishi shart) -->
+{{ episode_map|json_script:"episode-map" }}
+
+<!-- Anime tanlash + qism raqami + ogohlantirishlar (admin_upload_progress.js dan OLDIN turishi shart) -->
 <script>
 (function () {
-    const search = document.getElementById('movie-search');
-    const hidden = document.getElementById('episode-movie');
-    const list = document.getElementById('movie-list');
-    const empty = document.getElementById('movie-empty');
-    const form = document.getElementById('video-upload-form');
-    const options = Array.from(list.querySelectorAll('.movie-option'));
+    const form     = document.getElementById('video-upload-form');
+    const editId   = form.dataset.editId ? parseInt(form.dataset.editId, 10) : null;
+    const episodeMap = JSON.parse(document.getElementById('episode-map').textContent);
 
-    function open()  { list.classList.add('open'); }
-    function close() { list.classList.remove('open'); }
+    const hidden   = document.getElementById('episode-movie');
+    const numInput = document.getElementById('episode-number');
+    const search   = document.getElementById('movie-search');
+    const row      = document.getElementById('movie-row');
+    const cards    = Array.from(row.querySelectorAll('.movie-card'));
+    const selLine  = document.getElementById('movie-selected-line');
+    const selName  = document.getElementById('movie-selected-name');
+    const noMovie  = document.getElementById('movie-none');
+    const emptyMsg = document.getElementById('movie-empty');
+    const alerts   = document.getElementById('episode-alerts');
 
-    function filter() {
-        const q = search.value.trim().toLowerCase();
-        let shown = 0;
-        options.forEach(o => {
-            const ok = o.textContent.toLowerCase().includes(q);
-            o.style.display = ok ? '' : 'none';
-            if (ok) shown++;
+    function rangeText(a, b) { return a === b ? String(a) : a + '–' + b; }
+
+    // [1,2,3,5,6,9] -> "1–3, 5–6, 9"
+    function ranges(arr) {
+        const out = [];
+        let s = arr[0], p = arr[0];
+        for (let i = 1; i <= arr.length; i++) {
+            const v = arr[i];
+            if (v !== p + 1) {
+                out.push(rangeText(s, p));
+                s = v;
+            }
+            p = v;
+        }
+        return out.join(', ');
+    }
+
+    function analyze(nums) {
+        const count = {};
+        nums.forEach(n => { count[n] = (count[n] || 0) + 1; });
+        const uniq = Object.keys(count).map(Number).sort((a, b) => a - b);
+        const dups = uniq.filter(n => count[n] > 1);
+        const max = uniq.length ? uniq[uniq.length - 1] : 0;
+        const missing = [];
+        for (let i = 1; i < max; i++) if (!count[i]) missing.push(i);
+        return { count, uniq, dups, max, missing };
+    }
+
+    function addAlert(type, text) {
+        const icons = { info: 'bx-info-circle', warn: 'bx-error', error: 'bx-error-circle' };
+        const div = document.createElement('div');
+        div.className = 'ep-alert ep-' + type;
+        const i = document.createElement('i');
+        i.className = 'bx ' + icons[type];
+        const span = document.createElement('span');
+        span.textContent = text;
+        div.appendChild(i);
+        div.appendChild(span);
+        alerts.appendChild(div);
+    }
+
+    // true qaytarsa — saqlashni to'xtatish kerak (takroriy qism)
+    function renderAlerts() {
+        alerts.innerHTML = '';
+        const mid = hidden.value;
+        if (!mid) return false;
+
+        const list   = episodeMap[mid] || [];
+        const all    = list.map(e => e.n);
+        const others = list.filter(e => e.id !== editId).map(e => e.n);
+        const A = analyze(all);
+        const O = analyze(others);
+
+        if (!all.length) {
+            addAlert('info', "Bu animega hali qism qo'shilmagan. Birinchi qism: 1");
+        } else {
+            addAlert('info', "Mavjud: " + A.uniq.length + " ta qism, oxirgisi: " + A.max + "-qism. Keyingi: " + (A.max + 1));
+        }
+
+        // Bazadagi mavjud xatolar
+        A.dups.forEach(n => addAlert('error', n + "-qism " + A.count[n] + " marta takrorlangan!"));
+        if (A.missing.length) {
+            addAlert('warn', "Tartib buzilgan: " + ranges(A.missing) + "-qism(lar) yo'q");
+        }
+
+        // Hozir kiritilayotgan raqam
+        let blocking = false;
+        const n = parseInt(numInput.value, 10);
+        if (!isNaN(n)) {
+            if (O.count[n]) {
+                addAlert('error', n + "-qism bu animada allaqachon mavjud! Boshqa raqam kiriting.");
+                blocking = true;
+            } else if (n > O.max + 1) {
+                addAlert('warn', n + "-qism kiritilmoqda, lekin " + rangeText(O.max + 1, n - 1) + "-qism yo'q. Tartib buziladi.");
+            }
+        }
+        return blocking;
+    }
+
+    function centerCard(card) {
+        row.scrollLeft = card.offsetLeft - (row.clientWidth - card.offsetWidth) / 2;
+    }
+
+    function selectMovie(card, setNumber) {
+        cards.forEach(c => c.classList.toggle('selected', c === card));
+        hidden.value = card.dataset.id;
+        selName.textContent = card.dataset.name;
+        selLine.style.display = 'block';
+        noMovie.style.display = 'none';
+
+        if (setNumber) {
+            const nums = (episodeMap[hidden.value] || []).map(e => e.n);
+            numInput.value = (nums.length ? Math.max.apply(null, nums) : 0) + 1;
+        }
+        centerCard(card);
+        renderAlerts();
+    }
+
+    cards.forEach(card => {
+        // Yangi qism qo'shilayotganda raqam avtomatik qo'yiladi, tahrirda o'zgarmaydi
+        card.addEventListener('click', () => selectMovie(card, editId === null));
+        card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selectMovie(card, editId === null);
+            }
         });
-        empty.style.display = shown ? 'none' : 'block';
-    }
-
-    function showAll() {
-        options.forEach(o => o.style.display = '');
-        empty.style.display = 'none';
-    }
-
-    search.addEventListener('focus', function () {
-        search.select();
-        showAll();
-        open();
     });
 
     search.addEventListener('input', function () {
-        hidden.value = '';      // yozilsa, eski tanlov bekor bo'ladi
-        filter();
-        open();
-    });
-
-    options.forEach(o => {
-        o.addEventListener('click', function () {
-            hidden.value = o.dataset.id;
-            search.value = o.textContent.trim();
-            close();
+        const q = search.value.trim().toLowerCase();
+        let shown = 0;
+        cards.forEach(c => {
+            const ok = c.dataset.title.includes(q);
+            c.style.display = ok ? '' : 'none';
+            if (ok) shown++;
         });
+        emptyMsg.style.display = shown ? 'none' : 'block';
     });
 
-    document.addEventListener('click', function (e) {
-        if (!e.target.closest('.movie-picker')) {
-            close();
-            if (!hidden.value) search.value = '';
-        }
-    });
+    numInput.addEventListener('input', renderAlerts);
 
     form.addEventListener('submit', function (e) {
         if (!hidden.value) {
             e.preventDefault();
             e.stopImmediatePropagation();   // yuklash progressi boshlanib ketmasin
-            search.focus();
-            showAll();
-            open();
+            noMovie.style.display = 'block';
+            document.getElementById('movie-picker').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        if (renderAlerts()) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            alerts.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     });
+
+    // Boshlang'ich holat (tahrirlash yoki ?movie=ID bilan ochilganda)
+    if (hidden.value) {
+        const c = cards.find(x => x.dataset.id === String(hidden.value));
+        if (c) selectMovie(c, editId === null);
+    }
 })();
 </script>
 
