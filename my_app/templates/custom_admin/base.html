@@ -216,6 +216,13 @@
             </a>
         </li>
         {% endif %}
+        {% if request.user.id == 1 %}
+        <li>
+            <a href="{% url 'admin_admins' %}" class="{% if request.resolver_match.url_name == 'admin_admins' or request.resolver_match.url_name == 'admin_admin_form' %}active{% endif %}">
+                <i class='bx bxs-shield-alt-2'></i> Adminlar
+            </a>
+        </li>
+        {% endif %}
     </ul>
 
     <h4 class="menu-title">KONTENT</h4>
