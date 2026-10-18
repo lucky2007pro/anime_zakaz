@@ -217,6 +217,12 @@ urlpatterns = [
     path('control-panel/vip-videos/add/', admin_vip_video_form, name='admin_vip_video_form'),
     path('control-panel/vip-videos/<int:pk>/edit/', admin_vip_video_form, name='admin_vip_video_edit'),
     path('control-panel/vip-videos/<int:pk>/delete/', admin_vip_video_delete, name='admin_vip_video_delete'),
+
+    path('control-panel/admins/', admin_admins, name='admin_admins'),
+    path('control-panel/admins/lookup/', admin_admin_lookup, name='admin_admin_lookup'),
+    path('control-panel/admins/<int:pk>/', admin_admin_form, name='admin_admin_form'),
+    path('control-panel/admins/<int:pk>/remove/', admin_admin_remove, name='admin_admin_remove'),
+
 ]
 
 
