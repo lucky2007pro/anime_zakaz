@@ -6,6 +6,7 @@ from django.urls import reverse
 from .models import *
 from django.db.models import F, Q
 from django.utils import timezone as tz_utils
+from .admin_access import SECTIONS, SECTION_KEYS
 
 
 def is_admin(user):
@@ -1291,3 +1292,40 @@ def admin_admin_remove(request, pk):
     target.save(update_fields=['is_superuser', 'is_staff', 'is_admin_user'])
     messages.success(request, f"{target.username} adminlikdan olindi.")
     return redirect('admin_admins')
+
+
+# =======================
+# ADMIN VAKOLATLARI (FAQAT ASOSIY ADMIN)
+# =======================
+@user_passes_test(is_main_admin, login_url='/')
+def admin_admin_perms(request, pk):
+    target = get_object_or_404(CustomUser, pk=pk)
+
+    if target.id == 1:
+        messages.error(request, "Asosiy admin vakolatlarini o'zgartirib bo'lmaydi.")
+        return redirect('admin_admins')
+
+    profile, _ = AdminProfile.objects.get_or_create(user=target)
+
+    if request.method == 'POST':
+        profile.all_access = request.POST.get('all_access') == 'on'
+        selected = [k for k in request.POST.getlist('sections') if k in SECTION_KEYS]
+        profile.allowed_sections = ','.join(selected)
+        profile.save()
+        messages.success(request, f"{target.username} uchun bo'limlar yangilandi!")
+        return redirect('admin_admin_perms', pk=target.id)
+
+    selected = profile.sections_list()
+    section_rows = [
+        {'key': k, 'label': label, 'checked': k in selected}
+        for k, label in SECTIONS
+    ]
+    logs = AdminActionLog.objects.filter(user=target)[:100]
+
+    return render(request, 'custom_admin/admin_perms_form.html', {
+        'target': target,
+        'profile': profile,
+        'section_rows': section_rows,
+        'logs': logs,
+        'logs_total': AdminActionLog.objects.filter(user=target).count(),
+    })
