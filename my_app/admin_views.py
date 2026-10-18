@@ -7,6 +7,7 @@ from .models import *
 from django.db.models import F, Q
 from django.utils import timezone as tz_utils
 from .admin_access import SECTIONS, SECTION_KEYS
+from datetime import timedelta
 
 
 def is_admin(user):
@@ -25,13 +26,27 @@ def _is_ajax(request):
 
 @user_passes_test(is_admin, login_url='/')
 def admin_dashboard(request):
+    today = tz_utils.localdate()
+    yesterday = today - timedelta(days=1)
+
+    def day_stats(qs, field):
+        """Jami / bugun / kecha sonini qaytaradi"""
+        return {
+            'total': qs.count(),
+            'today': qs.filter(**{f'{field}__date': today}).count(),
+            'yesterday': qs.filter(**{f'{field}__date': yesterday}).count(),
+        }
+
     context = {
         'total_animes': Movie.objects.count(),
         'total_episodes': MovieEpisode.objects.count(),
         'total_genres': Category.objects.count(),
-        'total_users': CustomUser.objects.count(),
-        'total_messages': ChatMessage.objects.count(),
-        'total_comments': MovieComment.objects.count(),
+
+        # Jami / bugun / kecha
+        'users_stats': day_stats(CustomUser.objects.all(), 'date_joined'),
+        'messages_stats': day_stats(ChatMessage.objects.all(), 'created_at'),
+        'comments_stats': day_stats(MovieComment.objects.all(), 'created_at'),
+
         'total_receipts': SubscriptionReceipt.objects.filter(is_approved=False, is_rejected=False).count(),
         'latest_animes': Movie.objects.all().order_by('-created_at')[:5],
         'latest_users': CustomUser.objects.all().order_by('-date_joined')[:5],
