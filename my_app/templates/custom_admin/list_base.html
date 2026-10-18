@@ -93,6 +93,12 @@
                     <input type="text" name="user_id" placeholder="Foydalanuvchi ID">
                     <button type="submit" class="btn-outline">ID orqali ochish</button>
                 </form>
+            {% elif type == 'admin' %}
+                <div class="stat-pill"><i class='bx bxs-shield-alt-2'></i> Jami adminlar: <b>{{ total_admins }}</b></div>
+                <form method="get" action="{% url 'admin_admin_lookup' %}">
+                    <input type="text" name="user_id" placeholder="Foydalanuvchi ID">
+                    <button type="submit" class="btn-outline">Admin qilish</button>
+                </form>
             {% elif type == 'premium' %}
                 <div class="stat-pill"><i class='bx bxs-crown'></i> Jami VIP: <b>{{ total_vip }}</b></div>
             {% elif type == 'vip_video' %}
@@ -117,6 +123,8 @@
                     <th>Foydalanuvchi</th><th>Xabar</th><th>Sana</th><th>Harakatlar</th>
                 {% elif type == 'user' %}
                     <th>Username</th><th>Email</th><th>Vakolat</th><th>Holat</th><th>Harakatlar</th>
+                {% elif type == 'admin' %}
+                    <th>ID</th><th>Username</th><th>Email</th><th>Vakolatlar</th><th>Holat</th><th>Harakatlar</th>
                 {% elif type == 'receipt' %}
                     <th>Foydalanuvchi</th><th>Reja</th><th>Chek</th><th>Holat</th><th>Harakatlar</th>
                 {% elif type == 'avatar' %}
@@ -206,6 +214,23 @@
                         {% if item.is_staff %}<span class="badge badge-blue">Staff</span>{% endif %}
                         {% if item.is_admin_user %}<span class="badge badge-green">Kontent admin</span>{% endif %}
                         {% if not item.is_superuser and not item.is_staff and not item.is_admin_user %}<span style="color:var(--text-dim);">Oddiy user</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if item.is_active %}<span class="badge badge-green">Faol</span>
+                        {% else %}<span class="badge badge-red">Nofaol</span>{% endif %}
+                    </td>
+
+                {% elif type == 'admin' %}
+                    <td style="color:var(--text-dim); font-weight:700;">#{{ item.id }}</td>
+                    <td style="font-weight:700; color:#fff;">
+                        {{ item.username }}
+                        {% if item.id == 1 %}<span class="badge badge-yellow" style="margin-left:6px;">Asosiy admin</span>{% endif %}
+                    </td>
+                    <td style="color:var(--text-dim);">{{ item.email|default:"-" }}</td>
+                    <td>
+                        {% if item.is_superuser %}<span class="badge badge-purple">Superadmin</span>{% endif %}
+                        {% if item.is_staff %}<span class="badge badge-blue">Staff</span>{% endif %}
+                        {% if item.is_admin_user %}<span class="badge badge-green">Kontent admin</span>{% endif %}
                     </td>
                     <td>
                         {% if item.is_active %}<span class="badge badge-green">Faol</span>
@@ -465,6 +490,17 @@
                             <input type="hidden" name="value" value="{% if item.is_superuser %}0{% else %}1{% endif %}">
                             <button type="submit" class="action-btn delete" onclick="return confirm('Superadmin vakolatini o\'zgartirish?');">{% if item.is_superuser %}Superadminni olish{% else %}Superadmin qilish{% endif %}</button>
                         </form>
+
+                    {% elif type == 'admin' %}
+                        {% if item.id == 1 %}
+                            <span style="color:var(--text-dim); font-size:0.85rem;">O'zgartirib bo'lmaydi</span>
+                        {% else %}
+                            <a href="{% url 'admin_admin_form' item.id %}" class="action-btn">Tahrirlash</a>
+                            <form method="post" action="{% url 'admin_admin_remove' item.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="action-btn delete" onclick="return confirm('{{ item.username }} adminlikdan olinsinmi?');">Adminlikdan olish</button>
+                            </form>
+                        {% endif %}
 
                     {% elif type == 'receipt' %}
                         {% if not item.is_approved and not item.is_rejected %}
