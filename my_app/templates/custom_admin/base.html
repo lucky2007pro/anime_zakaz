@@ -19,6 +19,7 @@
             --text-main: #ffffff;
             --text-dim: #8892b0;
             --border-line: #1e1e24;
+            --topbar-h: 64px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         html, body { width: 100%; min-height: 100%; overflow-x: hidden; }
@@ -26,7 +27,11 @@
 
         /* SIDEBAR */
         .sidebar {
-            width: 280px; background: #050505;
+            width: 280px;
+            background:
+                linear-gradient(180deg, rgba(5,5,5,0.78) 0%, rgba(5,5,5,0.9) 100%),
+                url('https://i.pinimg.com/736x/d6/cd/69/d6cd69c61c41ae87b44cadb8683e2042.jpg') center / cover no-repeat;
+            background-color: #050505;
             border-right: 1px solid var(--border-line); display: flex; flex-direction: column; padding: 30px 20px;
             overflow-y: auto;
         }
@@ -58,7 +63,7 @@
             font-weight: 600; transition: all 0.25s ease;
         }
         .menu-list a:hover {
-            color: var(--accent); background: #0a0a0f;
+            color: var(--accent); background: rgba(10, 10, 15, 0.75);
             transform: translateX(4px); border-left: 2px solid var(--accent);
         }
         .menu-list a.active {
@@ -74,13 +79,13 @@
             font-size: 0.9rem; padding: 9px 12px; border-radius: 10px;
             transition: 0.25s;
         }
-        .sidebar-bottom-link:hover { color: #fff; background: #0a0a0f; }
+        .sidebar-bottom-link:hover { color: #fff; background: rgba(10, 10, 15, 0.75); }
         .sidebar-bottom-link.danger:hover { color: #ff3b30; background: rgba(255,59,48,0.08); }
         .sidebar-bottom-link i { font-size: 1.2rem; }
         .sidebar-user {
             margin-top: 12px;
             font-size: 0.78rem;
-            color: #444;
+            color: #6b7390;
             padding: 0 4px;
         }
 
@@ -90,12 +95,15 @@
             background: linear-gradient(135deg, #050510 0%, #000000 100%);
         }
 
-        /* TOPBAR */
+        /* TOPBAR (navbar) */
         .topbar {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 32px; height: 64px;
+            padding: 0 32px; height: var(--topbar-h);
             border-bottom: 1px solid var(--border-line);
-            background: rgba(0, 0, 0, 0.92);
+            background:
+                linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.6) 100%),
+                url('https://i.pinimg.com/736x/13/80/79/138079e6790fde58f59a8b8a4f0c7b67.jpg') center / cover no-repeat;
+            background-color: #000;
             position: sticky; top: 0; z-index: 10;
             gap: 12px;
         }
@@ -108,7 +116,7 @@
             width: 38px; height: 38px;
             align-items: center; justify-content: center;
             border: 1px solid var(--border-line);
-            background: #0a0a0f;
+            background: rgba(10, 10, 15, 0.8);
             color: var(--text-main);
             border-radius: 9px;
             cursor: pointer;
@@ -119,7 +127,7 @@
         /* Orqaga tugma */
         .back-btn {
             display: flex; align-items: center; gap: 6px;
-            background: #0a0a0f;
+            background: rgba(10, 10, 15, 0.8);
             border: 1px solid var(--border-line);
             color: var(--text-dim);
             padding: 7px 14px;
@@ -139,11 +147,12 @@
             font-size: 1rem; font-weight: 700; color: white;
             text-transform: uppercase; letter-spacing: 0.8px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.8);
         }
 
         .user-role {
             font-size: 0.72rem; font-weight: 800;
-            background: var(--border-line); color: var(--accent);
+            background: rgba(30, 30, 36, 0.85); color: var(--accent);
             padding: 5px 12px; border-radius: 4px;
             box-shadow: 0 0 10px rgba(0,243,255,0.15);
             white-space: nowrap;
@@ -164,19 +173,36 @@
 
         /* RESPONSIVE */
         @media (max-width: 992px) {
-            body { display: block; overflow: auto; }
+            /* Sahifa body orqali emas, oddiy hujjat sifatida scroll bo'ladi */
+            body { display: block; height: auto; min-height: 100vh; overflow-x: hidden; overflow-y: visible; }
+
             .sidebar {
                 position: fixed; top: 0; left: 0;
-                height: 100vh; z-index: 20;
+                height: 100vh; height: 100dvh; z-index: 20;
                 transform: translateX(-100%);
                 transition: transform 0.28s ease;
                 box-shadow: 10px 0 30px rgba(0,0,0,0.6);
             }
             .sidebar.open { transform: translateX(0); }
             .sidebar-overlay.active { display: block; }
-            .main-content { width: 100%; min-height: 100vh; }
+
+            /* Navbar scroll paytida joyida turadi (pastga tushmaydi) */
+            .topbar {
+                position: fixed;
+                top: 0; left: 0; right: 0;
+                width: 100%;
+                z-index: 10;
+                padding: 0 16px;
+            }
+
+            /* Navbar balandligicha tepadan bo'sh joy */
+            .main-content {
+                width: 100%;
+                min-height: 100vh;
+                overflow: visible;
+                padding-top: var(--topbar-h);
+            }
             .menu-toggle { display: inline-flex; }
-            .topbar { padding: 0 16px; }
             .content-area { padding: 18px; }
         }
 
