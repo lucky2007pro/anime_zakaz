@@ -19,10 +19,27 @@
         border-top: 3px solid var(--accent);
         text-align: left;
     }
+    .stat-card.wide { grid-column: span 2; }
     .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,243,255,0.1); border-color: var(--accent); }
     .stat-title { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .stat-value { font-size: 2.1rem; font-weight: 900; color: white; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
     .stat-card i { font-size: 1.3rem; color: var(--accent); }
+
+    /* Jami / Bugun / Kecha */
+    .stat-breakdown {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    .stat-col { min-width: 0; }
+    .stat-col + .stat-col { border-left: 1px solid var(--border-line); padding-left: 12px; }
+    .stat-label {
+        font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase;
+        letter-spacing: 1px; margin-bottom: 4px;
+    }
+    .stat-num { font-size: 1.9rem; font-weight: 900; color: white; line-height: 1.1; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+    .stat-num.today { color: #34d399; }
+    .stat-num.yesterday { color: #fbbf24; }
 
     .panel-header { margin-bottom: 20px; }
     .panel-header h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; }
@@ -47,6 +64,7 @@
 
     @media (max-width: 900px) {
         .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .stat-card.wide { grid-column: span 3; }
     }
 
     @media (max-width: 768px) {
@@ -56,12 +74,16 @@
         .stat-title { font-size: 0.6rem; letter-spacing: 0.6px; margin-bottom: 6px; }
         .stat-value { font-size: 1.3rem; }
         .stat-card i { font-size: 1rem; }
+        .stat-num { font-size: 1.4rem; }
+        .stat-label { font-size: 0.58rem; letter-spacing: 0.6px; }
+        .stat-col + .stat-col { padding-left: 8px; }
         .tables-container { gap: 18px; margin-top: 22px; }
         .panel-header h2 { font-size: 1.15rem; }
     }
 
     @media (max-width: 480px) {
         .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .stat-card.wide { grid-column: span 2; }
         .panel-header { flex-direction: column; align-items: flex-start; gap: 10px; }
     }
 </style>
@@ -87,17 +109,62 @@
             <div class="stat-title"><i class='bx bxs-category'></i> Janrlar</div>
             <div class="stat-value">{{ total_genres }}</div>
         </div>
-        <div class="stat-card">
+
+        <!-- Foydalanuvchilar -->
+        <div class="stat-card wide">
             <div class="stat-title"><i class='bx bxs-user-detail'></i> Foydalanuvchilar</div>
-            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-breakdown">
+                <div class="stat-col">
+                    <div class="stat-label">Jami</div>
+                    <div class="stat-num">{{ users_stats.total }}</div>
+                </div>
+                <div class="stat-col">
+                    <div class="stat-label">Bugun</div>
+                    <div class="stat-num today">+{{ users_stats.today }}</div>
+                </div>
+                <div class="stat-col">
+                    <div class="stat-label">Kecha</div>
+                    <div class="stat-num yesterday">+{{ users_stats.yesterday }}</div>
+                </div>
+            </div>
         </div>
-        <div class="stat-card">
+
+        <!-- Chat xabarlar -->
+        <div class="stat-card wide">
             <div class="stat-title"><i class='bx bx-message-dots'></i> Chat xabarlar</div>
-            <div class="stat-value">{{ total_messages }}</div>
+            <div class="stat-breakdown">
+                <div class="stat-col">
+                    <div class="stat-label">Jami</div>
+                    <div class="stat-num">{{ messages_stats.total }}</div>
+                </div>
+                <div class="stat-col">
+                    <div class="stat-label">Bugun</div>
+                    <div class="stat-num today">+{{ messages_stats.today }}</div>
+                </div>
+                <div class="stat-col">
+                    <div class="stat-label">Kecha</div>
+                    <div class="stat-num yesterday">+{{ messages_stats.yesterday }}</div>
+                </div>
+            </div>
         </div>
-        <div class="stat-card">
+
+        <!-- Izohlar -->
+        <div class="stat-card wide">
             <div class="stat-title"><i class='bx bx-comment-dots'></i> Izohlar</div>
-            <div class="stat-value">{{ total_comments }}</div>
+            <div class="stat-breakdown">
+                <div class="stat-col">
+                    <div class="stat-label">Jami</div>
+                    <div class="stat-num">{{ comments_stats.total }}</div>
+                </div>
+                <div class="stat-col">
+                    <div class="stat-label">Bugun</div>
+                    <div class="stat-num today">+{{ comments_stats.today }}</div>
+                </div>
+                <div class="stat-col">
+                    <div class="stat-label">Kecha</div>
+                    <div class="stat-num yesterday">+{{ comments_stats.yesterday }}</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
