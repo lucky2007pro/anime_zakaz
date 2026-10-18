@@ -1258,3 +1258,33 @@ class VipThankVideo(models.Model):
     def __str__(self):
         return self.title or f"VIP video #{self.id}"
 
+
+# =======================
+# ADMIN VAKOLATLARI VA HARAKATLAR TARIXI
+# =======================
+class AdminProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='admin_profile')
+    all_access = models.BooleanField(default=True, help_text="Yoqilsa, barcha bo'limlar ochiq")
+    allowed_sections = models.TextField(blank=True, default='', help_text="Vergul bilan ajratilgan bo'lim kalitlari")
+    last_seen = models.DateTimeField(null=True, blank=True)
+
+    def sections_list(self):
+        return [s for s in self.allowed_sections.split(',') if s]
+
+    def __str__(self):
+        return f"{self.user.username} - admin profil"
+
+
+class AdminActionLog(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='admin_logs')
+    action = models.CharField(max_length=255)
+    url_name = models.CharField(max_length=100, blank=True)
+    method = models.CharField(max_length=10, blank=True)
+    path = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username}: {self.action}"
