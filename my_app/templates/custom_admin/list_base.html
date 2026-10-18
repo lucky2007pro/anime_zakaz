@@ -495,6 +495,7 @@
                         {% if item.id == 1 %}
                             <span style="color:var(--text-dim); font-size:0.85rem;">O'zgartirib bo'lmaydi</span>
                         {% else %}
+                            <a href="{% url 'admin_admin_perms' item.id %}" class="action-btn" style="background:rgba(176,0,255,0.15); color:#d8b4fe; border-color:rgba(176,0,255,0.4);">Admin vakolatlari</a><br>
                             <a href="{% url 'admin_admin_form' item.id %}" class="action-btn">Tahrirlash</a>
                             <form method="post" action="{% url 'admin_admin_remove' item.id %}" style="display:inline;">
                                 {% csrf_token %}
