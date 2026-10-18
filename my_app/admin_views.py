@@ -4,13 +4,16 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
 from .models import *
-from django.db.models import F
+from django.db.models import F, Q
 from django.utils import timezone as tz_utils
 
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
 
+def is_main_admin(user):
+    """Faqat asosiy admin (id=1)"""
+    return user.is_authenticated and user.id == 1
 
 def is_super_admin(user):
     return user.is_authenticated and user.is_superuser
@@ -1216,3 +1219,75 @@ def admin_vip_video_delete(request, pk):
     messages.success(request, "VIP video o'chirildi!")
     return redirect('admin_vip_videos')
 
+
+# =======================
+# ADMINLAR (FAQAT ASOSIY ADMIN, ID=1)
+# =======================
+@user_passes_test(is_main_admin, login_url='/')
+def admin_admins(request):
+    admins = CustomUser.objects.filter(
+        Q(is_superuser=True) | Q(is_staff=True) | Q(is_admin_user=True)
+    ).order_by('id')
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Adminlar',
+        'items': admins,
+        'type': 'admin',
+        'total_admins': admins.count(),
+    })
+
+
+@user_passes_test(is_main_admin, login_url='/')
+def admin_admin_lookup(request):
+    """ID orqali foydalanuvchini topib, admin formasiga o'tkazadi"""
+    uid = request.GET.get('user_id', '').strip()
+    if uid.isdigit() and CustomUser.objects.filter(id=uid).exists():
+        return redirect('admin_admin_form', pk=int(uid))
+    messages.error(request, f"#{uid} ID li foydalanuvchi topilmadi.")
+    return redirect('admin_admins')
+
+
+@user_passes_test(is_main_admin, login_url='/')
+def admin_admin_form(request, pk):
+    target = get_object_or_404(CustomUser, pk=pk)
+
+    if target.id == 1:
+        messages.error(request, "Asosiy admin vakolatlarini o'zgartirib bo'lmaydi.")
+        return redirect('admin_admins')
+
+    if request.method == 'POST':
+        is_superuser = request.POST.get('is_superuser') == 'on'
+        is_staff = request.POST.get('is_staff') == 'on'
+        is_admin_user = request.POST.get('is_admin_user') == 'on'
+
+        if is_superuser:
+            is_staff = True
+            is_admin_user = True
+
+        target.is_superuser = is_superuser
+        target.is_staff = is_staff
+        target.is_admin_user = is_admin_user
+        target.is_active = request.POST.get('is_active') == 'on'
+        target.save(update_fields=['is_superuser', 'is_staff', 'is_admin_user', 'is_active'])
+
+        messages.success(request, f"{target.username} vakolatlari yangilandi!")
+        return redirect('admin_admins')
+
+    return render(request, 'custom_admin/admin_best_form.html', {'target': target})
+
+
+@user_passes_test(is_main_admin, login_url='/')
+def admin_admin_remove(request, pk):
+    if request.method != 'POST':
+        return redirect('admin_admins')
+
+    target = get_object_or_404(CustomUser, pk=pk)
+    if target.id == 1:
+        messages.error(request, "Asosiy adminni olib bo'lmaydi.")
+        return redirect('admin_admins')
+
+    target.is_superuser = False
+    target.is_staff = False
+    target.is_admin_user = False
+    target.save(update_fields=['is_superuser', 'is_staff', 'is_admin_user'])
+    messages.success(request, f"{target.username} adminlikdan olindi.")
+    return redirect('admin_admins')
