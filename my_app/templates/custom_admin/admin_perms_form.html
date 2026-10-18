@@ -1,0 +1,145 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}Admin vakolatlari{% endblock %}
+
+{% block extra_css %}
+.perm-wrap { max-width: 980px; }
+.perm-wrap h2 { font-size: 1.4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.perm-wrap h3 { font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin: 34px 0 14px; color: var(--accent); }
+.user-line { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 24px; }
+.user-line b { color: var(--accent); }
+
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.info-card { background: #0a0a0f; border: 1px solid var(--border-line); border-radius: 10px; padding: 16px; }
+.info-label { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+.info-value { font-size: 1.05rem; font-weight: 800; color: #fff; margin-top: 6px; }
+
+.all-access {
+    display: flex; align-items: center; gap: 14px; padding: 16px; margin-bottom: 14px;
+    background: rgba(176,0,255,0.08); border: 1px solid rgba(176,0,255,0.3);
+    border-radius: 10px; cursor: pointer;
+}
+.all-access input { width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+.all-access .t { font-weight: 800; color: #fff; }
+.all-access .d { font-size: 0.82rem; color: var(--text-dim); margin-top: 2px; }
+
+.sec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; transition: 0.2s; }
+.sec-grid.dimmed { opacity: 0.35; }
+.sec-item {
+    display: flex; align-items: center; gap: 12px; padding: 13px 14px;
+    background: #0a0a0f; border: 1px solid var(--border-line); border-radius: 10px;
+    cursor: pointer; transition: 0.2s; font-weight: 600; font-size: 0.92rem;
+}
+.sec-item:hover { border-color: #333; }
+.sec-item input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+
+.form-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+.btn-save {
+    background: var(--accent); color: #000; border: none; padding: 12px 26px;
+    border-radius: 6px; font-weight: 800; text-transform: uppercase; cursor: pointer;
+    box-shadow: 0 0 10px var(--accent-glow); transition: 0.3s;
+}
+.btn-save:hover { background: #fff; }
+.btn-cancel {
+    background: #1e1e24; color: #fff; border: 1px solid #333; padding: 12px 22px;
+    border-radius: 6px; font-weight: 700; text-decoration: none; text-transform: uppercase; font-size: 0.85rem;
+}
+
+.log-wrap { width: 100%; overflow-x: auto; }
+.log-table { width: 100%; border-collapse: collapse; min-width: 560px; }
+.log-table th { text-align: left; padding: 12px; font-size: 0.72rem; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border-line); letter-spacing: 1px; }
+.log-table td { padding: 12px; font-size: 0.9rem; border-bottom: 1px solid #111; }
+.log-table .time { color: var(--text-dim); white-space: nowrap; }
+.log-table .code { color: var(--text-dim); font-size: 0.78rem; }
+.empty-log { text-align: center; color: var(--text-dim); padding: 30px; }
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel perm-wrap">
+    <h2>Admin vakolatlari</h2>
+    <div class="user-line">
+        Admin: <b>{{ target.username }}</b> &nbsp;·&nbsp; ID: #{{ target.id }}
+        {% if target.email %}&nbsp;·&nbsp; {{ target.email }}{% endif %}
+    </div>
+
+    <!-- 1. FAOLLIK -->
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-label">Oxirgi kirish (login)</div>
+            <div class="info-value">
+                {% if target.last_login %}{{ target.last_login|date:"d.m.Y H:i" }}{% else %}Hali kirmagan{% endif %}
+            </div>
+        </div>
+        <div class="info-card">
+            <div class="info-label">Oxirgi faollik (panelda)</div>
+            <div class="info-value">
+                {% if profile.last_seen %}{{ profile.last_seen|date:"d.m.Y H:i" }}{% else %}Ma'lumot yo'q{% endif %}
+            </div>
+        </div>
+        <div class="info-card">
+            <div class="info-label">Jami o'zgartirishlar</div>
+            <div class="info-value">{{ logs_total }} ta</div>
+        </div>
+    </div>
+
+    <!-- 2. OCHIQ BO'LIMLAR -->
+    <form method="post">
+        {% csrf_token %}
+
+        <h3>Qaysi bo'limlar ochiq</h3>
+
+        <label class="all-access">
+            <input type="checkbox" name="all_access" id="allAccess" {% if profile.all_access %}checked{% endif %}>
+            <div>
+                <div class="t">Barcha bo'limlar ochiq</div>
+                <div class="d">Yoqilgan bo'lsa, quyidagi tanlov hisobga olinmaydi. O'chirsangiz faqat belgilangan bo'limlar ochiq bo'ladi.</div>
+            </div>
+        </label>
+
+        <div class="sec-grid {% if profile.all_access %}dimmed{% endif %}" id="secGrid">
+            {% for s in section_rows %}
+            <label class="sec-item">
+                <input type="checkbox" name="sections" value="{{ s.key }}" {% if s.checked %}checked{% endif %}>
+                <span>{{ s.label }}</span>
+            </label>
+            {% endfor %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Saqlash</button>
+            <a href="{% url 'admin_admins' %}" class="btn-cancel">Orqaga</a>
+        </div>
+    </form>
+
+    <!-- 3. HARAKATLAR TARIXI -->
+    <h3>Oxirgi harakatlar (100 tagacha)</h3>
+    <div class="log-wrap">
+        <table class="log-table">
+            <thead>
+                <tr><th>Vaqt</th><th>Harakat</th><th>Sahifa</th></tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td class="time">{{ log.created_at|date:"d.m.Y H:i:s" }}</td>
+                    <td>{{ log.action }}</td>
+                    <td class="code">{{ log.url_name }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="empty-log">Hali hech qanday o'zgartirish qilinmagan</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var all = document.getElementById('allAccess');
+        var grid = document.getElementById('secGrid');
+        all.addEventListener('change', function () {
+            grid.classList.toggle('dimmed', all.checked);
+        });
+    })();
+</script>
+{% endblock %}
