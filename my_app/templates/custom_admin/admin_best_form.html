@@ -1,0 +1,91 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}Admin vakolatlari{% endblock %}
+
+{% block extra_css %}
+.form-panel { max-width: 640px; }
+.form-panel h2 { font-size: 1.4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.user-line { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 26px; }
+.user-line b { color: var(--accent); }
+
+.perm-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px; margin-bottom: 12px;
+    background: #0a0a0f; border: 1px solid var(--border-line); border-radius: 10px;
+    cursor: pointer; transition: 0.2s;
+}
+.perm-item:hover { border-color: #333; }
+.perm-item input[type=checkbox] {
+    width: 20px; height: 20px; margin-top: 2px;
+    accent-color: var(--accent); flex-shrink: 0; cursor: pointer;
+}
+.perm-title { font-weight: 800; color: #fff; font-size: 0.95rem; }
+.perm-desc { color: var(--text-dim); font-size: 0.82rem; margin-top: 3px; line-height: 1.4; }
+.perm-item.danger .perm-title { color: #d8b4fe; }
+
+.form-actions { display: flex; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
+.btn-save {
+    background: var(--accent); color: #000; border: none;
+    padding: 12px 26px; border-radius: 6px; font-weight: 800;
+    text-transform: uppercase; cursor: pointer;
+    box-shadow: 0 0 10px var(--accent-glow); transition: 0.3s;
+}
+.btn-save:hover { background: #fff; }
+.btn-cancel {
+    background: #1e1e24; color: #fff; border: 1px solid #333;
+    padding: 12px 22px; border-radius: 6px; font-weight: 700;
+    text-decoration: none; text-transform: uppercase; font-size: 0.85rem;
+}
+.btn-cancel:hover { border-color: #555; }
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel form-panel">
+    <h2>Admin vakolatlari</h2>
+    <div class="user-line">
+        Foydalanuvchi: <b>{{ target.username }}</b> &nbsp;·&nbsp; ID: #{{ target.id }}
+        {% if target.email %}&nbsp;·&nbsp; {{ target.email }}{% endif %}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label class="perm-item">
+            <input type="checkbox" name="is_admin_user" {% if target.is_admin_user %}checked{% endif %}>
+            <div>
+                <div class="perm-title">Kontent admin</div>
+                <div class="perm-desc">Anime, qism, yangilik, story va boshqa kontentni boshqara oladi.</div>
+            </div>
+        </label>
+
+        <label class="perm-item">
+            <input type="checkbox" name="is_staff" {% if target.is_staff %}checked{% endif %}>
+            <div>
+                <div class="perm-title">Staff</div>
+                <div class="perm-desc">Admin panelga kirish huquqi.</div>
+            </div>
+        </label>
+
+        <label class="perm-item danger">
+            <input type="checkbox" name="is_superuser" {% if target.is_superuser %}checked{% endif %}>
+            <div>
+                <div class="perm-title">Superadmin</div>
+                <div class="perm-desc">Barcha huquqlar: foydalanuvchilar, obunalar va hokazo. Yoqilsa Staff va Kontent admin ham avtomatik yoqiladi.</div>
+            </div>
+        </label>
+
+        <label class="perm-item">
+            <input type="checkbox" name="is_active" {% if target.is_active %}checked{% endif %}>
+            <div>
+                <div class="perm-title">Akkaunt faol</div>
+                <div class="perm-desc">O'chirilsa foydalanuvchi tizimga kira olmaydi.</div>
+            </div>
+        </label>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Saqlash</button>
+            <a href="{% url 'admin_admins' %}" class="btn-cancel">Bekor qilish</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
