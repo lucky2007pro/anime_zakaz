@@ -1730,6 +1730,8 @@ const BM_HALF_VIP_ONLY = false;
 const BM_HALF_TIER     = "{{ user_tier|default:'basic'|escapejs }}";
 const BM_HALF_STAFF    = {% if request.user.is_staff or request.user.is_admin_user %}true{% else %}false{% endif %};
 const BM_HALF_STORAGE  = 'bm_half_load_on';
+const BM_IS_VIP      = (BM_HALF_TIER === 'vip') || BM_HALF_STAFF;
+const BM_HISOBIM_URL = "{% url 'hisobim_page' %}";
 </script>
 
 <main class="main-content">
@@ -2517,7 +2519,6 @@ episodeBtns.forEach(function(b){
     updateIntroToggleUi();
     if(typeof window.refreshIntroSkipButton === 'function') window.refreshIntroSkipButton();
 
-    // ⬇️ MANA SHU QATORNI QO'SHING
     markEpisodeWatched(b.dataset.episodeId);
 
     if(window.innerWidth <= 1024){
@@ -2525,12 +2526,10 @@ episodeBtns.forEach(function(b){
     }
   });
 });
-if(episodeBtns.length){ setEpDesc(episodeBtns[0]); setEpSize(episodeBtns[0]); }
-else { setEpSize(null); }
 if(episodeBtns.length){
     setEpDesc(episodeBtns[0]);
     setEpSize(episodeBtns[0]);
-    markEpisodeWatched(episodeBtns[0].dataset.episodeId);   // ⬅️ YANGI
+    markEpisodeWatched(episodeBtns[0].dataset.episodeId);
 }
 else { setEpSize(null); }
 
@@ -2965,7 +2964,13 @@ function initBmPlayer(){
 
   function togglePlay(){
     if(video.paused){
-      /* YARIM YUKLASH: maqsadga yetguncha ijro bloklanadi, yetganda o'zi boshlanadi */
+      /* yarim blob oxiriga yetib to'xtagan bo'lsa — to'liq yuklangach o'zi davom etadi */
+      if(halfStalled){
+        halfResume = true;
+        halfRender();
+        return;
+      }
+      /* maqsadga (50%) yetguncha ijro bloklanadi, yetganda o'zi boshlanadi */
       if(halfWaiting){
         halfPendingPlay = true;
         halfRender();
@@ -2978,11 +2983,26 @@ function initBmPlayer(){
   }
 
   /* =================================================================
-     YARIM YUKLASH (on/off) — brauzer buferiga 50% yuklanguncha kutadi
+     YARIM YUKLASH (on/off) — fetch bilan baytma-bayt yuklash
+
+     1) Video fetch() bilan yuklanadi, haqiqiy baytlar sanaladi (MB aniq).
+     2) 50% ga yetganda yuklangan qismdan Blob yasalib pleyerga beriladi.
+     3) Yuklash fonda davom etadi.
+     4) To'liq tugagach, joriy vaqt saqlangan holda to'liq Blob'ga almashtiriladi.
+
+     Zaxira rejimlar:
+       - Content-Length yo'q / fayl juda katta / fetch xato  -> brauzer buferi usuli
+       - MP4 faststart emas (yarim blob ochilmaydi)           -> oddiy ijro
+       - Tarmoq uzilsa                                        -> oddiy ijro
+
      ⚠️ Vaqtinchalik funksiya. Keyin VIP uchun: BM_HALF_VIP_ONLY = true
   ================================================================= */
-  var HALF_TARGET = 0.5;           /* maqsad: videoning 50% i */
-  var HALF_STALL_MS = 10000;       /* shuncha vaqt o'zgarmasa — "to'xtab qoldi" deb hisoblanadi */
+  var HALF_TARGET      = 0.5;                       /* maqsad: videoning 50% i */
+  var HALF_STALL_MS    = 10000;                     /* shuncha vaqt o'zgarmasa — "to'xtab qoldi" */
+  var HALF_FLUSH_BYTES = 16 * 1048576;              /* har 16 MB ni Blob'ga o'raymiz (RAM tejash) */
+  var HALF_MAX_MB      = isTouch() ? 700 : 2500;    /* shundan katta faylda fetch ishlatilmaydi */
+  var HALF_MIN_PARTIAL = 262144;                    /* yarim blob uchun minimal bayt (256 KB) */
+  var HALF_META_MS     = 8000;                      /* blob metadata ochilishi uchun kutish */
 
   var halfToggle  = $id('qa-half-toggle');
   var halfBox     = $id('half-box');
@@ -2999,42 +3019,64 @@ function initBmPlayer(){
   var halfCancel  = $id('half-cancel');
   var halfOverlay = $id('bm-half-wait-text');
 
+  /* asl manba (qism uchun bir marta aniqlanadi) */
+  var halfOrigSrc = (function(){
+    var s = video.querySelector('source');
+    return (s && s.src) || video.currentSrc || video.src || '';
+  })();
+
+  /* umumiy holat */
+  var halfRun         = 0;          /* eski async jarayonlarni bekor qilish uchun */
   var halfTimer       = null;
-  var halfWaiting     = false;
+  var halfMode        = 'init';     /* init | fetch | buffer */
+  var halfWaiting     = false;      /* 50% ga yetishni kutyapmiz */
   var halfPendingPlay = false;
-  var halfDone        = false;     /* shu qism uchun tayyor bo'ldi / o'tkazib yuborildi */
-  var halfLastBytes   = -1;
+  var halfSkipped     = false;
+  var halfLastKey     = -1;
   var halfLastChange  = 0;
   var halfHeadMB      = NaN;
-  var halfHeadTried   = false;
+
+  /* fetch holati */
+  var halfFetchCtl    = null;
+  var halfBytes       = 0;
+  var halfTotalBytes  = 0;
+  var halfFullDone    = false;
+  var halfBlobs       = [];         /* 16 MB li Blob bo'laklari */
+  var halfChunks      = [];         /* hali o'ralmagan Uint8Array'lar */
+  var halfChunkBytes  = 0;
+  var halfMime        = 'video/mp4';
+
+  /* pleyer holati */
+  var halfBlobUrl      = '';        /* hozir pleyerda ishlayotgan blob URL */
+  var halfPartialMode  = false;     /* pleyerda yarim blob ishlayapti */
+  var halfPartialBytes = 0;
+  var halfPartialFailed= false;
+  var halfMetaOk       = false;
+  var halfStalled      = false;     /* yarim blob oxiriga yetdi, kutyapmiz */
+  var halfResume       = false;     /* to'liq yuklangach davom etsinmi */
+  var halfWantTime     = 0;         /* foydalanuvchi o'tmoqchi bo'lgan vaqt */
 
   if(halfBox) halfBox.classList.remove('half-na');
 
-  /* player yo'q bo'lganda yoki boshqa qismga o'tilganda taymerni tozalash */
+  /* player yo'q bo'lganda yoki boshqa qismga o'tilganda hammasini tozalash */
   _bmAbort.signal.addEventListener('abort', function(){
+    halfRun++;
     clearInterval(halfTimer);
     halfTimer = null;
+    if(halfFetchCtl){ try{ halfFetchCtl.abort(); }catch(e){} halfFetchCtl = null; }
+    if(halfBlobUrl){ try{ URL.revokeObjectURL(halfBlobUrl); }catch(e){} halfBlobUrl = ''; }
+    halfBlobs = []; halfChunks = [];
   });
 
+  /* ---------- yordamchilar ---------- */
   function halfTotalMB(){
-    if(isFinite(halfHeadMB)) return halfHeadMB;            /* eng aniq: serverdan Content-Length */
+    if(isFinite(halfHeadMB)) return halfHeadMB;
     var el = document.getElementById('ep-size-value');
     var v  = bmParseSizeMB(el ? el.textContent : '');
-    if(isFinite(v)) return v;
-    if(!halfHeadTried){
-      halfHeadTried = true;
-      var u = video.currentSrc || '';
-      if(u){
-        fetch(u, { method: 'HEAD' }).then(function(r){
-          var cl = parseInt(r.headers.get('Content-Length'), 10);
-          if(cl > 0) halfHeadMB = cl / 1048576;
-        }).catch(function(){});
-      }
-    }
-    return NaN;
+    return isFinite(v) ? v : NaN;
   }
 
-  /* buferlangan ulush (0..1) — barcha buferlangan oraliqlar yig'indisi / davomiylik */
+  /* brauzer buferi bo'yicha ulush (zaxira rejim) */
   function halfBufferedFrac(){
     var d = video.duration;
     if(!d || !isFinite(d) || d <= 0) return 0;
@@ -3045,6 +3087,13 @@ function initBmPlayer(){
       }
     }catch(e){}
     return Math.max(0, Math.min(sum / d, 1));
+  }
+
+  function halfFrac(){
+    if(halfFullDone) return 1;
+    if(halfMode === 'fetch') return halfTotalBytes > 0 ? Math.min(halfBytes / halfTotalBytes, 1) : 0;
+    if(halfMode === 'buffer') return halfBufferedFrac();
+    return 0;
   }
 
   function halfSetState(text, cls){
@@ -3060,7 +3109,7 @@ function initBmPlayer(){
   }
 
   function halfRender(){
-    var f     = halfBufferedFrac();
+    var f     = halfFrac();
     var pct   = f * 100;
     var total = halfTotalMB();
     var hasTotal = isFinite(total);
@@ -3080,55 +3129,327 @@ function initBmPlayer(){
     if(halfStTot)   halfStTot.textContent   = hasTotal ? bmFmtMB(total) : '—';
 
     if(halfOverlay){
-      halfOverlay.textContent = 'Yarim yuklash: ' + Math.round(pct) + '% / ' + Math.round(HALF_TARGET * 100) + '% — kuting…';
+      if(halfStalled){
+        halfOverlay.textContent = 'Davomi yuklanmoqda: ' + Math.round(pct) + '% — kuting…';
+      } else {
+        halfOverlay.textContent = 'Yarim yuklash: ' + Math.round(pct) + '% / ' + Math.round(HALF_TARGET * 100) + '% — kuting…';
+      }
     }
     return f;
   }
 
-  function halfTick(){
-    if(!halfWaiting) return;
+  /* ---------- manbani almashtirish (vaqt va holat saqlanadi) ---------- */
+  function halfSwap(url, isBlob, atTime, play, onFail){
+    var prevBlob = halfBlobUrl;
+    var settled  = false;
+    var mt       = null;
 
-    if(!video.duration || !isFinite(video.duration)){
-      halfSetStatus("Video ma'lumotlari yuklanmoqda…", '');
-      halfRender();
-      return;
+    function detach(){
+      clearTimeout(mt);
+      video.removeEventListener('loadedmetadata', ok);
+      video.removeEventListener('error', bad);
+    }
+    function ok(){
+      if(settled) return;
+      settled = true; detach();
+      _seekDone  = true;
+      halfMetaOk = true;
+      try{ if(isFinite(atTime) && atTime > 0) video.currentTime = atTime; }catch(e){}
+      try{ video.playbackRate = SPEED_LIST[currentSpeedIdx].val; }catch(e){}
+      if(prevBlob && prevBlob !== url){ try{ URL.revokeObjectURL(prevBlob); }catch(e){} }
+      if(play) video.play().catch(function(){});
+    }
+    function bad(){
+      if(settled) return;
+      settled = true; detach();
+      if(isBlob){ try{ URL.revokeObjectURL(url); }catch(e){} }
+      halfBlobUrl = prevBlob;
+      if(onFail) onFail();
     }
 
-    var f = halfRender();
+    video.addEventListener('loadedmetadata', ok);
+    video.addEventListener('error', bad);
+    mt = setTimeout(bad, HALF_META_MS);
 
-    if(f >= HALF_TARGET){
-      halfFinish(false);
-      return;
+    halfMetaOk  = false;
+    halfBlobUrl = isBlob ? url : '';
+    video.src = url;
+    video.load();
+  }
+
+  function halfBuildBlob(){
+    return new Blob(halfBlobs.concat(halfChunks), { type: halfMime });
+  }
+
+  /* asl (oddiy) manbaga qaytish */
+  function halfRevertToOrig(msg){
+    var t    = halfWantTime > 0 ? halfWantTime : video.currentTime;
+    var play = halfStalled ? halfResume : !video.paused;
+    halfPartialMode = false;
+    halfStalled = false; halfResume = false; halfWantTime = 0;
+    player.classList.remove('half-waiting');
+    if(halfBlobUrl || video.currentSrc !== halfOrigSrc){
+      halfSwap(halfOrigSrc, false, t, play, null);
     }
+    if(msg){ halfSetState("Oddiy ijro", 'skip'); halfSetStatus(msg, 'warn'); }
+  }
 
-    /* to'xtab qolganini aniqlash */
-    var key = Math.round(f * 1000);
-    if(key !== halfLastBytes){
-      halfLastBytes  = key;
-      halfLastChange = Date.now();
-      halfSetStatus("Brauzer buferiga yuklanmoqda… " + Math.round(HALF_TARGET * 100) + "% ga yetganda ijro mumkin bo'ladi.", '');
-      if(halfNowBtn) halfNowBtn.classList.remove('pulse');
-    } else if(Date.now() - halfLastChange > HALF_STALL_MS){
-      halfSetStatus("Brauzer yuklashni to'xtatdi (" + Math.round(f * 100) + "%). Kutmasdan \"Hozir ko'rish\" ni bosishingiz mumkin.", 'warn');
-      if(halfNowBtn) halfNowBtn.classList.add('pulse');
+  /* ---------- 50% ga yetganda: yarim blob ---------- */
+  function halfGoPartial(){
+    if(halfPartialMode || halfFullDone || halfPartialFailed) return;
+    var blob = halfBuildBlob();
+    if(blob.size < HALF_MIN_PARTIAL) return;
+
+    var t    = video.currentTime;
+    var play = halfPendingPlay;
+    halfPendingPlay = false;
+
+    halfPartialMode  = true;
+    halfPartialBytes = halfBytes;
+
+    halfSwap(URL.createObjectURL(blob), true, t, play, function(){
+      /* yarim blob ochilmadi — MP4 da moov atom oxirida (faststart emas) */
+      halfPartialMode   = false;
+      halfPartialFailed = true;
+      if(halfFetchCtl){ try{ halfFetchCtl.abort(); }catch(e){} halfFetchCtl = null; }
+      clearInterval(halfTimer); halfTimer = null;
+      halfBlobs = []; halfChunks = [];
+      halfSwap(halfOrigSrc, false, t, play, null);
+      halfSetState("Oddiy ijro", 'skip');
+      halfSetStatus("Bu MP4 faylda faststart yo'q, shuning uchun yarim qismini ijro qilib bo'lmaydi. Oddiy ijroga o'tildi. (ffmpeg -movflags +faststart bilan tuzating)", 'warn');
+    });
+
+    halfFinish(false);
+  }
+
+  /* ---------- to'liq yuklandi: to'liq blob ---------- */
+  function halfOnFullDone(){
+    halfFullDone = true;
+    clearInterval(halfTimer); halfTimer = null;
+    halfFetchCtl = null;
+
+    if(halfPartialFailed || halfSkipped){ halfRender(); return; }
+
+    var blob = halfBuildBlob();
+    halfBlobs = []; halfChunks = []; halfChunkBytes = 0;
+
+    var t    = halfWantTime > 0 ? halfWantTime : video.currentTime;
+    var play = halfStalled ? halfResume : (!video.paused || halfPendingPlay);
+    halfPendingPlay = false;
+
+    halfStalled = false; halfResume = false; halfWantTime = 0;
+    halfPartialMode = false;
+    player.classList.remove('half-waiting');
+
+    halfSwap(URL.createObjectURL(blob), true, t, play, function(){
+      /* to'liq blob ochilmadi — oddiy ijroga qaytamiz */
+      halfFullDone = false;
+      halfSwap(halfOrigSrc, false, t, play, null);
+    });
+
+    halfRender();
+    halfSetState('Tayyor ✓', 'done');
+    halfSetStatus("✓ Video to'liq yuklandi. Endi istalgan joyga to'xtovsiz o'tishingiz mumkin.", 'ok');
+    halfWaiting = false;
+  }
+
+  /* ---------- tarmoq xatosi ---------- */
+  function halfNetError(){
+    if(halfFetchCtl){ try{ halfFetchCtl.abort(); }catch(e){} halfFetchCtl = null; }
+    clearInterval(halfTimer); halfTimer = null;
+    halfBlobs = []; halfChunks = [];
+    if(halfPartialMode){
+      halfRevertToOrig("Yuklash uzildi. Oddiy ijroga o'tildi.");
+    } else {
+      halfFallback("Yuklashda xato. Brauzer buferi usuliga o'tildi.");
     }
   }
 
+  /* ---------- zaxira: brauzer buferi usuli ---------- */
+  function halfFallback(msg){
+    if(halfFetchCtl){ try{ halfFetchCtl.abort(); }catch(e){} halfFetchCtl = null; }
+    halfBlobs = []; halfChunks = []; halfChunkBytes = 0; halfBytes = 0;
+    halfMode = 'buffer';
+    try{ video.preload = 'auto'; }catch(e){}
+    if(!halfTimer) halfTimer = setInterval(halfTick, 400);
+    halfSetStatus(msg || "Brauzer buferiga yuklanmoqda…", 'warn');
+  }
+
+  /* ---------- fetch bilan yuklash ---------- */
+  async function halfFetchLoop(run){
+    halfFetchCtl = new AbortController();
+    var r;
+    try{
+      r = await fetch(halfOrigSrc, { signal: halfFetchCtl.signal, credentials: 'same-origin' });
+    }catch(e){
+      if(run === halfRun && e.name !== 'AbortError') halfFallback("fetch ishlamadi. Brauzer buferi usuliga o'tildi.");
+      return;
+    }
+    if(run !== halfRun) return;
+
+    if(!r.ok || !r.body){ halfFallback("Server javobi mos emas. Brauzer buferi usuliga o'tildi."); return; }
+
+    var cl = parseInt(r.headers.get('Content-Length'), 10);
+    if(!(cl > 0)){ halfFallback("Fayl hajmi (Content-Length) aniqlanmadi. Brauzer buferi usuliga o'tildi."); return; }
+    if(cl / 1048576 > HALF_MAX_MB){
+      halfFallback("Fayl juda katta (" + bmFmtMB(cl / 1048576) + "). Xotirani tejash uchun brauzer buferi usuli ishlatilmoqda.");
+      return;
+    }
+
+    halfTotalBytes = cl;
+    halfHeadMB     = cl / 1048576;
+    var ct = r.headers.get('Content-Type') || '';
+    halfMime = /^video\//i.test(ct) ? ct.split(';')[0] : 'video/mp4';
+    halfMode = 'fetch';
+    halfLastKey = -1;
+    halfSetStatus("Serverdan baytma-bayt yuklanmoqda… " + Math.round(HALF_TARGET * 100) + "% ga yetganda ijro boshlanadi.", '');
+
+    var reader = r.body.getReader();
+    try{
+      while(true){
+        var res = await reader.read();
+        if(run !== halfRun){ try{ reader.cancel(); }catch(e){} return; }
+        if(res.done) break;
+
+        halfChunks.push(res.value);
+        halfChunkBytes += res.value.length;
+        halfBytes      += res.value.length;
+
+        if(halfChunkBytes >= HALF_FLUSH_BYTES){
+          halfBlobs.push(new Blob(halfChunks, { type: halfMime }));
+          halfChunks = []; halfChunkBytes = 0;
+        }
+
+        if(!halfPartialMode && !halfPartialFailed && !halfSkipped && !halfFullDone &&
+           halfBytes >= HALF_TARGET * halfTotalBytes){
+          halfGoPartial();
+        }
+      }
+    }catch(e){
+      if(run === halfRun && e.name !== 'AbortError') halfNetError();
+      return;
+    }
+
+    if(run !== halfRun) return;
+    if(halfBytes < halfTotalBytes * 0.999){ halfNetError(); return; }
+    halfOnFullDone();
+  }
+
+  /* ---------- taymer: progress va holat yozuvlari ---------- */
+  function halfTick(){
+    var f = halfRender();
+
+    if(halfMode === 'init'){
+      if(halfWaiting) halfSetStatus("Video ma'lumotlari yuklanmoqda…", '');
+      return;
+    }
+
+    if(halfWaiting){
+      if(halfMode === 'buffer'){
+        if(!video.duration || !isFinite(video.duration)){
+          halfSetStatus("Video ma'lumotlari yuklanmoqda…", '');
+          return;
+        }
+        if(f >= HALF_TARGET){ halfFinish(false); return; }
+      }
+
+      /* to'xtab qolganini aniqlash */
+      var key = Math.round(f * 1000);
+      if(key !== halfLastKey){
+        halfLastKey    = key;
+        halfLastChange = Date.now();
+        if(halfNowBtn) halfNowBtn.classList.remove('pulse');
+        halfSetStatus((halfMode === 'fetch' ? "Serverdan yuklanmoqda… " : "Brauzer buferiga yuklanmoqda… ") +
+                      Math.round(HALF_TARGET * 100) + "% ga yetganda ijro mumkin bo'ladi.", '');
+      } else if(Date.now() - halfLastChange > HALF_STALL_MS){
+        halfSetStatus("Yuklash to'xtab qoldi (" + Math.round(f * 100) + "%). Kutmasdan \"Hozir ko'rish\" ni bosishingiz mumkin.", 'warn');
+        if(halfNowBtn) halfNowBtn.classList.add('pulse');
+      }
+      return;
+    }
+
+    /* 50% dan keyin, fonda yuklanayotganda */
+    if(halfMode === 'fetch' && halfPartialMode && !halfFullDone && !halfStalled){
+      halfSetStatus("✓ Ijro mumkin. Fonda yuklanmoqda: " + Math.round(f * 100) + "%", 'ok');
+    }
+  }
+
+  /* ---------- yarim blob oxiriga yetib qolishni aniqlash ---------- */
+  function halfStall(wantT){
+    if(halfStalled || halfFullDone || !halfPartialMode) return;
+    halfResume   = !video.paused || halfResume;
+    halfWantTime = wantT || 0;
+    halfStalled  = true;
+    video.pause();
+    player.classList.add('half-waiting');
+    halfSetState('Davomi yuklanmoqda…', '');
+    halfSetStatus("Yuklangan qism tugadi. Davomi yuklanmoqda, tugagach o'zi davom etadi.", 'warn');
+    halfRender();
+  }
+
+  function halfCheckEdge(){
+    if(!halfPartialMode || halfFullDone || halfStalled || !halfMetaOk) return;
+    var d = video.duration;
+    if(!d || !isFinite(d)) return;
+    var lim = 0;
+    try{ if(video.buffered.length) lim = video.buffered.end(video.buffered.length - 1); }catch(e){}
+    if(lim >= d - 0.5) return;
+    if(video.currentTime >= lim - 0.5 && video.readyState < 3) halfStall();
+  }
+
+  video.addEventListener('timeupdate', halfCheckEdge, sig);
+  video.addEventListener('waiting',    halfCheckEdge, sig);
+  video.addEventListener('ended', function(){
+    if(halfPartialMode && !halfFullDone && video.duration && video.currentTime < video.duration - 1){
+      halfStall();
+    }
+  }, sig);
+  video.addEventListener('error', function(){
+    if(halfPartialMode && !halfFullDone && halfMetaOk) halfStall();
+  }, sig);
+
+  /* yuklanmagan joyga o'tib ketmoqchi bo'lsa */
+  video.addEventListener('seeking', function(){
+    if(!halfPartialMode || halfFullDone || halfStalled || !halfMetaOk) return;
+    var d = video.duration;
+    if(!d || !isFinite(d) || !(halfTotalBytes > 0)) return;
+    var approx = d * (halfPartialBytes / halfTotalBytes) * 0.95;
+    /* aniqroq: brauzer haqiqatan buferlagan oxirgi joy */
+    try{
+      if(video.buffered.length){
+        approx = Math.min(approx, video.buffered.end(video.buffered.length - 1));
+      }
+    }catch(e){}
+    var t = video.currentTime;
+    if(t > approx){
+      var want = t;
+      video.currentTime = Math.max(0, approx - 2);
+      halfStall(want);
+    }
+  }, sig);
+
+  /* ---------- tugatish / boshlash / to'xtatish ---------- */
   function halfFinish(skipped){
-    clearInterval(halfTimer);
-    halfTimer = null;
     halfWaiting = false;
-    halfDone = true;
     player.classList.remove('half-waiting');
     if(halfNowBtn){ halfNowBtn.classList.remove('pulse'); halfNowBtn.style.display = 'none'; }
+
+    if(skipped){
+      halfSkipped = true;
+      if(halfFetchCtl){ try{ halfFetchCtl.abort(); }catch(e){} halfFetchCtl = null; }
+      clearInterval(halfTimer); halfTimer = null;
+      halfBlobs = []; halfChunks = [];
+    } else if(halfMode === 'buffer'){
+      clearInterval(halfTimer); halfTimer = null;
+    }
 
     halfRender();
     if(skipped){
       halfSetState("O'tkazildi", 'skip');
-      halfSetStatus("Kutish o'tkazib yuborildi. Video yuklanishi davom etadi.", '');
+      halfSetStatus("Kutish o'tkazib yuborildi. Oddiy ijro, video yuklanishi davom etadi.", '');
     } else {
       halfSetState('Tayyor ✓', 'done');
-      halfSetStatus("✓ Tayyor! " + Math.round(HALF_TARGET * 100) + "% brauzer buferiga yuklandi — endi to'xtovsiz ko'rishingiz mumkin.", 'ok');
+      halfSetStatus("✓ Tayyor! " + Math.round(HALF_TARGET * 100) + "% yuklandi — endi to'xtovsiz ko'rishingiz mumkin.", 'ok');
     }
 
     if(halfPendingPlay){
@@ -3137,17 +3458,37 @@ function initBmPlayer(){
     }
   }
 
+  function halfReset(){
+    halfRun++;
+    clearInterval(halfTimer); halfTimer = null;
+    if(halfFetchCtl){ try{ halfFetchCtl.abort(); }catch(e){} halfFetchCtl = null; }
+    halfBlobs = []; halfChunks = []; halfChunkBytes = 0; halfBytes = 0;
+    if(!halfFullDone) halfTotalBytes = 0;
+    halfMode = 'init';
+    halfPartialMode = false; halfPartialFailed = false; halfSkipped = false;
+    halfStalled = false; halfResume = false; halfWantTime = 0;
+    halfLastKey = -1; halfLastChange = Date.now();
+  }
+
   function halfStart(){
     if(!halfBox) return;
     halfBox.classList.add('open');
     halfBox.classList.remove('half-na');
 
-    halfDone = false;
+    /* shu qism allaqachon to'liq yuklangan bo'lsa */
+    if(halfFullDone){
+      halfRender();
+      halfSetState('Tayyor ✓', 'done');
+      halfSetStatus("✓ Video to'liq yuklangan.", 'ok');
+      if(halfNowBtn) halfNowBtn.style.display = 'none';
+      return;
+    }
+
+    halfReset();
+    var run = halfRun;
+
     halfWaiting = true;
-    halfLastBytes = -1;
-    halfLastChange = Date.now();
-    halfHeadMB = NaN;
-    halfHeadTried = false;
+    halfHeadMB  = NaN;
 
     /* ijro ketayotgan bo'lsa to'xtatamiz va maqsadga yetgach davom ettiramiz */
     if(!video.paused){
@@ -3155,24 +3496,27 @@ function initBmPlayer(){
       halfPendingPlay = true;
     }
 
-    try{ video.preload = 'auto'; }catch(e){}
     player.classList.add('half-waiting');
-
     halfSetState('Kutilmoqda…', '');
     halfSetStatus("Video ma'lumotlari yuklanmoqda…", '');
     if(halfNowBtn){ halfNowBtn.style.display = ''; halfNowBtn.classList.remove('pulse'); }
 
-    clearInterval(halfTimer);
     halfTimer = setInterval(halfTick, 400);
-    setTimeout(halfTick, 0);   /* qism almashganda hajm yozuvi yangilanib bo'lgach birinchi hisoblash */
+    setTimeout(halfTick, 0);
+
+    if(halfOrigSrc && window.fetch && window.ReadableStream){
+      halfFetchLoop(run);
+    } else {
+      halfFallback("Brauzer fetch oqimini qo'llamaydi. Brauzer buferi usuli ishlatilmoqda.");
+    }
   }
 
   function halfStop(){
-    clearInterval(halfTimer);
-    halfTimer = null;
+    /* yarim blob ishlayotgan bo'lsa — oddiy manbaga qaytamiz (har qanday joyga o'tish uchun) */
+    if(halfPartialMode && !halfFullDone) halfRevertToOrig('');
+    halfReset();
     halfWaiting = false;
     halfPendingPlay = false;
-    halfDone = false;
     player.classList.remove('half-waiting');
     if(halfBox) halfBox.classList.remove('open');
   }
@@ -3185,10 +3529,13 @@ function initBmPlayer(){
     try{ localStorage.setItem(BM_HALF_STORAGE, on ? '1' : '0'); }catch(e){}
   }
 
-  /* ijro boshlanib ketsa (boshqa yo'l bilan) — maqsadga yetguncha to'xtatamiz */
+  /* ijro boshqa yo'l bilan boshlansa — maqsadga yetguncha to'xtatamiz */
   video.addEventListener('play', function(){
     if(halfWaiting){
       halfPendingPlay = true;
+      video.pause();
+    } else if(halfStalled){
+      halfResume = true;
       video.pause();
     }
   }, sig);
@@ -3198,7 +3545,7 @@ function initBmPlayer(){
       if(halfToggle.checked && !halfAllowed()){
         halfToggle.checked = false;
         if(confirm("Yarim yuklash faqat VIP foydalanuvchilar uchun. Obuna sahifasiga o'tasizmi?")){
-          window.location.href = "{% url 'hisobim_page' %}";
+          window.location.href = BM_HISOBIM_URL;
         }
         return;
       }
@@ -3225,6 +3572,9 @@ function initBmPlayer(){
   if(halfToggle && halfToggle.checked && halfAllowed()) halfStart();
   else if(halfBox && !(halfToggle && halfToggle.checked)) halfBox.classList.remove('open');
 
+  /* =================================================================
+     PLEYER BOSHQARUVI
+  ================================================================= */
   function updateProgress(){
     if(!video.duration || !isFinite(video.duration)) return;
     var pct = (video.currentTime / video.duration) * 100;
@@ -3633,9 +3983,6 @@ function toggleReplyForm(id){
 
 /* ---------------------------------------------------------------
    COMMENTS: JAVOBGA JAVOB QAYTARISH (reply ichidan)
-   — parent comment'ning reply-formasini ochib, "@username " bilan
-     to'ldiradi, shunday qilib kimga javob yozilayotgani aniq bo'ladi
-     va forma xuddi shu izohga (parent_id) yuboriladi.
 --------------------------------------------------------------- */
 function replyToReply(commentId, username){
   var form = document.getElementById('reply-form-' + commentId);
@@ -3679,8 +4026,7 @@ function toggleReplies(id, btn){
 }
 
 /* ---------------------------------------------------------------
-   COMMENTS: "kimga javob" belgisi — reply matni "@username " bilan
-   boshlansa, uni chat.html'dagi reply-info kabi ajratib ko'rsatadi
+   COMMENTS: "kimga javob" belgisi
 --------------------------------------------------------------- */
 function enhanceReplyMentions(){
   document.querySelectorAll('.comment-reply-item .comment-text').forEach(function(el){
@@ -3700,7 +4046,7 @@ function enhanceReplyMentions(){
 document.addEventListener('DOMContentLoaded', enhanceReplyMentions);
 
 /* ---------------------------------------------------------------
-   COMMENTS: STIKER PANELI (fikr bildirish input oxiridagi tugma)
+   COMMENTS: STIKER PANELI
 --------------------------------------------------------------- */
 (function(){
   var toggle = document.getElementById('commentStickerToggle');
@@ -3728,7 +4074,7 @@ function sendCommentSticker(url){
 }
 
 /* ---------------------------------------------------------------
-   USER MINI-PROFIL MODAL (avatar bosilganda) — chat.html bilan bir xil
+   USER MINI-PROFIL MODAL (avatar bosilganda)
 --------------------------------------------------------------- */
 function userProfileUrl(id) {
     return "{% url 'user_mini_profile_api' 0 %}".replace('/0/', '/' + id + '/');
