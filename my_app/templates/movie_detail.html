@@ -385,6 +385,26 @@
 }
 @keyframes bm-spin { to { transform: rotate(360deg); } }
 
+/* -- YARIM YUKLASH: pleer ustidagi "kuting" belgisi -- */
+.bm-half-wait {
+    position: absolute; left: 50%; top: 68%;
+    transform: translateX(-50%);
+    z-index: 22; display: none; align-items: center; gap: 9px;
+    background: rgba(20,20,28,.90); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,193,7,.45);
+    color: #ffc107; font-size: .78rem; font-weight: 800;
+    padding: 8px 14px; border-radius: 999px;
+    pointer-events: none; white-space: nowrap;
+    max-width: 92%;
+}
+.bm-player.half-waiting .bm-half-wait { display: flex; }
+.bm-half-wait-dot {
+    width: 14px; height: 14px; flex-shrink: 0;
+    border: 2px solid rgba(255,193,7,.25);
+    border-top-color: #ffc107; border-radius: 50%;
+    animation: bm-spin .8s linear infinite;
+}
+
 /* -- FULLSCREEN -- */
 .bm-player:-webkit-full-screen { border-radius: 0 !important; }
 .bm-player:-webkit-full-screen video { height: 100vh !important; aspect-ratio: unset !important; object-fit: contain !important; }
@@ -510,8 +530,8 @@
 }
 
 /* =====================================================================
-   QUICK ACTIONS: ULASHISH / ANIME HAQIDA / INTRONI UTQAZISH / ANIME
-   KADRLAR / REYTING
+   QUICK ACTIONS: ULASHISH / ANIME HAQIDA / YARIM YUKLASH / INTRONI
+   UTQAZISH / ANIME KADRLAR / REYTING
 ===================================================================== */
 .quick-actions-section {
     background: rgba(17,17,24,.88);
@@ -617,6 +637,15 @@
     transform: translateX(20px);
 }
 
+/* "Vaqtinchalik" belgisi (Yarim yuklash tugmasi tagida) */
+.qa-soon {
+    font-size: .58rem; font-weight: 800; color: #ffc107;
+    background: rgba(255,193,7,.12);
+    border: 1px solid rgba(255,193,7,.28);
+    padding: 1px 7px; border-radius: 999px;
+    white-space: nowrap; line-height: 1.5;
+}
+
 /* -- ANIME HAQIDA / ANIME KADRLAR — detail boxlar -- */
 .qa-detail-box {
     display: none;
@@ -701,6 +730,153 @@
     .qa-circle-btn { width: 40px; height: 40px; font-size: 1.1rem; }
     .qa-label { font-size: .62rem; }
     .qa-frame-item { flex: 0 0 78%; }
+}
+
+/* =====================================================================
+   YARIM YUKLASH BOXI (progress bar bilan)
+===================================================================== */
+.half-box {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    padding: 16px;
+}
+.half-box.open { display: flex; }
+
+.half-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap;
+}
+.half-title {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: .98rem; font-weight: 900; color: #fff;
+}
+.half-title i { color: #f87171; font-size: 1.25rem; }
+.half-state {
+    font-size: .72rem; font-weight: 800; padding: 4px 11px; border-radius: 999px;
+    background: rgba(255,193,7,.12); color: #ffc107;
+    border: 1px solid rgba(255,193,7,.28);
+}
+.half-state.done {
+    background: rgba(74,222,128,.14); color: #4ade80;
+    border-color: rgba(74,222,128,.30);
+}
+.half-state.skip {
+    background: rgba(255,255,255,.08); color: #e5e7eb;
+    border-color: rgba(255,255,255,.16);
+}
+
+.half-warn {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(255,193,7,.08);
+    border: 1px solid rgba(255,193,7,.25);
+    color: #fde68a;
+    border-radius: 12px; padding: 10px 12px;
+    font-size: .8rem; font-weight: 600; line-height: 1.5;
+}
+.half-warn i { color: #ffc107; font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+.half-warn b { color: #ffc107; font-weight: 900; }
+
+/* progress bar: ustida joriy %, tagida maqsad va jami yozuvlari */
+.half-progress { padding: 38px 6px 66px; }
+.half-track {
+    position: relative; height: 10px; border-radius: 999px;
+    background: rgba(255,255,255,.12);
+}
+.half-fill {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg,#b91c1c,#ef4444);
+    transition: width .3s ease;
+}
+.half-target-line {
+    position: absolute; left: 50%; top: -7px; bottom: -7px; width: 2px;
+    background: #ffc107; transform: translateX(-50%); border-radius: 2px;
+}
+.half-cur {
+    position: absolute; bottom: calc(100% + 10px); left: 0;
+    transform: translateX(-50%);
+    background: #dc2626; color: #fff;
+    font-size: .72rem; font-weight: 800;
+    padding: 3px 9px; border-radius: 8px; white-space: nowrap;
+    transition: left .3s ease;
+}
+.half-cur::after {
+    content: ""; position: absolute; left: 50%; top: 100%;
+    transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: #dc2626;
+}
+.half-target {
+    position: absolute; top: calc(100% + 12px); left: 50%;
+    transform: translateX(-50%);
+    font-size: .72rem; font-weight: 800; color: #ffc107;
+    white-space: nowrap; text-align: center;
+}
+.half-end-left, .half-end-right {
+    position: absolute; top: calc(100% + 38px);
+    font-size: .7rem; font-weight: 700; color: var(--text-dim);
+    white-space: nowrap;
+}
+.half-end-left  { left: 0; }
+.half-end-right { right: 0; }
+
+.half-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.half-stat {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px; padding: 9px 8px; text-align: center; min-width: 0;
+}
+.half-stat-label {
+    font-size: .6rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--text-dim); margin-bottom: 3px;
+}
+.half-stat-val {
+    font-size: .88rem; font-weight: 900; color: #fff;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.half-stat.loaded .half-stat-val { color: #f87171; }
+.half-stat.target .half-stat-val { color: #ffc107; }
+
+.half-status {
+    font-size: .82rem; font-weight: 700; color: rgba(255,255,255,.78);
+    line-height: 1.5;
+}
+.half-status.warn { color: #fbbf24; }
+.half-status.ok   { color: #4ade80; }
+
+.half-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.half-btn {
+    padding: 9px 18px; border-radius: 999px; cursor: pointer;
+    font-weight: 800; font-size: .85rem; transition: .2s;
+    background: rgba(255,255,255,.08); color: #e5e7eb;
+    border: 1px solid rgba(255,255,255,.14);
+    min-height: 40px;
+}
+.half-btn:hover { background: rgba(255,255,255,.14); }
+.half-btn.primary { background: #dc2626; border-color: #dc2626; color: #fff; }
+.half-btn.primary:hover { box-shadow: 0 6px 18px rgba(220,38,38,.4); transform: translateY(-2px); }
+.half-btn.pulse { animation: halfPulse 1.4s ease-in-out infinite; }
+@keyframes halfPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,.55); }
+    50%     { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+}
+
+/* iframe (Bunny) manbada ishlamaydi — progress yashiriladi */
+.half-box.half-na .half-progress,
+.half-box.half-na .half-stats,
+.half-box.half-na .half-actions { display: none; }
+
+@media (max-width: 520px) {
+    .half-box { padding: 12px; }
+    .half-progress { padding: 38px 4px 66px; }
+    .half-stat-val { font-size: .78rem; }
+    .half-btn { flex: 1 1 100%; }
 }
 
 /* =====================================================================
@@ -1544,6 +1720,16 @@
 const BM_MOVIE_TITLE = "{{ movie.title|escapejs }}";
 const BM_MOVIE_INTRO = "{{ movie.intro_time|default:''|escapejs }}";
 const BM_MOVIE_SIZE  = "{{ movie.size_display|escapejs }}";
+
+/* ---------------------------------------------------------------
+   YARIM YUKLASH — sozlamalar
+   ⚠️ Hozircha VAQTINCHALIK: hamma foydalanuvchi uchun ochiq.
+   Keyinchalik faqat VIP uchun qilish: BM_HALF_VIP_ONLY = true
+--------------------------------------------------------------- */
+const BM_HALF_VIP_ONLY = false;
+const BM_HALF_TIER     = "{{ user_tier|default:'basic'|escapejs }}";
+const BM_HALF_STAFF    = {% if request.user.is_staff or request.user.is_admin_user %}true{% else %}false{% endif %};
+const BM_HALF_STORAGE  = 'bm_half_load_on';
 </script>
 
 <main class="main-content">
@@ -1729,7 +1915,7 @@ const BM_MOVIE_SIZE  = "{{ movie.size_display|escapejs }}";
   <!-- ================= QUICK ACTIONS ================= -->
   <section class="quick-actions-section" id="quick-actions-section">
 
-    <!-- ICONS ROW: Ulashish / Anime haqida / Introni utqazib yuborish / Anime kadrlar / Anime reyteng -->
+    <!-- ICONS ROW: Ulashish / Anime haqida / Yarim yuklash / Introni utqazib yuborish / Anime kadrlar / Anime reyteng -->
     <div class="qa-icons-row" id="qa-icons-row">
       <div class="qa-item" id="qa-share">
         <span class="qa-label">Ulashish</span>
@@ -1743,6 +1929,16 @@ const BM_MOVIE_SIZE  = "{{ movie.size_display|escapejs }}";
         <button type="button" class="qa-circle-btn" id="qa-about-btn" title="Anime haqida" aria-label="Anime haqida">
           <i class='bx bx-info-circle'></i>
         </button>
+      </div>
+
+      <!-- YANGI: YARIM YUKLASH on/off (Introni utqazib yuborish oldida) -->
+      <div class="qa-item" id="qa-half">
+        <span class="qa-label">Yarim<br>yuklash</span>
+        <label class="qa-toggle-switch">
+          <input type="checkbox" id="qa-half-toggle">
+          <span class="qa-toggle-slider"></span>
+        </label>
+        <span class="qa-soon">Vaqtinchalik</span>
       </div>
 
       <div class="qa-item" id="qa-intro">
@@ -1770,6 +1966,52 @@ const BM_MOVIE_SIZE  = "{{ movie.size_display|escapejs }}";
       </div>
       {% endif %}
     </div><!-- /qa-icons-row -->
+
+    <!-- YARIM YUKLASH BOXI — "on" bosilganda ochiladi, progress bar bilan -->
+    <div class="half-box" id="half-box">
+      <div class="half-head">
+        <div class="half-title"><i class='bx bx-cloud-download'></i> Yarim yuklash</div>
+        <span class="half-state" id="half-state">Kutilmoqda…</span>
+      </div>
+
+      <div class="half-warn">
+        <i class='bx bx-error'></i>
+        <span><b>Ogohlantirish:</b> bu funksiya hozircha <b>vaqtinchalik</b> va hamma uchun ochiq. Keyinchalik faqat <b>VIP</b> foydalanuvchilar uchun bo'ladi.</span>
+      </div>
+
+      <div class="half-progress">
+        <div class="half-track" id="half-track">
+          <div class="half-fill" id="half-fill"></div>
+          <div class="half-target-line"></div>
+          <div class="half-cur" id="half-cur">0%</div>
+          <span class="half-end-left">0%</span>
+          <span class="half-target" id="half-target-label">50% · — (maqsad)</span>
+          <span class="half-end-right" id="half-total-label">100% · — (jami)</span>
+        </div>
+      </div>
+
+      <div class="half-stats">
+        <div class="half-stat loaded">
+          <div class="half-stat-label">Yuklandi</div>
+          <div class="half-stat-val" id="half-stat-loaded">—</div>
+        </div>
+        <div class="half-stat target">
+          <div class="half-stat-label">Maqsad (50%)</div>
+          <div class="half-stat-val" id="half-stat-target">—</div>
+        </div>
+        <div class="half-stat">
+          <div class="half-stat-label">Jami</div>
+          <div class="half-stat-val" id="half-stat-total">—</div>
+        </div>
+      </div>
+
+      <div class="half-status" id="half-status">Video ma'lumotlari yuklanmoqda…</div>
+
+      <div class="half-actions">
+        <button type="button" class="half-btn primary" id="half-now">▶ Hozir ko'rish</button>
+        <button type="button" class="half-btn" id="half-cancel">✕ Bekor qilish (OFF)</button>
+      </div>
+    </div>
 
     <!-- ANIME HAQIDA — admin qo'shgan matn shu yerda ochiladi -->
     <div class="qa-detail-box" id="qa-about-box">
@@ -2165,6 +2407,11 @@ function buildInner(title){
 </div>
 <div class="bm-spinner"><div class="bm-spinner-ring"></div></div>
 
+<div class="bm-half-wait" id="bm-half-wait">
+  <span class="bm-half-wait-dot"></span>
+  <span id="bm-half-wait-text">Yarim yuklash: kuting…</span>
+</div>
+
 <div class="bm-controls" id="bm-controls">
   <div class="bm-progress-wrap" id="bm-progress">
     <div class="bm-progress-buf"  id="bm-buf"></div>
@@ -2257,6 +2504,7 @@ episodeBtns.forEach(function(b){
 
     if(isIframeSrc(src)){
       videoContainerEl.innerHTML = buildIframeHTML(src);
+      initBmPlayer();   /* iframe uchun ham chaqiriladi — yarim yuklash boxi holatini yangilaydi */
     } else {
       videoContainerEl.innerHTML = buildBmHTML(src);
       initBmPlayer();
@@ -2356,10 +2604,12 @@ updateIntroToggleUi();
   var framesBox  = document.getElementById('qa-frames-box');
   var aboutBack  = document.getElementById('qa-about-back');
   var framesBack = document.getElementById('qa-frames-back');
+  var halfBoxEl  = document.getElementById('half-box');
   if(!iconsRow) return;
 
   function showBox(box){
     iconsRow.style.display = 'none';
+    if(halfBoxEl) halfBoxEl.style.display = 'none';   /* yarim yuklash boxi vaqtincha yashiriladi (holati saqlanadi) */
     if(aboutBox)  aboutBox.style.display  = 'none';
     if(framesBox) framesBox.style.display = 'none';
     box.style.display = 'flex';
@@ -2367,6 +2617,7 @@ updateIntroToggleUi();
   function showIcons(){
     if(aboutBox)  aboutBox.style.display  = 'none';
     if(framesBox) framesBox.style.display = 'none';
+    if(halfBoxEl) halfBoxEl.style.display = '';       /* CSS (.half-box.open) qaytadan boshqaradi */
     iconsRow.style.display = 'flex';
   }
 
@@ -2422,6 +2673,25 @@ function fmtTime(s){
   var m   = Math.floor(s / 60);
   var sec = Math.floor(s % 60);
   return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+/* ---- YARIM YUKLASH: hajm (MB) yordamchilari ---- */
+function bmParseSizeMB(txt){
+  if(!txt) return NaN;
+  var m = String(txt).replace(',', '.').match(/(\d+(?:\.\d+)?)\s*(GB|GiB|MB|MiB|KB|KiB|G|M|K)?/i);
+  if(!m) return NaN;
+  var n = parseFloat(m[1]);
+  var u = (m[2] || 'MB').toUpperCase().charAt(0);
+  if(u === 'G') n *= 1024;
+  else if(u === 'K') n /= 1024;
+  return n > 0 ? n : NaN;
+}
+
+function bmFmtMB(x){
+  if(!isFinite(x)) return '—';
+  if(x >= 1024) return (x / 1024).toFixed(2) + ' GB';
+  if(x >= 100)  return Math.round(x) + ' MB';
+  return x.toFixed(1).replace(/\.0$/, '') + ' MB';
 }
 
 function showRipple(el, label){
@@ -2520,7 +2790,25 @@ function initBmPlayer(){
 
   var player  = document.getElementById('bm-player');
   var video   = document.getElementById('video-player');
-  if(!player || !video) return;
+
+  /* iframe (Bunny) manba yoki video yo'q — yarim yuklash ishlamaydi, faqat xabar ko'rsatiladi */
+  if(!player || !video){
+    var naToggle = document.getElementById('qa-half-toggle');
+    var naBox    = document.getElementById('half-box');
+    var naStatus = document.getElementById('half-status');
+    var naState  = document.getElementById('half-state');
+    if(naToggle && naBox){
+      var showNA = function(){
+        naBox.classList.add('half-na');
+        naBox.classList.toggle('open', naToggle.checked);
+        if(naStatus){ naStatus.className = 'half-status warn'; naStatus.textContent = "Bu video manbasi (iframe) uchun yarim yuklash ishlamaydi."; }
+        if(naState){ naState.className = 'half-state skip'; naState.textContent = 'Mavjud emas'; }
+      };
+      naToggle.addEventListener('change', showNA, sig);
+      showNA();
+    }
+    return;
+  }
 
   var $id = function(id){ return document.getElementById(id); };
 
@@ -2676,8 +2964,266 @@ function initBmPlayer(){
   }
 
   function togglePlay(){
-    video.paused ? video.play().catch(function(){}) : video.pause();
+    if(video.paused){
+      /* YARIM YUKLASH: maqsadga yetguncha ijro bloklanadi, yetganda o'zi boshlanadi */
+      if(halfWaiting){
+        halfPendingPlay = true;
+        halfRender();
+        return;
+      }
+      video.play().catch(function(){});
+    } else {
+      video.pause();
+    }
   }
+
+  /* =================================================================
+     YARIM YUKLASH (on/off) — brauzer buferiga 50% yuklanguncha kutadi
+     ⚠️ Vaqtinchalik funksiya. Keyin VIP uchun: BM_HALF_VIP_ONLY = true
+  ================================================================= */
+  var HALF_TARGET = 0.5;           /* maqsad: videoning 50% i */
+  var HALF_STALL_MS = 10000;       /* shuncha vaqt o'zgarmasa — "to'xtab qoldi" deb hisoblanadi */
+
+  var halfToggle  = $id('qa-half-toggle');
+  var halfBox     = $id('half-box');
+  var halfStateEl = $id('half-state');
+  var halfFillEl  = $id('half-fill');
+  var halfCurEl   = $id('half-cur');
+  var halfTargetL = $id('half-target-label');
+  var halfTotalL  = $id('half-total-label');
+  var halfStLoad  = $id('half-stat-loaded');
+  var halfStTarg  = $id('half-stat-target');
+  var halfStTot   = $id('half-stat-total');
+  var halfStatus  = $id('half-status');
+  var halfNowBtn  = $id('half-now');
+  var halfCancel  = $id('half-cancel');
+  var halfOverlay = $id('bm-half-wait-text');
+
+  var halfTimer       = null;
+  var halfWaiting     = false;
+  var halfPendingPlay = false;
+  var halfDone        = false;     /* shu qism uchun tayyor bo'ldi / o'tkazib yuborildi */
+  var halfLastBytes   = -1;
+  var halfLastChange  = 0;
+  var halfHeadMB      = NaN;
+  var halfHeadTried   = false;
+
+  if(halfBox) halfBox.classList.remove('half-na');
+
+  /* player yo'q bo'lganda yoki boshqa qismga o'tilganda taymerni tozalash */
+  _bmAbort.signal.addEventListener('abort', function(){
+    clearInterval(halfTimer);
+    halfTimer = null;
+  });
+
+  function halfTotalMB(){
+    if(isFinite(halfHeadMB)) return halfHeadMB;            /* eng aniq: serverdan Content-Length */
+    var el = document.getElementById('ep-size-value');
+    var v  = bmParseSizeMB(el ? el.textContent : '');
+    if(isFinite(v)) return v;
+    if(!halfHeadTried){
+      halfHeadTried = true;
+      var u = video.currentSrc || '';
+      if(u){
+        fetch(u, { method: 'HEAD' }).then(function(r){
+          var cl = parseInt(r.headers.get('Content-Length'), 10);
+          if(cl > 0) halfHeadMB = cl / 1048576;
+        }).catch(function(){});
+      }
+    }
+    return NaN;
+  }
+
+  /* buferlangan ulush (0..1) — barcha buferlangan oraliqlar yig'indisi / davomiylik */
+  function halfBufferedFrac(){
+    var d = video.duration;
+    if(!d || !isFinite(d) || d <= 0) return 0;
+    var sum = 0;
+    try{
+      for(var i = 0; i < video.buffered.length; i++){
+        sum += video.buffered.end(i) - video.buffered.start(i);
+      }
+    }catch(e){}
+    return Math.max(0, Math.min(sum / d, 1));
+  }
+
+  function halfSetState(text, cls){
+    if(!halfStateEl) return;
+    halfStateEl.textContent = text;
+    halfStateEl.className = 'half-state' + (cls ? ' ' + cls : '');
+  }
+
+  function halfSetStatus(text, cls){
+    if(!halfStatus) return;
+    halfStatus.textContent = text;
+    halfStatus.className = 'half-status' + (cls ? ' ' + cls : '');
+  }
+
+  function halfRender(){
+    var f     = halfBufferedFrac();
+    var pct   = f * 100;
+    var total = halfTotalMB();
+    var hasTotal = isFinite(total);
+
+    var loadedMB = hasTotal ? f * total : NaN;
+    var targetMB = hasTotal ? HALF_TARGET * total : NaN;
+
+    if(halfFillEl) halfFillEl.style.width = pct + '%';
+    if(halfCurEl){
+      halfCurEl.style.left = Math.min(Math.max(pct, 12), 88) + '%';
+      halfCurEl.textContent = Math.round(pct) + '%' + (hasTotal ? ' · ' + bmFmtMB(loadedMB) + ' (yuklandi)' : ' (yuklandi)');
+    }
+    if(halfTargetL) halfTargetL.textContent = Math.round(HALF_TARGET * 100) + '%' + (hasTotal ? ' · ' + bmFmtMB(targetMB) : '') + ' (maqsad)';
+    if(halfTotalL)  halfTotalL.textContent  = '100%' + (hasTotal ? ' · ' + bmFmtMB(total) : '') + ' (jami)';
+    if(halfStLoad)  halfStLoad.textContent  = Math.round(pct) + '%' + (hasTotal ? ' · ' + bmFmtMB(loadedMB) : '');
+    if(halfStTarg)  halfStTarg.textContent  = hasTotal ? bmFmtMB(targetMB) : '50%';
+    if(halfStTot)   halfStTot.textContent   = hasTotal ? bmFmtMB(total) : '—';
+
+    if(halfOverlay){
+      halfOverlay.textContent = 'Yarim yuklash: ' + Math.round(pct) + '% / ' + Math.round(HALF_TARGET * 100) + '% — kuting…';
+    }
+    return f;
+  }
+
+  function halfTick(){
+    if(!halfWaiting) return;
+
+    if(!video.duration || !isFinite(video.duration)){
+      halfSetStatus("Video ma'lumotlari yuklanmoqda…", '');
+      halfRender();
+      return;
+    }
+
+    var f = halfRender();
+
+    if(f >= HALF_TARGET){
+      halfFinish(false);
+      return;
+    }
+
+    /* to'xtab qolganini aniqlash */
+    var key = Math.round(f * 1000);
+    if(key !== halfLastBytes){
+      halfLastBytes  = key;
+      halfLastChange = Date.now();
+      halfSetStatus("Brauzer buferiga yuklanmoqda… " + Math.round(HALF_TARGET * 100) + "% ga yetganda ijro mumkin bo'ladi.", '');
+      if(halfNowBtn) halfNowBtn.classList.remove('pulse');
+    } else if(Date.now() - halfLastChange > HALF_STALL_MS){
+      halfSetStatus("Brauzer yuklashni to'xtatdi (" + Math.round(f * 100) + "%). Kutmasdan \"Hozir ko'rish\" ni bosishingiz mumkin.", 'warn');
+      if(halfNowBtn) halfNowBtn.classList.add('pulse');
+    }
+  }
+
+  function halfFinish(skipped){
+    clearInterval(halfTimer);
+    halfTimer = null;
+    halfWaiting = false;
+    halfDone = true;
+    player.classList.remove('half-waiting');
+    if(halfNowBtn){ halfNowBtn.classList.remove('pulse'); halfNowBtn.style.display = 'none'; }
+
+    halfRender();
+    if(skipped){
+      halfSetState("O'tkazildi", 'skip');
+      halfSetStatus("Kutish o'tkazib yuborildi. Video yuklanishi davom etadi.", '');
+    } else {
+      halfSetState('Tayyor ✓', 'done');
+      halfSetStatus("✓ Tayyor! " + Math.round(HALF_TARGET * 100) + "% brauzer buferiga yuklandi — endi to'xtovsiz ko'rishingiz mumkin.", 'ok');
+    }
+
+    if(halfPendingPlay){
+      halfPendingPlay = false;
+      video.play().catch(function(){});
+    }
+  }
+
+  function halfStart(){
+    if(!halfBox) return;
+    halfBox.classList.add('open');
+    halfBox.classList.remove('half-na');
+
+    halfDone = false;
+    halfWaiting = true;
+    halfLastBytes = -1;
+    halfLastChange = Date.now();
+    halfHeadMB = NaN;
+    halfHeadTried = false;
+
+    /* ijro ketayotgan bo'lsa to'xtatamiz va maqsadga yetgach davom ettiramiz */
+    if(!video.paused){
+      video.pause();
+      halfPendingPlay = true;
+    }
+
+    try{ video.preload = 'auto'; }catch(e){}
+    player.classList.add('half-waiting');
+
+    halfSetState('Kutilmoqda…', '');
+    halfSetStatus("Video ma'lumotlari yuklanmoqda…", '');
+    if(halfNowBtn){ halfNowBtn.style.display = ''; halfNowBtn.classList.remove('pulse'); }
+
+    clearInterval(halfTimer);
+    halfTimer = setInterval(halfTick, 400);
+    setTimeout(halfTick, 0);   /* qism almashganda hajm yozuvi yangilanib bo'lgach birinchi hisoblash */
+  }
+
+  function halfStop(){
+    clearInterval(halfTimer);
+    halfTimer = null;
+    halfWaiting = false;
+    halfPendingPlay = false;
+    halfDone = false;
+    player.classList.remove('half-waiting');
+    if(halfBox) halfBox.classList.remove('open');
+  }
+
+  function halfAllowed(){
+    return !(BM_HALF_VIP_ONLY && BM_HALF_TIER !== 'vip' && !BM_HALF_STAFF);
+  }
+
+  function halfSaveState(on){
+    try{ localStorage.setItem(BM_HALF_STORAGE, on ? '1' : '0'); }catch(e){}
+  }
+
+  /* ijro boshlanib ketsa (boshqa yo'l bilan) — maqsadga yetguncha to'xtatamiz */
+  video.addEventListener('play', function(){
+    if(halfWaiting){
+      halfPendingPlay = true;
+      video.pause();
+    }
+  }, sig);
+
+  if(halfToggle){
+    halfToggle.addEventListener('change', function(){
+      if(halfToggle.checked && !halfAllowed()){
+        halfToggle.checked = false;
+        if(confirm("Yarim yuklash faqat VIP foydalanuvchilar uchun. Obuna sahifasiga o'tasizmi?")){
+          window.location.href = "{% url 'hisobim_page' %}";
+        }
+        return;
+      }
+      halfSaveState(halfToggle.checked);
+      if(halfToggle.checked) halfStart(); else halfStop();
+    }, sig);
+  }
+
+  if(halfNowBtn) halfNowBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(!halfWaiting) return;
+    halfPendingPlay = true;
+    halfFinish(true);
+  }, sig);
+
+  if(halfCancel) halfCancel.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(halfToggle) halfToggle.checked = false;
+    halfSaveState(false);
+    halfStop();
+  }, sig);
+
+  /* sahifa ochilganda / qism almashganda: tugma "on" bo'lsa avtomatik boshlanadi */
+  if(halfToggle && halfToggle.checked && halfAllowed()) halfStart();
+  else if(halfBox && !(halfToggle && halfToggle.checked)) halfBox.classList.remove('open');
 
   function updateProgress(){
     if(!video.duration || !isFinite(video.duration)) return;
@@ -2983,6 +3529,16 @@ function initBmPlayer(){
     }
   }, sig);
 }
+
+/* Yarim yuklash tugmasining saqlangan holatini tiklash (initBmPlayer'dan OLDIN) */
+(function(){
+  var t = document.getElementById('qa-half-toggle');
+  if(!t) return;
+  var on = false;
+  try{ on = localStorage.getItem(BM_HALF_STORAGE) === '1'; }catch(e){}
+  if(on && BM_HALF_VIP_ONLY && BM_HALF_TIER !== 'vip' && !BM_HALF_STAFF) on = false;
+  t.checked = on;
+})();
 
 /* Init on page load */
 initBmPlayer();
