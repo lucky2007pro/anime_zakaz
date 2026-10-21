@@ -781,6 +781,31 @@
 .half-warn i { color: #ffc107; font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
 .half-warn b { color: #ffc107; font-weight: 900; }
 
+/* YANGI: 50% / 95% tanlovi */
+.half-choice {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px; padding: 10px 12px;
+}
+.half-choice-label {
+    font-size: .8rem; font-weight: 800; color: #e5e7eb;
+}
+.half-choice-btns { display: flex; gap: 8px; }
+.half-choice-btn {
+    min-width: 70px; min-height: 36px; padding: 6px 16px;
+    border-radius: 999px; cursor: pointer;
+    background: rgba(255,255,255,.08); color: #e5e7eb;
+    border: 1px solid rgba(255,255,255,.16);
+    font-weight: 900; font-size: .85rem; transition: .2s;
+}
+.half-choice-btn:hover { background: rgba(220,38,38,.18); border-color: rgba(220,38,38,.35); color: #f87171; }
+.half-choice-btn.active {
+    background: #dc2626; border-color: #dc2626; color: #fff;
+    box-shadow: 0 6px 16px rgba(220,38,38,.35);
+}
+
 /* progress bar: ustida joriy %, tagida maqsad va jami yozuvlari */
 .half-progress { padding: 38px 6px 66px; }
 .half-track {
@@ -796,6 +821,7 @@
 .half-target-line {
     position: absolute; left: 50%; top: -7px; bottom: -7px; width: 2px;
     background: #ffc107; transform: translateX(-50%); border-radius: 2px;
+    transition: left .3s ease;
 }
 .half-cur {
     position: absolute; bottom: calc(100% + 10px); left: 0;
@@ -815,6 +841,7 @@
     transform: translateX(-50%);
     font-size: .72rem; font-weight: 800; color: #ffc107;
     white-space: nowrap; text-align: center;
+    transition: left .3s ease;
 }
 .half-end-left, .half-end-right {
     position: absolute; top: calc(100% + 38px);
@@ -870,6 +897,7 @@
 /* iframe (Bunny) manbada ishlamaydi — progress yashiriladi */
 .half-box.half-na .half-progress,
 .half-box.half-na .half-stats,
+.half-box.half-na .half-choice,
 .half-box.half-na .half-actions { display: none; }
 
 @media (max-width: 520px) {
@@ -877,6 +905,8 @@
     .half-progress { padding: 38px 4px 66px; }
     .half-stat-val { font-size: .78rem; }
     .half-btn { flex: 1 1 100%; }
+    .half-choice-btns { width: 100%; }
+    .half-choice-btn { flex: 1 1 0; }
 }
 
 /* =====================================================================
@@ -1730,6 +1760,7 @@ const BM_HALF_VIP_ONLY = false;
 const BM_HALF_TIER     = "{{ user_tier|default:'basic'|escapejs }}";
 const BM_HALF_STAFF    = {% if request.user.is_staff or request.user.is_admin_user %}true{% else %}false{% endif %};
 const BM_HALF_STORAGE  = 'bm_half_load_on';
+const BM_HALF_TARGET_STORAGE = 'bm_half_target';   /* tanlangan maqsad (0.5 yoki 0.95) */
 const BM_IS_VIP      = (BM_HALF_TIER === 'vip') || BM_HALF_STAFF;
 const BM_HISOBIM_URL = "{% url 'hisobim_page' %}";
 </script>
@@ -1933,7 +1964,7 @@ const BM_HISOBIM_URL = "{% url 'hisobim_page' %}";
         </button>
       </div>
 
-      <!-- YANGI: YARIM YUKLASH on/off (Introni utqazib yuborish oldida) -->
+      <!-- YARIM YUKLASH on/off (Introni utqazib yuborish oldida) -->
       <div class="qa-item" id="qa-half">
         <span class="qa-label">Yarim<br>yuklash</span>
         <label class="qa-toggle-switch">
@@ -1981,10 +2012,19 @@ const BM_HISOBIM_URL = "{% url 'hisobim_page' %}";
         <span><b>Ogohlantirish:</b> bu funksiya hozircha <b>vaqtinchalik</b> va hamma uchun ochiq. Keyinchalik faqat <b>VIP</b> foydalanuvchilar uchun bo'ladi.</span>
       </div>
 
+      <!-- YANGI: qancha yuklab olinsin — 50% yoki 95% -->
+      <div class="half-choice" id="half-choice">
+        <span class="half-choice-label">Qancha yuklab, keyin ko'rilsin?</span>
+        <div class="half-choice-btns">
+          <button type="button" class="half-choice-btn" data-target="0.5">50%</button>
+          <button type="button" class="half-choice-btn" data-target="0.95">95%</button>
+        </div>
+      </div>
+
       <div class="half-progress">
         <div class="half-track" id="half-track">
           <div class="half-fill" id="half-fill"></div>
-          <div class="half-target-line"></div>
+          <div class="half-target-line" id="half-target-line"></div>
           <div class="half-cur" id="half-cur">0%</div>
           <span class="half-end-left">0%</span>
           <span class="half-target" id="half-target-label">50% · — (maqsad)</span>
@@ -1998,7 +2038,7 @@ const BM_HISOBIM_URL = "{% url 'hisobim_page' %}";
           <div class="half-stat-val" id="half-stat-loaded">—</div>
         </div>
         <div class="half-stat target">
-          <div class="half-stat-label">Maqsad (50%)</div>
+          <div class="half-stat-label" id="half-stat-target-label">Maqsad (50%)</div>
           <div class="half-stat-val" id="half-stat-target">—</div>
         </div>
         <div class="half-stat">
@@ -2321,6 +2361,46 @@ const BM_HISOBIM_URL = "{% url 'hisobim_page' %}";
 =============================================================== -->
 <script>
 /* ---------------------------------------------------------------
+   HOLAT O'ZGARUVCHILARI + YARIM YUKLASH KALITI (HAR BIR QISM UCHUN ALOHIDA)
+   ⚠️ Bular skriptning eng boshida turishi shart.
+--------------------------------------------------------------- */
+var BM_CURRENT_INTRO = '';
+var BM_CURRENT_EP_ID = 'movie';
+
+function bmHalfKey(){
+  return 'bm_half_load_on_{{ movie.id }}_' + BM_CURRENT_EP_ID;
+}
+function bmHalfIsOn(){
+  try{ return localStorage.getItem(bmHalfKey()) === '1'; }catch(e){ return false; }
+}
+function bmHalfSet(on){
+  try{ localStorage.setItem(bmHalfKey(), on ? '1' : '0'); }catch(e){}
+}
+
+/* Yarim yuklash MAQSADI (50% yoki 95%) — barcha qismlar uchun umumiy tanlov */
+function bmHalfGetTarget(){
+  try{
+    var v = localStorage.getItem(BM_HALF_TARGET_STORAGE);
+    return v === '0.95' ? 0.95 : 0.5;
+  }catch(e){ return 0.5; }
+}
+function bmHalfSetTarget(v){
+  try{ localStorage.setItem(BM_HALF_TARGET_STORAGE, String(v)); }catch(e){}
+}
+
+/* Hozirgi (faol) qismni aniqlash */
+(function(){
+  var activeBtn = document.querySelector('.episode-btn[aria-pressed="true"]');
+  if(activeBtn){
+    BM_CURRENT_INTRO = activeBtn.dataset.intro || '';
+    BM_CURRENT_EP_ID = activeBtn.dataset.episodeId || 'ep';
+  } else {
+    BM_CURRENT_INTRO = (typeof BM_MOVIE_INTRO !== 'undefined') ? BM_MOVIE_INTRO : '';
+    BM_CURRENT_EP_ID = 'movie';
+  }
+})();
+
+/* ---------------------------------------------------------------
    SVG helpers
 --------------------------------------------------------------- */
 const _T = (typeof BM_MOVIE_TITLE !== 'undefined') ? BM_MOVIE_TITLE : '';
@@ -2502,11 +2582,16 @@ episodeBtns.forEach(function(b){
     if(!src){ return; }
 
     BM_CURRENT_INTRO = b.dataset.intro || '';
-    BM_CURRENT_EP_ID  = b.dataset.episodeId || 'ep';
+    BM_CURRENT_EP_ID = b.dataset.episodeId || 'ep';
+
+    /* Yarim yuklash tugmasi shu qismning O'Z holatiga o'tadi:
+       bu qismda yoqilmagan bo'lsa — o'chiq turadi */
+    var halfT = document.getElementById('qa-half-toggle');
+    if(halfT) halfT.checked = bmHalfIsOn();
 
     if(isIframeSrc(src)){
       videoContainerEl.innerHTML = buildIframeHTML(src);
-      initBmPlayer();   /* iframe uchun ham chaqiriladi — yarim yuklash boxi holatini yangilaydi */
+      initBmPlayer();
     } else {
       videoContainerEl.innerHTML = buildBmHTML(src);
       initBmPlayer();
@@ -2534,22 +2619,8 @@ if(episodeBtns.length){
 else { setEpSize(null); }
 
 /* ---------------------------------------------------------------
-   INTRONI UTQAZIB YUBORISH — holat va vaqt oralig'ini aniqlash
+   INTRONI UTQAZIB YUBORISH — holat
 --------------------------------------------------------------- */
-var BM_CURRENT_INTRO = '';
-var BM_CURRENT_EP_ID  = 'movie';
-
-(function(){
-  var activeBtn = document.querySelector('.episode-btn[aria-pressed="true"]');
-  if(activeBtn){
-    BM_CURRENT_INTRO = activeBtn.dataset.intro || '';
-    BM_CURRENT_EP_ID  = activeBtn.dataset.episodeId || 'ep';
-  } else {
-    BM_CURRENT_INTRO = BM_MOVIE_INTRO;
-    BM_CURRENT_EP_ID  = 'movie';
-  }
-})();
-
 function bmIntroStorageKey(epId){
   return 'bm_intro_skip_{{ movie.id }}_' + epId;
 }
@@ -2803,7 +2874,10 @@ function initBmPlayer(){
         if(naStatus){ naStatus.className = 'half-status warn'; naStatus.textContent = "Bu video manbasi (iframe) uchun yarim yuklash ishlamaydi."; }
         if(naState){ naState.className = 'half-state skip'; naState.textContent = 'Mavjud emas'; }
       };
-      naToggle.addEventListener('change', showNA, sig);
+      naToggle.addEventListener('change', function(){
+        bmHalfSet(naToggle.checked);   /* shu qism uchun saqlanadi */
+        showNA();
+      }, sig);
       showNA();
     }
     return;
@@ -2970,7 +3044,7 @@ function initBmPlayer(){
         halfRender();
         return;
       }
-      /* maqsadga (50%) yetguncha ijro bloklanadi, yetganda o'zi boshlanadi */
+      /* maqsadga (50% / 95%) yetguncha ijro bloklanadi, yetganda o'zi boshlanadi */
       if(halfWaiting){
         halfPendingPlay = true;
         halfRender();
@@ -2986,7 +3060,8 @@ function initBmPlayer(){
      YARIM YUKLASH (on/off) — fetch bilan baytma-bayt yuklash
 
      1) Video fetch() bilan yuklanadi, haqiqiy baytlar sanaladi (MB aniq).
-     2) 50% ga yetganda yuklangan qismdan Blob yasalib pleyerga beriladi.
+     2) Tanlangan maqsadga (50% yoki 95%) yetganda yuklangan qismdan
+        Blob yasalib pleyerga beriladi.
      3) Yuklash fonda davom etadi.
      4) To'liq tugagach, joriy vaqt saqlangan holda to'liq Blob'ga almashtiriladi.
 
@@ -2995,9 +3070,12 @@ function initBmPlayer(){
        - MP4 faststart emas (yarim blob ochilmaydi)           -> oddiy ijro
        - Tarmoq uzilsa                                        -> oddiy ijro
 
+     Holat HAR BIR QISM uchun alohida saqlanadi (bmHalfKey).
+     Maqsad (50% / 95%) barcha qismlar uchun umumiy (bmHalfGetTarget).
+
      ⚠️ Vaqtinchalik funksiya. Keyin VIP uchun: BM_HALF_VIP_ONLY = true
   ================================================================= */
-  var HALF_TARGET      = 0.5;                       /* maqsad: videoning 50% i */
+  var HALF_TARGET      = bmHalfGetTarget();         /* maqsad: 0.5 yoki 0.95 (foydalanuvchi tanlaydi) */
   var HALF_STALL_MS    = 10000;                     /* shuncha vaqt o'zgarmasa — "to'xtab qoldi" */
   var HALF_FLUSH_BYTES = 16 * 1048576;              /* har 16 MB ni Blob'ga o'raymiz (RAM tejash) */
   var HALF_MAX_MB      = isTouch() ? 700 : 2500;    /* shundan katta faylda fetch ishlatilmaydi */
@@ -3010,14 +3088,17 @@ function initBmPlayer(){
   var halfFillEl  = $id('half-fill');
   var halfCurEl   = $id('half-cur');
   var halfTargetL = $id('half-target-label');
+  var halfTargetLine = $id('half-target-line');
   var halfTotalL  = $id('half-total-label');
   var halfStLoad  = $id('half-stat-loaded');
   var halfStTarg  = $id('half-stat-target');
+  var halfStTargLbl = $id('half-stat-target-label');
   var halfStTot   = $id('half-stat-total');
   var halfStatus  = $id('half-status');
   var halfNowBtn  = $id('half-now');
   var halfCancel  = $id('half-cancel');
   var halfOverlay = $id('bm-half-wait-text');
+  var halfChoiceBtns = document.querySelectorAll('.half-choice-btn');
 
   /* asl manba (qism uchun bir marta aniqlanadi) */
   var halfOrigSrc = (function(){
@@ -3029,7 +3110,7 @@ function initBmPlayer(){
   var halfRun         = 0;          /* eski async jarayonlarni bekor qilish uchun */
   var halfTimer       = null;
   var halfMode        = 'init';     /* init | fetch | buffer */
-  var halfWaiting     = false;      /* 50% ga yetishni kutyapmiz */
+  var halfWaiting     = false;      /* maqsadga yetishni kutyapmiz */
   var halfPendingPlay = false;
   var halfSkipped     = false;
   var halfLastKey     = -1;
@@ -3108,9 +3189,17 @@ function initBmPlayer(){
     halfStatus.className = 'half-status' + (cls ? ' ' + cls : '');
   }
 
+  /* 50% / 95% tugmalarining faol holatini yangilash */
+  function halfRenderChoice(){
+    halfChoiceBtns.forEach(function(b){
+      b.classList.toggle('active', Math.abs(parseFloat(b.dataset.target) - HALF_TARGET) < 0.001);
+    });
+  }
+
   function halfRender(){
     var f     = halfFrac();
     var pct   = f * 100;
+    var tpct  = Math.round(HALF_TARGET * 100);
     var total = halfTotalMB();
     var hasTotal = isFinite(total);
 
@@ -3118,23 +3207,29 @@ function initBmPlayer(){
     var targetMB = hasTotal ? HALF_TARGET * total : NaN;
 
     if(halfFillEl) halfFillEl.style.width = pct + '%';
+    if(halfTargetLine) halfTargetLine.style.left = (HALF_TARGET * 100) + '%';
     if(halfCurEl){
       halfCurEl.style.left = Math.min(Math.max(pct, 12), 88) + '%';
       halfCurEl.textContent = Math.round(pct) + '%' + (hasTotal ? ' · ' + bmFmtMB(loadedMB) + ' (yuklandi)' : ' (yuklandi)');
     }
-    if(halfTargetL) halfTargetL.textContent = Math.round(HALF_TARGET * 100) + '%' + (hasTotal ? ' · ' + bmFmtMB(targetMB) : '') + ' (maqsad)';
+    if(halfTargetL){
+      halfTargetL.style.left = Math.min(Math.max(HALF_TARGET * 100, 22), 78) + '%';
+      halfTargetL.textContent = tpct + '%' + (hasTotal ? ' · ' + bmFmtMB(targetMB) : '') + ' (maqsad)';
+    }
     if(halfTotalL)  halfTotalL.textContent  = '100%' + (hasTotal ? ' · ' + bmFmtMB(total) : '') + ' (jami)';
     if(halfStLoad)  halfStLoad.textContent  = Math.round(pct) + '%' + (hasTotal ? ' · ' + bmFmtMB(loadedMB) : '');
-    if(halfStTarg)  halfStTarg.textContent  = hasTotal ? bmFmtMB(targetMB) : '50%';
+    if(halfStTargLbl) halfStTargLbl.textContent = 'Maqsad (' + tpct + '%)';
+    if(halfStTarg)  halfStTarg.textContent  = hasTotal ? bmFmtMB(targetMB) : (tpct + '%');
     if(halfStTot)   halfStTot.textContent   = hasTotal ? bmFmtMB(total) : '—';
 
     if(halfOverlay){
       if(halfStalled){
         halfOverlay.textContent = 'Davomi yuklanmoqda: ' + Math.round(pct) + '% — kuting…';
       } else {
-        halfOverlay.textContent = 'Yarim yuklash: ' + Math.round(pct) + '% / ' + Math.round(HALF_TARGET * 100) + '% — kuting…';
+        halfOverlay.textContent = 'Yarim yuklash: ' + Math.round(pct) + '% / ' + tpct + '% — kuting…';
       }
     }
+    halfRenderChoice();
     return f;
   }
 
@@ -3194,7 +3289,7 @@ function initBmPlayer(){
     if(msg){ halfSetState("Oddiy ijro", 'skip'); halfSetStatus(msg, 'warn'); }
   }
 
-  /* ---------- 50% ga yetganda: yarim blob ---------- */
+  /* ---------- maqsadga (50% / 95%) yetganda: yarim blob ---------- */
   function halfGoPartial(){
     if(halfPartialMode || halfFullDone || halfPartialFailed) return;
     var blob = halfBuildBlob();
@@ -3320,6 +3415,7 @@ function initBmPlayer(){
           halfChunks = []; halfChunkBytes = 0;
         }
 
+        /* HALF_TARGET har safar o'qiladi — tanlov o'zgarsa darhol hisobga olinadi */
         if(!halfPartialMode && !halfPartialFailed && !halfSkipped && !halfFullDone &&
            halfBytes >= HALF_TARGET * halfTotalBytes){
           halfGoPartial();
@@ -3368,7 +3464,7 @@ function initBmPlayer(){
       return;
     }
 
-    /* 50% dan keyin, fonda yuklanayotganda */
+    /* maqsaddan keyin, fonda yuklanayotganda */
     if(halfMode === 'fetch' && halfPartialMode && !halfFullDone && !halfStalled){
       halfSetStatus("✓ Ijro mumkin. Fonda yuklanmoqda: " + Math.round(f * 100) + "%", 'ok');
     }
@@ -3525,8 +3621,9 @@ function initBmPlayer(){
     return !(BM_HALF_VIP_ONLY && BM_HALF_TIER !== 'vip' && !BM_HALF_STAFF);
   }
 
+  /* shu qism uchun saqlash */
   function halfSaveState(on){
-    try{ localStorage.setItem(BM_HALF_STORAGE, on ? '1' : '0'); }catch(e){}
+    bmHalfSet(on);
   }
 
   /* ijro boshqa yo'l bilan boshlansa — maqsadga yetguncha to'xtatamiz */
@@ -3553,6 +3650,30 @@ function initBmPlayer(){
       if(halfToggle.checked) halfStart(); else halfStop();
     }, sig);
   }
+
+  /* ---------- YANGI: 50% / 95% tanlovi ---------- */
+  halfChoiceBtns.forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var v = parseFloat(b.dataset.target) >= 0.9 ? 0.95 : 0.5;
+      if(Math.abs(v - HALF_TARGET) < 0.001) return;
+
+      HALF_TARGET = v;
+      bmHalfSetTarget(v);
+      halfRenderChoice();
+
+      /* yarim yuklash yoqilgan bo'lsa — yangi maqsad bilan qaytadan boshlanadi */
+      if(halfToggle && halfToggle.checked && !halfFullDone){
+        halfStop();
+        halfBox && halfBox.classList.add('open');
+        halfStart();
+      } else {
+        halfRender();
+      }
+    }, sig);
+  });
+  halfRenderChoice();
+  halfRender();
 
   if(halfNowBtn) halfNowBtn.addEventListener('click', function(e){
     e.stopPropagation();
@@ -3880,13 +4001,14 @@ function initBmPlayer(){
   }, sig);
 }
 
-/* Yarim yuklash tugmasining saqlangan holatini tiklash (initBmPlayer'dan OLDIN) */
+/* Yarim yuklash tugmasining saqlangan holatini tiklash (initBmPlayer'dan OLDIN) —
+   faqat hozirgi (tanlangan) qism uchun */
 (function(){
   var t = document.getElementById('qa-half-toggle');
   if(!t) return;
-  var on = false;
-  try{ on = localStorage.getItem(BM_HALF_STORAGE) === '1'; }catch(e){}
-  if(on && BM_HALF_VIP_ONLY && BM_HALF_TIER !== 'vip' && !BM_HALF_STAFF) on = false;
+  var on = bmHalfIsOn();
+  if(on && typeof BM_HALF_VIP_ONLY !== 'undefined' && BM_HALF_VIP_ONLY &&
+     BM_HALF_TIER !== 'vip' && !BM_HALF_STAFF) on = false;
   t.checked = on;
 })();
 
@@ -4325,4 +4447,5 @@ function escHtml(str) {
     return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 </script>
+
 {% endblock %}
