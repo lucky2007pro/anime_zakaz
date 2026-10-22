@@ -5,8 +5,8 @@
 
 {% block extra_css %}
 <style>
-    /* Mobilda zoom (pinch / double-tap) o'chirilgan */
-    html, body { touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+    /* Mobilda zoom (pinch / double-tap) o'chirilgan — JS'siz, skrollni qotirmaydi */
+    html, body { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; }
 
     .category-top-space { margin-top: 100px; }
 
@@ -114,6 +114,7 @@
         margin: 0 auto;
         padding: 24px 5% 50px;
         overflow-x: hidden;
+        overflow-x: clip; /* skroll konteyner yaratmaydi */
     }
 
     .cards-grid {
@@ -144,6 +145,7 @@
         background: var(--bg-surface);
         box-shadow: 0 10px 28px rgba(0,0,0,0.4);
         transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease;
+        contain: layout paint style;
     }
 
     .anime-card img {
@@ -323,7 +325,7 @@
         opacity: 0.4;
     }
 
-    /* ================= ANIME TAVSIYA ================= */
+    /* ================= ANIME TAVSIYA (faqat desktop) ================= */
     .rec-dock {
         position: fixed;
         left: 0; right: 0;
@@ -456,28 +458,85 @@
         .vip-badge i { font-size: 1.05rem; }
     }
 
-    /* ===== MOBIL: gold effekt va zoom yo'q ===== */
+    /* ===== MOBIL: lag yo'q — gold effekt, blur, zoom, og'ir soyalar o'chirilgan ===== */
     @media (max-width: 768px), (hover: none) {
         .anime-card,
         .anime-card.is-vip {
             animation: none !important;
             transition: none !important;
             transform: none !important;
-            box-shadow: 0 10px 28px rgba(0,0,0,0.4) !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.35) !important;
         }
         .vip-sweep { display: none !important; }
         .anime-card img { transition: none !important; transform: none !important; }
 
+        /* cheksiz VIP animatsiyalari o'chirildi */
+        .vip-badge, .vip-badge i, .vip-badge::after {
+            animation: none !important;
+        }
+        .vip-badge { box-shadow: 0 2px 6px rgba(245, 158, 11, 0.45); }
+        .vip-badge::after { display: none; }
+
+        /* har bir kartadagi blur o'rniga oddiy fon */
+        .tag-jp {
+            background: rgba(60,60,70,0.85);
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        .top-badge-episode {
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
         .card-wrapper { animation-name: cardInFlat; }
-        .category-panel.enter-right { animation-name: panelInRightFlat; }
-        .category-panel.enter-left  { animation-name: panelInLeftFlat; }
+        /* faqat birinchi 8 ta karta animatsiya qiladi */
+        .card-wrapper:nth-child(n+9) { animation: none !important; opacity: 1; }
+
+        .category-panel.enter-right { animation-name: panelInRightFlat; animation-duration: .3s; }
+        .category-panel.enter-left  { animation-name: panelInLeftFlat;  animation-duration: .3s; }
+        .category-panel.leave-left  { animation-duration: .12s; }
+        .category-panel.leave-right { animation-duration: .12s; }
 
         .category-tab-btn:active { transform: none; }
         .category-tab-btn:not(.active):hover i { transform: none; }
     }
     @keyframes cardInFlat { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes panelInRightFlat { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes panelInLeftFlat  { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes panelInRightFlat { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes panelInLeftFlat  { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* ===== MOBIL: 3 ta bo'lim pastga ("Anime tavsiya" o'rniga) ===== */
+    @media (max-width: 768px) {
+        .rec-dock { display: none !important; }
+
+        .category-top-space { margin-top: 80px; }
+
+        .category-tabs-wrapper {
+            position: fixed;
+            top: auto;
+            left: 0;
+            right: 0;
+            max-width: none;
+            margin: 0;
+            padding: 0 12px;
+            bottom: var(--rec-bottom, calc(12px + env(safe-area-inset-bottom, 0px)));
+            z-index: 997;
+            transition: bottom .3s ease;
+        }
+
+        .category-tabs {
+            background: rgba(17, 17, 24, 0.97);
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border-radius: 18px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+        }
+
+        .tab-indicator { box-shadow: 0 4px 12px rgba(255, 0, 60, 0.35); }
+
+        /* pastdagi bo'limlar kontentni to'smasligi uchun */
+        .category-container { padding-bottom: 140px; }
+    }
 </style>
 {% endblock %}
 
@@ -521,7 +580,7 @@
                                 <div class="top-badge-episode"><i class='bx bx-movie-play'></i> Film</div>
                             {% endif %}
                         </div>
-                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" draggable="false">
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" decoding="async" draggable="false">
                         <div class="card-overlay">
                             <h4 class="card-title">{{ anime.title }}</h4>
                             <div class="card-meta">
@@ -559,7 +618,7 @@
                                 <div class="top-badge-episode"><i class='bx bx-movie-play'></i> Film</div>
                             {% endif %}
                         </div>
-                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" draggable="false">
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" decoding="async" draggable="false">
                         <div class="card-overlay">
                             <h4 class="card-title">{{ anime.title }}</h4>
                             <div class="card-meta">
@@ -593,7 +652,7 @@
                         <div class="top-badge-group">
                             <div class="top-badge-episode"><i class='bx bx-movie-play'></i> Film</div>
                         </div>
-                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" draggable="false">
+                        <img src="{% if anime.image %}{{ anime.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ anime.title }}" loading="lazy" decoding="async" draggable="false">
                         <div class="card-overlay">
                             <h4 class="card-title">{{ anime.title }}</h4>
                             <div class="card-meta">
@@ -616,7 +675,7 @@
     </div>
 </div>
 
-<!-- ===== ANIME TAVSIYA ===== -->
+<!-- ===== ANIME TAVSIYA (desktop) ===== -->
 <div class="rec-dock" id="recDock">
     <div class="rec-toast" id="recToast" role="status" aria-live="polite">
         <i class='bx bxs-crown'></i>
@@ -629,7 +688,7 @@
 </div>
 
 <script>
-/* Mobilda zoom'ni o'chirish */
+/* Mobilda zoom'ni o'chirish (skrollni to'smaydigan usul) */
 (function () {
     'use strict';
     var vp = document.querySelector('meta[name="viewport"]');
@@ -640,14 +699,12 @@
     }
     vp.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
 
-    /* iOS Safari pinch-zoom */
+    /* iOS Safari pinch-zoom (faqat gesture hodisalari, skrollga tegmaydi) */
     ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (ev) {
         document.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false });
     });
-    document.addEventListener('touchmove', function (e) {
-        if (e.touches.length > 1) e.preventDefault();
-    }, { passive: false });
-
+    /* DIQQAT: document'dagi touchmove (passive:false) olib tashlandi — aynan shu skrollni qotirardi.
+       Pinch-zoom'ni endi CSS "touch-action: pan-x pan-y" to'xtatadi. */
 })();
 </script>
 
@@ -701,12 +758,16 @@
 
             newP.classList.add('active', dir > 0 ? 'enter-right' : 'enter-left');
 
+            /* Faqat ekranga sig'adigan dastlabki kartalarni qayta animatsiya qilamiz */
             var cards = newP.querySelectorAll('.card-wrapper');
-            cards.forEach(function (c) {
-                c.style.animation = 'none';
-                void c.offsetWidth;
-                c.style.animation = '';
-            });
+            var limit = Math.min(cards.length, 12);
+            for (var i = 0; i < limit; i++) {
+                cards[i].style.animation = 'none';
+            }
+            void newP.offsetWidth; /* bitta reflow */
+            for (var j = 0; j < limit; j++) {
+                cards[j].style.animation = '';
+            }
 
             timer2 = setTimeout(function () { clearAnim(newP); }, 520);
         }, 200);
@@ -755,12 +816,13 @@
     var recLink   = document.getElementById('recToastLink');
     var recTimer  = null;
 
+    /* Pastki tab bar tepasiga joylashtirish (mobilda 3 ta bo'lim ham shu o'zgaruvchidan foydalanadi) */
     function placeDock() {
         var bar = document.getElementById('bottomTabBar');
         var root = document.documentElement;
         if (window.innerWidth <= 768 && bar && !bar.classList.contains('tab-hidden')) {
             var r = bar.getBoundingClientRect();
-            root.style.setProperty('--rec-bottom', Math.round(window.innerHeight - r.top + 6) + 'px');
+            root.style.setProperty('--rec-bottom', Math.round(window.innerHeight - r.top + 8) + 'px');
         } else {
             root.style.removeProperty('--rec-bottom');
         }
@@ -769,6 +831,18 @@
     window.addEventListener('load', placeDock);
     window.addEventListener('resize', placeDock);
     window.addEventListener('orientationchange', function () { setTimeout(placeDock, 300); });
+
+    /* Tab bar skroll paytida yashirinsa/chiqsa — bo'limlar ham mos holda tushadi/ko'tariladi */
+    var bottomBar = document.getElementById('bottomTabBar');
+    if (bottomBar) {
+        if (window.MutationObserver) {
+            new MutationObserver(function () {
+                placeDock();
+                setTimeout(placeDock, 350);
+            }).observe(bottomBar, { attributes: true, attributeFilter: ['class'] });
+        }
+        bottomBar.addEventListener('transitionend', placeDock);
+    }
 
     function showRecToast() {
         if (IS_VIP) {
