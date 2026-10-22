@@ -5,107 +5,301 @@
 
 {% block extra_css %}
 <style>
+    /* =====================================================
+       BESTMEDIA — IMKONIYATLAR (v3)
+       Faqat transform/opacity animatsiyalar (mobil lag yo'q)
+       ===================================================== */
     .imkon-wrap {
-        max-width: 900px;
-        margin: 0 auto;
+        --imkon-gold: #fbbf24;
+        --imkon-ease: cubic-bezier(.22, 1, .36, 1);
+        width: 100%;
+        max-width: 1080px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 18px 16px 56px;
+        padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+        position: relative;
+        left: 0;
+        right: 0;
+        float: none;
+        overflow-x: clip;
+        -webkit-tap-highlight-color: transparent;
     }
 
+    /* Ota konteyner (base.html) bir tomonlama padding/margin bersa ham — o'rtaga tekislaydi */
+    .main-content:has(> .imkon-wrap) {
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .imkon-grid, .imkon-header, .imkon-locked, .imkon-card { width: 100%; max-width: 100%; }
+
+    .imkon-wrap *,
+    .imkon-wrap *::before,
+    .imkon-wrap *::after { box-sizing: border-box; }
+
+    .imkon-wrap button,
+    .imkon-toggle,
+    .imkon-bg-item,
+    .imkon-vip-video-card { touch-action: manipulation; }
+
+    /* ================= HEADER ================= */
     .imkon-header {
+        position: relative;
         text-align: center;
-        margin-bottom: 30px;
+        padding: clamp(26px, 5vw, 46px) 18px;
+        margin-bottom: 26px;
+        border: 1px solid var(--glass-border);
+        border-radius: 26px;
+        background:
+            radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 65%),
+            var(--glass-bg);
+        overflow: hidden;
+        isolation: isolate;
+        animation: imkonFadeUp .6s var(--imkon-ease) both;
+    }
+
+    .imkon-header::before,
+    .imkon-header::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: -1;
+        will-change: transform;
+    }
+
+    .imkon-header::before {
+        width: 220px; height: 220px;
+        top: -140px; right: -60px;
+        background: var(--accent);
+        opacity: .10;
+        animation: imkonOrb 9s ease-in-out infinite;
+    }
+
+    .imkon-header::after {
+        width: 180px; height: 180px;
+        bottom: -120px; left: -50px;
+        background: var(--imkon-gold);
+        opacity: .08;
+        animation: imkonOrb 11s ease-in-out infinite reverse;
     }
 
     .imkon-header h1 {
-        font-size: 1.6rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: clamp(1.45rem, 3.6vw, 2.1rem);
         font-weight: 900;
-        margin-bottom: 8px;
+        line-height: 1.25;
+        letter-spacing: -.03em;
+        margin: 0 0 8px;
+    }
+
+    .imkon-header h1 i {
+        color: var(--imkon-gold);
+        display: inline-block;
+        animation: imkonCrown 3.2s ease-in-out infinite;
+        filter: drop-shadow(0 0 8px rgba(251,191,36,.45));
     }
 
     .imkon-header p {
+        max-width: 560px;
+        margin: 0 auto;
         color: var(--text-dim);
-        font-size: 0.9rem;
+        font-size: .92rem;
+        line-height: 1.6;
     }
 
+    /* ================= LOCKED ================= */
     .imkon-locked {
         text-align: center;
-        background: var(--glass-bg);
+        background:
+            radial-gradient(ellipse at 50% 0%, rgba(251,191,36,.10), transparent 70%),
+            var(--glass-bg);
         border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        padding: 50px 20px;
+        border-radius: 22px;
+        padding: clamp(32px, 6vw, 58px) 22px;
+        animation: imkonFadeUp .6s var(--imkon-ease) .1s both;
     }
 
     .imkon-locked i {
-        font-size: 3rem;
-        color: #fbbf24;
-        margin-bottom: 15px;
+        display: inline-block;
+        font-size: 3.2rem;
+        color: var(--imkon-gold);
+        margin-bottom: 14px;
+        animation: imkonFloat 3s ease-in-out infinite;
     }
 
-    .imkon-locked h3 {
-        font-weight: 900;
-        margin-bottom: 10px;
-    }
-
-    .imkon-locked p {
-        color: var(--text-dim);
-        margin-bottom: 20px;
-    }
+    .imkon-locked h3 { font-weight: 900; margin-bottom: 10px; }
+    .imkon-locked p { color: var(--text-dim); margin-bottom: 22px; line-height: 1.6; }
 
     .imkon-locked a {
         display: inline-block;
-        padding: 12px 28px;
+        padding: 13px 30px;
         background: var(--accent);
         color: #000;
         border-radius: 30px;
         font-weight: 900;
         text-decoration: none;
+        transition: transform .2s ease, background .2s ease;
     }
 
+    .imkon-locked a:active { transform: scale(.96); }
+
+    /* ================= SECTION LABEL + GRID ================= */
+    .imkon-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        align-items: start;
+    }
+
+    .imkon-full { grid-column: 1 / -1; }
+
+    .imkon-section {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 10px 2px 0;
+        font-size: .78rem;
+        font-weight: 900;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        animation: imkonFadeUp .5s var(--imkon-ease) both;
+        animation-delay: calc(var(--i, 0) * 60ms);
+    }
+
+    .imkon-section:first-child { margin-top: 0; }
+
+    .imkon-section i {
+        color: var(--accent);
+        font-size: 1.1rem;
+        display: inline-block;
+        animation: imkonPulse 2.6s ease-in-out infinite;
+    }
+
+    .imkon-section::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--glass-border), transparent);
+    }
+
+    /* ================= CARD ================= */
     .imkon-card {
+        position: relative;
+        min-width: 0;
         background: var(--glass-bg);
         border: 1px solid var(--glass-border);
-        border-radius: 18px;
-        padding: 20px;
-        margin-bottom: 22px;
+        border-radius: 22px;
+        padding: clamp(16px, 2.6vw, 24px);
+        box-shadow: 0 8px 26px rgba(0,0,0,.10);
+        transition: border-color .25s ease, transform .25s var(--imkon-ease);
+        animation: imkonFadeUp .55s var(--imkon-ease) both;
+        animation-delay: calc(var(--i, 0) * 60ms);
     }
+
+    .imkon-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 55%);
+        opacity: 0;
+        transition: opacity .35s ease;
+        pointer-events: none;
+    }
+
+    .imkon-card:has(.imkon-card-head .imkon-toggle.on:not(.small))::before { opacity: 1; }
+    .imkon-card:has(.imkon-card-head .imkon-toggle.on:not(.small)) {
+        border-color: color-mix(in srgb, var(--accent) 38%, var(--glass-border));
+    }
+
+    .imkon-card > * { position: relative; }
 
     .imkon-card-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        gap: 14px;
+        min-width: 0;
     }
+
+    .imkon-card-head > div:first-child { min-width: 0; flex: 1; }
 
     .imkon-card-title {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         font-weight: 900;
         font-size: 1.02rem;
+        line-height: 1.35;
     }
 
     .imkon-card-title i {
-        font-size: 1.3rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        font-size: 1.35rem;
         color: var(--accent);
+        border-radius: 13px;
+        background: color-mix(in srgb, var(--accent) 12%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+        will-change: transform;
+        transition: background .3s ease, color .3s ease, box-shadow .3s ease;
+    }
+
+    .imkon-card:has(.imkon-card-head .imkon-toggle.on:not(.small)) .imkon-card-title i {
+        background: var(--accent);
+        color: #000;
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
     }
 
     .imkon-card-desc {
         color: var(--text-dim);
-        font-size: 0.83rem;
-        margin-top: 6px;
-        line-height: 1.5;
+        font-size: .83rem;
+        margin-top: 8px;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
     }
 
-    /* ===== TOGGLE ICON ===== */
+    /* ======== DOIMIY ICON ANIMATSIYALARI (faqat transform) ======== */
+    .ic-float  { animation: imkonFloat 3s ease-in-out infinite; }
+    .ic-pulse  { animation: imkonPulse 2.4s ease-in-out infinite; }
+    .ic-wiggle { animation: imkonWiggle 3.4s ease-in-out infinite; }
+    .ic-sway   { animation: imkonSway 3.6s ease-in-out infinite; }
+    .ic-bounce { animation: imkonBounce 2.2s ease-in-out infinite; }
+    .ic-rocket { animation: imkonRocket 2.6s ease-in-out infinite; }
+    .ic-spin   { animation: imkonSpin 7s linear infinite; }
+
+    /* ON / OFF paytida icon animatsiyasi (JS qo'shadi) */
+    .icon-on  { animation: imkonIconOn .7s var(--imkon-ease) 1 !important; }
+    .icon-off { animation: imkonIconOff .5s ease 1 !important; }
+
+    /* ================= TOGGLE ================= */
     .imkon-toggle {
-        width: 52px;
+        width: 54px;
         height: 30px;
         border-radius: 30px;
-        background: rgba(255,255,255,0.08);
+        background: rgba(255,255,255,.08);
         border: 1px solid var(--glass-border);
         position: relative;
         cursor: pointer;
         flex-shrink: 0;
-        transition: background 0.25s ease;
+        transition: background .3s ease, border-color .3s ease;
     }
 
     .imkon-toggle::after {
@@ -117,61 +311,70 @@
         height: 22px;
         border-radius: 50%;
         background: #fff;
-        transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
+        box-shadow: 0 2px 6px rgba(0,0,0,.3);
+        transition: transform .35s var(--imkon-ease), width .2s ease;
+        will-change: transform;
     }
 
-    .imkon-toggle.on {
-        background: var(--accent);
-    }
+    .imkon-toggle:active::after { width: 28px; }
+    .imkon-toggle.on { background: var(--accent); border-color: var(--accent); }
+    .imkon-toggle.on::after { transform: translateX(24px); }
+    .imkon-toggle.on:active::after { transform: translateX(18px); }
 
-    .imkon-toggle.on::after {
-        transform: translateX(22px);
-    }
+    .imkon-toggle.small { width: 44px; height: 25px; }
+    .imkon-toggle.small::after { width: 19px; height: 19px; top: 2px; left: 2px; }
+    .imkon-toggle.small:active::after { width: 24px; }
+    .imkon-toggle.small.on::after { transform: translateX(19px); }
+    .imkon-toggle.small.on:active::after { transform: translateX(14px); }
 
-    /* Kichik toggle (Premium VIP box ichidagi sub-sozlamalar uchun) */
-    .imkon-toggle.small {
-        width: 42px;
-        height: 24px;
-    }
-    .imkon-toggle.small::after {
-        width: 18px;
-        height: 18px;
-        top: 3px;
-        left: 3px;
-    }
-    .imkon-toggle.small.on::after {
-        transform: translateX(18px);
-    }
-
-    /* ===== FON PICKER ===== */
-    .imkon-bg-box {
-        max-height: 0;
-        overflow: hidden;
+    /* ================= COLLAPSE (o'lcham sakramaydi) ================= */
+    .imkon-bg-box,
+    .imkon-vipbox-box,
+    .imkon-music-box {
+        display: grid;
+        grid-template-rows: 0fr;
         opacity: 0;
-        transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease, margin 0.4s ease;
+        visibility: hidden;
         margin-top: 0;
+        transition: grid-template-rows .45s var(--imkon-ease), opacity .3s ease, margin .45s var(--imkon-ease), visibility 0s linear .45s;
     }
 
-    .imkon-bg-box.open {
-        max-height: 1000px;
+    .imkon-bg-box.open,
+    .imkon-vipbox-box.open,
+    .imkon-music-box.open {
+        grid-template-rows: 1fr;
         opacity: 1;
-        margin-top: 16px;
+        visibility: visible;
+        margin-top: 18px;
+        transition-delay: 0s;
     }
 
+    .imkon-collapse-in { min-height: 0; overflow: hidden; }
+
+    /* ================= FON PICKER ================= */
     .imkon-bg-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));   /* doim 3x3 */
         gap: 10px;
+        max-width: 520px;
+        margin: 0 auto;
     }
 
-    .imkon-bg-item {
+    .imkon-bg-item,
+    .imkon-bg-ph {
         position: relative;
-        aspect-ratio: 3/4;
-        border-radius: 12px;
+        aspect-ratio: 3 / 4;
+        border-radius: 14px;
+    }
+
+    .imkon-bg-ph { visibility: hidden; pointer-events: none; }   /* o'lcham saqlovchi bo'sh katak */
+
+    .imkon-bg-item {
         overflow: hidden;
         cursor: pointer;
+        background: rgba(255,255,255,.04);
         border: 2px solid transparent;
-        transition: border-color 0.2s ease, transform 0.2s ease;
+        transition: border-color .2s ease, transform .25s var(--imkon-ease);
     }
 
     .imkon-bg-item img {
@@ -181,9 +384,8 @@
         display: block;
     }
 
-    .imkon-bg-item.active {
-        border-color: var(--accent);
-    }
+    .imkon-bg-item:active { transform: scale(.96); }
+    .imkon-bg-item.active { border-color: var(--accent); }
 
     .imkon-bg-item.active::after {
         content: '\ea41';
@@ -199,105 +401,90 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.9rem;
+        font-size: .9rem;
+        animation: imkonPop .5s var(--imkon-ease) both;
     }
+
+    .imkon-bg-grid.page-anim .imkon-bg-item { animation: imkonItemIn .35s var(--imkon-ease) both; }
 
     .imkon-bg-empty {
         color: var(--text-dim);
-        font-size: 0.85rem;
-        grid-column: 1/-1;
+        font-size: .85rem;
+        grid-column: 1 / -1;
         text-align: center;
         padding: 20px 0;
     }
 
-    /* ===== FON PAGINATION ===== */
+    /* ================= FON PAGINATION ================= */
     .imkon-bg-pager {
         display: none;
         align-items: center;
         justify-content: center;
         gap: 14px;
         margin-top: 14px;
+        min-height: 40px;
     }
 
     .imkon-bg-pager-btn {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         border: 1px solid var(--glass-border);
-        background: rgba(255,255,255,0.05);
+        background: rgba(255,255,255,.05);
         color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        font-size: 1.2rem;
-        transition: 0.2s;
+        font-size: 1.25rem;
+        transition: transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
     }
 
-    .imkon-bg-pager-btn:hover:not(:disabled) {
-        background: var(--accent);
-        color: #000;
-        border-color: var(--accent);
-    }
-
-    .imkon-bg-pager-btn:disabled {
-        opacity: 0.35;
-        cursor: not-allowed;
-    }
+    .imkon-bg-pager-btn:active:not(:disabled) { transform: scale(.9); }
+    .imkon-bg-pager-btn:disabled { opacity: .35; cursor: not-allowed; }
 
     .imkon-bg-page-info {
-        font-size: 0.82rem;
+        font-size: .85rem;
         font-weight: 800;
         color: var(--text-dim);
-        min-width: 46px;
+        min-width: 56px;
         text-align: center;
     }
 
     .imkon-bg-page-info b { color: var(--accent); }
 
-    /* ===== PREMIUM VIP BOX ===== */
-    .imkon-vipbox-box {
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease, margin 0.4s ease;
-        margin-top: 0;
-    }
-
-    .imkon-vipbox-box.open {
-        max-height: 2000px;
-        opacity: 1;
-        margin-top: 16px;
-    }
-
+    /* ================= VIP BOX ================= */
     .imkon-vipbox-preview {
         width: 140px;
         max-width: 100%;
         margin: 0 auto 16px;
-        border-radius: 14px;
+        border-radius: 16px;
         overflow: hidden;
-        border: 1px solid rgba(255,193,7,0.35);
-        box-shadow: 0 0 18px rgba(255,193,7,0.12);
+        border: 1px solid rgba(255,193,7,.35);
+        box-shadow: 0 0 18px rgba(255,193,7,.12);
+        animation: imkonFloat 4s ease-in-out infinite;
     }
 
     .imkon-vipbox-preview img {
         width: 100%;
         display: block;
-        aspect-ratio: 3/4;
+        aspect-ratio: 3 / 4;
         object-fit: cover;
     }
 
     .imkon-vipbox-sec-title {
-        font-size: 0.82rem;
+        font-size: .8rem;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: .06em;
         color: #ffc107;
         margin: 14px 0 10px;
         display: flex;
         align-items: center;
         gap: 6px;
     }
+
+    .imkon-vipbox-sec-title i { display: inline-block; animation: imkonPulse 2.2s ease-in-out infinite; }
 
     .imkon-vip-videos-grid {
         display: grid;
@@ -307,32 +494,29 @@
     }
 
     .imkon-vip-video-card {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 12px;
+        min-width: 0;
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 14px;
         padding: 8px;
         cursor: pointer;
-        transition: 0.25s;
         text-align: center;
         position: relative;
+        transition: border-color .25s ease, background .25s ease, transform .25s var(--imkon-ease);
     }
 
-    .imkon-vip-video-card:hover {
-        border-color: rgba(255,193,7,0.5);
-        transform: translateY(-2px);
-    }
+    .imkon-vip-video-card:active { transform: scale(.97); }
 
     .imkon-vip-video-card.selected {
         border-color: #ffd700;
-        background: rgba(255,215,0,0.08);
-        box-shadow: 0 0 16px rgba(255,193,7,0.25);
+        background: rgba(255,215,0,.08);
     }
 
     .imkon-vip-video-thumb {
         position: relative;
         width: 100%;
         aspect-ratio: 16 / 9;
-        border-radius: 8px;
+        border-radius: 9px;
         overflow: hidden;
         background: #000;
         margin-bottom: 6px;
@@ -343,6 +527,7 @@
         height: 100%;
         object-fit: cover;
         display: block;
+        pointer-events: none;
     }
 
     .imkon-vip-video-badge {
@@ -362,6 +547,7 @@
         display: flex;
         align-items: center;
         gap: 2px;
+        animation: imkonPop .45s var(--imkon-ease) both;
     }
 
     .imkon-vip-video-title {
@@ -378,215 +564,198 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        padding: 12px 0;
-        border-top: 1px solid rgba(255,255,255,0.06);
-        font-size: 0.85rem;
+        padding: 13px 0;
+        border-top: 1px solid rgba(255,255,255,.06);
+        font-size: .86rem;
         color: var(--text-light, #fff);
         font-weight: 600;
     }
 
-    .imkon-vipbox-option:first-of-type {
-        border-top: none;
+    .imkon-vipbox-option:first-of-type { border-top: none; }
+
+    .imkon-vipbox-option > span {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
     }
 
-    /* ===== SO'ROVNOMA ===== */
-    .imkon-vote-input-row {
-        display: flex;
-        gap: 10px;
-        margin-top: 14px;
+    .imkon-vipbox-option > span i {
+        display: inline-block;
+        font-size: 1.15rem;
+        color: #ffc107;
+        flex-shrink: 0;
     }
+
+    /* ================= INPUT / BUTTON ================= */
+    .imkon-vote-input-row { display: flex; gap: 10px; margin-top: 16px; }
 
     .imkon-vote-input-row input {
         flex: 1;
-        padding: 12px 16px;
-        background: rgba(0,0,0,0.25);
+        min-width: 0;
+        width: 100%;
+        padding: 13px 16px;
+        background: rgba(0,0,0,.25);
         border: 1px solid var(--glass-border);
-        border-radius: 12px;
+        border-radius: 13px;
         color: #fff;
         outline: none;
         font-family: 'Outfit';
+        font-size: 16px;                 /* iOS zoom oldini oladi */
+        transition: border-color .2s ease, box-shadow .2s ease;
     }
 
     .imkon-vote-input-row input:focus {
         border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
     }
 
     .imkon-btn {
-        padding: 12px 20px;
+        padding: 13px 22px;
         background: var(--accent);
         color: #000;
         border: none;
-        border-radius: 12px;
+        border-radius: 13px;
         font-weight: 900;
         cursor: pointer;
         font-family: 'Outfit';
         white-space: nowrap;
-        transition: 0.2s;
+        transition: transform .2s ease, background .2s ease;
     }
 
-    .imkon-btn:hover { background: #fff; }
-    .imkon-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .imkon-btn:active { transform: scale(.96); }
+    .imkon-btn:disabled { opacity: .5; cursor: not-allowed; }
 
-    .imkon-vote-list {
+    .imkon-vote-list,
+    .imkon-req-list {
         margin-top: 16px;
         display: flex;
         flex-direction: column;
         gap: 10px;
+    }
+
+    .imkon-vote-row,
+    .imkon-req-row,
+    .imkon-music-row {
+        min-width: 0;
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 15px;
+        overflow-wrap: anywhere;
+        transition: border-color .2s ease, background .2s ease;
     }
 
     .imkon-vote-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
-        padding: 12px 14px;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 14px;
+        gap: 12px;
+        padding: 13px 14px;
     }
 
-    .imkon-vote-name {
-        font-weight: 800;
-        font-size: 0.92rem;
-    }
+    .imkon-vote-row > div:first-child { min-width: 0; }
+    .imkon-vote-row > div:last-child { display: flex; align-items: center; flex-shrink: 0; }
+
+    .imkon-vote-name { font-weight: 800; font-size: .92rem; }
 
     .imkon-vote-approved {
         display: block;
-        font-size: 0.72rem;
+        font-size: .72rem;
         color: #4ade80;
         font-weight: 700;
         margin-top: 3px;
     }
 
+    .imkon-vote-approved i { display: inline-block; animation: imkonPulse 2s ease-in-out infinite; }
+
     .imkon-vote-count {
-        font-size: 0.8rem;
+        font-size: .8rem;
         color: var(--text-dim);
-        margin-right: 8px;
+        margin-right: 10px;
         white-space: nowrap;
     }
 
     .imkon-vote-btn {
-        padding: 8px 16px;
+        padding: 9px 16px;
         border-radius: 30px;
         border: 1px solid var(--glass-border);
-        background: rgba(255,255,255,0.05);
+        background: rgba(255,255,255,.05);
         color: #fff;
-        font-size: 0.78rem;
+        font-size: .78rem;
         font-weight: 800;
         cursor: pointer;
         white-space: nowrap;
-        transition: 0.2s;
+        transition: transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
     }
 
-    .imkon-vote-btn.voted {
-        background: var(--accent);
-        color: #000;
-        border-color: var(--accent);
-    }
+    .imkon-vote-btn:active { transform: scale(.94); }
+    .imkon-vote-btn.voted { background: var(--accent); color: #000; border-color: var(--accent); }
 
     .imkon-vote-empty {
         color: var(--text-dim);
-        font-size: 0.85rem;
+        font-size: .85rem;
         text-align: center;
         padding: 10px 0;
     }
 
-    /* ===== OBUNACHILAR SONI ===== */
+    /* ================= STAT ================= */
     .imkon-stat-value {
-        font-size: 1.6rem;
+        font-size: clamp(1.8rem, 5vw, 2.3rem);
         font-weight: 900;
         color: var(--accent);
+        margin: 12px 0 0;
+        line-height: 1;
     }
 
-    /* ===== ANIME SO'RASH ===== */
-    .imkon-req-list {
-        margin-top: 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
+    /* ================= ANIME SO'RASH ================= */
     .imkon-req-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 14px;
-        background: rgba(255,255,255,0.03);
-        border-radius: 12px;
-        border: 1px solid rgba(255,255,255,0.06);
-        font-size: 0.88rem;
+        gap: 10px;
+        padding: 11px 14px;
+        font-size: .88rem;
     }
 
-    .imkon-req-row span.count {
-        color: var(--accent);
-        font-weight: 800;
-    }
+    .imkon-req-row span.count { color: var(--accent); font-weight: 800; }
 
-    .imkon-note {
-        font-size: 0.72rem;
-        color: var(--text-dim);
-        margin-top: 8px;
-    }
+    .imkon-note { font-size: .75rem; color: var(--text-dim); margin-top: 10px; line-height: 1.5; }
 
-    .imkon-msg {
-        font-size: 0.8rem;
-        margin-top: 10px;
-        display: none;
-    }
-
-    .imkon-msg.show { display: block; }
+    .imkon-msg { font-size: .8rem; margin-top: 10px; display: none; }
+    .imkon-msg.show { display: block; animation: imkonFadeUp .25s ease both; }
     .imkon-msg.err { color: #ff5b5b; }
     .imkon-msg.ok { color: #4ade80; }
 
-    /* ===== BETA HOME STATUS ===== */
+    /* ================= BETA STATUS ================= */
     .imkon-beta-status {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 6px;
-        font-size: 0.8rem;
+        font-size: .8rem;
         font-weight: 700;
-        margin-top: 10px;
+        margin-top: 12px;
     }
 
+    .imkon-beta-status i { display: inline-block; }
     .imkon-beta-status.on { color: #4ade80; }
+    .imkon-beta-status.on i { animation: imkonPulse 2s ease-in-out infinite; }
     .imkon-beta-status.off { color: var(--text-dim); }
-
     .imkon-beta-status b { color: #d99aff; }
 
-    /* ===== PREMIUM MUZIKA ===== */
-    .imkon-music-box {
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease, margin 0.4s ease;
-        margin-top: 0;
-    }
+    /* ================= MUZIKA ================= */
+    .imkon-volume-row { display: flex; align-items: center; gap: 12px; }
 
-    .imkon-music-box.open {
-        max-height: 700px;
-        opacity: 1;
-        margin-top: 16px;
-    }
-
-    .imkon-volume-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .imkon-volume-row i {
-        font-size: 1.1rem;
-        color: var(--text-dim);
-        flex-shrink: 0;
-    }
+    .imkon-volume-row i { font-size: 1.15rem; color: var(--text-dim); flex-shrink: 0; }
 
     .imkon-volume-row input[type="range"] {
         flex: 1;
+        min-width: 0;
         -webkit-appearance: none;
         appearance: none;
         height: 6px;
         border-radius: 10px;
-        background: rgba(255,255,255,0.1);
+        background: rgba(255,255,255,.12);
         outline: none;
         cursor: pointer;
     }
@@ -594,8 +763,8 @@
     .imkon-volume-row input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
         background: var(--accent);
         cursor: pointer;
@@ -603,8 +772,8 @@
     }
 
     .imkon-volume-row input[type="range"]::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
         background: var(--accent);
         cursor: pointer;
@@ -613,23 +782,15 @@
 
     .imkon-volume-value {
         text-align: center;
-        font-size: 0.8rem;
+        font-size: .8rem;
         color: var(--text-dim);
         margin-top: 6px;
         font-weight: 700;
     }
 
-    .imkon-volume-value span {
-        color: var(--accent);
-        font-weight: 900;
-    }
+    .imkon-volume-value span { color: var(--accent); font-weight: 900; }
 
-    .imkon-music-list {
-        margin-top: 18px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
+    .imkon-music-list { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
 
     .imkon-music-row {
         display: flex;
@@ -637,450 +798,144 @@
         justify-content: space-between;
         gap: 10px;
         padding: 12px 14px;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 14px;
-        transition: border-color 0.2s ease, background 0.2s ease;
     }
 
     .imkon-music-row.playing {
         border-color: var(--accent);
-        background: rgba(255,255,255,0.06);
+        background: rgba(255,255,255,.06);
+        box-shadow: inset 3px 0 0 var(--accent);
     }
 
     .imkon-music-name {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 9px;
+        min-width: 0;
         font-weight: 800;
-        font-size: 0.9rem;
+        font-size: .9rem;
+        overflow-wrap: anywhere;
     }
 
     .imkon-music-name i {
+        display: inline-block;
         color: var(--accent);
-        font-size: 1.1rem;
+        font-size: 1.2rem;
+        flex-shrink: 0;
     }
 
+    .imkon-music-row.playing .imkon-music-name i { animation: imkonSpin 2.4s linear infinite; }
+
     .imkon-music-play-btn {
-        width: 38px;
-        height: 38px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
         border: 1px solid var(--glass-border);
-        background: rgba(255,255,255,0.06);
+        background: rgba(255,255,255,.06);
         color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         flex-shrink: 0;
-        font-size: 1.1rem;
-        transition: 0.2s;
+        font-size: 1.2rem;
+        transition: transform .2s ease, background .2s ease, color .2s ease;
     }
 
-    .imkon-music-row.playing .imkon-music-play-btn {
-        background: var(--accent);
-        color: #000;
+    .imkon-music-play-btn:active { transform: scale(.9); }
+    .imkon-music-row.playing .imkon-music-play-btn { background: var(--accent); color: #000; }
+
+    /* ================= HOVER (faqat sichqoncha qurilmalarda) ================= */
+    @media (hover: hover) and (pointer: fine) {
+        .imkon-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 40%, var(--glass-border)); }
+        .imkon-toggle:hover { border-color: var(--accent); }
+        .imkon-bg-item:hover { transform: translateY(-3px); }
+        .imkon-vip-video-card:hover { border-color: rgba(255,193,7,.55); transform: translateY(-2px); }
+        .imkon-btn:hover:not(:disabled) { background: #fff; transform: translateY(-1px); }
+        .imkon-vote-btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+        .imkon-vote-row:hover, .imkon-req-row:hover { border-color: color-mix(in srgb, var(--accent) 28%, var(--glass-border)); }
+        .imkon-bg-pager-btn:hover:not(:disabled) { background: var(--accent); color: #000; border-color: var(--accent); transform: translateY(-1px); }
+        .imkon-music-play-btn:hover { transform: scale(1.08); }
+        .imkon-locked a:hover { transform: translateY(-2px); background: #fff; }
+        .imkon-card:hover .imkon-card-title i { transform: scale(1.06); }
     }
 
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-    /* ===== BESTMEDIA: responsive polish + subtle animations ===== */
-    .imkon-wrap {
-        width: min(100% - 32px, 980px);
-        padding: 18px 0 44px;
-        animation: imkanPageIn .55s cubic-bezier(.2,.75,.25,1) both;
-    }
+    /* ================= KEYFRAMES (transform/opacity) ================= */
+    @keyframes imkonFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes imkonItemIn { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+    @keyframes imkonPop    { 0% { transform: scale(0); } 70% { transform: scale(1.25); } 100% { transform: scale(1); } }
+    @keyframes imkonFloat  { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    @keyframes imkonPulse  { 0%,100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+    @keyframes imkonWiggle { 0%,86%,100% { transform: rotate(0); } 90% { transform: rotate(-12deg); } 94% { transform: rotate(10deg); } 97% { transform: rotate(-6deg); } }
+    @keyframes imkonSway   { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+    @keyframes imkonBounce { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-6px); } 60% { transform: translateY(0); } 75% { transform: translateY(-2px); } }
+    @keyframes imkonRocket { 0%,100% { transform: translate(0,0) rotate(0); } 50% { transform: translate(2px,-4px) rotate(4deg); } }
+    @keyframes imkonSpin   { to { transform: rotate(360deg); } }
+    @keyframes imkonCrown  { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-4px) rotate(4deg); } }
+    @keyframes imkonOrb    { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-22px, 16px); } }
+    @keyframes imkonIconOn  { 0% { transform: scale(1) rotate(0); } 35% { transform: scale(1.35) rotate(-18deg); } 65% { transform: scale(.9) rotate(10deg); } 100% { transform: scale(1) rotate(0); } }
+    @keyframes imkonIconOff { 0% { transform: scale(1); } 40% { transform: scale(.72); } 100% { transform: scale(1); } }
 
-    .imkon-header {
-        position: relative;
-        padding: clamp(22px, 4vw, 38px) 18px;
-        margin-bottom: 24px;
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-        background:
-            radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 65%),
-            var(--glass-bg);
-        overflow: hidden;
-    }
-
-    .imkon-header::before {
-        content: "";
-        position: absolute;
-        width: 180px;
-        height: 180px;
-        top: -125px;
-        right: -55px;
-        border-radius: 50%;
-        background: var(--accent);
-        opacity: .08;
-        filter: blur(8px);
-        pointer-events: none;
-    }
-
-    .imkon-header h1 {
-        position: relative;
-        font-size: clamp(1.45rem, 3.5vw, 2rem);
-        line-height: 1.25;
-        letter-spacing: -.035em;
-    }
-
-    .imkon-header p {
-        position: relative;
-        max-width: 560px;
-        margin: 0 auto;
-        line-height: 1.6;
-    }
-
-    .imkon-card,
-    .imkon-locked {
-        position: relative;
-        min-width: 0;
-        box-shadow: 0 8px 28px rgba(0,0,0,.10);
-        transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
-        animation: imkanCardIn .55s both;
-    }
-
-    .imkon-card {
-        padding: clamp(16px, 2.8vw, 24px);
-        border-radius: 20px;
-        scroll-margin-top: 90px;
-    }
-
-    .imkon-card:hover {
-        border-color: color-mix(in srgb, var(--accent) 40%, var(--glass-border));
-        box-shadow: 0 14px 34px rgba(0,0,0,.16);
-    }
-
-    .imkon-card-head {
-        min-width: 0;
-    }
-
-    .imkon-card-head > div:first-child {
-        min-width: 0;
-        flex: 1;
-    }
-
-    .imkon-card-title {
-        line-height: 1.4;
-    }
-
-    .imkon-card-desc {
-        max-width: 700px;
-        overflow-wrap: anywhere;
-    }
-
-    .imkon-toggle {
-        outline: none;
-        box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 25%, transparent);
-    }
-
-    .imkon-toggle:hover {
-        box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 14%, transparent);
-    }
-
-    .imkon-toggle:focus-visible,
-    .imkon-bg-pager-btn:focus-visible,
-    .imkon-btn:focus-visible,
-    .imkon-vote-btn:focus-visible,
-    .imkon-music-play-btn:focus-visible,
-    .imkon-bg-item:focus-visible,
-    .imkon-vip-video-card:focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 3px;
-    }
-
-    .imkon-bg-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 12px;
-    }
-
-    .imkon-bg-item {
-        background: rgba(255,255,255,.04);
-        box-shadow: 0 5px 16px rgba(0,0,0,.16);
-    }
-
-    .imkon-bg-item:hover {
-        transform: translateY(-3px) scale(1.015);
-    }
-
-    .imkon-bg-item img {
-        transition: transform .35s ease, filter .35s ease;
-    }
-
-    .imkon-bg-item:hover img {
-        transform: scale(1.05);
-    }
-
-    .imkon-vipbox-preview {
-        transition: transform .3s ease, box-shadow .3s ease;
-    }
-
-    .imkon-vipbox-preview:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(255,193,7,.18);
-    }
-
-    .imkon-vip-video-card {
-        min-width: 0;
-    }
-
-    .imkon-vip-video-thumb video {
-        object-fit: cover;
-    }
-
-    .imkon-vote-input-row input {
-        min-width: 0;
-        width: 100%;
-        transition: border-color .2s ease, box-shadow .2s ease;
-    }
-
-    .imkon-vote-input-row input:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 13%, transparent);
-    }
-
-    .imkon-btn,
-    .imkon-vote-btn,
-    .imkon-music-play-btn,
-    .imkon-bg-pager-btn {
-        -webkit-tap-highlight-color: transparent;
-        transition: transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
-    }
-
-    .imkon-btn:hover:not(:disabled),
-    .imkon-vote-btn:hover,
-    .imkon-music-play-btn:hover,
-    .imkon-bg-pager-btn:hover:not(:disabled) {
-        transform: translateY(-1px);
-    }
-
-    .imkon-vote-row,
-    .imkon-req-row,
-    .imkon-music-row {
-        min-width: 0;
-        overflow-wrap: anywhere;
-        transition: border-color .2s ease, background .2s ease, transform .2s ease;
-    }
-
-    .imkon-vote-row:hover,
-    .imkon-req-row:hover {
-        border-color: color-mix(in srgb, var(--accent) 25%, var(--glass-border));
-    }
-
-    .imkon-vote-row > div,
-    .imkon-music-name {
-        min-width: 0;
-    }
-
-    .imkon-music-name {
-        overflow-wrap: anywhere;
-    }
-
-    .imkon-music-row.playing {
-        box-shadow: inset 3px 0 0 var(--accent);
-    }
-
-    .imkon-msg.show {
-        animation: imkanMessageIn .25s ease both;
-    }
-
-    .imkon-locked {
-        padding: clamp(30px, 6vw, 56px) 22px;
-        background:
-            radial-gradient(ellipse at 50% 0%, rgba(251,191,36,.09), transparent 70%),
-            var(--glass-bg);
-    }
-
-    .imkon-locked i {
-        animation: imkanFloat 3s ease-in-out infinite;
-    }
-
-    .imkon-locked a {
-        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
-        box-shadow: 0 7px 20px color-mix(in srgb, var(--accent) 18%, transparent);
-    }
-
-    .imkon-locked a:hover {
-        transform: translateY(-2px);
-        background: #fff;
-    }
-
-    @keyframes imkanPageIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes imkanCardIn {
-        from { opacity: 0; transform: translateY(14px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes imkanMessageIn {
-        from { opacity: 0; transform: translateY(-4px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes imkanFloat {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
-    }
-
-    @media (min-width: 1100px) {
-        .imkon-wrap { width: min(100% - 48px, 980px); }
-        .imkon-card { margin-bottom: 20px; }
+    /* ================= MOBIL ================= */
+    @media (max-width: 860px) {
+        .imkon-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+        .imkon-full { grid-column: auto; }
+        .imkon-section { margin-top: 8px; }
     }
 
     @media (max-width: 640px) {
-        .imkon-wrap {
-            width: calc(100% - 22px);
-            padding-top: 10px;
-            padding-bottom: 28px;
-        }
+        .imkon-wrap { padding: 10px 11px 40px; padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
 
-        .imkon-header {
-            border-radius: 19px;
-            margin-bottom: 14px;
-            padding: 24px 14px;
-        }
+        .imkon-header { border-radius: 20px; margin-bottom: 16px; padding: 26px 14px; }
+        .imkon-header::before { width: 160px; height: 160px; }
+        .imkon-header::after { display: none; }
 
-        .imkon-card {
-            padding: 16px;
-            margin-bottom: 13px;
-            border-radius: 17px;
-        }
+        .imkon-card { padding: 16px; border-radius: 18px; }
+        .imkon-card-head { align-items: flex-start; gap: 12px; }
+        .imkon-card-title { font-size: .96rem; gap: 10px; }
+        .imkon-card-title i { width: 36px; height: 36px; font-size: 1.25rem; border-radius: 12px; }
+        .imkon-card-desc { font-size: .79rem; }
 
-        .imkon-card-head {
-            align-items: flex-start;
-            gap: 12px;
-        }
+        .imkon-toggle { width: 50px; height: 28px; }
+        .imkon-toggle::after { width: 20px; height: 20px; }
+        .imkon-toggle:active::after { width: 25px; }
+        .imkon-toggle.on::after { transform: translateX(22px); }
+        .imkon-toggle.on:active::after { transform: translateX(17px); }
+        .imkon-toggle.small { width: 42px; height: 24px; }
+        .imkon-toggle.small::after { width: 18px; height: 18px; }
+        .imkon-toggle.small:active::after { width: 22px; }
+        .imkon-toggle.small.on::after { transform: translateX(18px); }
+        .imkon-toggle.small.on:active::after { transform: translateX(14px); }
 
-        .imkon-card-title {
-            font-size: .96rem;
-            gap: 8px;
-        }
+        .imkon-bg-grid { gap: 8px; }
+        .imkon-bg-item, .imkon-bg-ph { border-radius: 11px; }
 
-        .imkon-card-title i {
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
+        .imkon-vip-videos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 
-        .imkon-card-desc {
-            font-size: .79rem;
-            line-height: 1.55;
-        }
+        .imkon-vote-input-row { flex-direction: column; gap: 9px; }
+        .imkon-vote-input-row input, .imkon-btn { min-height: 46px; border-radius: 12px; }
 
-        .imkon-toggle {
-            width: 48px;
-            height: 28px;
-        }
+        .imkon-vote-row { padding: 12px; align-items: flex-start; }
+        .imkon-vote-row > div:last-child { flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+        .imkon-vote-count { margin-right: 0; font-size: .74rem; }
+        .imkon-vote-btn { padding: 9px 12px; font-size: .74rem; }
 
-        .imkon-toggle::after {
-            width: 20px;
-            height: 20px;
-        }
+        .imkon-req-row { align-items: flex-start; padding: 11px 12px; font-size: .82rem; }
+        .imkon-req-row span:last-child { text-align: right; flex-shrink: 0; }
 
-        .imkon-toggle.on::after {
-            transform: translateX(20px);
-        }
+        .imkon-music-row { padding: 10px 12px; }
+        .imkon-music-name { font-size: .83rem; }
+        .imkon-volume-row { gap: 9px; }
 
-        .imkon-toggle.small {
-            width: 40px;
-            height: 23px;
-        }
-
-        .imkon-toggle.small::after {
-            width: 17px;
-            height: 17px;
-        }
-
-        .imkon-toggle.small.on::after {
-            transform: translateX(17px);
-        }
-
-        .imkon-bg-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
-        }
-
-        .imkon-vip-videos-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 9px;
-        }
-
-        .imkon-vip-video-card {
-            padding: 7px;
-        }
-
-        .imkon-vote-input-row {
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .imkon-vote-input-row input,
-        .imkon-btn {
-            min-height: 44px;
-            border-radius: 11px;
-        }
-
-        .imkon-vote-row {
-            align-items: flex-start;
-            padding: 11px;
-        }
-
-        .imkon-vote-row > div:last-child {
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            gap: 7px;
-        }
-
-        .imkon-vote-count {
-            margin-right: 0;
-            font-size: .74rem;
-        }
-
-        .imkon-vote-btn {
-            padding: 8px 11px;
-            font-size: .73rem;
-        }
-
-        .imkon-req-row {
-            align-items: flex-start;
-            gap: 8px;
-            padding: 11px;
-            font-size: .82rem;
-        }
-
-        .imkon-req-row span:last-child {
-            text-align: right;
-            flex-shrink: 0;
-        }
-
-        .imkon-music-row {
-            padding: 10px 11px;
-        }
-
-        .imkon-music-name {
-            font-size: .82rem;
-            gap: 7px;
-        }
-
-        .imkon-music-play-btn {
-            width: 40px;
-            height: 40px;
-        }
-
-        .imkon-volume-row {
-            gap: 8px;
-        }
-
-        .imkon-stat-value {
-            font-size: 1.8rem;
-        }
+        /* Mobil yengillashtirish: og'ir effektlar o'chiriladi */
+        .imkon-card { box-shadow: none; }
+        .imkon-vipbox-preview { animation: none; }
     }
 
     @media (max-width: 380px) {
-        .imkon-wrap { width: calc(100% - 16px); }
+        .imkon-wrap { padding-left: 8px; padding-right: 8px; }
         .imkon-card { padding: 13px; }
-        .imkon-bg-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
         .imkon-vote-row { flex-direction: column; }
         .imkon-vote-row > div:last-child { width: 100%; justify-content: space-between; }
         .imkon-req-row { flex-direction: column; }
@@ -1088,26 +943,11 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-        .imkon-wrap,
-        .imkon-card,
-        .imkon-locked i,
-        .imkon-msg.show {
+        .imkon-wrap *, .imkon-wrap *::before, .imkon-wrap *::after {
             animation: none !important;
-        }
-
-        .imkon-card,
-        .imkon-bg-item,
-        .imkon-bg-item img,
-        .imkon-toggle,
-        .imkon-btn,
-        .imkon-vote-btn,
-        .imkon-music-play-btn,
-        .imkon-bg-pager-btn,
-        .imkon-vipbox-preview {
-            transition: none !important;
+            transition-duration: .01ms !important;
         }
     }
-
 </style>
 {% endblock %}
 
@@ -1116,7 +956,7 @@
 <div class="imkon-wrap">
 
     <div class="imkon-header">
-        <h1><i class='bx bxs-crown' style="color:#fbbf24;"></i> Premium Imkoniyatlar</h1>
+        <h1><i class='bx bxs-crown'></i> Premium Imkoniyatlar</h1>
         <p>VIP va Premium azolar uchun maxsus funksiyalar</p>
     </div>
 
@@ -1131,227 +971,241 @@
 
     {% else %}
 
-    <!-- ================= 1) OXIRGI VERSIYANI SINAB KO'RISH ================= -->
-    <div class="imkon-card">
-        <div class="imkon-card-head">
-            <div>
-                <div class="imkon-card-title"><i class='bx bxs-rocket'></i> Oxirgi versiyani sinab ko'rish</div>
-                <div class="imkon-card-desc">Yoqsangiz, bosh sahifaning yangi (beta) versiyasi ochiladi. Sinov muddati tugagach, avtomatik odatdagi sahifaga qaytasiz.</div>
+    <div class="imkon-grid">
 
-                <div class="imkon-beta-status {% if beta_home_active %}on{% else %}off{% endif %}" id="betaStatusText">
-                    {% if beta_home_active %}
-                        <i class='bx bx-check-circle'></i> Yoqilgan — Tugash sanasi: <b>{{ beta_expire_local|date:"d.m.Y H:i" }}</b>
-                    {% else %}
-                        <i class='bx bx-x-circle'></i> O'chirilgan
-                    {% endif %}
-                </div>
-            </div>
-            <div class="imkon-toggle {% if beta_home_active %}on{% endif %}" id="betaToggle" onclick="toggleBetaHome()"></div>
-        </div>
-    </div>
+        <div class="imkon-section" style="--i:0"><i class='bx bxs-magic-wand'></i> Shaxsiylashtirish</div>
 
-    <!-- ================= 2) PREMIUM FON ================= -->
-    <div class="imkon-card">
-        <div class="imkon-card-head">
-            <div>
-                <div class="imkon-card-title"><i class='bx bxs-image'></i> Premium fon</div>
-                <div class="imkon-card-desc">Butun sayt uchun maxsus fon rasmini o'rnating</div>
-            </div>
-            <div class="imkon-toggle {% if settings.premium_bg_on %}on{% endif %}" id="bgToggle" onclick="toggleBg()"></div>
-        </div>
-
-        <div class="imkon-bg-box {% if settings.premium_bg_on %}open{% endif %}" id="bgBox">
-            <div class="imkon-bg-grid" id="bgGrid">
-                {% for bg in backgrounds %}
-                <div class="imkon-bg-item {% if settings.premium_bg_id == bg.id %}active{% endif %}"
-                     data-id="{{ bg.id }}" onclick="selectBg({{ bg.id }}, this)">
-                    <img src="{{ bg.image.url }}" alt="{{ bg.name|default:'fon' }}" loading="lazy">
-                </div>
-                {% empty %}
-                <p class="imkon-bg-empty">Admin hali premium fon yuklamagan.</p>
-                {% endfor %}
-            </div>
-
-            <!-- Sahifalash: 9 tadan ortiq fon bo'lsa avtomatik ko'rinadi -->
-            <div class="imkon-bg-pager" id="bgPager">
-                <button type="button" class="imkon-bg-pager-btn" id="bgPrevBtn" onclick="bgPrevPage()">
-                    <i class='bx bx-chevron-left'></i>
-                </button>
-                <span class="imkon-bg-page-info" id="bgPageInfo"></span>
-                <button type="button" class="imkon-bg-pager-btn" id="bgNextBtn" onclick="bgNextPage()">
-                    <i class='bx bx-chevron-right'></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= 2.5) PREMIUM VIP BOX ================= -->
-    <div class="imkon-card">
-        <div class="imkon-card-head">
-            <div>
-                <div class="imkon-card-title"><i class='bx bxs-crown'></i> Premium VIP box</div>
-                <div class="imkon-card-desc">Yoqsangiz, chatda boshqalar sizning avataringizga bosganda oddiy profil o'rniga maxsus VIP box ochiladi.</div>
-            </div>
-            <div class="imkon-toggle {% if settings.premium_vip_box_on %}on{% endif %}" id="vipBoxToggle" onclick="toggleVipBox()"></div>
-        </div>
-
-        <div class="imkon-vipbox-box {% if settings.premium_vip_box_on %}open{% endif %}" id="vipBoxBox">
-
-            <div class="imkon-vipbox-preview">
-                <img src="https://i.pinimg.com/736x/4e/1c/7b/4e1c7b9b437f08367f2118bd5c544c3a.jpg" alt="VIP box ko'rinishi" loading="lazy">
-            </div>
-
-            <div class="imkon-vipbox-sec-title"><i class='bx bxs-video'></i> VIP box videosini tanlash</div>
-            <div class="imkon-vip-videos-grid">
-                {% for vitem in vip_videos %}
-                <div class="imkon-vip-video-card {% if settings.vip_box_video_id == vitem.id or not settings.vip_box_video and forloop.first %}selected{% endif %}"
-                     onclick="selectVipVideo({{ vitem.id }}, this)">
-                    <div class="imkon-vip-video-thumb">
-                        <video src="{{ vitem.video.url }}" muted playsinline preload="metadata"></video>
-                        <div class="imkon-vip-video-badge"><i class='bx bx-check'></i> Tanlangan</div>
-                    </div>
-                    <div class="imkon-vip-video-title">{{ vitem.title|default:"VIP video" }}</div>
-                </div>
-                {% empty %}
-                <div class="imkon-bg-empty" style="padding:10px 0; font-size:0.8rem; grid-column:1/-1;">Hozircha admin tomonidan boshqa video yuklanmagan.</div>
-                {% endfor %}
-            </div>
-
-            <div class="imkon-vipbox-option">
-                <span>Oxirgi animelarni ko'rsatish</span>
-                <div class="imkon-toggle small {% if settings.vip_box_show_recent_anime %}on{% endif %}" id="vipBoxRecentToggle" onclick="toggleVipBoxRecent()"></div>
-            </div>
-
-            <div class="imkon-vipbox-option">
-                <span>VIP obuna tugash vaqtini ko'rsatish</span>
-                <div class="imkon-toggle small {% if settings.vip_box_show_vip_expire %}on{% endif %}" id="vipBoxExpireToggle" onclick="toggleVipBoxExpire()"></div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ================= 3) PREMIUM MUZIKALAR ================= -->
-    <div class="imkon-card">
-        <div class="imkon-card-head">
-            <div>
-                <div class="imkon-card-title"><i class='bx bxs-music'></i> Premium muzikalar</div>
-                <div class="imkon-card-desc">Musiqa tanlasangiz, u butun sayt bo'ylab (sahifalar orasida ham) ijro bo'lib turadi. Faqat 1 ta musiqa bir vaqtning o'zida ijro bo'ladi.</div>
-            </div>
-            <div class="imkon-toggle {% if settings.premium_music_on %}on{% endif %}" id="musicToggle" onclick="toggleMusic()"></div>
-        </div>
-
-        <div class="imkon-music-box {% if settings.premium_music_on %}open{% endif %}" id="musicBox">
-
-            <div class="imkon-volume-row">
-                <i class='bx bxs-volume-low'></i>
-                <input type="range" id="musicVolume" min="0" max="100"
-                       value="{{ settings.premium_music_volume }}"
-                       oninput="onVolumeInput(this.value)"
-                       onchange="saveVolume(this.value)">
-                <i class='bx bxs-volume-full'></i>
-            </div>
-            <div class="imkon-volume-value"><span id="volumeValueText">{{ settings.premium_music_volume }}</span>%</div>
-
-            <div class="imkon-music-list" id="musicList">
-                {% for m in musics %}
-                <div class="imkon-music-row {% if settings.premium_music_id == m.id and settings.premium_music_on %}playing{% endif %}"
-                     data-music-id="{{ m.id }}">
-                    <span class="imkon-music-name"><i class='bx bxs-disc'></i> {{ m.name }}</span>
-                    <button class="imkon-music-play-btn" onclick="toggleTrack({{ m.id }}, '{{ m.file.url }}', this)">
-                        {% if settings.premium_music_id == m.id and settings.premium_music_on %}
-                        <i class='bx bx-pause'></i>
-                        {% else %}
-                        <i class='bx bx-play'></i>
-                        {% endif %}
-                    </button>
-                </div>
-                {% empty %}
-                <p class="imkon-bg-empty">Admin hali musiqa yuklamagan.</p>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= 4) SO'ROVNOMA ================= -->
-    <div class="imkon-card">
-        <div class="imkon-card-title"><i class='bx bxs-conversation'></i> Premium so'rovnoma</div>
-        <div class="imkon-card-desc">Faqat 1 ta anime nomi taklif qiling. 10 ovoz yig'sa — ANI BEST tomonidan ovozlashtiriladi.</div>
-
-        {% if not my_vote_request %}
-        <div class="imkon-vote-input-row">
-            <input type="text" id="voteNameInput" placeholder="Anime nom kiriting...">
-            <button class="imkon-btn" onclick="submitVoteRequest()">Taklif qilish</button>
-        </div>
-        <p class="imkon-msg" id="voteMsg"></p>
-        {% else %}
-        <p class="imkon-note" style="margin-top:14px;">Siz allaqachon taklif qilgansiz: <b>{{ my_vote_request.name }}</b></p>
-        {% endif %}
-
-        <div class="imkon-vote-list" id="voteList">
-            {% for vr in vote_requests %}
-            <div class="imkon-vote-row" data-req-id="{{ vr.id }}">
+        <!-- ================= 1) OXIRGI VERSIYANI SINAB KO'RISH ================= -->
+        <div class="imkon-card imkon-full" style="--i:1">
+            <div class="imkon-card-head">
                 <div>
-                    <span class="imkon-vote-name">{{ vr.name }}</span>
-                    {% if vr.votes_count >= 10 %}
-                    <span class="imkon-vote-approved"><i class='bx bx-check-circle'></i> ANI BEST tomonidan ovozlashtiriladi</span>
-                    {% endif %}
+                    <div class="imkon-card-title"><i class='bx bxs-rocket ic-rocket'></i> Oxirgi versiyani sinab ko'rish</div>
+                    <div class="imkon-card-desc">Yoqsangiz, bosh sahifaning yangi (beta) versiyasi ochiladi. Sinov muddati tugagach, avtomatik odatdagi sahifaga qaytasiz.</div>
+
+                    <div class="imkon-beta-status {% if beta_home_active %}on{% else %}off{% endif %}" id="betaStatusText">
+                        {% if beta_home_active %}
+                            <i class='bx bx-check-circle'></i> Yoqilgan — Tugash sanasi: <b>{{ beta_expire_local|date:"d.m.Y H:i" }}</b>
+                        {% else %}
+                            <i class='bx bx-x-circle'></i> O'chirilgan
+                        {% endif %}
+                    </div>
                 </div>
-                <div style="display:flex; align-items:center;">
-                    <span class="imkon-vote-count"><span class="vote-count-num">{{ vr.votes_count }}</span> ovoz</span>
-                    <button class="imkon-vote-btn {% if vr.id in voted_ids %}voted{% endif %}"
-                            onclick="voteFor({{ vr.id }}, this)">
-                        {% if vr.id in voted_ids %}Ovoz berildi{% else %}Ovoz berish{% endif %}
+                <div class="imkon-toggle {% if beta_home_active %}on{% endif %}" id="betaToggle" onclick="toggleBetaHome()"></div>
+            </div>
+        </div>
+
+        <!-- ================= 2) PREMIUM FON ================= -->
+        <div class="imkon-card" style="--i:2">
+            <div class="imkon-card-head">
+                <div>
+                    <div class="imkon-card-title"><i class='bx bxs-image ic-float'></i> Premium fon</div>
+                    <div class="imkon-card-desc">Butun sayt uchun maxsus fon rasmini o'rnating</div>
+                </div>
+                <div class="imkon-toggle {% if settings.premium_bg_on %}on{% endif %}" id="bgToggle" onclick="toggleBg()"></div>
+            </div>
+
+            <div class="imkon-bg-box {% if settings.premium_bg_on %}open{% endif %}" id="bgBox">
+              <div class="imkon-collapse-in">
+                <div class="imkon-bg-grid" id="bgGrid">
+                    {% for bg in backgrounds %}
+                    <div class="imkon-bg-item {% if settings.premium_bg_id == bg.id %}active{% endif %}"
+                         data-id="{{ bg.id }}" onclick="selectBg({{ bg.id }}, this)">
+                        <img src="{{ bg.image.url }}" alt="{{ bg.name|default:'fon' }}" loading="lazy" decoding="async">
+                    </div>
+                    {% empty %}
+                    <p class="imkon-bg-empty">Admin hali premium fon yuklamagan.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Sahifalash: 9 tadan ortiq fon bo'lsa avtomatik ko'rinadi -->
+                <div class="imkon-bg-pager" id="bgPager">
+                    <button type="button" class="imkon-bg-pager-btn" id="bgPrevBtn" onclick="bgPrevPage()" aria-label="Oldingi">
+                        <i class='bx bx-chevron-left'></i>
+                    </button>
+                    <span class="imkon-bg-page-info" id="bgPageInfo"></span>
+                    <button type="button" class="imkon-bg-pager-btn" id="bgNextBtn" onclick="bgNextPage()" aria-label="Keyingi">
+                        <i class='bx bx-chevron-right'></i>
                     </button>
                 </div>
+              </div>
             </div>
-            {% empty %}
-            <p class="imkon-vote-empty">Hali hech kim taklif qilmagan.</p>
-            {% endfor %}
         </div>
-    </div>
 
-    <!-- ================= 5) OBUNACHILAR SONI ================= -->
-    <div class="imkon-card">
-        <div class="imkon-card-title"><i class='bx bxs-group'></i> Premium obunachilar soni</div>
-        <p class="imkon-stat-value">{{ premium_count }}</p>
-    </div>
-
-    <!-- ================= 6) TELEGRAM YUKLAB OLISH ================= -->
-    <div class="imkon-card">
-        <div class="imkon-card-head">
-            <div>
-                <div class="imkon-card-title"><i class='bx bxl-telegram'></i> Telegram orqali yuklab olish</div>
-                <div class="imkon-card-desc">Premium/VIP animelarni Telegram orqali yuklab olish (tez orada)</div>
+        <!-- ================= 2.5) PREMIUM VIP BOX ================= -->
+        <div class="imkon-card" style="--i:3">
+            <div class="imkon-card-head">
+                <div>
+                    <div class="imkon-card-title"><i class='bx bxs-crown ic-wiggle'></i> Premium VIP box</div>
+                    <div class="imkon-card-desc">Yoqsangiz, chatda boshqalar sizning avataringizga bosganda oddiy profil o'rniga maxsus VIP box ochiladi.</div>
+                </div>
+                <div class="imkon-toggle {% if settings.premium_vip_box_on %}on{% endif %}" id="vipBoxToggle" onclick="toggleVipBox()"></div>
             </div>
-            <div class="imkon-toggle {% if settings.telegram_download_on %}on{% endif %}" id="tgToggle" onclick="toggleTelegramDownload()"></div>
-        </div>
-    </div>
 
-    <!-- ================= 7) OLDINDAN ANIME SO'RASH ================= -->
-    <div class="imkon-card">
-        <div class="imkon-card-title"><i class='bx bxs-search-alt'></i> Oldindan anime surash</div>
-        <div class="imkon-card-desc">To'xtab qolgan yoki ANI BEST'da hali chiqmagan animeni so'rang (1 marta)</div>
+            <div class="imkon-vipbox-box {% if settings.premium_vip_box_on %}open{% endif %}" id="vipBoxBox">
+              <div class="imkon-collapse-in">
 
-        {% if not my_request %}
-        <div class="imkon-vote-input-row">
-            <input type="text" id="reqNameInput" placeholder="Anime nomini so'rash...">
-            <button class="imkon-btn" onclick="submitAnimeRequest()">So'rash</button>
-        </div>
-        <p class="imkon-msg" id="reqMsg"></p>
-        {% else %}
-        <p class="imkon-note" style="margin-top:14px;">Siz so'ragan anime: <b>{{ my_request.name }}</b></p>
-        {% endif %}
+                <div class="imkon-vipbox-preview">
+                    <img src="https://i.pinimg.com/736x/4e/1c/7b/4e1c7b9b437f08367f2118bd5c544c3a.jpg" alt="VIP box ko'rinishi" loading="lazy" decoding="async">
+                </div>
 
-        <div class="imkon-req-list">
-            {% for r in requested_names %}
-            <div class="imkon-req-row">
-                <span>{{ r.name }}</span>
-                <span class="count">{{ r.total }} chiqarilar</span>
+                <div class="imkon-vipbox-sec-title"><i class='bx bxs-video'></i> VIP box videosini tanlash</div>
+                <div class="imkon-vip-videos-grid">
+                    {% for vitem in vip_videos %}
+                    <div class="imkon-vip-video-card {% if settings.vip_box_video_id == vitem.id or not settings.vip_box_video and forloop.first %}selected{% endif %}"
+                         onclick="selectVipVideo({{ vitem.id }}, this)">
+                        <div class="imkon-vip-video-thumb">
+                            <video src="{{ vitem.video.url }}#t=0.1" muted playsinline preload="metadata"></video>
+                            <div class="imkon-vip-video-badge"><i class='bx bx-check'></i> Tanlangan</div>
+                        </div>
+                        <div class="imkon-vip-video-title">{{ vitem.title|default:"VIP video" }}</div>
+                    </div>
+                    {% empty %}
+                    <div class="imkon-bg-empty" style="padding:10px 0; font-size:0.8rem; grid-column:1/-1;">Hozircha admin tomonidan boshqa video yuklanmagan.</div>
+                    {% endfor %}
+                </div>
+
+                <div class="imkon-vipbox-option">
+                    <span><i class='bx bx-history ic-spin'></i> Oxirgi animelarni ko'rsatish</span>
+                    <div class="imkon-toggle small {% if settings.vip_box_show_recent_anime %}on{% endif %}" id="vipBoxRecentToggle" onclick="toggleVipBoxRecent()"></div>
+                </div>
+
+                <div class="imkon-vipbox-option">
+                    <span><i class='bx bx-time-five ic-pulse'></i> VIP obuna tugash vaqtini ko'rsatish</span>
+                    <div class="imkon-toggle small {% if settings.vip_box_show_vip_expire %}on{% endif %}" id="vipBoxExpireToggle" onclick="toggleVipBoxExpire()"></div>
+                </div>
+
+              </div>
             </div>
-            {% empty %}
-            <p class="imkon-vote-empty">Hali hech kim so'ramagan.</p>
-            {% endfor %}
         </div>
+
+        <!-- ================= 3) PREMIUM MUZIKALAR ================= -->
+        <div class="imkon-card imkon-full" style="--i:4">
+            <div class="imkon-card-head">
+                <div>
+                    <div class="imkon-card-title"><i class='bx bxs-music ic-bounce'></i> Premium muzikalar</div>
+                    <div class="imkon-card-desc">Musiqa tanlasangiz, u butun sayt bo'ylab (sahifalar orasida ham) ijro bo'lib turadi. Faqat 1 ta musiqa bir vaqtning o'zida ijro bo'ladi.</div>
+                </div>
+                <div class="imkon-toggle {% if settings.premium_music_on %}on{% endif %}" id="musicToggle" onclick="toggleMusic()"></div>
+            </div>
+
+            <div class="imkon-music-box {% if settings.premium_music_on %}open{% endif %}" id="musicBox">
+              <div class="imkon-collapse-in">
+
+                <div class="imkon-volume-row">
+                    <i class='bx bxs-volume-low'></i>
+                    <input type="range" id="musicVolume" min="0" max="100"
+                           value="{{ settings.premium_music_volume }}"
+                           oninput="onVolumeInput(this.value)"
+                           onchange="saveVolume(this.value)">
+                    <i class='bx bxs-volume-full'></i>
+                </div>
+                <div class="imkon-volume-value"><span id="volumeValueText">{{ settings.premium_music_volume }}</span>%</div>
+
+                <div class="imkon-music-list" id="musicList">
+                    {% for m in musics %}
+                    <div class="imkon-music-row {% if settings.premium_music_id == m.id and settings.premium_music_on %}playing{% endif %}"
+                         data-music-id="{{ m.id }}">
+                        <span class="imkon-music-name"><i class='bx bxs-disc'></i> {{ m.name }}</span>
+                        <button class="imkon-music-play-btn" onclick="toggleTrack({{ m.id }}, '{{ m.file.url }}', this)">
+                            {% if settings.premium_music_id == m.id and settings.premium_music_on %}
+                            <i class='bx bx-pause'></i>
+                            {% else %}
+                            <i class='bx bx-play'></i>
+                            {% endif %}
+                        </button>
+                    </div>
+                    {% empty %}
+                    <p class="imkon-bg-empty">Admin hali musiqa yuklamagan.</p>
+                    {% endfor %}
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div class="imkon-section" style="--i:5"><i class='bx bxs-group'></i> Hamjamiyat</div>
+
+        <!-- ================= 4) SO'ROVNOMA ================= -->
+        <div class="imkon-card imkon-full" style="--i:6">
+            <div class="imkon-card-title"><i class='bx bxs-conversation ic-sway'></i> Premium so'rovnoma</div>
+            <div class="imkon-card-desc">Faqat 1 ta anime nomi taklif qiling. 10 ovoz yig'sa — ANI BEST tomonidan ovozlashtiriladi.</div>
+
+            {% if not my_vote_request %}
+            <div class="imkon-vote-input-row">
+                <input type="text" id="voteNameInput" placeholder="Anime nom kiriting...">
+                <button class="imkon-btn" onclick="submitVoteRequest()">Taklif qilish</button>
+            </div>
+            <p class="imkon-msg" id="voteMsg"></p>
+            {% else %}
+            <p class="imkon-note" style="margin-top:14px;">Siz allaqachon taklif qilgansiz: <b>{{ my_vote_request.name }}</b></p>
+            {% endif %}
+
+            <div class="imkon-vote-list" id="voteList">
+                {% for vr in vote_requests %}
+                <div class="imkon-vote-row" data-req-id="{{ vr.id }}">
+                    <div>
+                        <span class="imkon-vote-name">{{ vr.name }}</span>
+                        {% if vr.votes_count >= 10 %}
+                        <span class="imkon-vote-approved"><i class='bx bx-check-circle'></i> ANI BEST tomonidan ovozlashtiriladi</span>
+                        {% endif %}
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <span class="imkon-vote-count"><span class="vote-count-num">{{ vr.votes_count }}</span> ovoz</span>
+                        <button class="imkon-vote-btn {% if vr.id in voted_ids %}voted{% endif %}"
+                                onclick="voteFor({{ vr.id }}, this)">
+                            {% if vr.id in voted_ids %}Ovoz berildi{% else %}Ovoz berish{% endif %}
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="imkon-vote-empty">Hali hech kim taklif qilmagan.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ================= 5) OBUNACHILAR SONI ================= -->
+        <div class="imkon-card" style="--i:7">
+            <div class="imkon-card-title"><i class='bx bxs-group ic-pulse'></i> Premium obunachilar soni</div>
+            <p class="imkon-stat-value">{{ premium_count }}</p>
+        </div>
+
+        <!-- ================= 6) TELEGRAM YUKLAB OLISH ================= -->
+        <div class="imkon-card" style="--i:8">
+            <div class="imkon-card-head">
+                <div>
+                    <div class="imkon-card-title"><i class='bx bxl-telegram ic-float'></i> Telegram orqali yuklab olish</div>
+                    <div class="imkon-card-desc">Premium/VIP animelarni Telegram orqali yuklab olish (tez orada)</div>
+                </div>
+                <div class="imkon-toggle {% if settings.telegram_download_on %}on{% endif %}" id="tgToggle" onclick="toggleTelegramDownload()"></div>
+            </div>
+        </div>
+
+        <!-- ================= 7) OLDINDAN ANIME SO'RASH ================= -->
+        <div class="imkon-card imkon-full" style="--i:9">
+            <div class="imkon-card-title"><i class='bx bxs-search-alt ic-wiggle'></i> Oldindan anime surash</div>
+            <div class="imkon-card-desc">To'xtab qolgan yoki ANI BEST'da hali chiqmagan animeni so'rang (1 marta)</div>
+
+            {% if not my_request %}
+            <div class="imkon-vote-input-row">
+                <input type="text" id="reqNameInput" placeholder="Anime nomini so'rash...">
+                <button class="imkon-btn" onclick="submitAnimeRequest()">So'rash</button>
+            </div>
+            <p class="imkon-msg" id="reqMsg"></p>
+            {% else %}
+            <p class="imkon-note" style="margin-top:14px;">Siz so'ragan anime: <b>{{ my_request.name }}</b></p>
+            {% endif %}
+
+            <div class="imkon-req-list">
+                {% for r in requested_names %}
+                <div class="imkon-req-row">
+                    <span>{{ r.name }}</span>
+                    <span class="count">{{ r.total }} chiqarilar</span>
+                </div>
+                {% empty %}
+                <p class="imkon-vote-empty">Hali hech kim so'ramagan.</p>
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
 
     {% endif %}
@@ -1410,6 +1264,8 @@ function selectBg(id, el) {
 
 /* ============================================
    PREMIUM FON — SAHIFALASH (9 tadan)
+   Oxirgi sahifada bo'sh kataklar qo'shiladi,
+   shuning uchun box o'lchami o'zgarmaydi.
    ============================================ */
 const BG_PER_PAGE = 9;
 let bgItems = [];
@@ -1429,19 +1285,44 @@ function initBgPager() {
     });
     bgPage = activeIndex >= 0 ? Math.floor(activeIndex / BG_PER_PAGE) + 1 : 1;
 
-    renderBgPage();
+    renderBgPage(false);
 }
 
-function renderBgPage() {
+function renderBgPage(animate) {
+    const grid = document.getElementById('bgGrid');
     const pager = document.getElementById('bgPager');
     const info = document.getElementById('bgPageInfo');
     const prevBtn = document.getElementById('bgPrevBtn');
     const nextBtn = document.getElementById('bgNextBtn');
 
+    let shown = 0;
     bgItems.forEach((item, i) => {
         const page = Math.floor(i / BG_PER_PAGE) + 1;
-        item.style.display = (page === bgPage) ? '' : 'none';
+        const visible = (page === bgPage);
+        item.style.display = visible ? '' : 'none';
+        if (visible) shown++;
     });
+
+    if (grid) {
+        // eski bo'sh kataklarni tozalash
+        grid.querySelectorAll('.imkon-bg-ph').forEach(p => p.remove());
+
+        // 9 tadan ortiq bo'lsa — har sahifa bir xil balandlikda bo'lishi uchun to'ldiramiz
+        if (bgItems.length > BG_PER_PAGE) {
+            for (let k = shown; k < BG_PER_PAGE; k++) {
+                const ph = document.createElement('div');
+                ph.className = 'imkon-bg-ph';
+                ph.setAttribute('aria-hidden', 'true');
+                grid.appendChild(ph);
+            }
+        }
+
+        if (animate) {
+            grid.classList.remove('page-anim');
+            void grid.offsetWidth;
+            grid.classList.add('page-anim');
+        }
+    }
 
     if (!pager) return;
 
@@ -1458,14 +1339,14 @@ function renderBgPage() {
 function bgPrevPage() {
     if (bgPage > 1) {
         bgPage--;
-        renderBgPage();
+        renderBgPage(true);
     }
 }
 
 function bgNextPage() {
     if (bgPage < bgTotalPages) {
         bgPage++;
-        renderBgPage();
+        renderBgPage(true);
     }
 }
 
@@ -1599,7 +1480,6 @@ function submitAnimeRequest() {
 }
 
 /* ============================================
-/* ============================================
    PREMIUM MUZIKA
    ============================================ */
 let previewAudio = window.globalBgAudio || new Audio();
@@ -1610,6 +1490,7 @@ if (document.getElementById('musicVolume')) {
 
 document.addEventListener('DOMContentLoaded', () => {
     initBgPager();
+    initToggleIconAnimations();
 
     const playingRow = document.querySelector('.imkon-music-row.playing');
     if (playingRow) {
@@ -1717,6 +1598,44 @@ function toggleTrack(id, url, btn) {
             document.getElementById('musicToggle').classList.add('on');
             document.getElementById('musicBox').classList.add('open');
         }
+    });
+}
+
+/* ============================================
+   ON/OFF PAYTIDA ICON ANIMATSIYASI
+   Toggle holati o'zgarganda kartadagi icon "pop"
+   bo'ladi (mavjud funksiyalarga tegmaydi).
+   ============================================ */
+function playIconAnim(icon, isOn) {
+    if (!icon) return;
+    icon.classList.remove('icon-on', 'icon-off');
+    void icon.offsetWidth;
+    icon.classList.add(isOn ? 'icon-on' : 'icon-off');
+    setTimeout(() => icon.classList.remove('icon-on', 'icon-off'), 800);
+}
+
+function initToggleIconAnimations() {
+    if (!window.MutationObserver) return;
+
+    document.querySelectorAll('.imkon-toggle').forEach(toggle => {
+        let wasOn = toggle.classList.contains('on');
+
+        new MutationObserver(() => {
+            const isOn = toggle.classList.contains('on');
+            if (isOn === wasOn) return;
+            wasOn = isOn;
+
+            let icon;
+            if (toggle.classList.contains('small')) {
+                // VIP box ichidagi kichik toggle — o'z yonidagi icon
+                const opt = toggle.closest('.imkon-vipbox-option');
+                icon = opt ? opt.querySelector('span i') : null;
+            } else {
+                const card = toggle.closest('.imkon-card');
+                icon = card ? card.querySelector('.imkon-card-title i') : null;
+            }
+            playIconAnim(icon, isOn);
+        }).observe(toggle, { attributes: true, attributeFilter: ['class'] });
     });
 }
 </script>
