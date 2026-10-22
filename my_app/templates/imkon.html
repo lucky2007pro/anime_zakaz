@@ -681,6 +681,433 @@
         background: var(--accent);
         color: #000;
     }
+
+
+    /* ===== BESTMEDIA: responsive polish + subtle animations ===== */
+    .imkon-wrap {
+        width: min(100% - 32px, 980px);
+        padding: 18px 0 44px;
+        animation: imkanPageIn .55s cubic-bezier(.2,.75,.25,1) both;
+    }
+
+    .imkon-header {
+        position: relative;
+        padding: clamp(22px, 4vw, 38px) 18px;
+        margin-bottom: 24px;
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        background:
+            radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 65%),
+            var(--glass-bg);
+        overflow: hidden;
+    }
+
+    .imkon-header::before {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        top: -125px;
+        right: -55px;
+        border-radius: 50%;
+        background: var(--accent);
+        opacity: .08;
+        filter: blur(8px);
+        pointer-events: none;
+    }
+
+    .imkon-header h1 {
+        position: relative;
+        font-size: clamp(1.45rem, 3.5vw, 2rem);
+        line-height: 1.25;
+        letter-spacing: -.035em;
+    }
+
+    .imkon-header p {
+        position: relative;
+        max-width: 560px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .imkon-card,
+    .imkon-locked {
+        position: relative;
+        min-width: 0;
+        box-shadow: 0 8px 28px rgba(0,0,0,.10);
+        transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+        animation: imkanCardIn .55s both;
+    }
+
+    .imkon-card {
+        padding: clamp(16px, 2.8vw, 24px);
+        border-radius: 20px;
+        scroll-margin-top: 90px;
+    }
+
+    .imkon-card:hover {
+        border-color: color-mix(in srgb, var(--accent) 40%, var(--glass-border));
+        box-shadow: 0 14px 34px rgba(0,0,0,.16);
+    }
+
+    .imkon-card-head {
+        min-width: 0;
+    }
+
+    .imkon-card-head > div:first-child {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .imkon-card-title {
+        line-height: 1.4;
+    }
+
+    .imkon-card-desc {
+        max-width: 700px;
+        overflow-wrap: anywhere;
+    }
+
+    .imkon-toggle {
+        outline: none;
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 25%, transparent);
+    }
+
+    .imkon-toggle:hover {
+        box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 14%, transparent);
+    }
+
+    .imkon-toggle:focus-visible,
+    .imkon-bg-pager-btn:focus-visible,
+    .imkon-btn:focus-visible,
+    .imkon-vote-btn:focus-visible,
+    .imkon-music-play-btn:focus-visible,
+    .imkon-bg-item:focus-visible,
+    .imkon-vip-video-card:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+    }
+
+    .imkon-bg-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 12px;
+    }
+
+    .imkon-bg-item {
+        background: rgba(255,255,255,.04);
+        box-shadow: 0 5px 16px rgba(0,0,0,.16);
+    }
+
+    .imkon-bg-item:hover {
+        transform: translateY(-3px) scale(1.015);
+    }
+
+    .imkon-bg-item img {
+        transition: transform .35s ease, filter .35s ease;
+    }
+
+    .imkon-bg-item:hover img {
+        transform: scale(1.05);
+    }
+
+    .imkon-vipbox-preview {
+        transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .imkon-vipbox-preview:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255,193,7,.18);
+    }
+
+    .imkon-vip-video-card {
+        min-width: 0;
+    }
+
+    .imkon-vip-video-thumb video {
+        object-fit: cover;
+    }
+
+    .imkon-vote-input-row input {
+        min-width: 0;
+        width: 100%;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .imkon-vote-input-row input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 13%, transparent);
+    }
+
+    .imkon-btn,
+    .imkon-vote-btn,
+    .imkon-music-play-btn,
+    .imkon-bg-pager-btn {
+        -webkit-tap-highlight-color: transparent;
+        transition: transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+    }
+
+    .imkon-btn:hover:not(:disabled),
+    .imkon-vote-btn:hover,
+    .imkon-music-play-btn:hover,
+    .imkon-bg-pager-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+    }
+
+    .imkon-vote-row,
+    .imkon-req-row,
+    .imkon-music-row {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        transition: border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+
+    .imkon-vote-row:hover,
+    .imkon-req-row:hover {
+        border-color: color-mix(in srgb, var(--accent) 25%, var(--glass-border));
+    }
+
+    .imkon-vote-row > div,
+    .imkon-music-name {
+        min-width: 0;
+    }
+
+    .imkon-music-name {
+        overflow-wrap: anywhere;
+    }
+
+    .imkon-music-row.playing {
+        box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    .imkon-msg.show {
+        animation: imkanMessageIn .25s ease both;
+    }
+
+    .imkon-locked {
+        padding: clamp(30px, 6vw, 56px) 22px;
+        background:
+            radial-gradient(ellipse at 50% 0%, rgba(251,191,36,.09), transparent 70%),
+            var(--glass-bg);
+    }
+
+    .imkon-locked i {
+        animation: imkanFloat 3s ease-in-out infinite;
+    }
+
+    .imkon-locked a {
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+        box-shadow: 0 7px 20px color-mix(in srgb, var(--accent) 18%, transparent);
+    }
+
+    .imkon-locked a:hover {
+        transform: translateY(-2px);
+        background: #fff;
+    }
+
+    @keyframes imkanPageIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes imkanCardIn {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes imkanMessageIn {
+        from { opacity: 0; transform: translateY(-4px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes imkanFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    @media (min-width: 1100px) {
+        .imkon-wrap { width: min(100% - 48px, 980px); }
+        .imkon-card { margin-bottom: 20px; }
+    }
+
+    @media (max-width: 640px) {
+        .imkon-wrap {
+            width: calc(100% - 22px);
+            padding-top: 10px;
+            padding-bottom: 28px;
+        }
+
+        .imkon-header {
+            border-radius: 19px;
+            margin-bottom: 14px;
+            padding: 24px 14px;
+        }
+
+        .imkon-card {
+            padding: 16px;
+            margin-bottom: 13px;
+            border-radius: 17px;
+        }
+
+        .imkon-card-head {
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .imkon-card-title {
+            font-size: .96rem;
+            gap: 8px;
+        }
+
+        .imkon-card-title i {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .imkon-card-desc {
+            font-size: .79rem;
+            line-height: 1.55;
+        }
+
+        .imkon-toggle {
+            width: 48px;
+            height: 28px;
+        }
+
+        .imkon-toggle::after {
+            width: 20px;
+            height: 20px;
+        }
+
+        .imkon-toggle.on::after {
+            transform: translateX(20px);
+        }
+
+        .imkon-toggle.small {
+            width: 40px;
+            height: 23px;
+        }
+
+        .imkon-toggle.small::after {
+            width: 17px;
+            height: 17px;
+        }
+
+        .imkon-toggle.small.on::after {
+            transform: translateX(17px);
+        }
+
+        .imkon-bg-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .imkon-vip-videos-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .imkon-vip-video-card {
+            padding: 7px;
+        }
+
+        .imkon-vote-input-row {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .imkon-vote-input-row input,
+        .imkon-btn {
+            min-height: 44px;
+            border-radius: 11px;
+        }
+
+        .imkon-vote-row {
+            align-items: flex-start;
+            padding: 11px;
+        }
+
+        .imkon-vote-row > div:last-child {
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 7px;
+        }
+
+        .imkon-vote-count {
+            margin-right: 0;
+            font-size: .74rem;
+        }
+
+        .imkon-vote-btn {
+            padding: 8px 11px;
+            font-size: .73rem;
+        }
+
+        .imkon-req-row {
+            align-items: flex-start;
+            gap: 8px;
+            padding: 11px;
+            font-size: .82rem;
+        }
+
+        .imkon-req-row span:last-child {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .imkon-music-row {
+            padding: 10px 11px;
+        }
+
+        .imkon-music-name {
+            font-size: .82rem;
+            gap: 7px;
+        }
+
+        .imkon-music-play-btn {
+            width: 40px;
+            height: 40px;
+        }
+
+        .imkon-volume-row {
+            gap: 8px;
+        }
+
+        .imkon-stat-value {
+            font-size: 1.8rem;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .imkon-wrap { width: calc(100% - 16px); }
+        .imkon-card { padding: 13px; }
+        .imkon-bg-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+        .imkon-vote-row { flex-direction: column; }
+        .imkon-vote-row > div:last-child { width: 100%; justify-content: space-between; }
+        .imkon-req-row { flex-direction: column; }
+        .imkon-req-row span:last-child { text-align: left; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .imkon-wrap,
+        .imkon-card,
+        .imkon-locked i,
+        .imkon-msg.show {
+            animation: none !important;
+        }
+
+        .imkon-card,
+        .imkon-bg-item,
+        .imkon-bg-item img,
+        .imkon-toggle,
+        .imkon-btn,
+        .imkon-vote-btn,
+        .imkon-music-play-btn,
+        .imkon-bg-pager-btn,
+        .imkon-vipbox-preview {
+            transition: none !important;
+        }
+    }
+
 </style>
 {% endblock %}
 
