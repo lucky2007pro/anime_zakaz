@@ -72,28 +72,16 @@
         -webkit-tap-highlight-color: transparent;
     }
 
+    /* Icon animatsiyasi olib tashlandi */
     .category-tab-btn i {
         font-size: 1.3rem;
         display: inline-block;
-        transition: transform .3s ease;
     }
 
     .category-tab-btn:not(.active):hover { color: var(--text-light); background: rgba(255,255,255,0.05); }
-    .category-tab-btn:not(.active):hover i { transform: scale(1.18) rotate(-6deg); }
     .category-tab-btn:active { transform: scale(.96); }
 
     .category-tab-btn.active { color: #fff; }
-
-    .category-tab-btn.active[data-anim="daily"] i { animation: iconPop .7s cubic-bezier(.34, 1.56, .64, 1), iconPulse 2.6s ease-in-out .8s infinite; }
-    .category-tab-btn.active[data-anim="all"]   i { animation: iconFlip .7s cubic-bezier(.34, 1.56, .64, 1), iconFloat 2.4s ease-in-out .8s infinite; }
-    .category-tab-btn.active[data-anim="film"]  i { animation: iconClap .7s cubic-bezier(.34, 1.56, .64, 1), iconWiggle 2.8s ease-in-out .8s infinite; }
-
-    @keyframes iconPop   { 0% { transform: scale(.3) rotate(-40deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
-    @keyframes iconPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
-    @keyframes iconFlip  { 0% { transform: rotateY(-180deg) scale(.4); opacity: 0; } 100% { transform: rotateY(0) scale(1); opacity: 1; } }
-    @keyframes iconFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-    @keyframes iconClap  { 0% { transform: rotate(-60deg) scale(.4); opacity: 0; } 100% { transform: rotate(0) scale(1); opacity: 1; } }
-    @keyframes iconWiggle { 0%, 80%, 100% { transform: rotate(0); } 85% { transform: rotate(-14deg); } 90% { transform: rotate(10deg); } 95% { transform: rotate(-6deg); } }
 
     /* ================= PANELS ================= */
     .category-panel { display: none; }
@@ -115,6 +103,7 @@
         padding: 24px 5% 50px;
         overflow-x: hidden;
         overflow-x: clip; /* skroll konteyner yaratmaydi */
+        overflow-anchor: none; /* panel almashganda brauzer skrollni siljitmasin */
     }
 
     .cards-grid {
@@ -403,7 +392,6 @@
 
     @media (prefers-reduced-motion: reduce) {
         .rec-toast { transition: none !important; }
-        .category-tab-btn i,
         .category-panel,
         .card-wrapper,
         .tab-indicator,
@@ -499,7 +487,6 @@
         .category-panel.leave-right { animation-duration: .12s; }
 
         .category-tab-btn:active { transform: none; }
-        .category-tab-btn:not(.active):hover i { transform: none; }
     }
     @keyframes cardInFlat { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes panelInRightFlat { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
@@ -548,13 +535,13 @@
     <div class="category-tabs-wrapper">
         <div class="category-tabs" id="categoryTabs">
             <span class="tab-indicator" id="tabIndicator"></span>
-            <button class="category-tab-btn active" data-target="panel-daily" data-anim="daily" onclick="switchCategoryTab(this)">
+            <button class="category-tab-btn active" data-target="panel-daily" onclick="switchCategoryTab(this)">
                 <i class='bx bx-calendar-star'></i> Kunlik
             </button>
-            <button class="category-tab-btn" data-target="panel-all" data-anim="all" onclick="switchCategoryTab(this)">
+            <button class="category-tab-btn" data-target="panel-all" onclick="switchCategoryTab(this)">
                 <i class='bx bx-collection'></i> Barcha
             </button>
-            <button class="category-tab-btn" data-target="panel-film" data-anim="film" onclick="switchCategoryTab(this)">
+            <button class="category-tab-btn" data-target="panel-film" onclick="switchCategoryTab(this)">
                 <i class='bx bx-movie-play'></i> Film
             </button>
         </div>
@@ -703,8 +690,6 @@
     ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (ev) {
         document.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false });
     });
-    /* DIQQAT: document'dagi touchmove (passive:false) olib tashlandi — aynan shu skrollni qotirardi.
-       Pinch-zoom'ni endi CSS "touch-action: pan-x pan-y" to'xtatadi. */
 })();
 </script>
 
@@ -730,6 +715,17 @@
         ANIM_CLASSES.forEach(function (c) { p.classList.remove(c); });
     }
 
+    /* Sahifani darhol eng tepaga (kartalar boshiga) qaytarish — barcha holatda ishlaydi */
+    function scrollToTopNow() {
+        var de = document.documentElement;
+        var prev = de.style.scrollBehavior;
+        de.style.scrollBehavior = 'auto'; /* smooth scroll bo'lsa ham darhol o'tsin */
+        window.scrollTo(0, 0);
+        de.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+        de.style.scrollBehavior = prev;
+    }
+
     function goTo(idx) {
         if (idx === current || idx < 0 || idx >= tabs.length) return;
 
@@ -750,6 +746,9 @@
         current = idx;
         moveIndicator();
 
+        /* Bo'lim almashishi bilan sahifa boshiga qaytadi */
+        scrollToTopNow();
+
         oldP.classList.add(dir > 0 ? 'leave-left' : 'leave-right');
 
         timer1 = setTimeout(function () {
@@ -757,6 +756,10 @@
             oldP.classList.remove('active');
 
             newP.classList.add('active', dir > 0 ? 'enter-right' : 'enter-left');
+
+            /* Yangi panel ko'ringandan keyin ham tepada ekanligiga ishonch hosil qilamiz */
+            scrollToTopNow();
+            requestAnimationFrame(scrollToTopNow);
 
             /* Faqat ekranga sig'adigan dastlabki kartalarni qayta animatsiya qilamiz */
             var cards = newP.querySelectorAll('.card-wrapper');
