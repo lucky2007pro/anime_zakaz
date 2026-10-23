@@ -72,7 +72,6 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* Icon animatsiyasi olib tashlandi */
     .category-tab-btn i {
         font-size: 1.3rem;
         display: inline-block;
@@ -121,6 +120,9 @@
         animation: cardIn .55s cubic-bezier(.22, 1, .36, 1) both;
         animation-delay: calc(min(var(--i, 0), 12) * 45ms + 120ms);
         -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none; /* uzoq bosganda brauzer menyusi chiqmasin */
+        -webkit-user-select: none;
+        user-select: none;
     }
     @keyframes cardIn { from { opacity: 0; transform: translateY(22px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
@@ -133,7 +135,7 @@
         cursor: pointer;
         background: var(--bg-surface);
         box-shadow: 0 10px 28px rgba(0,0,0,0.4);
-        transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease;
+        transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease, filter .2s ease;
         contain: layout paint style;
     }
 
@@ -143,7 +145,11 @@
         object-fit: cover;
         display: block;
         transition: transform .6s cubic-bezier(.22, 1, .36, 1);
+        -webkit-user-drag: none;
     }
+
+    /* Uzoq bosilayotganda (panel ochilishidan oldin) ozgina qorayadi */
+    .card-wrapper.pressing .anime-card { filter: brightness(.78); }
 
     /* Faqat sichqoncha bor qurilmalarda hover zoom */
     @media (hover: hover) and (pointer: fine) {
@@ -238,6 +244,53 @@
     }
     .top-badge-episode i { font-size: 0.95rem; }
 
+    /* ================= O'NG YUQORI BURCHAK: TOJ + TAVSIYA TUGMASI ================= */
+    .card-corner {
+        position: absolute;
+        top: 9px; right: 9px;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .rec-info-btn {
+        position: relative;
+        width: 30px; height: 30px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.28);
+        background: rgba(10, 10, 16, 0.62);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+        transition: transform .25s cubic-bezier(.22, 1, .36, 1), background .25s ease, border-color .25s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .rec-info-btn i {
+        font-size: 1.2rem;
+        line-height: 1;
+        color: var(--accent, #ff003c);
+        filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent, #ff003c) 60%, transparent));
+    }
+    .rec-info-btn:active { transform: scale(.88); }
+    .rec-info-btn:focus-visible { outline: 2px solid var(--accent, #ff003c); outline-offset: 2px; }
+
+    @media (hover: hover) and (pointer: fine) {
+        .rec-info-btn:hover {
+            transform: scale(1.12);
+            background: var(--accent, #ff003c);
+            border-color: transparent;
+        }
+        .rec-info-btn:hover i { color: #fff; filter: none; }
+    }
+
     /* ================= VIP ================= */
     .anime-card.is-vip {
         box-shadow: 0 0 0 1.5px rgba(251,191,36,.75), 0 10px 28px rgba(251,191,36,.18);
@@ -249,9 +302,7 @@
     }
 
     .vip-badge {
-        position: absolute;
-        top: 9px; right: 9px;
-        z-index: 5;
+        position: relative;
         width: 34px; height: 34px;
         display: flex;
         align-items: center;
@@ -314,7 +365,7 @@
         opacity: 0.4;
     }
 
-    /* ================= ANIME TAVSIYA (faqat desktop) ================= */
+    /* ================= ANIME TAVSIYA (faqat desktop pastki tugma) ================= */
     .rec-dock {
         position: fixed;
         left: 0; right: 0;
@@ -390,8 +441,386 @@
         text-transform: uppercase;
     }
 
+    /* =====================================================================
+       TAVSIYA PANEL — umumiy overlay
+       ===================================================================== */
+    .tp-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        background: rgba(6, 6, 10, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .3s ease, visibility .3s;
+    }
+    .tp-overlay.show { opacity: 1; visibility: visible; }
+
+    /* Bosilgan karta blur ustida aniq ko'rinib turadi */
+    .card-wrapper.rec-focus { position: relative; z-index: 2001; }
+
+    body.tp-lock { overflow: hidden; }
+
+    /* Umumiy qator (ustun) uslubi — ikkala panel uchun asos */
+    .tp-note {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 14px;
+        border-radius: 14px;
+        background: rgba(251, 191, 36, 0.12);
+        border: 1px solid rgba(251, 191, 36, 0.32);
+        color: #fde68a;
+        font-size: 0.8rem;
+        font-weight: 700;
+        line-height: 1.35;
+        max-height: 0;
+        margin-top: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        opacity: 0;
+        overflow: hidden;
+        border-width: 0;
+        transition: max-height .3s ease, opacity .25s ease, margin .3s ease, padding .3s ease;
+    }
+    .tp-note i { font-size: 1.2rem; color: #fbbf24; flex-shrink: 0; }
+    .tp-note.show {
+        max-height: 80px;
+        opacity: 1;
+        margin-top: 12px;
+        padding-top: 11px;
+        padding-bottom: 11px;
+        border-width: 1px;
+    }
+
+    /* =====================================================================
+       1) DESKTOP: o'ng tomondan chiqadigan vertikal panel (drawer)
+       ===================================================================== */
+    .tpd {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        bottom: 16px;
+        z-index: 2002;
+        width: 400px;
+        max-width: calc(100vw - 32px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 28px;
+        background: rgba(16, 16, 24, 0.92);
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65),
+                    0 0 60px color-mix(in srgb, var(--accent, #ff003c) 12%, transparent);
+        color: #fff;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(40px) scale(.97);
+        transition: opacity .3s ease, transform .45s cubic-bezier(.22, 1, .36, 1), visibility .3s;
+    }
+    .tpd.show { opacity: 1; visibility: visible; transform: translateX(0) scale(1); }
+
+    .tpd-hero {
+        position: relative;
+        flex-shrink: 0;
+        padding: 22px 22px 20px;
+        overflow: hidden;
+    }
+    .tpd-hero-bg {
+        position: absolute;
+        inset: -30px;
+        background-size: cover;
+        background-position: center;
+        filter: blur(32px) saturate(150%) brightness(.55);
+        transform: scale(1.2);
+    }
+    .tpd-hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(16,16,24,0.1) 0%, rgba(16,16,24,0.92) 100%);
+    }
+    .tpd-hero > * { position: relative; z-index: 1; }
+
+    .tpd-close {
+        position: absolute !important;
+        top: 14px;
+        right: 14px;
+        width: 36px; height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 50%;
+        background: rgba(0,0,0,0.35);
+        color: #fff;
+        cursor: pointer;
+        transition: background .2s ease, transform .2s ease;
+    }
+    .tpd-close i { font-size: 1.35rem; }
+    .tpd-close:hover { background: rgba(255,255,255,0.18); transform: rotate(90deg); }
+    .tpd-close:focus-visible { outline: 2px solid var(--accent, #ff003c); outline-offset: 2px; }
+
+    .tpd-label {
+        margin: 0 0 14px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: rgba(255,255,255,0.7);
+    }
+
+    .tpd-anime {
+        display: flex;
+        align-items: flex-end;
+        gap: 16px;
+    }
+    .tpd-poster {
+        flex-shrink: 0;
+        width: 96px;
+        aspect-ratio: 2 / 3;
+        border-radius: 14px;
+        object-fit: cover;
+        background: #1c1c28;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+        border: 1px solid rgba(255,255,255,0.14);
+    }
+    .tpd-info { min-width: 0; padding-bottom: 4px; }
+    .tpd-name {
+        margin: 0 0 8px;
+        font-size: 1.2rem;
+        font-weight: 900;
+        line-height: 1.25;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .tpd-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tpd-chip {
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.12);
+        font-size: 0.7rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .tpd-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 14px 16px 18px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.2) transparent;
+    }
+    .tpd-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .tpd-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        text-align: left;
+        cursor: pointer;
+        transition: background .2s ease, border-color .2s ease, transform .25s cubic-bezier(.22, 1, .36, 1);
+    }
+    .tpd-item-ic {
+        flex-shrink: 0;
+        width: 46px; height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--accent, #ff003c) 16%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent, #ff003c) 35%, transparent);
+        transition: background .2s ease, border-color .2s ease;
+    }
+    .tpd-item-ic i { font-size: 1.5rem; color: var(--accent, #ff003c); transition: color .2s ease; }
+    .tpd-item-tx { flex: 1; min-width: 0; }
+    .tpd-item-tx b { display: block; font-size: 0.94rem; font-weight: 800; }
+    .tpd-item-tx span {
+        display: block;
+        margin-top: 2px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: var(--text-dim, #9a9aa8);
+    }
+    .tpd-item-go { font-size: 1.3rem; color: rgba(255,255,255,0.35); transition: transform .25s ease, color .2s ease; }
+
+    .tpd-item:hover {
+        background: rgba(255,255,255,0.08);
+        border-color: color-mix(in srgb, var(--accent, #ff003c) 45%, transparent);
+        transform: translateX(-3px);
+    }
+    .tpd-item:hover .tpd-item-ic { background: var(--accent, #ff003c); border-color: transparent; }
+    .tpd-item:hover .tpd-item-ic i { color: #fff; }
+    .tpd-item:hover .tpd-item-go { color: #fff; transform: translateX(3px); }
+    .tpd-item:active { transform: scale(.98); }
+    .tpd-item:focus-visible { outline: 2px solid var(--accent, #ff003c); outline-offset: 2px; }
+
+    .tpd-foot {
+        flex-shrink: 0;
+        padding: 12px 22px 16px;
+        border-top: 1px solid rgba(255,255,255,0.07);
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--text-dim, #8a8a98);
+        text-align: center;
+    }
+
+    /* =====================================================================
+       2) MOBIL: pastdan chiqadigan sheet (alohida dizayn)
+       ===================================================================== */
+    .tpm {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        z-index: 2002;
+        display: none;
+        flex-direction: column;
+        max-height: 86vh;
+        border-radius: 26px 26px 0 0;
+        background: #14141d;
+        border-top: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 -16px 50px rgba(0,0,0,0.6);
+        color: #fff;
+        padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+        transform: translateY(105%);
+        visibility: hidden;
+        transition: transform .38s cubic-bezier(.22, 1, .36, 1), visibility .38s;
+        will-change: transform;
+    }
+    .tpm.show { transform: translateY(0); visibility: visible; }
+
+    .tpm-drag { flex-shrink: 0; touch-action: none; }
+    .tpm-handle {
+        width: 42px; height: 5px;
+        margin: 10px auto 6px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.25);
+    }
+    .tpm-head {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 8px 16px 14px;
+    }
+    .tpm-poster {
+        flex-shrink: 0;
+        width: 54px;
+        aspect-ratio: 2 / 3;
+        border-radius: 10px;
+        object-fit: cover;
+        background: #1c1c28;
+        border: 1px solid rgba(255,255,255,0.12);
+    }
+    .tpm-info { flex: 1; min-width: 0; }
+    .tpm-name {
+        margin: 0 0 3px;
+        font-size: 1rem;
+        font-weight: 900;
+        line-height: 1.25;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .tpm-meta {
+        margin: 0;
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--text-dim, #9a9aa8);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .tpm-close {
+        flex-shrink: 0;
+        width: 36px; height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .tpm-close i { font-size: 1.35rem; }
+    .tpm-close:active { transform: scale(.9); }
+
+    .tpm-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 0 12px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .tpm-list { display: flex; flex-direction: column; }
+
+    .tpm-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        padding: 13px 8px;
+        border: none;
+        border-radius: 16px;
+        background: transparent;
+        color: #fff;
+        text-align: left;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .tpm-item + .tpm-item { border-top: 1px solid rgba(255,255,255,0.06); border-radius: 0 0 16px 16px; }
+    .tpm-item:active { background: rgba(255,255,255,0.07); }
+    .tpm-item-ic {
+        flex-shrink: 0;
+        width: 44px; height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--accent, #ff003c) 18%, transparent);
+    }
+    .tpm-item-ic i { font-size: 1.45rem; color: var(--accent, #ff003c); }
+    .tpm-item-tx { flex: 1; min-width: 0; }
+    .tpm-item-tx b { display: block; font-size: 0.95rem; font-weight: 800; }
+    .tpm-item-tx span {
+        display: block;
+        margin-top: 2px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: var(--text-dim, #9a9aa8);
+    }
+    .tpm-item-go { font-size: 1.3rem; color: rgba(255,255,255,0.3); }
+    .tpm .tp-note { margin-left: 12px; margin-right: 12px; }
+    .tpm .tp-note.show { margin-top: 10px; }
+
+    /* ---- Qurilmaga qarab bittasi ko'rinadi ---- */
+    @media (max-width: 768px) {
+        .tpd { display: none !important; }
+        .tpm { display: flex; }
+        /* mobilda og'ir blur yo'q */
+        .tp-overlay {
+            background: rgba(6, 6, 10, 0.72);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+    }
+    @media (min-width: 769px) {
+        .tpm { display: none !important; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
         .rec-toast { transition: none !important; }
+        .tp-overlay, .tpd, .tpm, .tp-note, .tpd-item, .tpd-item-go, .tpd-close { transition: none !important; }
         .category-panel,
         .card-wrapper,
         .tab-indicator,
@@ -442,8 +871,11 @@
         .category-tab-btn { font-size: 0.72rem; padding: 10px 4px; gap: 5px; }
         .category-tab-btn i { font-size: 1.05rem; }
         .top-badge-group { top: 8px; left: 8px; }
-        .vip-badge { top: 7px; right: 7px; width: 30px; height: 30px; border-radius: 10px; }
+        .card-corner { top: 7px; right: 7px; gap: 6px; }
+        .vip-badge { width: 30px; height: 30px; border-radius: 10px; }
         .vip-badge i { font-size: 1.05rem; }
+        .rec-info-btn { width: 28px; height: 28px; }
+        .rec-info-btn i { font-size: 1.1rem; }
     }
 
     /* ===== MOBIL: lag yo'q — gold effekt, blur, zoom, og'ir soyalar o'chirilgan ===== */
@@ -476,6 +908,11 @@
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
         }
+        .rec-info-btn {
+            background: rgba(10,10,16,0.8);
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
 
         .card-wrapper { animation-name: cardInFlat; }
         /* faqat birinchi 8 ta karta animatsiya qiladi */
@@ -487,6 +924,9 @@
         .category-panel.leave-right { animation-duration: .12s; }
 
         .category-tab-btn:active { transform: none; }
+
+        /* uzoq bosish effekti mobilda ham ishlashi uchun */
+        .card-wrapper.pressing .anime-card { filter: brightness(.78); }
     }
     @keyframes cardInFlat { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes panelInRightFlat { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
@@ -554,12 +994,17 @@
             <div class="cards-grid">
                 {% for anime in daily_movies %}
                 {% if anime.id %}
-                <a class="card-wrapper" style="--i: {{ forloop.counter0 }};" href="{% url 'movie_detail' anime.id %}">
+                <a class="card-wrapper" style="--i: {{ forloop.counter0 }};" href="{% url 'movie_detail' anime.id %}" data-anime-id="{{ anime.id }}" data-anime-title="{{ anime.title }}">
                     <div class="anime-card{% if anime.is_vip or anime.vip or anime.is_premium or anime.premium %} is-vip{% endif %}">
                         {% if anime.is_vip or anime.vip or anime.is_premium or anime.premium %}
                         <div class="vip-sweep"></div>
-                        <div class="vip-badge" title="VIP"><i class='bx bxs-crown'></i></div>
                         {% endif %}
+                        <div class="card-corner">
+                            {% if anime.is_vip or anime.vip or anime.is_premium or anime.premium %}
+                            <div class="vip-badge" title="VIP"><i class='bx bxs-crown'></i></div>
+                            {% endif %}
+                            <button type="button" class="rec-info-btn" aria-label="Tavsiya panel" title="Tavsiya panel"><i class='bx bx-error-circle'></i></button>
+                        </div>
                         <div class="top-badge-group">
                             {% if anime.episodes.count > 0 %}
                                 <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
@@ -592,12 +1037,17 @@
             <div class="cards-grid">
                 {% for anime in all_movies %}
                 {% if anime.id %}
-                <a class="card-wrapper" style="--i: {{ forloop.counter0 }};" href="{% url 'movie_detail' anime.id %}">
+                <a class="card-wrapper" style="--i: {{ forloop.counter0 }};" href="{% url 'movie_detail' anime.id %}" data-anime-id="{{ anime.id }}" data-anime-title="{{ anime.title }}">
                     <div class="anime-card{% if anime.is_vip or anime.vip or anime.is_premium or anime.premium %} is-vip{% endif %}">
                         {% if anime.is_vip or anime.vip or anime.is_premium or anime.premium %}
                         <div class="vip-sweep"></div>
-                        <div class="vip-badge" title="VIP"><i class='bx bxs-crown'></i></div>
                         {% endif %}
+                        <div class="card-corner">
+                            {% if anime.is_vip or anime.vip or anime.is_premium or anime.premium %}
+                            <div class="vip-badge" title="VIP"><i class='bx bxs-crown'></i></div>
+                            {% endif %}
+                            <button type="button" class="rec-info-btn" aria-label="Tavsiya panel" title="Tavsiya panel"><i class='bx bx-error-circle'></i></button>
+                        </div>
                         <div class="top-badge-group">
                             {% if anime.episodes.count > 0 %}
                                 <div class="top-badge-episode">{{ anime.episodes.count }} qism</div>
@@ -630,12 +1080,17 @@
             <div class="cards-grid">
                 {% for anime in movie_films %}
                 {% if anime.id %}
-                <a class="card-wrapper" style="--i: {{ forloop.counter0 }};" href="{% url 'movie_detail' anime.id %}">
+                <a class="card-wrapper" style="--i: {{ forloop.counter0 }};" href="{% url 'movie_detail' anime.id %}" data-anime-id="{{ anime.id }}" data-anime-title="{{ anime.title }}">
                     <div class="anime-card{% if anime.is_vip or anime.vip or anime.is_premium or anime.premium %} is-vip{% endif %}">
                         {% if anime.is_vip or anime.vip or anime.is_premium or anime.premium %}
                         <div class="vip-sweep"></div>
-                        <div class="vip-badge" title="VIP"><i class='bx bxs-crown'></i></div>
                         {% endif %}
+                        <div class="card-corner">
+                            {% if anime.is_vip or anime.vip or anime.is_premium or anime.premium %}
+                            <div class="vip-badge" title="VIP"><i class='bx bxs-crown'></i></div>
+                            {% endif %}
+                            <button type="button" class="rec-info-btn" aria-label="Tavsiya panel" title="Tavsiya panel"><i class='bx bx-error-circle'></i></button>
+                        </div>
                         <div class="top-badge-group">
                             <div class="top-badge-episode"><i class='bx bx-movie-play'></i> Film</div>
                         </div>
@@ -662,7 +1117,7 @@
     </div>
 </div>
 
-<!-- ===== ANIME TAVSIYA (desktop) ===== -->
+<!-- ===== ANIME TAVSIYA (desktop pastki tugma) ===== -->
 <div class="rec-dock" id="recDock">
     <div class="rec-toast" id="recToast" role="status" aria-live="polite">
         <i class='bx bxs-crown'></i>
@@ -673,6 +1128,55 @@
         <i class='bx bxs-magic-wand'></i> Anime tavsiya
     </button>
 </div>
+
+<!-- =====================================================================
+     TAVSIYA PANEL
+     ===================================================================== -->
+<div class="tp-overlay" id="tpOverlay"></div>
+
+<!-- ---------- DESKTOP: o'ng tomondagi vertikal panel ---------- -->
+<aside class="tpd" id="tpDesktop" role="dialog" aria-modal="true" aria-labelledby="tpdName">
+    <div class="tpd-hero">
+        <div class="tpd-hero-bg" id="tpdBg"></div>
+        <button type="button" class="tpd-close" id="tpdClose" aria-label="Yopish"><i class='bx bx-x'></i></button>
+        <p class="tpd-label">Tavsiya panel</p>
+        <div class="tpd-anime">
+            <img class="tpd-poster" id="tpdPoster" src="" alt="">
+            <div class="tpd-info">
+                <h3 class="tpd-name" id="tpdName"></h3>
+                <div class="tpd-meta" id="tpdMeta"></div>
+            </div>
+        </div>
+    </div>
+    <div class="tpd-body">
+        <div class="tpd-list" id="tpdList"></div>
+        <div class="tp-note" id="tpdNote" role="status" aria-live="polite">
+            <i class='bx bx-time-five'></i><span id="tpdNoteText"></span>
+        </div>
+    </div>
+    <div class="tpd-foot">Yopish uchun Esc tugmasini bosing</div>
+</aside>
+
+<!-- ---------- MOBIL: pastdan chiquvchi sheet ---------- -->
+<section class="tpm" id="tpMobile" role="dialog" aria-modal="true" aria-labelledby="tpmName">
+    <div class="tpm-drag" id="tpmDrag">
+        <div class="tpm-handle"></div>
+        <div class="tpm-head">
+            <img class="tpm-poster" id="tpmPoster" src="" alt="">
+            <div class="tpm-info">
+                <h3 class="tpm-name" id="tpmName"></h3>
+                <p class="tpm-meta" id="tpmMeta"></p>
+            </div>
+            <button type="button" class="tpm-close" id="tpmClose" aria-label="Yopish"><i class='bx bx-x'></i></button>
+        </div>
+    </div>
+    <div class="tpm-body">
+        <div class="tpm-list" id="tpmList"></div>
+    </div>
+    <div class="tp-note" id="tpmNote" role="status" aria-live="polite">
+        <i class='bx bx-time-five'></i><span id="tpmNoteText"></span>
+    </div>
+</section>
 
 <script>
 /* Mobilda zoom'ni o'chirish (skrollni to'smaydigan usul) */
@@ -864,6 +1368,304 @@
     document.addEventListener('pointerdown', function (e) {
         if (dock && !dock.contains(e.target)) recToast.classList.remove('show');
     }, true);
+})();
+</script>
+
+<script>
+/* ===== TAVSIYA PANEL: desktop (o'ng panel) va mobil (pastki sheet) alohida ===== */
+(function () {
+    'use strict';
+
+    var container = document.getElementById('categoryContainer');
+    var overlay   = document.getElementById('tpOverlay');
+
+    /* desktop elementlari */
+    var D = {
+        root:   document.getElementById('tpDesktop'),
+        bg:     document.getElementById('tpdBg'),
+        poster: document.getElementById('tpdPoster'),
+        name:   document.getElementById('tpdName'),
+        meta:   document.getElementById('tpdMeta'),
+        list:   document.getElementById('tpdList'),
+        note:   document.getElementById('tpdNote'),
+        noteTx: document.getElementById('tpdNoteText'),
+        close:  document.getElementById('tpdClose')
+    };
+
+    /* mobil elementlari */
+    var M = {
+        root:   document.getElementById('tpMobile'),
+        drag:   document.getElementById('tpmDrag'),
+        poster: document.getElementById('tpmPoster'),
+        name:   document.getElementById('tpmName'),
+        meta:   document.getElementById('tpmMeta'),
+        list:   document.getElementById('tpmList'),
+        note:   document.getElementById('tpmNote'),
+        noteTx: document.getElementById('tpmNoteText'),
+        close:  document.getElementById('tpmClose')
+    };
+
+    var mq = window.matchMedia('(max-width: 768px)');
+
+    var LONG_MS   = 480;   /* uzoq bosish vaqti */
+    var MOVE_TOL  = 10;    /* shuncha px siljisa — skroll deb hisoblanadi */
+
+    var pressTimer = null;
+    var pressWrap  = null;
+    var startX = 0, startY = 0;
+    var suppressClick = false;
+    var suppressTimer = null;
+    var focusedWrap = null;
+    var noteTimer = null;
+    var openMode = null; /* 'desktop' | 'mobile' | null */
+
+    /* ---------- bo'limlar (ustun ro'yxati) ---------- */
+    var ITEMS = [
+        { key: 'Anime edit',    icon: 'bx-edit-alt',        desc: "Ma'lumotlarni tahrirlash" },
+        { key: 'Anime haqida',  icon: 'bx-info-circle',     desc: "To'liq tavsif va tafsilotlar" },
+        { key: 'Anime izoh',    icon: 'bx-comment-detail',  desc: "Fikrlar va sharhlar" },
+        { key: 'Anibest',       icon: 'bx-trophy',          desc: "Eng yaxshilar reytingi" }
+    ];
+
+    function buildList(listEl, prefix) {
+        var html = '';
+        ITEMS.forEach(function (it) {
+            html += '<button type="button" class="' + prefix + '-item" data-feature="' + it.key + '">' +
+                        '<span class="' + prefix + '-item-ic"><i class="bx ' + it.icon + '"></i></span>' +
+                        '<span class="' + prefix + '-item-tx"><b>' + it.key + '</b><span>' + it.desc + '</span></span>' +
+                        '<i class="bx bx-chevron-right ' + prefix + '-item-go"></i>' +
+                    '</button>';
+        });
+        listEl.innerHTML = html;
+    }
+    buildList(D.list, 'tpd');
+    buildList(M.list, 'tpm');
+
+    /* ---------- karta ma'lumotlarini olish ---------- */
+    function readCard(wrap) {
+        var img   = wrap.querySelector('.anime-card img');
+        var cat   = wrap.querySelector('.tag-jp');
+        var year  = wrap.querySelector('.tag-year');
+        var ep    = wrap.querySelector('.top-badge-episode');
+        return {
+            title:  wrap.getAttribute('data-anime-title') || '',
+            image:  img ? img.getAttribute('src') : '',
+            cat:    cat ? cat.textContent.trim() : '',
+            year:   year ? year.textContent.trim() : '',
+            ep:     ep ? ep.textContent.trim() : ''
+        };
+    }
+
+    function fillDesktop(d) {
+        D.poster.src = d.image;
+        D.poster.alt = d.title;
+        D.bg.style.backgroundImage = d.image ? 'url("' + d.image + '")' : 'none';
+        D.name.textContent = d.title;
+        D.meta.innerHTML = '';
+        [d.ep, d.cat, d.year].forEach(function (t) {
+            if (!t) return;
+            var s = document.createElement('span');
+            s.className = 'tpd-chip';
+            s.textContent = t;
+            D.meta.appendChild(s);
+        });
+    }
+
+    function fillMobile(d) {
+        M.poster.src = d.image;
+        M.poster.alt = d.title;
+        M.name.textContent = d.title;
+        M.meta.textContent = [d.ep, d.cat, d.year].filter(Boolean).join(' • ');
+    }
+
+    /* ---------- ochish / yopish ---------- */
+    function hideNote() {
+        clearTimeout(noteTimer);
+        D.note.classList.remove('show');
+        M.note.classList.remove('show');
+    }
+
+    function openPanel(wrap) {
+        if (!wrap) return;
+        if (focusedWrap) focusedWrap.classList.remove('rec-focus');
+        focusedWrap = wrap;
+        wrap.classList.remove('pressing');
+        wrap.classList.add('rec-focus');
+
+        var data = readCard(wrap);
+        hideNote();
+
+        overlay.classList.add('show');
+        document.body.classList.add('tp-lock');
+
+        if (mq.matches) {
+            openMode = 'mobile';
+            fillMobile(data);
+            M.root.style.transform = '';
+            M.root.style.transition = '';
+            M.root.classList.add('show');
+            D.root.classList.remove('show');
+        } else {
+            openMode = 'desktop';
+            fillDesktop(data);
+            D.root.classList.add('show');
+            M.root.classList.remove('show');
+            setTimeout(function () { if (openMode === 'desktop') D.close.focus(); }, 60);
+        }
+    }
+
+    function closeAll() {
+        hideNote();
+        D.root.classList.remove('show');
+        M.root.style.transition = '';
+        M.root.style.transform = '';
+        M.root.classList.remove('show');
+        overlay.classList.remove('show');
+        document.body.classList.remove('tp-lock');
+        openMode = null;
+        if (focusedWrap) {
+            focusedWrap.classList.remove('rec-focus');
+            focusedWrap = null;
+        }
+    }
+
+    function isOpen() { return openMode !== null; }
+
+    /* ---------- "Tez orada" xabari (panel ichida) ---------- */
+    function showNote(name) {
+        var text = name + " — tez orada qo'shiladi";
+        var n  = openMode === 'mobile' ? M.note   : D.note;
+        var tx = openMode === 'mobile' ? M.noteTx : D.noteTx;
+        tx.textContent = text;
+        n.classList.add('show');
+        clearTimeout(noteTimer);
+        noteTimer = setTimeout(function () { n.classList.remove('show'); }, 2800);
+    }
+
+    function onItemClick(e) {
+        var item = e.target.closest('[data-feature]');
+        if (item) showNote(item.getAttribute('data-feature'));
+    }
+    D.list.addEventListener('click', onItemClick);
+    M.list.addEventListener('click', onItemClick);
+
+    D.close.addEventListener('click', closeAll);
+    M.close.addEventListener('click', closeAll);
+    overlay.addEventListener('click', closeAll);
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && isOpen()) closeAll();
+    });
+
+    /* ekran o'lchami o'zgarsa (masalan, telefon aylantirilsa) — panelni yopamiz */
+    var onBreakpoint = function () { if (isOpen()) closeAll(); };
+    if (mq.addEventListener) mq.addEventListener('change', onBreakpoint);
+    else if (mq.addListener) mq.addListener(onBreakpoint);
+
+    /* ---------- mobil sheet: pastga surib yopish ---------- */
+    var dragStartY = 0, dragDy = 0, dragging = false;
+
+    M.drag.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        dragging = true;
+        dragDy = 0;
+        dragStartY = e.touches[0].clientY;
+        M.root.style.transition = 'none';
+    }, { passive: true });
+
+    M.drag.addEventListener('touchmove', function (e) {
+        if (!dragging) return;
+        dragDy = Math.max(0, e.touches[0].clientY - dragStartY);
+        M.root.style.transform = 'translateY(' + dragDy + 'px)';
+    }, { passive: true });
+
+    function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        M.root.style.transition = '';
+        if (dragDy > 90) {
+            closeAll();
+        } else {
+            M.root.style.transform = '';
+        }
+        dragDy = 0;
+    }
+    M.drag.addEventListener('touchend', endDrag, { passive: true });
+    M.drag.addEventListener('touchcancel', endDrag, { passive: true });
+
+    /* ---------- undov tugmasi (mobil + PC) ---------- */
+    container.addEventListener('click', function (e) {
+        /* uzoq bosishdan keyin havola ochilib ketmasin */
+        if (suppressClick) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+        var btn = e.target.closest('.rec-info-btn');
+        if (btn) {
+            e.preventDefault();
+            e.stopPropagation();
+            openPanel(btn.closest('.card-wrapper'));
+        }
+    }, true);
+
+    /* ---------- uzoq bosish (touch) ---------- */
+    function cancelPress() {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+        if (pressWrap) {
+            pressWrap.classList.remove('pressing');
+            pressWrap = null;
+        }
+    }
+
+    container.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) { cancelPress(); return; }
+        var wrap = e.target.closest('.card-wrapper');
+        if (!wrap || e.target.closest('.rec-info-btn')) return;
+
+        cancelPress();
+        pressWrap = wrap;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        wrap.classList.add('pressing');
+
+        pressTimer = setTimeout(function () {
+            var w = pressWrap;
+            pressTimer = null;
+            if (!w) return;
+            suppressClick = true;
+            clearTimeout(suppressTimer);
+            if (navigator.vibrate) { try { navigator.vibrate(18); } catch (err) {} }
+            openPanel(w);
+        }, LONG_MS);
+    }, { passive: true });
+
+    container.addEventListener('touchmove', function (e) {
+        if (!pressTimer) return;
+        var t = e.touches[0];
+        if (Math.abs(t.clientX - startX) > MOVE_TOL || Math.abs(t.clientY - startY) > MOVE_TOL) {
+            cancelPress();
+        }
+    }, { passive: true });
+
+    function endPress() {
+        cancelPress();
+        if (suppressClick) {
+            /* touchend'dan keyin keladigan click'ni yutib yuboramiz */
+            clearTimeout(suppressTimer);
+            suppressTimer = setTimeout(function () { suppressClick = false; }, 450);
+        }
+    }
+    container.addEventListener('touchend', endPress, { passive: true });
+    container.addEventListener('touchcancel', endPress, { passive: true });
+
+    /* Android/iOS uzoq bosganda chiqadigan brauzer menyusini o'chirish */
+    container.addEventListener('contextmenu', function (e) {
+        if (e.target.closest('.card-wrapper') && ('ontouchstart' in window)) {
+            e.preventDefault();
+        }
+    });
 })();
 </script>
 {% endblock %}
