@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% static 'images/default.svg' as default_movie_poster %}
-
 {% block title %}Profil | BESTMEDIA{% endblock %}
 
 {% block extra_css %}
@@ -179,9 +177,21 @@
     background:
         linear-gradient(
             180deg,
-            rgba(8,6,14,0.35),
-            rgba(8,6,14,0.62)
+            rgba(8,6,14,0.45),
+            rgba(8,6,14,0.72)
         );
+}
+
+/* Rasmli profil kartada matn o'qilishi uchun soya */
+.pv-card.has-bg .pv-name-value,
+.pv-card.has-bg .pv-id-value,
+.pv-card.has-bg .pv-name-label,
+.pv-card.has-bg .pv-id-label,
+.pv-card.has-bg .pv-level-title,
+.pv-card.has-bg .pv-level-label {
+    text-shadow:
+        0 1px 2px rgba(0,0,0,0.85),
+        0 0 10px rgba(0,0,0,0.55);
 }
 
 
@@ -285,7 +295,7 @@
 .pv-card.has-bg .pv-name-label,
 .pv-card.has-bg .pv-id-label,
 .pv-card.has-bg .pv-level-title {
-    color: rgba(255,255,255,0.75);
+    color: rgba(255,255,255,0.85);
 }
 
 
@@ -390,6 +400,11 @@
 
     box-shadow:
         0 0 14px rgba(180,92,255,0.10);
+}
+
+/* Rasmli fonda badge o'qilishi uchun */
+.pv-card.has-bg .pv-tier-badge {
+    background-color: rgba(10,8,16,0.55);
 }
 
 
@@ -546,6 +561,8 @@
 }
 
 .pv-menu-box {
+    position: relative;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -669,20 +686,121 @@
 
 /* =========================================================
    PREMIUM PROFIL DIZAYN — MENYU TUGMALARI RASMLI FON
+   ---------------------------------------------------------
+   Muammo: rasm ustiga yozuv qo'shilganda matn o'qilmasdi.
+   Yechim:
+     ::before  -> rasm (alohida qatlam)
+     ::after   -> qorong'i gradient (chapda kuchliroq,
+                  chunki matn chapda turadi)
+     matn      -> oq rang + soya + yarim shaffof "plashka"
+     icon      -> to'q shisha fon
+   Hamma kontent z-index: 2 da, ya'ni rasmdan YUQORIDA.
    ========================================================= */
 
 .pv-menu-box.has-img {
-    background-image:
-        linear-gradient(rgba(10,8,16,0.58), rgba(10,8,16,0.72)),
-        var(--menu-bg);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    overflow: hidden;
+    isolation: isolate;
+
+    background: #120e1a;
     border-color: rgba(255,255,255,0.14);
 }
 
+.pv-menu-box.has-img::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    background-image: var(--menu-bg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    transition: transform .35s ease;
+}
+
+.pv-menu-box.has-img::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(8,6,14,0.90) 0%,
+            rgba(8,6,14,0.74) 50%,
+            rgba(8,6,14,0.50) 100%
+        );
+}
+
+.pv-menu-box.has-img:hover::before {
+    transform: scale(1.04);
+}
+
+/* kontent rasmdan yuqorida */
+.pv-menu-box.has-img > * {
+    position: relative;
+    z-index: 2;
+}
+
+.pv-menu-box.has-img,
+.pv-menu-box.has-img .pv-menu-left {
+    color: #fff;
+}
+
+/* matn: oq + soya + yengil plashka */
+.pv-menu-box.has-img .pv-menu-left > span {
+    color: #fff;
+
+    padding: 3px 9px;
+    border-radius: 8px;
+
+    background: rgba(0,0,0,0.38);
+
+    text-shadow:
+        0 1px 2px rgba(0,0,0,0.90),
+        0 0 8px rgba(0,0,0,0.60);
+}
+
+/* ikonka */
 .pv-menu-box.has-img .pv-menu-left i {
-    background: rgba(0,0,0,0.35);
+    background: rgba(0,0,0,0.55);
+    border-color: rgba(255,255,255,0.18);
+
+    color: #d99aff;
+
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7));
+}
+
+/* strelka */
+.pv-menu-box.has-img .pv-menu-right i,
+.pv-menu-box.has-img > .pv-menu-arrow {
+    color: rgba(255,255,255,0.85);
+
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+}
+
+.pv-menu-box.has-img:hover .pv-menu-arrow {
+    color: #fff;
+}
+
+/* summa (Hisobim) */
+.pv-menu-box.has-img .pv-menu-amount {
+    color: #f0d6ff;
+
+    padding: 3px 9px;
+    border-radius: 8px;
+
+    background: rgba(0,0,0,0.50);
+    border: 1px solid rgba(255,255,255,0.12);
+
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+}
+
+.pv-menu-box.has-img:hover {
+    border-color: rgba(180,92,255,0.50);
 }
 
 
@@ -859,7 +977,8 @@
     transition:
         border-color .15s,
         transform .15s,
-        box-shadow .15s;
+        box-shadow .15s,
+        opacity .3s ease;
 }
 
 .p-av-item input:checked ~ .p-av-img {
@@ -994,6 +1113,8 @@
     object-fit: cover;
 
     display: block;
+
+    transition: opacity .3s ease;
 }
 
 .p-watched-row-info {
@@ -1059,6 +1180,151 @@
 
     white-space: nowrap;
 }
+
+
+/* =========================================================
+   LOADING SKELETON
+   ---------------------------------------------------------
+   Sahifa yuklanguncha #pvSkeleton ko'rinadi,
+   tayyor bo'lgach u o'chib, #pvReal chiqadi.
+   ========================================================= */
+
+@keyframes sk-shimmer {
+    0%   { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+@keyframes pv-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.sk,
+.sk-img {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,0.045) 30%,
+            rgba(255,255,255,0.11) 50%,
+            rgba(255,255,255,0.045) 70%
+        );
+    background-size: 300% 100%;
+    animation: sk-shimmer 1.4s linear infinite;
+}
+
+.sk { border-radius: 8px; }
+
+.sk-circle { border-radius: 50%; }
+
+/* real kontent: skeleton tugaguncha yashirin */
+.pv-real { display: none; }
+
+.pv-real.pv-ready {
+    display: block;
+    animation: pv-fade-in .35s ease both;
+}
+
+/* skeleton elementlari o'lchamlari */
+.sk-card {
+    border: 1px solid rgba(255,255,255,0.085);
+    border-radius: 18px;
+    padding: 17px;
+    margin-bottom: 10px;
+    background: rgba(255,255,255,0.03);
+}
+
+.sk-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sk-grow { flex: 1 1 auto; min-width: 0; }
+
+.sk-avatar { width: 68px; height: 68px; flex-shrink: 0; }
+
+.sk-line-sm { height: 9px;  width: 38px; margin-bottom: 8px; }
+.sk-line-md { height: 15px; width: 60%; }
+.sk-id      { height: 20px; width: 54px; }
+
+.sk-badge {
+    height: 22px;
+    width: 92px;
+    border-radius: 20px;
+    margin: 14px auto;
+}
+
+.sk-level-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.sk-level-title  { height: 13px; width: 60px; }
+.sk-level-circle { width: 58px; height: 58px; }
+
+.sk-footer { height: 38px; border-radius: 12px; margin-bottom: 4px; }
+
+.sk-menu-title { height: 12px; width: 70px; margin: 18px 2px 10px; }
+
+.sk-menu-list { display: flex; flex-direction: column; gap: 8px; }
+
+.sk-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 13px 15px;
+    border-radius: 13px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.025);
+}
+
+.sk-menu-icon { width: 31px; height: 31px; border-radius: 9px; flex-shrink: 0; }
+.sk-menu-text { height: 13px; width: 40%; }
+
+.sk-watched {
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.025);
+}
+
+.sk-watched-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sk-watched-row:last-child { border-bottom: none; }
+
+.sk-poster { width: 46px; height: 46px; border-radius: 9px; flex-shrink: 0; }
+.sk-w-title { height: 12px; width: 65%; margin-bottom: 8px; }
+.sk-w-meta  { height: 9px;  width: 35%; }
+.sk-w-btn   { height: 26px; width: 54px; border-radius: 8px; flex-shrink: 0; }
+
+/* rasmlar (tahrirlash/oxirgi ko'rilganlar) yuklanguncha shimmer */
+.p-watched-row-img.sk-img,
+.p-av-item.sk-img {
+    position: relative;
+}
+
+.p-av-item.sk-img { border-radius: 50%; }
+
+.sk-img img { opacity: 0; }
+
+.sk-img.img-loaded {
+    animation: none;
+    background: rgba(255,255,255,0.04);
+}
+
+.sk-img.img-loaded img { opacity: 1; }
+
+/* JS o'chiq bo'lsa — skeleton yashiriladi, kontent ko'rinadi */
+.no-js-note { display: none; }
 
 
 /* =========================================================
@@ -1175,6 +1441,11 @@
         font-size: 12px;
     }
 
+    .pv-menu-box.has-img .pv-menu-left > span,
+    .pv-menu-box.has-img .pv-menu-amount {
+        padding: 2px 7px;
+    }
+
     .p-form-row {
         width: 100%;
 
@@ -1259,6 +1530,14 @@
         font-size: 10px;
     }
 
+    /* skeleton — mobil o'lchamlar */
+    .sk-card { padding: 13px; border-radius: 14px; }
+    .sk-avatar { width: 52px; height: 52px; }
+    .sk-level-circle { width: 48px; height: 48px; }
+    .sk-menu-item { padding: 11px 12px; border-radius: 11px; }
+    .sk-menu-icon { width: 28px; height: 28px; }
+    .sk-poster { width: 40px; height: 40px; border-radius: 8px; }
+
     .pcard,
     .pv-card,
     .pv-menu-box,
@@ -1274,6 +1553,11 @@
         background: rgba(26, 22, 34, 0.65);
     }
 
+    /* rasmli tugma: mobil fon qoidasi rasm qatlamiga ta'sir qilmasin */
+    .pv-menu-box.has-img {
+        background: #120e1a;
+    }
+
     .pv-card {
         background:
             radial-gradient(
@@ -1282,6 +1566,13 @@
                 transparent 32%
             ),
             rgba(26, 22, 34, 0.7);
+    }
+
+    /* rasmli profil karta: mobil fon qoidasi rasmni o'chirib yubormasin */
+    .pv-card.has-bg {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 
     .p-footer {
@@ -1311,6 +1602,11 @@
                 rgba(255,255,255,0.025)
             );
         border-color: rgba(255,255,255,0.075);
+    }
+
+    .pv-menu-box.has-img:hover {
+        background: #120e1a;
+        border-color: rgba(180,92,255,0.45);
     }
 }
 
@@ -1385,26 +1681,8 @@
         width: 27px;
         height: 27px;
     }
-}
 
-
-/* =========================================================
-   PREMIUM DIZAYN — mobil/hover qoidalaridan KEYIN turishi shart
-   (ustunlik uchun)
-   ========================================================= */
-
-.pv-menu-box.has-img,
-.pv-menu-box.has-img:hover {
-    background-image:
-        linear-gradient(rgba(10,8,16,0.58), rgba(10,8,16,0.72)),
-        var(--menu-bg);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.pv-menu-box.has-img:hover {
-    border-color: rgba(180,92,255,0.45);
+    .sk-avatar { width: 46px; height: 46px; }
 }
 
 
@@ -1417,22 +1695,107 @@
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;
     }
+
+    .sk,
+    .sk-img {
+        animation: none !important;
+    }
 }
 
 </style>
+
+<noscript>
+<style>
+    #pvSkeleton { display: none !important; }
+    .pv-real { display: block !important; }
+    .sk-img img { opacity: 1 !important; }
+</style>
+</noscript>
 {% endblock %}
 
 
 {% block content %}
 
+{# default poster — bu qator {% block %} ICHIDA bo'lishi shart, aks holda child shablonda ishlamaydi #}
+{% static 'images/default.svg' as default_movie_poster %}
+
 <main class="main-content">
 
 <div class="profile-wrap">
 
+    <!-- =====================================================
+         LOADING SKELETON
+         ===================================================== -->
+    <div id="pvSkeleton" aria-hidden="true">
+
+        <div class="sk sk-line-md" style="width:130px;margin:0 0 12px 2px;"></div>
+
+        <div class="sk-card">
+            <div class="sk-row">
+                <div class="sk sk-circle sk-avatar"></div>
+                <div class="sk-grow">
+                    <div class="sk sk-line-sm"></div>
+                    <div class="sk sk-line-md"></div>
+                </div>
+                <div>
+                    <div class="sk sk-line-sm" style="margin-left:auto;width:22px;"></div>
+                    <div class="sk sk-id"></div>
+                </div>
+            </div>
+
+            <div class="sk sk-badge"></div>
+
+            <div class="sk-level-row">
+                <div class="sk sk-level-title"></div>
+                <div class="sk sk-circle sk-level-circle"></div>
+            </div>
+        </div>
+
+        <div class="sk sk-footer"></div>
+
+        <div class="sk sk-menu-title"></div>
+
+        <div class="sk-menu-list">
+            <div class="sk-menu-item"><div class="sk sk-menu-icon"></div><div class="sk sk-menu-text"></div></div>
+            <div class="sk-menu-item"><div class="sk sk-menu-icon"></div><div class="sk sk-menu-text"></div></div>
+            <div class="sk-menu-item"><div class="sk sk-menu-icon"></div><div class="sk sk-menu-text"></div></div>
+            <div class="sk-menu-item"><div class="sk sk-menu-icon"></div><div class="sk sk-menu-text"></div></div>
+            <div class="sk-menu-item"><div class="sk sk-menu-icon"></div><div class="sk sk-menu-text"></div></div>
+            <div class="sk-menu-item"><div class="sk sk-menu-icon"></div><div class="sk sk-menu-text"></div></div>
+        </div>
+
+        <div class="sk sk-menu-title" style="width:110px;margin-top:22px;"></div>
+
+        <div class="sk-watched">
+            <div class="sk-watched-row">
+                <div class="sk sk-poster"></div>
+                <div class="sk-grow"><div class="sk sk-w-title"></div><div class="sk sk-w-meta"></div></div>
+                <div class="sk sk-w-btn"></div>
+            </div>
+            <div class="sk-watched-row">
+                <div class="sk sk-poster"></div>
+                <div class="sk-grow"><div class="sk sk-w-title"></div><div class="sk sk-w-meta"></div></div>
+                <div class="sk sk-w-btn"></div>
+            </div>
+            <div class="sk-watched-row">
+                <div class="sk sk-poster"></div>
+                <div class="sk-grow"><div class="sk sk-w-title"></div><div class="sk sk-w-meta"></div></div>
+                <div class="sk sk-w-btn"></div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REAL KONTENT (skeleton tugagach ko'rinadi)
+         ===================================================== -->
+    <div class="pv-real" id="pvReal">
+
     <h2 class="pv-title">profil malumotlar</h2>
 
     <div class="pv-card tier-{{ user_tier|default:'basic' }}{% if profile_bg_url %} has-bg{% endif %}"
-         {% if profile_bg_url %}style="background-image:url('{{ profile_bg_url }}');"{% endif %}>
+         {% if profile_bg_url %}data-preload="{{ profile_bg_url }}" style="background-image:url('{{ profile_bg_url }}');"{% endif %}>
 
         <div class="pv-top-row">
 
@@ -1493,7 +1856,7 @@
         <!-- 1) Hisobim — rasm 1 -->
         <a href="{% url 'hisobim_page' %}"
            class="pv-menu-box pv-menu-hisobim{% if menu_images %} has-img{% endif %}"
-           {% if menu_images %}style="--menu-bg:url('{{ menu_images.0 }}');"{% endif %}>
+           {% if menu_images %}data-preload="{{ menu_images.0 }}" style="--menu-bg:url('{{ menu_images.0 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-wallet'></i>
                 <span>Hisobim</span>
@@ -1507,7 +1870,7 @@
         <!-- 2) Saqlanganlar — rasm 2 -->
         <a href="{% url 'favorites_page' %}"
            class="pv-menu-box{% if menu_images %} has-img{% endif %}"
-           {% if menu_images %}style="--menu-bg:url('{{ menu_images.1 }}');"{% endif %}>
+           {% if menu_images %}data-preload="{{ menu_images.1 }}" style="--menu-bg:url('{{ menu_images.1 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-heart'></i>
                 <span>Saqlanganlar</span>
@@ -1518,7 +1881,7 @@
         <!-- 3) Statistika — rasm 3 -->
         <a href="{% url 'statistika_page' %}"
            class="pv-menu-box{% if menu_images %} has-img{% endif %}"
-           {% if menu_images %}style="--menu-bg:url('{{ menu_images.2 }}');"{% endif %}>
+           {% if menu_images %}data-preload="{{ menu_images.2 }}" style="--menu-bg:url('{{ menu_images.2 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-bar-chart-alt-2'></i>
                 <span>Statistika</span>
@@ -1529,7 +1892,7 @@
         <!-- 4) Premium imkonlar — rasm 4 -->
         <a href="{% url 'imkon_page' %}"
            class="pv-menu-box{% if menu_images %} has-img{% endif %}"
-           {% if menu_images %}style="--menu-bg:url('{{ menu_images.3 }}');"{% endif %}>
+           {% if menu_images %}data-preload="{{ menu_images.3 }}" style="--menu-bg:url('{{ menu_images.3 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bxs-crown'></i>
                 <span>Premium imkonlar</span>
@@ -1540,7 +1903,7 @@
         <!-- 5) Sozlamalar — rasm 5 -->
         <a href="{% url 'settings_general' %}"
            class="pv-menu-box{% if menu_images %} has-img{% endif %}"
-           {% if menu_images %}style="--menu-bg:url('{{ menu_images.4 }}');"{% endif %}>
+           {% if menu_images %}data-preload="{{ menu_images.4 }}" style="--menu-bg:url('{{ menu_images.4 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-cog'></i>
                 <span>Sozlamalar</span>
@@ -1549,8 +1912,8 @@
         </a>
 
         <!-- 6) Profil tahrirlash — rasm 6 -->
-        <div class="pv-menu-box{% if menu_images %} has-img{% endif %}" id="profilTahrirlashBtn" role="button" tabindex="0"
-             {% if menu_images %}style="--menu-bg:url('{{ menu_images.5 }}');"{% endif %}>
+        <div class="pv-menu-box{% if menu_images %} has-img{% endif %}" id="profilTahrirlashBtn" role="button" tabindex="0" aria-expanded="false" aria-controls="profilTahrirlashBox"
+             {% if menu_images %}data-preload="{{ menu_images.5 }}" style="--menu-bg:url('{{ menu_images.5 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-edit-alt'></i>
                 <span>Profil tahrirlash</span>
@@ -1586,7 +1949,7 @@
 
             <div class="p-av-grid">
                 {% for av in avatars %}
-                    <label class="p-av-item" title="{{ av.name|default:'Avatar' }}">
+                    <label class="p-av-item sk-img" title="{{ av.name|default:'Avatar' }}">
                         <input type="radio" name="avatar_id" value="{{ av.id }}" {% if user.avatar and user.avatar.id == av.id %}checked{% endif %}>
                         <img class="p-av-img" src="{{ av.image.url }}" alt="{{ av.name|default:'avatar' }}" loading="lazy">
                     </label>
@@ -1606,7 +1969,7 @@
     <div class="pcard p-watched-list">
         {% for w in last_watched_history %}
             <a href="{% url 'movie_detail' w.movie.id %}" class="p-watched-row">
-                <div class="p-watched-row-img">
+                <div class="p-watched-row-img sk-img">
                     <img src="{% if w.movie.image %}{{ w.movie.image.url }}{% else %}{{ default_movie_poster }}{% endif %}" alt="{{ w.movie.title }}" loading="lazy">
                 </div>
                 <div class="p-watched-row-info">
@@ -1625,29 +1988,101 @@
         {% endfor %}
     </div>
 
+    </div><!-- /#pvReal -->
+
 </div>
 </main>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var btn = document.getElementById('profilTahrirlashBtn');
-    var box = document.getElementById('profilTahrirlashBox');
+
+    /* -----------------------------------------------------
+       1) PROFIL TAHRIRLASH — ochish/yopish
+       ----------------------------------------------------- */
+    var btn   = document.getElementById('profilTahrirlashBtn');
+    var box   = document.getElementById('profilTahrirlashBox');
     var arrow = document.getElementById('profilTahrirlashArrow');
 
+    function toggleEdit() {
+        var open = box.classList.toggle('pv-edit-open');
+        if (arrow) arrow.classList.toggle('pv-edit-rotated', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
     if (btn && box) {
-        btn.addEventListener('click', function () {
-            box.classList.toggle('pv-edit-open');
-            if (arrow) {
-                arrow.classList.toggle('pv-edit-rotated');
+        btn.addEventListener('click', toggleEdit);
+
+        btn.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleEdit();
             }
         });
+    }
 
-        btn.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                box.classList.toggle('pv-edit-open');
-                if (arrow) {
-                    arrow.classList.toggle('pv-edit-rotated');
-                }
+
+    /* -----------------------------------------------------
+       2) LOADING SKELETON
+       Fon rasmlari (profil karta + menyu tugmalari)
+       oldindan yuklanadi. Hammasi tayyor bo'lgach (yoki
+       3 soniya o'tgach) skeleton o'chadi.
+       ----------------------------------------------------- */
+    var skeleton = document.getElementById('pvSkeleton');
+    var real     = document.getElementById('pvReal');
+    var shown    = false;
+
+    function showReal() {
+        if (shown) return;
+        shown = true;
+
+        if (skeleton && skeleton.parentNode) {
+            skeleton.parentNode.removeChild(skeleton);
+        }
+        if (real) real.classList.add('pv-ready');
+
+        initImageFade();
+    }
+
+    function preload(url) {
+        return new Promise(function (resolve) {
+            var img = new Image();
+            img.onload = img.onerror = function () { resolve(); };
+            img.src = url;
+        });
+    }
+
+    var urls = [];
+    document.querySelectorAll('[data-preload]').forEach(function (el) {
+        var u = el.getAttribute('data-preload');
+        if (u && urls.indexOf(u) === -1) urls.push(u);
+    });
+
+    if (urls.length) {
+        Promise.all(urls.map(preload)).then(showReal);
+        setTimeout(showReal, 3000);   // zaxira: internet sekin bo'lsa
+    } else {
+        showReal();
+    }
+
+
+    /* -----------------------------------------------------
+       3) RASMLAR — yuklanguncha shimmer, keyin fade-in
+       ----------------------------------------------------- */
+    function initImageFade() {
+        document.querySelectorAll('.sk-img').forEach(function (wrap) {
+            var img = wrap.querySelector('img');
+            if (!img) {
+                wrap.classList.add('img-loaded');
+                return;
+            }
+
+            function done() { wrap.classList.add('img-loaded'); }
+
+            if (img.complete && img.naturalWidth > 0) {
+                done();
+            } else {
+                img.addEventListener('load', done);
+                img.addEventListener('error', done);
             }
         });
     }
