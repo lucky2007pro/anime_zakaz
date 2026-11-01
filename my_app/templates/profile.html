@@ -160,6 +160,32 @@
 
 
 /* =========================================================
+   PREMIUM PROFIL DIZAYN — FON RASMI
+   ========================================================= */
+
+.pv-card.has-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.pv-card.has-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(8,6,14,0.35),
+            rgba(8,6,14,0.62)
+        );
+}
+
+
+/* =========================================================
    PROFILE TOP
    ========================================================= */
 
@@ -254,6 +280,12 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.pv-card.has-bg .pv-name-label,
+.pv-card.has-bg .pv-id-label,
+.pv-card.has-bg .pv-level-title {
+    color: rgba(255,255,255,0.75);
 }
 
 
@@ -632,6 +664,25 @@
 
     font-weight: 900;
     font-size: 13px;
+}
+
+
+/* =========================================================
+   PREMIUM PROFIL DIZAYN — MENYU TUGMALARI RASMLI FON
+   ========================================================= */
+
+.pv-menu-box.has-img {
+    background-image:
+        linear-gradient(rgba(10,8,16,0.58), rgba(10,8,16,0.72)),
+        var(--menu-bg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-color: rgba(255,255,255,0.14);
+}
+
+.pv-menu-box.has-img .pv-menu-left i {
+    background: rgba(0,0,0,0.35);
 }
 
 
@@ -1338,6 +1389,26 @@
 
 
 /* =========================================================
+   PREMIUM DIZAYN — mobil/hover qoidalaridan KEYIN turishi shart
+   (ustunlik uchun)
+   ========================================================= */
+
+.pv-menu-box.has-img,
+.pv-menu-box.has-img:hover {
+    background-image:
+        linear-gradient(rgba(10,8,16,0.58), rgba(10,8,16,0.72)),
+        var(--menu-bg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.pv-menu-box.has-img:hover {
+    border-color: rgba(180,92,255,0.45);
+}
+
+
+/* =========================================================
    REDUCED MOTION
    ========================================================= */
 
@@ -1358,9 +1429,10 @@
 
 <div class="profile-wrap">
 
-    <h2 class="pv-title">Profil</h2>
+    <h2 class="pv-title">profil malumotlar</h2>
 
-    <div class="pv-card tier-{{ user_tier|default:'basic' }}">
+    <div class="pv-card tier-{{ user_tier|default:'basic' }}{% if profile_bg_url %} has-bg{% endif %}"
+         {% if profile_bg_url %}style="background-image:url('{{ profile_bg_url }}');"{% endif %}>
 
         <div class="pv-top-row">
 
@@ -1418,7 +1490,10 @@
 
     <div class="pv-menu-list">
 
-        <a href="{% url 'hisobim_page' %}" class="pv-menu-box pv-menu-hisobim">
+        <!-- 1) Hisobim — rasm 1 -->
+        <a href="{% url 'hisobim_page' %}"
+           class="pv-menu-box pv-menu-hisobim{% if menu_images %} has-img{% endif %}"
+           {% if menu_images %}style="--menu-bg:url('{{ menu_images.0 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-wallet'></i>
                 <span>Hisobim</span>
@@ -1429,7 +1504,10 @@
             </span>
         </a>
 
-        <a href="{% url 'favorites_page' %}" class="pv-menu-box">
+        <!-- 2) Saqlanganlar — rasm 2 -->
+        <a href="{% url 'favorites_page' %}"
+           class="pv-menu-box{% if menu_images %} has-img{% endif %}"
+           {% if menu_images %}style="--menu-bg:url('{{ menu_images.1 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-heart'></i>
                 <span>Saqlanganlar</span>
@@ -1437,7 +1515,10 @@
             <i class='bx bx-chevron-right pv-menu-arrow'></i>
         </a>
 
-        <a href="{% url 'statistika_page' %}" class="pv-menu-box">
+        <!-- 3) Statistika — rasm 3 -->
+        <a href="{% url 'statistika_page' %}"
+           class="pv-menu-box{% if menu_images %} has-img{% endif %}"
+           {% if menu_images %}style="--menu-bg:url('{{ menu_images.2 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-bar-chart-alt-2'></i>
                 <span>Statistika</span>
@@ -1445,7 +1526,10 @@
             <i class='bx bx-chevron-right pv-menu-arrow'></i>
         </a>
 
-        <a href="{% url 'imkon_page' %}" class="pv-menu-box">
+        <!-- 4) Premium imkonlar — rasm 4 -->
+        <a href="{% url 'imkon_page' %}"
+           class="pv-menu-box{% if menu_images %} has-img{% endif %}"
+           {% if menu_images %}style="--menu-bg:url('{{ menu_images.3 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bxs-crown'></i>
                 <span>Premium imkonlar</span>
@@ -1453,7 +1537,10 @@
             <i class='bx bx-chevron-right pv-menu-arrow'></i>
         </a>
 
-        <a href="{% url 'settings_general' %}" class="pv-menu-box">
+        <!-- 5) Sozlamalar — rasm 5 -->
+        <a href="{% url 'settings_general' %}"
+           class="pv-menu-box{% if menu_images %} has-img{% endif %}"
+           {% if menu_images %}style="--menu-bg:url('{{ menu_images.4 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-cog'></i>
                 <span>Sozlamalar</span>
@@ -1461,7 +1548,9 @@
             <i class='bx bx-chevron-right pv-menu-arrow'></i>
         </a>
 
-        <div class="pv-menu-box" id="profilTahrirlashBtn" role="button" tabindex="0">
+        <!-- 6) Profil tahrirlash — rasm 6 -->
+        <div class="pv-menu-box{% if menu_images %} has-img{% endif %}" id="profilTahrirlashBtn" role="button" tabindex="0"
+             {% if menu_images %}style="--menu-bg:url('{{ menu_images.5 }}');"{% endif %}>
             <span class="pv-menu-left">
                 <i class='bx bx-edit-alt'></i>
                 <span>Profil tahrirlash</span>
@@ -1472,8 +1561,7 @@
     </div>
 
     <!-- =====================================================
-         PROFIL TAHRIRLASH BOX — menyudan keyin, eski joyida.
-         Default holatda yopiq, faqat tugma bosilganda ochiladi.
+         PROFIL TAHRIRLASH BOX — default holatda yopiq.
          ===================================================== -->
 
     <div class="pcard pv-edit-box" id="profilTahrirlashBox">
