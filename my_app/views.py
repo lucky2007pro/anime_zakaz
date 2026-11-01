@@ -38,6 +38,45 @@ User = get_user_model()
 NEWS_PAGE_SIZE = 9
 BETA_HOME_TRIAL_DAYS = 7
 
+# ================= PREMIUM PROFIL DIZAYN =================
+PROFILE_BG_IMAGES = {
+    'auto': [
+        "https://i.pinimg.com/736x/c6/5b/e9/c65be95c075b8320206dede275efb86e.jpg",
+        "https://i.pinimg.com/1200x/18/c8/d8/18c8d809a6254f49a777c265aeea96b9.jpg",
+        "https://i.pinimg.com/1200x/6b/80/00/6b8000750955adf16beb24c7b8f7c843.jpg",
+        "https://i.pinimg.com/1200x/83/f8/62/83f862f7c78bdc091ba731b363f9503c.jpg",
+    ],
+    'boy': [
+        "https://i.pinimg.com/736x/37/9e/dc/379edc1ff046f02d6ab88b30e31db40d.jpg",
+        "https://i.pinimg.com/736x/28/4d/36/284d36687bdbf6d5efe729a85c003b72.jpg",
+        "https://i.pinimg.com/736x/b9/6a/28/b96a281ce3b6b5dee37cbf5f8c0dbdc7.jpg",
+        "https://i.pinimg.com/736x/55/06/dc/5506dc46d13fc5c45a34c054892905e0.jpg",
+    ],
+    'girl': [
+        "https://i.pinimg.com/736x/4b/72/34/4b72347326af08813372779bec75bb49.jpg",
+        "https://i.pinimg.com/736x/a1/0e/92/a10e92e1d8fcce89004172f7caf35ef5.jpg",
+        "https://i.pinimg.com/736x/5d/2a/8b/5d2a8b45918a3fde015813c08da06021.jpg",
+    ],
+}
+PROFILE_BG_LABELS = [('auto', 'Avto'), ('boy', "O'g'il bolalar"), ('girl', 'Qiz bolalar')]
+
+PROFILE_MENU_IMAGES = [
+    "https://i.pinimg.com/1200x/a1/ea/37/a1ea37ff55116bcdf478404177bb249a.jpg",
+    "https://i.pinimg.com/1200x/ff/92/35/ff9235cd827885e439aef1bb9e153754.jpg",
+    "https://i.pinimg.com/1200x/2b/69/4d/2b694d81a69d6cd52ddcec3d3a6e0fab.jpg",
+    "https://i.pinimg.com/1200x/ad/5f/72/ad5f72869bd3b37c7862f1a572682ea2.jpg",
+    "https://i.pinimg.com/1200x/b5/c7/0f/b5c70fe9470ec5bdc7e3c79888168aa6.jpg",
+    "https://i.pinimg.com/1200x/da/66/ec/da66ecd52ccf2d2f4279c6e50fc0cce4.jpg",
+    "https://i.pinimg.com/1200x/f1/d0/11/f1d0113e19c6bbfda196d4e54256b864.jpg",
+    "",
+]
+
+
+def _is_premium_user(user):
+    vip_data, _ = VipUser.objects.get_or_create(user=user)
+    return vip_data.get_tier() in ['premium', 'vip'] or user.is_staff or user.is_admin_user
+
+
 # =======================
 # REGISTER
 # =======================
@@ -99,7 +138,9 @@ def logout_view(request):
     return redirect('login')
 
 
-
+# =======================
+# HOME
+# =======================
 # =======================
 # HOME
 # =======================
@@ -220,6 +261,9 @@ def home(request):
     }
 
     return render(request, template_name, context)
+
+
+
 
 
 
@@ -587,6 +631,17 @@ def profile(request):
     for w in last_watched_history:
         w.local_time = localtime(w.last_watched, tz)
 
+    # ===== PREMIUM PROFIL DIZAYN =====
+    p_settings, _ = UserSettings.objects.get_or_create(user=request.user)
+    profile_bg_url = None
+    menu_images = []
+    if p_settings.premium_profile_on and _is_premium_user(request.user):
+        imgs = PROFILE_BG_IMAGES.get(p_settings.premium_profile_cat, PROFILE_BG_IMAGES['auto'])
+        idx = p_settings.premium_profile_bg_idx if p_settings.premium_profile_bg_idx < len(imgs) else 0
+        profile_bg_url = imgs[idx]
+        if p_settings.premium_profile_menu_on:
+            menu_images = PROFILE_MENU_IMAGES
+
     context = {
         'total_users': CustomUser.objects.count(),
         'vip_active': vip_data.vip_active(),
@@ -597,6 +652,8 @@ def profile(request):
         'last_watched_history': last_watched_history,
         'user_level': request.user.get_level(),
         'watched_count': request.user.watched_count(),
+        'profile_bg_url': profile_bg_url,
+        'menu_images': menu_images,
     }
     return render(request, 'profile.html', context)
 
@@ -1881,6 +1938,15 @@ def imkon_page(request):
             settings_obj.beta_home_on = False
             settings_obj.save(update_fields=['beta_home_on'])
 
+    profile_bg_groups = []
+    for key, label in PROFILE_BG_LABELS:
+        profile_bg_groups.append({
+            'key': key,
+            'label': label,
+            'images': [{'idx': i, 'url': u} for i, u in enumerate(PROFILE_BG_IMAGES[key])],
+        })
+    profile_menu_images = PROFILE_MENU_IMAGES
+
     context = {
         'is_premium': is_premium,
         'user_tier': tier,
@@ -1896,8 +1962,49 @@ def imkon_page(request):
         'beta_expire_local': beta_expire_local,    # YANGI
         'musics': musics,
         'vip_videos': vip_videos,
+        'profile_bg_groups': profile_bg_groups,
+        'profile_menu_images': profile_menu_images,
     }
     return render(request, 'imkon.html', context)
+
+@login_required
+def imkon_toggle_profile_design(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    if not _is_premium_user(request.user):
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+    s, _ = UserSettings.objects.get_or_create(user=request.user)
+    s.premium_profile_on = not s.premium_profile_on
+    s.save()
+    return JsonResponse({'premium_profile_on': s.premium_profile_on})
+
+
+@login_required
+def imkon_select_profile_bg(request, cat, idx):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    if not _is_premium_user(request.user):
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+    imgs = PROFILE_BG_IMAGES.get(cat)
+    if imgs is None or idx < 0 or idx >= len(imgs):
+        return JsonResponse({'error': "Noto'g'ri rasm"}, status=400)
+    s, _ = UserSettings.objects.get_or_create(user=request.user)
+    s.premium_profile_cat = cat
+    s.premium_profile_bg_idx = idx
+    s.save()
+    return JsonResponse({'ok': True, 'cat': cat, 'idx': idx})
+
+
+@login_required
+def imkon_toggle_profile_menu(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    if not _is_premium_user(request.user):
+        return JsonResponse({'error': 'Faqat premium/VIP azolar uchun'}, status=403)
+    s, _ = UserSettings.objects.get_or_create(user=request.user)
+    s.premium_profile_menu_on = not s.premium_profile_menu_on
+    s.save()
+    return JsonResponse({'premium_profile_menu_on': s.premium_profile_menu_on})
 
 # =======================
 # PREMIUM MUZIKA — YOQISH/O'CHIRISH
@@ -2305,3 +2412,7 @@ def mark_episode_watched(request, episode_id):
         defaults={'last_watched': timezone.now(), 'last_episode': episode}
     )
     return JsonResponse({'ok': True})
+
+
+
+
