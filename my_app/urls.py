@@ -1,19 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import (
-    register, login, home, movie_detail, check_username,
-    profile, make_vip, search, anime_catalog,
-    chat, chat_messages_api, edit_message, delete_message, ban_user,
-    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page, aloqa, news_feed, news_detail, toggle_like, next_story_view, prev_story_view, story_view, mark_story_seen,
-    reelbest_view_increment,reelbest_comments_api,reelbest_add_comment,reelbest_toggle_like,reelbest_page,
-    settings_privacy, settings_devices, settings_premium, settings_telegram, settings_general, user_mini_profile_api,
-    anime_category, notice, delete_comment, service_worker_view, offline_view, manifest_view,
-    hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
-    imkon_vote_request_add, imkon_vote, imkon_anime_request_add, check_username,
-    news_load_more, vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem, imkon_toggle_beta_home,
-    save_push_subscription, send_test_push_api,imkon_set_music_volume,imkon_select_music,imkon_toggle_music,poll_vote,mark_episode_watched,imkon_toggle_vip_box_expire,imkon_toggle_vip_box_recent,imkon_toggle_vip_box,
-    imkon_select_vip_box_video
-)
+from .views import *
 from .admin_views import *
 from django.conf import settings
 from django.conf.urls.static import static
@@ -223,6 +210,10 @@ urlpatterns = [
     path('control-panel/admins/<int:pk>/', admin_admin_form, name='admin_admin_form'),
     path('control-panel/admins/<int:pk>/remove/', admin_admin_remove, name='admin_admin_remove'),
     path('control-panel/admins/<int:pk>/permissions/', admin_admin_perms, name='admin_admin_perms'),
+    path('imkon/profil-dizayn/toggle/', imkon_toggle_profile_design, name='imkon_toggle_profile_design'),
+    path('imkon/profil-dizayn/<str:cat>/<int:idx>/tanlash/', imkon_select_profile_bg, name='imkon_select_profile_bg'),
+    path('imkon/profil-dizayn/menyu/toggle/', imkon_toggle_profile_menu, name='imkon_toggle_profile_menu'),
+
 ]
 
 
