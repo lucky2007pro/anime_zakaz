@@ -601,6 +601,12 @@ class UserSettings(models.Model):
         'PremiumBackground', on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
     )
     telegram_download_on = models.BooleanField(default=False)
+    
+    premium_profile_on = models.BooleanField(default=False)
+    premium_profile_cat = models.CharField(max_length=10, default='auto')  # auto / boy / girl
+    premium_profile_bg_idx = models.PositiveSmallIntegerField(default=0)
+    premium_profile_menu_on = models.BooleanField(default=False)
+
 
     # YANGI — PREMIUM VIP BOX (chat'da avatar bosilganda maxsus oyna)
     premium_vip_box_on = models.BooleanField(
