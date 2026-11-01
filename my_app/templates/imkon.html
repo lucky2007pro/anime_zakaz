@@ -6,7 +6,7 @@
 {% block extra_css %}
 <style>
     /* =====================================================
-       BESTMEDIA — IMKONIYATLAR (v3)
+       BESTMEDIA — IMKONIYATLAR (v5)
        Faqat transform/opacity animatsiyalar (mobil lag yo'q)
        ===================================================== */
     .imkon-wrap {
@@ -26,7 +26,6 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* Ota konteyner (base.html) bir tomonlama padding/margin bersa ham — o'rtaga tekislaydi */
     .main-content:has(> .imkon-wrap) {
         padding-left: 0;
         padding-right: 0;
@@ -46,6 +45,8 @@
     .imkon-wrap button,
     .imkon-toggle,
     .imkon-bg-item,
+    .imkon-pd-item,
+    .imkon-pd-tab,
     .imkon-vip-video-card { touch-action: manipulation; }
 
     /* ================= HEADER ================= */
@@ -285,7 +286,6 @@
     .ic-rocket { animation: imkonRocket 2.6s ease-in-out infinite; }
     .ic-spin   { animation: imkonSpin 7s linear infinite; }
 
-    /* ON / OFF paytida icon animatsiyasi (JS qo'shadi) */
     .icon-on  { animation: imkonIconOn .7s var(--imkon-ease) 1 !important; }
     .icon-off { animation: imkonIconOff .5s ease 1 !important; }
 
@@ -330,6 +330,7 @@
     /* ================= COLLAPSE (o'lcham sakramaydi) ================= */
     .imkon-bg-box,
     .imkon-vipbox-box,
+    .imkon-pdesign-box,
     .imkon-music-box {
         display: grid;
         grid-template-rows: 0fr;
@@ -341,6 +342,7 @@
 
     .imkon-bg-box.open,
     .imkon-vipbox-box.open,
+    .imkon-pdesign-box.open,
     .imkon-music-box.open {
         grid-template-rows: 1fr;
         opacity: 1;
@@ -354,7 +356,7 @@
     /* ================= FON PICKER ================= */
     .imkon-bg-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));   /* doim 3x3 */
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 10px;
         max-width: 520px;
         margin: 0 auto;
@@ -367,7 +369,7 @@
         border-radius: 14px;
     }
 
-    .imkon-bg-ph { visibility: hidden; pointer-events: none; }   /* o'lcham saqlovchi bo'sh katak */
+    .imkon-bg-ph { visibility: hidden; pointer-events: none; }
 
     .imkon-bg-item {
         overflow: hidden;
@@ -587,6 +589,144 @@
         flex-shrink: 0;
     }
 
+    /* ================= PREMIUM PROFIL DIZAYN (ixcham) ================= */
+    .imkon-pd-inner {
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    .imkon-pd-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .imkon-pd-tab {
+        padding: 10px 6px;
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+        background: rgba(255,255,255,.04);
+        color: var(--text-dim);
+        font-family: 'Outfit';
+        font-weight: 800;
+        font-size: .78rem;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+    }
+
+    .imkon-pd-tab:active { transform: scale(.96); }
+
+    .imkon-pd-tab.active {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+    }
+
+    .imkon-pd-panel { display: none; }
+    .imkon-pd-panel.active { display: block; animation: imkonFadeUp .35s var(--imkon-ease) both; }
+
+    /* Premium fon kartalari bilan bir xil o'lcham: 3 ustun, 3:4 */
+    .imkon-pd-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .imkon-pd-item {
+        position: relative;
+        aspect-ratio: 3 / 4;
+        border-radius: 14px;
+        overflow: hidden;
+        cursor: pointer;
+        background: rgba(255,255,255,.04);
+        border: 2px solid transparent;
+        transition: border-color .2s ease, transform .25s var(--imkon-ease);
+    }
+
+    .imkon-pd-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .imkon-pd-item:active { transform: scale(.96); }
+    .imkon-pd-item.active { border-color: var(--accent); }
+
+    .imkon-pd-item.active::after {
+        content: '\ea41';
+        font-family: 'boxicons';
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 22px;
+        height: 22px;
+        background: var(--accent);
+        color: #000;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .9rem;
+        animation: imkonPop .5s var(--imkon-ease) both;
+    }
+
+    /* Tugmalar (Hisobim, Saqlanganlar, ...) ixcham ko'rinishi */
+    .imkon-pd-btns {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        margin: 4px 0 8px;
+    }
+
+    .imkon-pd-btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 9px;
+        height: 40px;
+        padding: 0 12px;
+        border-radius: 11px;
+        border: 1px solid rgba(255,255,255,.14);
+        background-image:
+            linear-gradient(rgba(10,8,16,.58), rgba(10,8,16,.72)),
+            var(--pd-bg);
+        background-size: cover;
+        background-position: center;
+        color: #fff;
+        font-size: .82rem;
+        font-weight: 800;
+    }
+
+    .imkon-pd-btn span {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .imkon-pd-btn span i {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        background: rgba(0,0,0,.35);
+        color: var(--accent);
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .imkon-pd-btn > i { color: rgba(255,255,255,.5); font-size: 1.1rem; flex-shrink: 0; }
+
     /* ================= INPUT / BUTTON ================= */
     .imkon-vote-input-row { display: flex; gap: 10px; margin-top: 16px; }
 
@@ -601,7 +741,7 @@
         color: #fff;
         outline: none;
         font-family: 'Outfit';
-        font-size: 16px;                 /* iOS zoom oldini oladi */
+        font-size: 16px;
         transition: border-color .2s ease, box-shadow .2s ease;
     }
 
@@ -848,7 +988,8 @@
     @media (hover: hover) and (pointer: fine) {
         .imkon-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 40%, var(--glass-border)); }
         .imkon-toggle:hover { border-color: var(--accent); }
-        .imkon-bg-item:hover { transform: translateY(-3px); }
+        .imkon-bg-item:hover, .imkon-pd-item:hover { transform: translateY(-3px); }
+        .imkon-pd-tab:hover:not(.active) { border-color: var(--accent); color: #fff; }
         .imkon-vip-video-card:hover { border-color: rgba(255,193,7,.55); transform: translateY(-2px); }
         .imkon-btn:hover:not(:disabled) { background: #fff; transform: translateY(-1px); }
         .imkon-vote-btn:hover { transform: translateY(-1px); border-color: var(--accent); }
@@ -911,6 +1052,11 @@
         .imkon-bg-grid { gap: 8px; }
         .imkon-bg-item, .imkon-bg-ph { border-radius: 11px; }
 
+        .imkon-pd-grid { gap: 8px; }
+        .imkon-pd-item { border-radius: 11px; }
+        .imkon-pd-tab { font-size: .72rem; padding: 9px 4px; }
+        .imkon-pd-btn { height: 38px; font-size: .78rem; }
+
         .imkon-vip-videos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 
         .imkon-vote-input-row { flex-direction: column; gap: 9px; }
@@ -928,7 +1074,6 @@
         .imkon-music-name { font-size: .83rem; }
         .imkon-volume-row { gap: 9px; }
 
-        /* Mobil yengillashtirish: og'ir effektlar o'chiriladi */
         .imkon-card { box-shadow: none; }
         .imkon-vipbox-preview { animation: none; }
     }
@@ -1017,7 +1162,6 @@
                     {% endfor %}
                 </div>
 
-                <!-- Sahifalash: 9 tadan ortiq fon bo'lsa avtomatik ko'rinadi -->
                 <div class="imkon-bg-pager" id="bgPager">
                     <button type="button" class="imkon-bg-pager-btn" id="bgPrevBtn" onclick="bgPrevPage()" aria-label="Oldingi">
                         <i class='bx bx-chevron-left'></i>
@@ -1078,8 +1222,79 @@
             </div>
         </div>
 
-        <!-- ================= 3) PREMIUM MUZIKALAR ================= -->
+        <!-- ================= 2.7) PREMIUM PROFIL DIZAYN ================= -->
         <div class="imkon-card imkon-full" style="--i:4">
+            <div class="imkon-card-head">
+                <div>
+                    <div class="imkon-card-title"><i class='bx bxs-palette ic-float'></i> Premium profil dizayn</div>
+                    <div class="imkon-card-desc">Yoqsangiz, profilingizdagi "profil ma'lumotlar" boxiga va tugmalarga o'zingiz tanlagan rasmli fon o'rnatiladi.</div>
+                </div>
+                <div class="imkon-toggle {% if settings.premium_profile_on %}on{% endif %}" id="profileDesignToggle" onclick="event.stopPropagation(); toggleProfileDesign()"></div>
+            </div>
+
+            <div class="imkon-pdesign-box {% if settings.premium_profile_on %}open{% endif %}" id="profileDesignBox">
+              <div class="imkon-collapse-in">
+               <div class="imkon-pd-inner">
+
+                <div class="imkon-vipbox-sec-title"><i class='bx bxs-image'></i> Profil box fonini tanlash</div>
+
+                <div class="imkon-pd-tabs" id="pdTabs">
+                    {% for g in profile_bg_groups %}
+                    <button type="button"
+                            class="imkon-pd-tab {% if settings.premium_profile_cat == g.key %}active{% elif not settings.premium_profile_cat and g.key == 'auto' %}active{% endif %}"
+                            data-cat="{{ g.key }}" onclick="event.stopPropagation(); switchProfileTab('{{ g.key }}', this)">{{ g.label }}</button>
+                    {% endfor %}
+                </div>
+
+                {% for g in profile_bg_groups %}
+                <div class="imkon-pd-panel {% if settings.premium_profile_cat == g.key %}active{% elif not settings.premium_profile_cat and g.key == 'auto' %}active{% endif %}" data-panel="{{ g.key }}">
+                    <div class="imkon-pd-grid">
+                        {% for img in g.images %}
+                        <div class="imkon-pd-item {% if settings.premium_profile_cat == g.key and settings.premium_profile_bg_idx == img.idx %}active{% endif %}"
+                             onclick="event.stopPropagation(); selectProfileBg('{{ g.key }}', {{ img.idx }}, this)">
+                            <img src="{{ img.url }}" alt="{{ g.label }} {{ forloop.counter }}" loading="lazy" decoding="async">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="imkon-vipbox-sec-title" style="margin-top:20px;"><i class='bx bxs-layout'></i> Tugmalar fon rasmi</div>
+
+                <!-- Profildagi BARCHA 6 ta tugma uchun rasm (profile_menu_images dagi 0..5) -->
+                <div class="imkon-pd-btns">
+                    <div class="imkon-pd-btn" style="--pd-bg:url('{{ profile_menu_images.0 }}');">
+                        <span><i class='bx bx-wallet'></i> Hisobim</span><i class='bx bx-chevron-right'></i>
+                    </div>
+                    <div class="imkon-pd-btn" style="--pd-bg:url('{{ profile_menu_images.1 }}');">
+                        <span><i class='bx bx-heart'></i> Saqlanganlar</span><i class='bx bx-chevron-right'></i>
+                    </div>
+                    <div class="imkon-pd-btn" style="--pd-bg:url('{{ profile_menu_images.2 }}');">
+                        <span><i class='bx bx-bar-chart-alt-2'></i> Statistika</span><i class='bx bx-chevron-right'></i>
+                    </div>
+                    <div class="imkon-pd-btn" style="--pd-bg:url('{{ profile_menu_images.3 }}');">
+                        <span><i class='bx bxs-crown'></i> Premium imkonlar</span><i class='bx bx-chevron-right'></i>
+                    </div>
+                    <div class="imkon-pd-btn" style="--pd-bg:url('{{ profile_menu_images.4 }}');">
+                        <span><i class='bx bx-cog'></i> Sozlamalar</span><i class='bx bx-chevron-right'></i>
+                    </div>
+                    <div class="imkon-pd-btn" style="--pd-bg:url('{{ profile_menu_images.5 }}');">
+                        <span><i class='bx bx-edit-alt'></i> Profil tahrirlash</span><i class='bx bx-chevron-down'></i>
+                    </div>
+                </div>
+
+                <div class="imkon-vipbox-option">
+                    <span><i class='bx bx-grid-alt ic-pulse'></i> Profildagi tugmalarga rasmli fon</span>
+                    <div class="imkon-toggle small {% if settings.premium_profile_menu_on %}on{% endif %}" id="profileBtnToggle" onclick="event.stopPropagation(); toggleProfileBtns()"></div>
+                </div>
+
+               </div>
+              </div>
+            </div>
+        </div>
+
+        <!-- ================= 3) PREMIUM MUZIKALAR ================= -->
+        <div class="imkon-card imkon-full" style="--i:5">
             <div class="imkon-card-head">
                 <div>
                     <div class="imkon-card-title"><i class='bx bxs-music ic-bounce'></i> Premium muzikalar</div>
@@ -1122,10 +1337,10 @@
             </div>
         </div>
 
-        <div class="imkon-section" style="--i:5"><i class='bx bxs-group'></i> Hamjamiyat</div>
+        <div class="imkon-section" style="--i:6"><i class='bx bxs-group'></i> Hamjamiyat</div>
 
         <!-- ================= 4) SO'ROVNOMA ================= -->
-        <div class="imkon-card imkon-full" style="--i:6">
+        <div class="imkon-card imkon-full" style="--i:7">
             <div class="imkon-card-title"><i class='bx bxs-conversation ic-sway'></i> Premium so'rovnoma</div>
             <div class="imkon-card-desc">Faqat 1 ta anime nomi taklif qiling. 10 ovoz yig'sa — ANI BEST tomonidan ovozlashtiriladi.</div>
 
@@ -1163,13 +1378,13 @@
         </div>
 
         <!-- ================= 5) OBUNACHILAR SONI ================= -->
-        <div class="imkon-card" style="--i:7">
+        <div class="imkon-card" style="--i:8">
             <div class="imkon-card-title"><i class='bx bxs-group ic-pulse'></i> Premium obunachilar soni</div>
             <p class="imkon-stat-value">{{ premium_count }}</p>
         </div>
 
         <!-- ================= 6) TELEGRAM YUKLAB OLISH ================= -->
-        <div class="imkon-card" style="--i:8">
+        <div class="imkon-card" style="--i:9">
             <div class="imkon-card-head">
                 <div>
                     <div class="imkon-card-title"><i class='bx bxl-telegram ic-float'></i> Telegram orqali yuklab olish</div>
@@ -1180,7 +1395,7 @@
         </div>
 
         <!-- ================= 7) OLDINDAN ANIME SO'RASH ================= -->
-        <div class="imkon-card imkon-full" style="--i:9">
+        <div class="imkon-card imkon-full" style="--i:10">
             <div class="imkon-card-title"><i class='bx bxs-search-alt ic-wiggle'></i> Oldindan anime surash</div>
             <div class="imkon-card-desc">To'xtab qolgan yoki ANI BEST'da hali chiqmagan animeni so'rang (1 marta)</div>
 
@@ -1264,8 +1479,6 @@ function selectBg(id, el) {
 
 /* ============================================
    PREMIUM FON — SAHIFALASH (9 tadan)
-   Oxirgi sahifada bo'sh kataklar qo'shiladi,
-   shuning uchun box o'lchami o'zgarmaydi.
    ============================================ */
 const BG_PER_PAGE = 9;
 let bgItems = [];
@@ -1304,10 +1517,8 @@ function renderBgPage(animate) {
     });
 
     if (grid) {
-        // eski bo'sh kataklarni tozalash
         grid.querySelectorAll('.imkon-bg-ph').forEach(p => p.remove());
 
-        // 9 tadan ortiq bo'lsa — har sahifa bir xil balandlikda bo'lishi uchun to'ldiramiz
         if (bgItems.length > BG_PER_PAGE) {
             for (let k = shown; k < BG_PER_PAGE; k++) {
                 const ph = document.createElement('div');
@@ -1392,6 +1603,49 @@ function selectVipVideo(id, card) {
         if (data.error) { alert(data.error); return; }
         document.querySelectorAll('.imkon-vip-video-card').forEach(c => c.classList.remove('selected'));
         if (card) card.classList.add('selected');
+    });
+}
+
+/* ============================================
+   PREMIUM PROFIL DIZAYN
+   ============================================ */
+function toggleProfileDesign() {
+    fetch("{% url 'imkon_toggle_profile_design' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+        document.getElementById('profileDesignToggle').classList.toggle('on', data.premium_profile_on);
+        document.getElementById('profileDesignBox').classList.toggle('open', data.premium_profile_on);
+    });
+}
+
+function switchProfileTab(cat, btn) {
+    document.querySelectorAll('.imkon-pd-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.imkon-pd-panel').forEach(p => {
+        p.classList.toggle('active', p.getAttribute('data-panel') === cat);
+    });
+}
+
+function selectProfileBg(cat, idx, el) {
+    fetch(`/imkon/profil-dizayn/${cat}/${idx}/tanlash/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+        document.querySelectorAll('.imkon-pd-item').forEach(i => i.classList.remove('active'));
+        if (el) el.classList.add('active');
+    });
+}
+
+function toggleProfileBtns() {
+    fetch("{% url 'imkon_toggle_profile_menu' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+        document.getElementById('profileBtnToggle').classList.toggle('on', data.premium_profile_menu_on);
     });
 }
 
@@ -1498,7 +1752,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const onclickAttr = btn ? btn.getAttribute('onclick') : '';
         const match = onclickAttr ? onclickAttr.match(/toggleTrack\((\d+),\s*'([^']+)'/) : null;
         if (match) {
-            // Agar globalBgMusic hali o'ynamayotgan bo'lsa yoki boshqa trek bo'lsa
             if (!previewAudio.src || !previewAudio.src.includes(match[2])) {
                 previewAudio.src = match[2];
             }
@@ -1526,7 +1779,6 @@ function toggleMusic() {
             document.querySelectorAll('.imkon-music-row').forEach(r => r.classList.remove('playing'));
             document.querySelectorAll('.imkon-music-play-btn').forEach(b => b.innerHTML = "<i class='bx bx-play'></i>");
         } else {
-            // Agar yoqilsa, tanlangan trekni o'ynatish
             const playingRow = document.querySelector('.imkon-music-row.playing') || document.querySelector('.imkon-music-row');
             if (playingRow) {
                 const btn = playingRow.querySelector('.imkon-music-play-btn');
@@ -1603,8 +1855,6 @@ function toggleTrack(id, url, btn) {
 
 /* ============================================
    ON/OFF PAYTIDA ICON ANIMATSIYASI
-   Toggle holati o'zgarganda kartadagi icon "pop"
-   bo'ladi (mavjud funksiyalarga tegmaydi).
    ============================================ */
 function playIconAnim(icon, isOn) {
     if (!icon) return;
@@ -1627,7 +1877,6 @@ function initToggleIconAnimations() {
 
             let icon;
             if (toggle.classList.contains('small')) {
-                // VIP box ichidagi kichik toggle — o'z yonidagi icon
                 const opt = toggle.closest('.imkon-vipbox-option');
                 icon = opt ? opt.querySelector('span i') : null;
             } else {
