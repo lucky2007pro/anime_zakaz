@@ -38,6 +38,7 @@ User = get_user_model()
 NEWS_PAGE_SIZE = 9
 BETA_HOME_TRIAL_DAYS = 7
 
+
 # ================= PREMIUM PROFIL DIZAYN =================
 PROFILE_BG_IMAGES = {
     'auto': [
@@ -45,6 +46,8 @@ PROFILE_BG_IMAGES = {
         "https://i.pinimg.com/1200x/18/c8/d8/18c8d809a6254f49a777c265aeea96b9.jpg",
         "https://i.pinimg.com/1200x/6b/80/00/6b8000750955adf16beb24c7b8f7c843.jpg",
         "https://i.pinimg.com/1200x/83/f8/62/83f862f7c78bdc091ba731b363f9503c.jpg",
+        "https://i.pinimg.com/736x/b8/3a/71/b83a71cd0b99803ae99b8945cf4f9d6f.jpg",
+        "https://i.pinimg.com/736x/b9/54/b0/b954b0ad404755b289a3b651279d80a2.jpg",
     ],
     'boy': [
         "https://i.pinimg.com/736x/37/9e/dc/379edc1ff046f02d6ab88b30e31db40d.jpg",
@@ -56,6 +59,7 @@ PROFILE_BG_IMAGES = {
         "https://i.pinimg.com/736x/4b/72/34/4b72347326af08813372779bec75bb49.jpg",
         "https://i.pinimg.com/736x/a1/0e/92/a10e92e1d8fcce89004172f7caf35ef5.jpg",
         "https://i.pinimg.com/736x/5d/2a/8b/5d2a8b45918a3fde015813c08da06021.jpg",
+        "https://i.pinimg.com/736x/4b/64/98/4b64981e9f96ac9d4d944202a54193f2.jpg",
     ],
 }
 PROFILE_BG_LABELS = [('auto', 'Avto'), ('boy', "O'g'il bolalar"), ('girl', 'Qiz bolalar')]
