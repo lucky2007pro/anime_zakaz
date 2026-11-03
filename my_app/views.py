@@ -2547,7 +2547,7 @@ def daraja_oshirish_page(request):
         'url_reels': _safe_url(['reelbest_page'], '/reels/'),
         'url_chat': _safe_url(['chat'], '/chat/'),
         'url_news': _safe_url(['news_feed', 'news'], '/news/'),
-        'url_anime': _safe_url(['anime_catalog'], '/'),
+        'url_anime': _safe_url(['anime_category'], '/'),
     }
     return render(request, 'daraja_oshirish.html', context)
 
