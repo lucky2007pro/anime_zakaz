@@ -23,21 +23,16 @@ from django.template.loader import render_to_string
 import json
 from pywebpush import webpush, WebPushException
 from django.conf import settings
+import random
+from django.db import transaction
 
 
 
-from .models import (
-    CustomUser, VipUser, Category, Movie, SiteSettings, MP3, ChatMessage, SubscriptionReceipt, ProfileAvatar, AnimeNews, NewsLike,
-    Story, StoryView, ReelBest, ReelBestLike, ReelBestComment,
-    UserSettings,AnimeSchedule,AnimeSectionItem, Notice, NoticeRead,WatchHistory, FavoriteAnime,NoResultsMedia,
-    AccountHistory, DebtRequest, BalanceTopupRequest, JackpotCode, JackpotCodeUse,UserBalance,PushSubscription,
-    WatchedEpisode,VipThankVideo
-)
+from .models import *
 
 User = get_user_model()
 NEWS_PAGE_SIZE = 9
 BETA_HOME_TRIAL_DAYS = 7
-
 
 # ================= PREMIUM PROFIL DIZAYN =================
 PROFILE_BG_IMAGES = {
@@ -79,6 +74,66 @@ PROFILE_MENU_IMAGES = [
 def _is_premium_user(user):
     vip_data, _ = VipUser.objects.get_or_create(user=user)
     return vip_data.get_tier() in ['premium', 'vip'] or user.is_staff or user.is_admin_user
+
+# =======================
+# DARAJA OSHIRISH (BST)
+# =======================
+PUZZLE_IMAGE_URL = "https://i.pinimg.com/736x/21/6f/47/216f4718f7675003001a16e35585975e.jpg"
+PUZZLE_REWARD_BST = 2
+PUZZLE_MIN_SECONDS = 6      # bundan tez yechilsa rad etiladi
+
+BST_STAGES = [
+    ("0–10",  "Xira tilla",   "#8f8156"),
+    ("11–20", "Tilla",        "#c9a93f"),
+    ("21–30", "Yorqin tilla", "#ffc107"),
+    ("31–40", "Zarhal",       "#ff9800"),
+    ("41–50", "Olov",         "#ff5a36"),
+    ("51–55", "Afsonaviy",    "#b45cff"),
+]
+BST_BOUNDS = [0, 10, 20, 30, 40, 50, 55]
+
+
+def _tz_today():
+    return localtime(timezone.now(), ZoneInfo('Asia/Tashkent')).strftime('%Y-%m-%d')
+
+
+def _safe_url(names, fallback):
+    for n in names:
+        try:
+            return reverse(n)
+        except Exception:
+            continue
+    return fallback
+
+
+def award_bst(user, source, ref, amount=1):
+    """BST berish. Qancha qo'shilganini qaytaradi (0 = allaqachon berilgan yoki limit)."""
+    if not getattr(user, 'is_authenticated', False):
+        return 0
+    try:
+        with transaction.atomic():
+            data, _ = daraja_kutarish.objects.select_for_update().get_or_create(user=user)
+            if data.level >= BST_MAX:
+                return 0
+            if BstLog.objects.filter(user=user, source=source, ref=str(ref)).exists():
+                return 0
+            add = min(amount, BST_MAX - data.level)
+            BstLog.objects.create(user=user, source=source, ref=str(ref), amount=add)
+            data.level += add
+            data.save()
+            return add
+    except Exception as e:
+        print("BST xatosi:", e)   # asosiy amal (like/izoh) buzilmasin
+        return 0
+
+
+def _puzzle_next_time(data):
+    if data.puzzle_last_done:
+        nxt = data.puzzle_last_done + timedelta(hours=24)
+        if nxt > timezone.now():
+            return nxt
+    return None
+
 
 
 # =======================
@@ -298,6 +353,7 @@ def movie_detail(request, id):
             new_comment = MovieComment.objects.create(
                 movie=movie, user=request.user, text=text, parent=parent_comment
             )
+            award_bst(request.user, 'movie_comment', movie.id)
 
             if parent_comment and parent_comment.user != request.user:
                 Notice.objects.create(
@@ -733,6 +789,7 @@ def chat(request):
     tz = ZoneInfo('Asia/Tashkent')
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
 
+
     messages_count = ChatMessage.objects.count()
     has_more = messages_count > 40
 
@@ -779,6 +836,7 @@ def chat(request):
                 reply_to=reply_to_msg,
                 reply_to_news=reply_to_news,                      # YANGI
             )
+            award_bst(request.user, 'chat_daily', _tz_today())
             if reply_to_msg and reply_to_msg.user != request.user:
                 Notice.objects.create(
                     notice_type='reply',
@@ -1117,6 +1175,8 @@ def toggle_like(request, pk):
         user=request.user,
         news=news
     )
+    if created:
+        award_bst(request.user, 'news_like', news.pk)
 
     if not created:
         like_obj.delete()
@@ -1240,6 +1300,8 @@ def reelbest_toggle_like(request, reel_id):
         liked = False
     else:
         liked = True
+        award_bst(request.user, 'reel_like', reel.id)
+
 
     return JsonResponse({'liked': liked, 'total_likes': reel.likes.count()})
 
@@ -1268,6 +1330,7 @@ def reelbest_add_comment(request, reel_id):
     comment = ReelBestComment.objects.create(
         reel=reel, user=request.user, text=text, reply_to=reply_to
     )
+    award_bst(request.user, 'reel_comment', reel.id)
 
     avatar_url = None
     if getattr(request.user, 'avatar', None) and request.user.avatar.image:
@@ -2419,9 +2482,169 @@ def mark_episode_watched(request, episode_id):
 
 
 
+
+
 @login_required(login_url='login')
 def daraja_oshirish_page(request):
-    from .models import daraja_kutarish
-    daraja_kutarish.objects.get_or_create(user=request.user)
-    # TODO: bestdaraja keyin shu yerga yoziladi
-    return HttpResponse("Daraja oshirish — tez orada")
+    from django.db.models import Sum
+    data, _ = daraja_kutarish.objects.get_or_create(user=request.user)
+    bst = min(data.level, BST_MAX)
+
+    # --- bosqich (ranglar kesimi) ---
+    cur_idx = 0 if bst <= 10 else min((bst - 1) // 10, 5)
+    stages = [
+        {'range': r, 'name': n, 'color': c, 'active': i == cur_idx}
+        for i, (r, n, c) in enumerate(BST_STAGES)
+    ]
+    stops = []
+    for i, (_, _, color) in enumerate(BST_STAGES):
+        a = BST_BOUNDS[i] / BST_MAX * 100
+        b = BST_BOUNDS[i + 1] / BST_MAX * 100
+        stops.append(f"{color} {a:.2f}%")
+        stops.append(f"{color} {b:.2f}%")
+    gradient = "linear-gradient(90deg, " + ", ".join(stops) + ")"
+
+    ticks = [f"{v / BST_MAX * 100:.2f}" for v in BST_BOUNDS[1:-1]]
+    scale = []
+    for v in BST_BOUNDS:
+        tx = "0%" if v == 0 else ("-100%" if v == BST_MAX else "-50%")
+        scale.append({'v': v, 'left': f"{v / BST_MAX * 100:.2f}", 'tx': tx})
+
+    # --- olingan BST lar ---
+    earned = {
+        r['source']: r['t'] for r in
+        BstLog.objects.filter(user=request.user).values('source').annotate(t=Sum('amount'))
+    }
+    chat_today = BstLog.objects.filter(
+        user=request.user, source='chat_daily', ref=_tz_today()
+    ).exists()
+
+    # --- puzzle ---
+    nxt = _puzzle_next_time(data)
+    puzzle_wait = int((nxt - timezone.now()).total_seconds()) if nxt else 0
+
+    context = {
+        'bst': bst, 'bst_max': BST_MAX, 'goal': BST_PREMIUM_GOAL,
+        'percent_css': f"{bst / BST_MAX * 100:.2f}",
+        'cur_color': BST_STAGES[cur_idx][2],
+        'cur_stage_name': BST_STAGES[cur_idx][1],
+        'gradient': gradient, 'ticks': ticks, 'scale': scale, 'stages': stages,
+
+        'reward_claimed': data.reward_claimed,
+        'can_claim': (not data.reward_claimed) and bst >= BST_PREMIUM_GOAL,
+        'goal_left': max(BST_PREMIUM_GOAL - bst, 0),
+
+        'puzzle_image': PUZZLE_IMAGE_URL,
+        'puzzle_reward': PUZZLE_REWARD_BST,
+        'puzzle_available': nxt is None,
+        'puzzle_wait': puzzle_wait,
+
+        'earned_reels': earned.get('reel_like', 0) + earned.get('reel_comment', 0),
+        'earned_news': earned.get('news_like', 0),
+        'earned_movie': earned.get('movie_comment', 0),
+        'chat_today': chat_today,
+
+        'url_reels': _safe_url(['reelbest_page'], '/reels/'),
+        'url_chat': _safe_url(['chat'], '/chat/'),
+        'url_news': _safe_url(['news_feed', 'news'], '/news/'),
+        'url_anime': _safe_url(['anime_catalog'], '/'),
+    }
+    return render(request, 'daraja_oshirish.html', context)
+
+
+@login_required
+def daraja_claim_reward(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    with transaction.atomic():
+        data, _ = daraja_kutarish.objects.select_for_update().get_or_create(user=request.user)
+        if data.reward_claimed:
+            return JsonResponse({'error': "Yutuq allaqachon olingan"}, status=400)
+        if data.level < BST_PREMIUM_GOAL:
+            return JsonResponse({'error': f"Yutuq uchun {BST_PREMIUM_GOAL} BST kerak"}, status=400)
+
+        data.reward_claimed = True
+        data.save()
+
+        vip_data, _ = VipUser.objects.get_or_create(user=request.user)
+        if vip_data.vip_active():
+            vip_data.vip_expire = vip_data.vip_expire + timedelta(days=1)   # tarifni pasaytirmaymiz
+        else:
+            vip_data.is_vip = True
+            vip_data.tier = 'premium'
+            vip_data.vip_expire = timezone.now() + timedelta(days=1)
+        vip_data.save()
+
+        AccountHistory.objects.create(
+            user=request.user,
+            text=f"{BST_PREMIUM_GOAL} BST yutug'i: 1 kunlik Premium aktivlashtirildi 🎉"
+        )
+    return JsonResponse({'ok': True})
+
+
+def _new_puzzle_cells():
+    cells = list(range(9))
+    while cells == list(range(9)):
+        random.shuffle(cells)
+    return cells
+
+
+@login_required
+def daraja_puzzle_start(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    with transaction.atomic():
+        data, _ = daraja_kutarish.objects.select_for_update().get_or_create(user=request.user)
+        if _puzzle_next_time(data):
+            return JsonResponse({'error': "Puzzle bugun yechilgan. 24 soatdan keyin urinib ko'ring"}, status=400)
+
+        if data.puzzle_cells:
+            cells = [int(x) for x in data.puzzle_cells.split(',')]
+        else:
+            cells = _new_puzzle_cells()
+            data.puzzle_cells = ','.join(map(str, cells))
+        data.puzzle_started_at = timezone.now()   # vaqt har startda qayta boshlanadi
+        data.save()
+    return JsonResponse({'ok': True, 'cells': cells})
+
+
+@login_required
+def daraja_puzzle_finish(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST talab qilinadi'}, status=405)
+    try:
+        moves = json.loads(request.body).get('moves')
+        assert isinstance(moves, list) and len(moves) <= 300
+        moves = [(int(a), int(b)) for a, b in moves]
+        assert all(0 <= a <= 8 and 0 <= b <= 8 and a != b for a, b in moves)
+    except Exception:
+        return JsonResponse({'error': "Noto'g'ri ma'lumot"}, status=400)
+
+    with transaction.atomic():
+        data, _ = daraja_kutarish.objects.select_for_update().get_or_create(user=request.user)
+        if _puzzle_next_time(data):
+            return JsonResponse({'error': "Puzzle bugun yechilgan"}, status=400)
+        if not data.puzzle_cells or not data.puzzle_started_at:
+            return JsonResponse({'error': "Puzzle boshlanmagan"}, status=400)
+
+        cells = [int(x) for x in data.puzzle_cells.split(',')]
+        for a, b in moves:
+            cells[a], cells[b] = cells[b], cells[a]
+        if cells != list(range(9)):
+            return JsonResponse({'error': "Puzzle to'g'ri terilmagan"}, status=400)
+
+        elapsed = (timezone.now() - data.puzzle_started_at).total_seconds()
+        if elapsed < PUZZLE_MIN_SECONDS:
+            return JsonResponse({'error': "Juda tez! Qaytadan urinib ko'ring"}, status=400)
+
+        now = timezone.now()
+        gained = min(PUZZLE_REWARD_BST, BST_MAX - data.level)
+        data.level += gained
+        data.puzzle_last_done = now
+        data.puzzle_cells = ''
+        data.puzzle_started_at = None
+        data.save()
+        if gained:
+            BstLog.objects.create(user=request.user, source='puzzle',
+                                  ref=now.isoformat(), amount=gained)
+    return JsonResponse({'ok': True, 'gained': gained, 'level': data.level})
