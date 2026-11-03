@@ -4,11 +4,15 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
 from .models import *
-from django.db.models import F, Q, Max
+from django.db.models import F
 from django.utils import timezone as tz_utils
+from django.db.models import F, Q, Max
 from .admin_access import SECTIONS, SECTION_KEYS
 from datetime import timedelta
 from collections import defaultdict
+
+from django.db import transaction
+from .views import BST_STAGES
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
@@ -23,6 +27,7 @@ def is_super_admin(user):
 
 def _is_ajax(request):
     return request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_dashboard(request):
@@ -54,7 +59,6 @@ def admin_dashboard(request):
         'latest_topics': SubscriptionReceipt.objects.all().order_by('-created_at')[:5],
     }
     return render(request, 'custom_admin/dashboard.html', context)
-
 
 @user_passes_test(is_super_admin, login_url='/')
 def admin_users(request):
@@ -108,6 +112,7 @@ def admin_user_role(request, user_id):
     messages.success(request, f"{user.username} uchun vakolatlar yangilandi.")
     return redirect('admin_users')
 
+
 @user_passes_test(is_admin, login_url='/')
 def admin_movies(request):
     movies = Movie.objects.all().order_by('-created_at')
@@ -116,6 +121,7 @@ def admin_movies(request):
         'items': movies,
         'type': 'movie'
     })
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_genres(request):
@@ -126,6 +132,7 @@ def admin_genres(request):
         'type': 'genre'
     })
 
+
 @user_passes_test(is_admin, login_url='/')
 def admin_chat(request):
     messages_qs = ChatMessage.objects.all().order_by('-created_at')[:50]
@@ -134,6 +141,7 @@ def admin_chat(request):
         'items': messages_qs,
         'type': 'chat'
     })
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_movie_form(request, pk=None):
@@ -159,7 +167,7 @@ def admin_movie_form(request, pk=None):
 
         if not movie:
             movie = Movie()
-        
+
         movie.title = title
         movie.description = desc
         movie.video_url = vid_url
@@ -181,7 +189,7 @@ def admin_movie_form(request, pk=None):
             movie.video_file = video_file
         if hero_media:
             movie.hero_media = hero_media
-            
+
         try:
             movie.save()
         except Exception:
@@ -196,8 +204,9 @@ def admin_movie_form(request, pk=None):
 
         messages.success(request, "Anime muvaffaqiyatli saqlandi!")
         return redirect('admin_movies')
-        
+
     return render(request, 'custom_admin/movie_form.html', {'movie': movie, 'genres': genres})
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_movie_delete(request, pk):
@@ -205,6 +214,7 @@ def admin_movie_delete(request, pk):
     movie.delete()
     messages.success(request, "Anime o'chirildi!")
     return redirect('admin_movies')
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_episodes(request):
@@ -230,19 +240,19 @@ def _episode_map():
             continue
         data[str(m_id)].append({'id': ep_id, 'n': n})
     return dict(data)
- 
- 
+
+
 @user_passes_test(is_admin, login_url='/')
 def admin_episode_form(request, pk=None):
     episode = get_object_or_404(MovieEpisode, pk=pk) if pk else None
     movies = Movie.objects.all().order_by('-created_at')
     episode_map = _episode_map()
- 
+
     def form_context():
         selected = (
-            request.POST.get('movie')
-            or (episode.movie_id if episode is not None and episode.movie_id else '')
-            or request.GET.get('movie', '')
+                request.POST.get('movie')
+                or (episode.movie_id if episode is not None and episode.movie_id else '')
+                or request.GET.get('movie', '')
         )
         return {
             'episode': episode,
@@ -250,13 +260,13 @@ def admin_episode_form(request, pk=None):
             'episode_map': episode_map,
             'selected_movie_id': selected,
         }
- 
+
     def fail(err_msg):
         if _is_ajax(request):
             return JsonResponse({'ok': False, 'error': err_msg}, status=400)
         messages.error(request, err_msg)
         return render(request, 'custom_admin/episode_form.html', form_context())
- 
+
     if request.method == 'POST':
         movie_id = request.POST.get('movie')
         ep_num = request.POST.get('episode_number')
@@ -265,35 +275,35 @@ def admin_episode_form(request, pk=None):
         description = request.POST.get('description')
         intro_time = request.POST.get('intro_time')
         video_file = request.FILES.get('video_file')
- 
+
         # --- Tekshiruvlar (saqlashdan oldin) ---
         if not movie_id or not str(movie_id).isdigit():
             return fail("Anime tanlanmadi! Avval animeni tanlang.")
- 
+
         try:
             ep_num_int = int(ep_num)
         except (TypeError, ValueError):
             ep_num_int = 0
         if ep_num_int < 1:
             return fail("Qism raqami noto'g'ri kiritildi.")
- 
+
         movie_obj = get_object_or_404(Movie, id=movie_id)
- 
+
         # Shu animeda boshqa qismlar (tahrirda o'zi hisobga olinmaydi)
         others = MovieEpisode.objects.filter(movie_id=movie_obj.id)
         if episode is not None:
             others = others.exclude(pk=episode.pk)
- 
+
         # 1) Takroriy qism — saqlanmaydi
         if others.filter(episode_number=ep_num_int).exists():
             return fail(f"Bu animada {ep_num_int}-qism allaqachon mavjud! Boshqa raqam kiriting.")
- 
+
         # 2) Tartib buzilishi — saqlanadi, lekin ogohlantiriladi
         last_number = others.aggregate(m=Max('episode_number'))['m'] or 0
- 
+
         if not episode:
             episode = MovieEpisode()
- 
+
         episode.movie = movie_obj
         episode.episode_number = ep_num_int
         episode.title = title
@@ -302,12 +312,12 @@ def admin_episode_form(request, pk=None):
         episode.intro_time = intro_time
         if video_file:
             episode.video_file = video_file
- 
+
         try:
             episode.save()
         except Exception:
             return fail("Video yuklanmadi. Video URL kiriting yoki to'g'ri video formatini yuklang.")
- 
+
         if ep_num_int > last_number + 1:
             first_missing = last_number + 1
             if ep_num_int - first_missing == 1:
@@ -319,14 +329,15 @@ def admin_episode_form(request, pk=None):
                 f"Diqqat: {ep_num_int}-qism saqlandi, lekin {missing_text}-qism(lar) yo'q. "
                 f"Qismlar tartibi buzilgan!"
             )
- 
+
         if _is_ajax(request):
             return JsonResponse({'ok': True, 'redirect_url': reverse('admin_episodes')})
- 
+
         messages.success(request, "Qism muvaffaqiyatli saqlandi!")
         return redirect('admin_episodes')
- 
+
     return render(request, 'custom_admin/episode_form.html', form_context())
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_episode_delete(request, pk):
@@ -334,6 +345,7 @@ def admin_episode_delete(request, pk):
     episode.delete()
     messages.success(request, "Qism o'chirildi!")
     return redirect('admin_episodes')
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_genre_form(request, pk=None):
@@ -347,6 +359,7 @@ def admin_genre_form(request, pk=None):
         messages.success(request, "Janr muvaffaqiyatli saqlandi!")
         return redirect('admin_genres')
     return render(request, 'custom_admin/genre_form.html', {'genre': genre})
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_genre_delete(request, pk):
@@ -367,7 +380,7 @@ def admin_message_edit(request, pk):
             msg.save()
             messages.success(request, "Xabar muvaffaqiyatli tahrirlandi!")
             return redirect('admin_chat')
-    
+
     return render(request, 'custom_admin/message_form.html', {'message': msg})
 
 
@@ -397,14 +410,14 @@ def admin_subscription_action(request, pk, action):
     if action == 'approve':
         receipt.is_approved = True
         receipt.is_rejected = False
-        
+
         vip_user, created = VipUser.objects.get_or_create(user=receipt.user)
         if not vip_user.is_vip or not vip_user.vip_expire:
             vip_user.vip_expire = timezone.now()
-        
+
         # current time is less than expire then add to it, else add to now
         start_time = max(timezone.now(), vip_user.vip_expire) if vip_user.is_vip else timezone.now()
-        
+
         if receipt.plan == '1_month':
             vip_user.vip_expire = start_time + timedelta(days=30)
             if vip_user.tier == 'basic':
@@ -412,18 +425,18 @@ def admin_subscription_action(request, pk, action):
         else:
             vip_user.vip_expire = start_time + timedelta(days=365)
             vip_user.tier = 'vip'
-        
+
         vip_user.is_vip = True
         vip_user.save()
         receipt.save()
         messages.success(request, f"{receipt.user.username} ga VIP vaqti qo'shildi! ({receipt.plan})")
-        
+
     elif action == 'reject':
         receipt.is_approved = False
         receipt.is_rejected = True
         receipt.save()
         messages.error(request, f"{receipt.user.username} obunasi rad etildi!")
-        
+
     return redirect('admin_subscriptions')
 
 
@@ -435,6 +448,7 @@ def admin_avatars(request):
         'items': avatars,
         'type': 'avatar',
     })
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_avatar_form(request):
@@ -449,6 +463,7 @@ def admin_avatar_form(request):
         return redirect('admin_avatars')
 
     return render(request, 'custom_admin/avatar_form.html')
+
 
 @user_passes_test(is_admin, login_url='/')
 def admin_avatar_delete(request, pk):
@@ -478,7 +493,7 @@ def admin_comment_edit(request, pk):
             comment.save()
             messages.success(request, "Izoh muvaffaqiyatli tahrirlandi!")
             return redirect('admin_comments')
-    
+
     return render(request, 'custom_admin/comment_form.html', {'comment': comment})
 
 
@@ -488,7 +503,6 @@ def admin_comment_delete(request, pk):
     comment.delete()
     messages.success(request, "Izoh o'chirildi!")
     return redirect('admin_comments')
-
 
 
 # =======================
@@ -510,16 +524,16 @@ def admin_schedule_form(request, pk=None):
     if request.method == 'POST':
         if not schedule:
             schedule = AnimeSchedule()
-        schedule.name           = request.POST.get('name', '').strip()
-        schedule.subtitle       = request.POST.get('subtitle', '').strip()
-        schedule.image_url      = request.POST.get('image_url', '').strip()
-        schedule.day            = request.POST.get('day', '')
-        schedule.fandub         = request.POST.get('fandub', 'AniBest').strip()
-        schedule.watch_url      = request.POST.get('watch_url', '').strip()
-        schedule.is_active      = request.POST.get('is_active') == 'on'
+        schedule.name = request.POST.get('name', '').strip()
+        schedule.subtitle = request.POST.get('subtitle', '').strip()
+        schedule.image_url = request.POST.get('image_url', '').strip()
+        schedule.day = request.POST.get('day', '')
+        schedule.fandub = request.POST.get('fandub', 'AniBest').strip()
+        schedule.watch_url = request.POST.get('watch_url', '').strip()
+        schedule.is_active = request.POST.get('is_active') == 'on'
         try:
             schedule.episode_number = int(request.POST.get('episode_number', 1))
-            schedule.order          = int(request.POST.get('order', 0))
+            schedule.order = int(request.POST.get('order', 0))
         except (TypeError, ValueError):
             schedule.episode_number = 1
             schedule.order = 0
@@ -559,10 +573,10 @@ def admin_story_form(request, pk=None):
     if request.method == 'POST':
         if not story:
             story = Story()
-        story.title       = request.POST.get('title', '').strip()
+        story.title = request.POST.get('title', '').strip()
         story.description = request.POST.get('description', '').strip()
-        story.link        = request.POST.get('link', '').strip() or None
-        story.is_active   = request.POST.get('is_active') == 'on'
+        story.link = request.POST.get('link', '').strip() or None
+        story.is_active = request.POST.get('is_active') == 'on'
 
         expires_at = request.POST.get('expires_at', '').strip()
         if expires_at:
@@ -620,10 +634,10 @@ def admin_news_form(request, pk=None):
     if request.method == 'POST':
         if not news:
             news = AnimeNews()
-        news.title       = request.POST.get('title', '').strip()
+        news.title = request.POST.get('title', '').strip()
         news.description = request.POST.get('description', '').strip()
-        news.link        = request.POST.get('link', '').strip() or None
-        news.author      = request.user
+        news.link = request.POST.get('link', '').strip() or None
+        news.author = request.user
 
         if request.FILES.get('image'):
             news.image = request.FILES['image']
@@ -653,6 +667,7 @@ def admin_news_likes(request, pk):
         'items': likes,
         'type': 'newslike'
     })
+
 
 # =======================
 # ANIME SECTION ITEM (Kunlik anime / Anime film)
@@ -711,6 +726,7 @@ def admin_section_delete(request, pk):
     messages.success(request, "Bo'lim elementi o'chirildi!")
     return redirect('admin_sections')
 
+
 # =======================
 # NOTICE (E'lonlar)
 # =======================
@@ -744,8 +760,8 @@ def admin_notice_form(request, pk=None):
             notice = Notice()
         notice.title = request.POST.get('title', '').strip()
         notice.message = request.POST.get('message', '').strip()
-        notice.notice_type = 'admin'          # <-- doim 'admin', forma orqali o'zgartirilmaydi
-        notice.target_user = None             # <-- hammaga ko'rinishi uchun bo'sh
+        notice.notice_type = 'admin'  # <-- doim 'admin', forma orqali o'zgartirilmaydi
+        notice.target_user = None  # <-- hammaga ko'rinishi uchun bo'sh
         notice.created_by = request.user
         notice.is_active = request.POST.get('is_active') == 'on' or 'is_active' in request.POST
         notice.save()
@@ -764,7 +780,8 @@ def admin_notice_form(request, pk=None):
                 print("admin_notice_form push xatosi:", e)
 
         if sent_count > 0:
-            messages.success(request, f"E'lon muvaffaqiyatli saqlandi va {sent_count} ta foydalanuvchi qurilmasiga Push bildirishnoma yuborildi!")
+            messages.success(request,
+                             f"E'lon muvaffaqiyatli saqlandi va {sent_count} ta foydalanuvchi qurilmasiga Push bildirishnoma yuborildi!")
         else:
             messages.success(request, "E'lon muvaffaqiyatli saqlandi!")
         return redirect('admin_notices')
@@ -776,12 +793,14 @@ def admin_notice_form(request, pk=None):
         'total_users_count': total_users_count,
     })
 
+
 @user_passes_test(is_admin, login_url='/')
 def admin_notice_delete(request, pk):
     notice = get_object_or_404(Notice, pk=pk)
     notice.delete()
     messages.success(request, "E'lon o'chirildi!")
     return redirect('admin_notices')
+
 
 # =======================
 # ANIME HAQIDA (about_info)
@@ -932,7 +951,8 @@ def admin_jackpot_cancel_user(request, pk):
     use = JackpotCodeUse.objects.filter(code=jackpot, user_id=user_id).first()
     if use:
         use.delete()
-        messages.success(request, f"#{user_id} ID li foydalanuvchi uchun jackpot bekor qilindi. U kodni qayta ishlata oladi.")
+        messages.success(request,
+                         f"#{user_id} ID li foydalanuvchi uchun jackpot bekor qilindi. U kodni qayta ishlata oladi.")
     else:
         messages.error(request, f"#{user_id} ID li foydalanuvchi bu koddan foydalanmagan.")
     return redirect('admin_jackpot_form', pk=jackpot.pk)
@@ -1065,7 +1085,6 @@ def admin_qarz_rad(request, pk):
     return redirect('admin_qarz_list')
 
 
-
 # =======================
 # REELBEST (ADMIN)
 # =======================
@@ -1179,6 +1198,7 @@ def admin_premium_cancel(request, pk):
     vip.save()
     messages.success(request, f"{vip.user.username} obunasi bekor qilindi!")
     return redirect('admin_premium_list')
+
 
 # =======================
 # SO'ROVNOMALAR (POLL)
@@ -1306,7 +1326,6 @@ def admin_vip_video_delete(request, pk):
     messages.success(request, "VIP video o'chirildi!")
     return redirect('admin_vip_videos')
 
-
 # =======================
 # ADMINLAR (FAQAT ASOSIY ADMIN, ID=1)
 # =======================
@@ -1379,7 +1398,6 @@ def admin_admin_remove(request, pk):
     messages.success(request, f"{target.username} adminlikdan olindi.")
     return redirect('admin_admins')
 
-
 # =======================
 # ADMIN VAKOLATLARI (FAQAT ASOSIY ADMIN)
 # =======================
@@ -1415,3 +1433,128 @@ def admin_admin_perms(request, pk):
         'logs': logs,
         'logs_total': AdminActionLog.objects.filter(user=target).count(),
     })
+
+# =======================
+# DARAJA (BST) BOSHQARUVI
+# =======================
+def _bst_stage(level):
+    idx = 0 if level <= 10 else min((level - 1) // 10, 5)
+    _, name, color = BST_STAGES[idx]
+    return name, color
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_daraja_list(request):
+    items = list(
+        daraja_kutarish.objects.select_related('user').order_by('-level', '-updated_at')
+    )
+    for it in items:
+        it.stage_name, it.stage_color = _bst_stage(it.level)
+
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Daraja (BST)',
+        'items': items,
+        'type': 'daraja',
+        'total_daraja': sum(1 for it in items if it.level > 0),
+        'bst_max': BST_MAX,
+        'goal': BST_PREMIUM_GOAL,
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_daraja_form(request, user_id=None):
+    # ---------- POST: amallar ----------
+    if request.method == 'POST':
+        uid = request.POST.get('user_id', '').strip()
+        action = request.POST.get('action')
+
+        target_user = CustomUser.objects.filter(id=uid).first() if uid.isdigit() else None
+        if not target_user:
+            messages.error(request, f"#{uid} ID li foydalanuvchi topilmadi.")
+            return redirect('admin_daraja_form_lookup')
+
+        try:
+            amount = int(request.POST.get('amount', 0) or 0)
+        except (TypeError, ValueError):
+            amount = 0
+
+        with transaction.atomic():
+            data, _ = daraja_kutarish.objects.select_for_update().get_or_create(user=target_user)
+
+            if action == 'set':
+                try:
+                    lvl = int(request.POST.get('level', 0))
+                except (TypeError, ValueError):
+                    messages.error(request, "To'g'ri qiymat kiriting.")
+                    return redirect('admin_daraja_form', user_id=target_user.id)
+                data.level = max(0, min(lvl, BST_MAX))
+                data.save()
+                messages.success(request, f"{target_user.username} darajasi {data.level} BST ga o'rnatildi.")
+
+            elif action in ('add', 'sub'):
+                if amount <= 0:
+                    messages.error(request, "To'g'ri miqdor kiriting.")
+                    return redirect('admin_daraja_form', user_id=target_user.id)
+                if action == 'add':
+                    data.level = min(data.level + amount, BST_MAX)
+                    messages.success(request, f"{target_user.username} ga BST qo'shildi. Hozir: {data.level}")
+                else:
+                    data.level = max(data.level - amount, 0)
+                    messages.success(request, f"{target_user.username} dan BST ayirildi. Hozir: {data.level}")
+                data.save()
+
+            elif action == 'toggle_reward':
+                data.reward_claimed = not data.reward_claimed
+                data.save()
+                holat = "olingan" if data.reward_claimed else "olinmagan"
+                messages.success(request, f"Yutuq holati: {holat}.")
+
+            elif action == 'puzzle_reset':
+                data.puzzle_last_done = None
+                data.puzzle_cells = ''
+                data.puzzle_started_at = None
+                data.save()
+                messages.success(request, f"{target_user.username} uchun puzzle limiti bekor qilindi.")
+
+            elif action == 'reset':
+                data.level = 0
+                data.reward_claimed = False
+                data.puzzle_last_done = None
+                data.puzzle_cells = ''
+                data.puzzle_started_at = None
+                data.save()
+                BstLog.objects.filter(user=target_user).delete()
+                messages.success(request, f"{target_user.username} darajasi to'liq 0 ga tushirildi.")
+
+            else:
+                messages.error(request, "Noto'g'ri amal.")
+
+        return redirect('admin_daraja_form', user_id=target_user.id)
+
+    # ---------- GET: ko'rsatish ----------
+    target_user = None
+    lookup_id = user_id or request.GET.get('user_id', '').strip()
+    if lookup_id:
+        target_user = CustomUser.objects.filter(id=lookup_id).first() if str(lookup_id).isdigit() else None
+        if not target_user:
+            messages.error(request, f"#{lookup_id} ID li foydalanuvchi topilmadi.")
+
+    ctx = {'target_user': None}
+    if target_user:
+        data, _ = daraja_kutarish.objects.get_or_create(user=target_user)
+        bst = min(data.level, BST_MAX)
+        stage_name, stage_color = _bst_stage(bst)
+        ctx = {
+            'target_user': target_user,
+            'data': data,
+            'stage_name': stage_name,
+            'stage_color': stage_color,
+            'bst_max': BST_MAX,
+            'goal': BST_PREMIUM_GOAL,
+            'goal_left': max(BST_PREMIUM_GOAL - bst, 0),
+            'percent_css': f"{bst / BST_MAX * 100:.2f}",
+            'puzzle_in_progress': bool(data.puzzle_cells and data.puzzle_started_at),
+            'logs': BstLog.objects.filter(user=target_user).order_by('-created_at')[:30],
+        }
+
+    return render(request, 'custom_admin/darajabst_form.html', ctx)
