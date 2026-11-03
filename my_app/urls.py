@@ -219,6 +219,12 @@ urlpatterns = [
     path('daraja-oshirish/puzzle/finish/', daraja_puzzle_finish, name='daraja_puzzle_finish'),
     path('daraja-oshirish/claim/', daraja_claim_reward, name='daraja_claim_reward'),
 
+    # DARAJA / BST (admin)
+    path('control-panel/daraja/', admin_daraja_list, name='admin_daraja_list'),
+    path('control-panel/daraja/qidirish/', admin_daraja_form, name='admin_daraja_form_lookup'),
+    path('control-panel/daraja/<int:user_id>/', admin_daraja_form, name='admin_daraja_form'),
+
+    
 ]
 
 
