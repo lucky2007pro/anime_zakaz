@@ -17,6 +17,7 @@ SECTIONS = [
     ('polls', "So'rovnomalar"),
     ('notices', "E'lonlar"),
     ('hisob', 'Hisoblar'),
+    ('daraja', 'Daraja (BST)'),
     ('qarz', "Qarz so'rovlari"),
     ('jackpot', 'Jackpot kodlar'),
 ]
@@ -42,6 +43,7 @@ PREFIX_MAP = [
     ('notice', 'notices'),
     ('jackpot', 'jackpot'),
     ('hisob', 'hisob'),
+    ('daraja', 'daraja'),
     ('qarz', 'qarz'),
     ('premium', 'premium'),
     ('vip_video', 'vip_video'),
