@@ -376,6 +376,13 @@
             </a>
         </li>
         {% endif %}
+        {% if 'daraja' in request.allowed_sections %}
+        <li>
+            <a href="{% url 'admin_daraja_list' %}" class="{% if 'daraja' in request.resolver_match.url_name %}active{% endif %}">
+                <i class='bx bx-trending-up'></i> Daraja (BST)
+            </a>
+        </li>
+        {% endif %}
         {% if 'qarz' in request.allowed_sections %}
         <li>
             <a href="{% url 'admin_qarz_list' %}" class="{% if 'qarz' in request.resolver_match.url_name %}active{% endif %}">
