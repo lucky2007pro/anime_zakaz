@@ -2419,4 +2419,9 @@ def mark_episode_watched(request, episode_id):
 
 
 
-
+@login_required(login_url='login')
+def daraja_oshirish_page(request):
+    from .models import daraja_kutarish
+    daraja_kutarish.objects.get_or_create(user=request.user)
+    # TODO: bestdaraja keyin shu yerga yoziladi
+    return HttpResponse("Daraja oshirish — tez orada")
