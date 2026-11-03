@@ -3,7 +3,10 @@ from django.db import models
 from django.template.defaultfilters import title
 from django.utils import timezone
 from zoneinfo import ZoneInfo
+from django.core.validators import MaxValueValidator
 
+BST_MAX = 55            
+BST_PREMIUM_GOAL = 40   
 
 
 # =======================
@@ -1296,12 +1299,19 @@ class AdminActionLog(models.Model):
     def __str__(self):
         return f"{self.user.username}: {self.action}"
 
-# =======================
-# DARAJA OSHIRISH
-# =======================
 class daraja_kutarish(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='daraja_data')
-    level = models.PositiveIntegerField(default=0, help_text="Foydalanuvchining joriy darajasi")
+    level = models.PositiveIntegerField(
+        default=0, validators=[MaxValueValidator(BST_MAX)],
+        help_text="Joriy BST (0–55). Daraja = BST"
+    )
+    reward_claimed = models.BooleanField(default=False, help_text="40 BST yutug'i olinganmi")
+
+    # Kunlik puzzle
+    puzzle_cells = models.CharField(max_length=30, blank=True, default='')
+    puzzle_started_at = models.DateTimeField(null=True, blank=True)
+    puzzle_last_done = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -1310,4 +1320,27 @@ class daraja_kutarish(models.Model):
         verbose_name_plural = "Daraja oshirish"
 
     def __str__(self):
-        return f"{self.user.username} — {self.level}-daraja"
+        return f"{self.user.username} — {self.level} BST"
+
+
+class BstLog(models.Model):
+    SOURCE_CHOICES = [
+        ('reel_like', 'Reels like'),
+        ('reel_comment', 'Reels izoh'),
+        ('news_like', 'Story/yangilik like'),
+        ('chat_daily', 'Chat (kunlik)'),
+        ('movie_comment', 'Anime izoh'),
+        ('puzzle', 'Puzzle'),
+    ]
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='bst_logs')
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES)
+    ref = models.CharField(max_length=60)
+    amount = models.PositiveSmallIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'source', 'ref')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} +{self.amount} ({self.source}:{self.ref})"
