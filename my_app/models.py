@@ -63,9 +63,10 @@ class CustomUser(AbstractUser):
         return 0
 
     def get_level(self):
-        """Umumiy daraja = kunlik daraja + ko'rilgan anime darajasi"""
-        return self._days_level() + self._watched_level()
-
+        """Yangi tizim: daraja_kutarish jadvalidan o'qiydi. Yozuv yo'q bo'lsa — 0"""
+        lvl = daraja_kutarish.objects.filter(user=self).values_list('level', flat=True).first()
+        return lvl or 0
+        
     def display_name(self):
         """Profilda kiritilgan ismi bo'lsa o'shani, bo'lmasa username'ni qaytaradi"""
         return self.first_name.strip() if self.first_name and self.first_name.strip() else self.username
@@ -1294,3 +1295,19 @@ class AdminActionLog(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.action}"
+
+# =======================
+# DARAJA OSHIRISH
+# =======================
+class daraja_kutarish(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='daraja_data')
+    level = models.PositiveIntegerField(default=0, help_text="Foydalanuvchining joriy darajasi")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Daraja oshirish"
+        verbose_name_plural = "Daraja oshirish"
+
+    def __str__(self):
+        return f"{self.user.username} — {self.level}-daraja"
