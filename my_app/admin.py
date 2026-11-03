@@ -4,14 +4,7 @@ from django.utils import timezone
 from .models import VipUser
 
 
-from .models import (
-    Category, CustomUser, VipUser, Movie, MovieEpisode,
-    SiteSettings, MP3, ChatMessage, ProfileAvatar, SubscriptionReceipt,NewsLike, AnimeNews, Story, StoryView,
-    ReelBest, ReelBestLike, ReelBestComment,AnimeSchedule,AnimeSectionItem,Notice, NoticeRead,MovieFrame,NoResultsMedia,
-    PremiumBackground, AnimeVoteRequest, AnimeVote, AnimeRequestSuggestion,
-    AccountHistory, DebtRequest, JackpotCode, JackpotCodeUse,
-    BalanceTopupRequest, UserBalance,PushSubscription,PremiumMusic,Poll, PollOption, PollVote,WatchedEpisode,VipThankVideo
-)
+from .models import *
 
 
 class CustomUserAdmin(UserAdmin):
@@ -472,6 +465,48 @@ class VipThankVideoAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'is_active', 'created_at')
     list_editable = ('is_active',)
     list_filter = ('is_active',)
+
+# =======================
+# DARAJA (BST)
+# =======================
+@admin.register(daraja_kutarish)
+class DarajaKutarishAdmin(admin.ModelAdmin):
+    list_display = ('user', 'level', 'stage_display', 'reward_claimed', 'puzzle_last_done', 'updated_at')
+    list_editable = ('level', 'reward_claimed')      # darajani ro'yxatning o'zida o'zgartirish
+    list_filter = ('reward_claimed',)
+    search_fields = ('user__username', 'user__email')
+    ordering = ('-level',)
+    readonly_fields = ('created_at', 'updated_at')
+    actions = ['reset_to_zero', 'reset_puzzle_limit']
+
+    def stage_display(self, obj):
+        names = ["Xira tilla", "Tilla", "Yorqin tilla", "Zarhal", "Olov", "Afsonaviy"]
+        idx = 0 if obj.level <= 10 else min((obj.level - 1) // 10, 5)
+        return f"{obj.level}/{BST_MAX} · {names[idx]}"
+    stage_display.short_description = "Bosqich"
+
+    def reset_to_zero(self, request, queryset):
+        users = list(queryset.values_list('user_id', flat=True))
+        BstLog.objects.filter(user_id__in=users).delete()
+        n = queryset.update(level=0, reward_claimed=False,
+                            puzzle_cells='', puzzle_started_at=None, puzzle_last_done=None)
+        self.message_user(request, f"{n} ta foydalanuvchi darajasi 0 ga tushirildi")
+    reset_to_zero.short_description = "Tanlanganlarni 0 BST ga tushirish (tarix bilan)"
+
+    def reset_puzzle_limit(self, request, queryset):
+        n = queryset.update(puzzle_last_done=None, puzzle_cells='', puzzle_started_at=None)
+        self.message_user(request, f"{n} ta foydalanuvchi puzzle limiti bekor qilindi")
+    reset_puzzle_limit.short_description = "Puzzle 24 soat limitini bekor qilish"
+
+
+@admin.register(BstLog)
+class BstLogAdmin(admin.ModelAdmin):
+    list_display = ('user', 'source', 'ref', 'amount', 'created_at')
+    list_filter = ('source', 'created_at')
+    search_fields = ('user__username', 'ref')
+    readonly_fields = ('user', 'source', 'ref', 'amount', 'created_at')
+
+
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
