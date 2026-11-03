@@ -214,6 +214,11 @@ urlpatterns = [
     path('imkon/profil-dizayn/<str:cat>/<int:idx>/tanlash/', imkon_select_profile_bg, name='imkon_select_profile_bg'),
     path('imkon/profil-dizayn/menyu/toggle/', imkon_toggle_profile_menu, name='imkon_toggle_profile_menu'),
     path('daraja-oshirish/', daraja_oshirish_page, name='daraja_oshirish'),
+    path('daraja-oshirish/', daraja_oshirish_page, name='daraja_oshirish'),
+    path('daraja-oshirish/puzzle/start/', daraja_puzzle_start, name='daraja_puzzle_start'),
+    path('daraja-oshirish/puzzle/finish/', daraja_puzzle_finish, name='daraja_puzzle_finish'),
+    path('daraja-oshirish/claim/', daraja_claim_reward, name='daraja_claim_reward'),
+
 ]
 
 
