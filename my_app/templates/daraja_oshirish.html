@@ -1,0 +1,933 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}Daraja oshirish | BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* =========================================================
+   DARAJA OSHIRISH (BST — Best Story Time)
+   Yengil: backdrop-filter yo'q, animatsiya faqat bir marta
+   (progress: clip-path), puzzle: faqat background-position.
+   ========================================================= */
+
+.dr-wrap {
+    max-width: 680px;
+    margin: 20px auto;
+    padding: 0 14px 40px;
+}
+
+.dr-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-light, #fff);
+    margin: 0 0 10px 2px;
+}
+
+.dr-box {
+    background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.028));
+    border: 1px solid rgba(255,255,255,0.085);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 10px 30px rgba(0,0,0,0.12);
+    contain: content;
+}
+
+.dr-box-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.dr-box-head i {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 19px;
+    color: #ffc107;
+    background: linear-gradient(145deg, rgba(255,193,7,0.16), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,193,7,0.18);
+}
+
+.dr-box-head h3 {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 800;
+    color: var(--text-light, #fff);
+}
+
+.dr-box-head small {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    margin-top: 2px;
+}
+
+.dr-text {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.65);
+    margin: 0 0 12px;
+}
+
+
+/* ---------- long-press / belgilash / drag bloklash ---------- */
+.dr-bar-wrap,
+.dr-btn,
+.dr-chip,
+.pz-cell {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* =========================================================
+   1) PROGRESS BOX
+   ========================================================= */
+
+.dr-hero-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.dr-hero-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 4px;
+}
+
+.dr-hero-num {
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--cur, #ffc107);
+}
+
+.dr-hero-num small {
+    font-size: 14px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.45);
+}
+
+.dr-hero-stage {
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 20px;
+    color: var(--cur, #ffc107);
+    border: 1px solid var(--cur, #ffc107);
+    background: rgba(255,255,255,0.04);
+    white-space: nowrap;
+}
+
+.dr-bar-wrap {
+    position: relative;
+    padding-bottom: 26px;
+}
+
+.dr-bar {
+    position: relative;
+    height: 18px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.07);
+    overflow: hidden;
+    box-shadow: 0 0 16px -4px var(--cur, #ffc107);
+}
+
+.dr-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--dr-grad);
+    clip-path: inset(0 100% 0 0 round 10px);
+    transition: clip-path 1.2s cubic-bezier(.3, .7, .2, 1);
+}
+
+.dr-go .dr-fill {
+    clip-path: inset(0 calc(100% - var(--p, 0%)) 0 0 round 10px);
+}
+
+.dr-tick {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    background: rgba(10,8,16,0.75);
+    z-index: 2;
+}
+
+.dr-sc {
+    position: absolute;
+    top: 24px;
+    font-size: 10.5px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.45);
+    transform: translateX(var(--tx, -50%));
+    white-space: nowrap;
+}
+
+.dr-chips {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 6px;
+}
+
+.dr-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 7px 9px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.025);
+    min-width: 0;
+}
+
+.dr-chip i {
+    display: block;
+    width: 100%;
+    height: 4px;
+    border-radius: 3px;
+    background: var(--c);
+    margin-bottom: 4px;
+}
+
+.dr-chip b {
+    font-size: 11px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.8);
+}
+
+.dr-chip span {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dr-chip.on {
+    border-color: var(--c);
+    background: rgba(255,255,255,0.06);
+}
+
+.dr-chip.on b { color: var(--c); }
+
+
+/* =========================================================
+   2) SHARTLAR
+   ========================================================= */
+
+.dr-rules {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.dr-rule {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 11px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+}
+
+.dr-rule small {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    margin-top: 1px;
+}
+
+.dr-pill {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 900;
+    color: #ffc107;
+    background: rgba(255,193,7,0.12);
+    border: 1px solid rgba(255,193,7,0.28);
+    white-space: nowrap;
+}
+
+.dr-note {
+    margin: 12px 0 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.4);
+}
+
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+
+.dr-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 11px;
+    background: linear-gradient(90deg, #ffc107, #ff9800);
+    color: #1a1204;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(255,193,7,0.14), inset 0 1px 0 rgba(255,255,255,0.3);
+    touch-action: manipulation;
+    transition: opacity .2s ease;
+}
+
+.dr-btn:active { opacity: .88; }
+
+.dr-btn[disabled],
+.dr-btn.off {
+    opacity: .45;
+    cursor: default;
+    pointer-events: none;
+}
+
+.dr-btn.ghost {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-light, #fff);
+    box-shadow: none;
+}
+
+
+/* =========================================================
+   3) YUTUQ
+   ========================================================= */
+
+.dr-reward-state {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(255,255,255,0.14);
+}
+
+.dr-reward-state.ok {
+    color: #ffd23f;
+    background: rgba(255,193,7,0.08);
+    border: 1px solid rgba(255,193,7,0.3);
+}
+
+.dr-reward-state b { color: #ffc107; }
+
+
+/* =========================================================
+   4) PUZZLE
+   ========================================================= */
+
+.pz-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.6);
+}
+
+.pz-stage {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto 12px;
+}
+
+.pz-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.05);
+}
+
+.pz-cell {
+    background-size: 300% 300%;
+    background-repeat: no-repeat;
+    background-color: rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: opacity .15s ease;
+}
+
+.pz-cell.sel {
+    opacity: .65;
+    outline: 3px solid #ffc107;
+    outline-offset: -3px;
+}
+
+.pz-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    text-align: center;
+    background: rgba(10,8,16,0.72);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.pz-overlay .dr-btn { width: auto; min-width: 150px; }
+
+.pz-count {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffc107;
+    letter-spacing: .03em;
+}
+
+.pz-msg {
+    min-height: 18px;
+    margin: 0;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.6);
+}
+
+.pz-msg.good { color: #6dff9c; }
+.pz-msg.bad  { color: #ff7a7a; }
+
+
+/* =========================================================
+   5) YO'NALTIRUVCHI BOXLAR
+   ========================================================= */
+
+.dr-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+}
+
+.dr-status .done {
+    color: #6dff9c;
+}
+
+@media (min-width: 769px) {
+    .dr-wrap { max-width: 740px; margin: 28px auto; }
+    .dr-title { font-size: 20px; }
+    .dr-box { padding: 20px 22px; }
+    .dr-hero-num { font-size: 38px; }
+}
+
+@media (max-width: 380px) {
+    .dr-wrap { padding-left: 8px; padding-right: 8px; }
+    .dr-box { padding: 13px; }
+    .dr-chip span { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dr-fill { transition: none; }
+    * { transition-duration: 0.01ms !important; }
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<main class="main-content">
+<div class="dr-wrap">
+
+    <h2 class="dr-title">Daraja oshirish</h2>
+
+    <!-- =====================================================
+         1) PROGRESS BOX
+         ===================================================== -->
+    <div class="dr-box" style="--cur: {{ cur_color }};">
+
+        <div class="dr-hero-top">
+            <div>
+                <div class="dr-hero-label">BST · Best Story Time</div>
+                <div class="dr-hero-num">{{ bst }} <small>/ {{ bst_max }} BST</small></div>
+            </div>
+            <div class="dr-hero-stage">{{ cur_stage_name }}</div>
+        </div>
+
+        <div class="dr-bar-wrap" id="drBarWrap" style="--dr-grad: {{ gradient }}; --p: {{ percent_css }}%;">
+            <div class="dr-bar">
+                <div class="dr-fill"></div>
+                {% for t in ticks %}<span class="dr-tick" style="left: {{ t }}%;"></span>{% endfor %}
+            </div>
+            {% for sc in scale %}
+                <span class="dr-sc" style="left: {{ sc.left }}%; --tx: {{ sc.tx }};">{% if sc.v == goal %}🎁 {% endif %}{{ sc.v }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="dr-chips">
+            {% for s in stages %}
+                <div class="dr-chip{% if s.active %} on{% endif %}" style="--c: {{ s.color }};">
+                    <i></i>
+                    <b>{{ s.range }}</b>
+                    <span>{{ s.name }}</span>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         2) SHARTLAR
+         ===================================================== -->
+    <div class="dr-box">
+
+        <div class="dr-box-head">
+            <i class='bx bx-list-check'></i>
+            <div>
+                <h3>Shartlar</h3>
+                <small>BST — daraja uchun maxsus coin</small>
+            </div>
+        </div>
+
+        <p class="dr-text">Har bir topshiriq uchun 1 dan 10 BST gacha beriladi. Topshiriqlarni bajaring va darajangizni 55 BST gacha oshiring.</p>
+
+        <ul class="dr-rules">
+            <li class="dr-rule">
+                <div>Reels — like + izoh
+                    <small>Like 1 BST, izoh yana 1 BST (har bir reels uchun)</small>
+                </div>
+                <span class="dr-pill">+2 BST</span>
+            </li>
+            <li class="dr-rule">
+                <div>Story like
+                    <small>Har bir story uchun bir marta</small>
+                </div>
+                <span class="dr-pill">+1 BST</span>
+            </li>
+            <li class="dr-rule">
+                <div>Chat xabar
+                    <small>Kuniga ko'pi bilan 1 marta</small>
+                </div>
+                <span class="dr-pill">+1 BST</span>
+            </li>
+            <li class="dr-rule">
+                <div>Anime izoh
+                    <small>Har bir anime uchun bir marta</small>
+                </div>
+                <span class="dr-pill">+1 BST</span>
+            </li>
+            <li class="dr-rule">
+                <div>Kunlik puzzle
+                    <small>24 soatda 1 marta</small>
+                </div>
+                <span class="dr-pill">+{{ puzzle_reward }} BST</span>
+            </li>
+            <li class="dr-rule">
+                <div>Yutuq
+                    <small>Jami {{ goal }} BST yig'ilganda</small>
+                </div>
+                <span class="dr-pill">🎁 1 kun Premium</span>
+            </li>
+        </ul>
+
+        <p class="dr-note">Bir xil narsa uchun BST faqat bir marta beriladi (masalan, bitta reels ga qayta like bosish BST bermaydi).</p>
+
+    </div>
+
+
+    <!-- =====================================================
+         3) YUTUQ
+         ===================================================== -->
+    <div class="dr-box">
+
+        <div class="dr-box-head">
+            <i class='bx bx-gift'></i>
+            <div>
+                <h3>Yutuq</h3>
+                <small>{{ goal }} BST uchun 1 kunlik Premium</small>
+            </div>
+        </div>
+
+        {% if reward_claimed %}
+            <div class="dr-reward-state ok">✅ Yutuq olingan — 1 kunlik Premium faollashtirilgan.</div>
+        {% elif can_claim %}
+            <div class="dr-reward-state ok">🎉 Tabriklaymiz! {{ goal }} BST yig'dingiz. Yutuqni olishingiz mumkin.</div>
+            <button type="button" class="dr-btn" id="drClaim">🎁 Yutuqni olish</button>
+        {% else %}
+            <div class="dr-reward-state">Yutuqqa yana <b>{{ goal_left }} BST</b> qoldi.</div>
+            <button type="button" class="dr-btn" disabled>🎁 Yutuqni olish</button>
+        {% endif %}
+
+        <p class="pz-msg" id="drClaimMsg"></p>
+
+    </div>
+
+
+    <!-- =====================================================
+         4) PUZZLE
+         ===================================================== -->
+    <div class="dr-box">
+
+        <div class="dr-box-head">
+            <i class='bx bx-extension'></i>
+            <div>
+                <h3>Kunlik puzzle</h3>
+                <small>Rasmni terib +{{ puzzle_reward }} BST oling · 24 soatda 1 marta</small>
+            </div>
+        </div>
+
+        <div class="pz-meta">
+            <span id="pzMoves">Yurishlar: 0</span>
+            <span id="pzTime">00:00</span>
+        </div>
+
+        <div class="pz-stage">
+            <div class="pz-grid" id="pzGrid"></div>
+
+            <div class="pz-overlay" id="pzOverlay">
+                {% if puzzle_available %}
+                    <span>Bo'laklarni ketma-ket bosib o'rnini almashtiring</span>
+                    <button type="button" class="dr-btn" id="pzStart">▶ Boshlash</button>
+                {% else %}
+                    <span>Keyingi puzzle</span>
+                    <span class="pz-count" id="pzCount">--:--:--</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <p class="pz-msg" id="pzMsg"></p>
+
+    </div>
+
+
+    <!-- =====================================================
+         5) REELS
+         ===================================================== -->
+    <div class="dr-box">
+        <div class="dr-box-head">
+            <i class='bx bx-movie-play'></i>
+            <div>
+                <h3>Reels</h3>
+                <small>Like + izoh = 2 BST</small>
+            </div>
+        </div>
+        <p class="dr-text">Reels larga like bosing va izoh yozib o'z BST laringizni oling.</p>
+        <div class="dr-status">
+            <span>Olingan: <b>{{ earned_reels }} BST</b></span>
+        </div>
+        <a href="{{ url_reels }}" class="dr-btn" draggable="false">Reels ga o'tish →</a>
+    </div>
+
+
+    <!-- =====================================================
+         6) CHAT
+         ===================================================== -->
+    <div class="dr-box">
+        <div class="dr-box-head">
+            <i class='bx bx-chat'></i>
+            <div>
+                <h3>Chat</h3>
+                <small>Kuniga 1 BST</small>
+            </div>
+        </div>
+        <p class="dr-text">Bugun suhbatlashing va 1 BST oling.</p>
+        <div class="dr-status">
+            <span>Bugun:
+                {% if chat_today %}<b class="done">bajarildi ✓</b>{% else %}<b>hali yozilmagan</b>{% endif %}
+            </span>
+        </div>
+        <a href="{{ url_chat }}" class="dr-btn{% if chat_today %} ghost{% endif %}" draggable="false">Chatga o'tish →</a>
+    </div>
+
+
+    <!-- =====================================================
+         7) STORY
+         ===================================================== -->
+    <div class="dr-box">
+        <div class="dr-box-head">
+            <i class='bx bx-news'></i>
+            <div>
+                <h3>Story</h3>
+                <small>Har bir like — 1 BST</small>
+            </div>
+        </div>
+        <p class="dr-text">Story larga like bosing va har biri uchun 1 BST oling.</p>
+        <div class="dr-status">
+            <span>Olingan: <b>{{ earned_news }} BST</b></span>
+        </div>
+        <a href="{{ url_news }}" class="dr-btn" draggable="false">Story ga o'tish →</a>
+    </div>
+
+
+    <!-- =====================================================
+         8) ANIME IZOHLAR
+         ===================================================== -->
+    <div class="dr-box">
+        <div class="dr-box-head">
+            <i class='bx bx-comment-detail'></i>
+            <div>
+                <h3>Anime izohlar</h3>
+                <small>Har bir anime uchun 1 BST</small>
+            </div>
+        </div>
+        <p class="dr-text">Animelar ostida fikringizni yozing va 1 BST oling.</p>
+        <div class="dr-status">
+            <span>Olingan: <b>{{ earned_movie }} BST</b></span>
+        </div>
+        <a href="{{ url_anime }}" class="dr-btn" draggable="false">Animelarga o'tish →</a>
+    </div>
+
+</div>
+</main>
+
+<script>
+(function () {
+    var CSRF   = '{{ csrf_token }}';
+    var PZ_IMG = '{{ puzzle_image|escapejs }}';
+    var PZ_AVAILABLE = {% if puzzle_available %}true{% else %}false{% endif %};
+    var PZ_WAIT = {{ puzzle_wait|unlocalize }};
+    var URL_START  = '{% url "daraja_puzzle_start" %}';
+    var URL_FINISH = '{% url "daraja_puzzle_finish" %}';
+    var URL_CLAIM  = '{% url "daraja_claim_reward" %}';
+
+    function post(url, body) {
+        return fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body || {})
+        }).then(function (r) {
+            return r.json().then(function (j) { j._status = r.status; return j; });
+        });
+    }
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+    /* ---------- progress bar: bir marta to'ladi ---------- */
+    var wrap = document.getElementById('drBarWrap');
+    if (wrap) {
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () { wrap.classList.add('dr-go'); });
+        });
+    }
+
+    /* ---------- uzoq bosish / kontekst menyu bloklash ---------- */
+    document.addEventListener('contextmenu', function (e) {
+        if (e.target.closest && e.target.closest('.pz-cell, .dr-btn, .dr-bar-wrap, .dr-chip')) {
+            e.preventDefault();
+        }
+    }, true);
+
+    /* ---------- yutuqni olish ---------- */
+    var claim = document.getElementById('drClaim');
+    var claimMsg = document.getElementById('drClaimMsg');
+    if (claim) {
+        claim.addEventListener('click', function () {
+            claim.disabled = true;
+            post(URL_CLAIM).then(function (res) {
+                if (res.ok) {
+                    claimMsg.className = 'pz-msg good';
+                    claimMsg.textContent = '🎉 1 kunlik Premium faollashtirildi!';
+                    setTimeout(function () { location.reload(); }, 1400);
+                } else {
+                    claimMsg.className = 'pz-msg bad';
+                    claimMsg.textContent = res.error || 'Xatolik yuz berdi';
+                    claim.disabled = false;
+                }
+            }).catch(function () {
+                claimMsg.className = 'pz-msg bad';
+                claimMsg.textContent = 'Internet bilan muammo';
+                claim.disabled = false;
+            });
+        });
+    }
+
+    /* =====================================================
+       PUZZLE (3x3, almashtirish)
+       Aralashtirish va tekshirish serverda.
+       ===================================================== */
+    var grid    = document.getElementById('pzGrid');
+    var overlay = document.getElementById('pzOverlay');
+    var startBtn = document.getElementById('pzStart');
+    var msg     = document.getElementById('pzMsg');
+    var movesEl = document.getElementById('pzMoves');
+    var timeEl  = document.getElementById('pzTime');
+    var countEl = document.getElementById('pzCount');
+
+    var cells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    var moves = [];
+    var sel = -1, playing = false, t0 = 0, timerId = null;
+    var els = [];
+
+    new Image().src = PZ_IMG;   // oldindan yuklash
+
+    for (var i = 0; i < 9; i++) {
+        var d = document.createElement('div');
+        d.className = 'pz-cell';
+        d.setAttribute('data-pos', i);
+        d.style.backgroundImage = "url('" + PZ_IMG + "')";
+        grid.appendChild(d);
+        els.push(d);
+    }
+
+    function paint(pos) {
+        var p = cells[pos];
+        els[pos].style.backgroundPosition = ((p % 3) * 50) + '% ' + (Math.floor(p / 3) * 50) + '%';
+    }
+
+    function paintAll() { for (var k = 0; k < 9; k++) paint(k); }
+
+    function isSolved() {
+        for (var k = 0; k < 9; k++) if (cells[k] !== k) return false;
+        return true;
+    }
+
+    function setMsg(text, cls) {
+        msg.className = 'pz-msg' + (cls ? ' ' + cls : '');
+        msg.textContent = text || '';
+    }
+
+    paintAll();
+
+    function tickTimer() {
+        var s = Math.floor((Date.now() - t0) / 1000);
+        timeEl.textContent = pad(Math.floor(s / 60)) + ':' + pad(s % 60);
+    }
+
+    function finish() {
+        playing = false;
+        clearInterval(timerId);
+        setMsg('Tekshirilmoqda...');
+        post(URL_FINISH, { moves: moves }).then(function (res) {
+            if (res.ok) {
+                setMsg('🎉 Barakalla! +' + res.gained + ' BST', 'good');
+                setTimeout(function () { location.reload(); }, 1800);
+            } else {
+                setMsg(res.error || 'Xatolik yuz berdi', 'bad');
+                setTimeout(function () { location.reload(); }, 2600);
+            }
+        }).catch(function () {
+            setMsg('Internet bilan muammo', 'bad');
+        });
+    }
+
+    grid.addEventListener('click', function (e) {
+        if (!playing) return;
+        var c = e.target.closest('.pz-cell');
+        if (!c) return;
+        var pos = parseInt(c.getAttribute('data-pos'), 10);
+
+        if (sel === -1) {
+            sel = pos;
+            els[pos].classList.add('sel');
+            return;
+        }
+        if (sel === pos) {
+            els[pos].classList.remove('sel');
+            sel = -1;
+            return;
+        }
+
+        var tmp = cells[sel]; cells[sel] = cells[pos]; cells[pos] = tmp;
+        moves.push([sel, pos]);
+        els[sel].classList.remove('sel');
+        paint(sel); paint(pos);
+        sel = -1;
+        movesEl.textContent = 'Yurishlar: ' + moves.length;
+
+        if (isSolved()) finish();
+    });
+
+    if (startBtn) {
+        startBtn.addEventListener('click', function () {
+            startBtn.disabled = true;
+            post(URL_START).then(function (res) {
+                if (!res.ok) {
+                    setMsg(res.error || 'Xatolik yuz berdi', 'bad');
+                    startBtn.disabled = false;
+                    return;
+                }
+                cells = res.cells;
+                moves = [];
+                sel = -1;
+                paintAll();
+                movesEl.textContent = 'Yurishlar: 0';
+                overlay.style.display = 'none';
+                setMsg('');
+                playing = true;
+                t0 = Date.now();
+                tickTimer();
+                timerId = setInterval(tickTimer, 1000);
+            }).catch(function () {
+                setMsg('Internet bilan muammo', 'bad');
+                startBtn.disabled = false;
+            });
+        });
+    }
+
+    /* ---------- keyingi puzzle gacha sanoq ---------- */
+    if (!PZ_AVAILABLE && countEl) {
+        var left = PZ_WAIT;
+        function drawCount() {
+            if (left <= 0) { location.reload(); return; }
+            var h = Math.floor(left / 3600);
+            var m = Math.floor((left % 3600) / 60);
+            var s = left % 60;
+            countEl.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+            left--;
+        }
+        drawCount();
+        setInterval(drawCount, 1000);
+    }
+})();
+</script>
+{% endblock %}
