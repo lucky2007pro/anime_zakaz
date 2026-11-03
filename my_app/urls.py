@@ -213,7 +213,7 @@ urlpatterns = [
     path('imkon/profil-dizayn/toggle/', imkon_toggle_profile_design, name='imkon_toggle_profile_design'),
     path('imkon/profil-dizayn/<str:cat>/<int:idx>/tanlash/', imkon_select_profile_bg, name='imkon_select_profile_bg'),
     path('imkon/profil-dizayn/menyu/toggle/', imkon_toggle_profile_menu, name='imkon_toggle_profile_menu'),
-
+    path('daraja-oshirish/', daraja_oshirish_page, name='daraja_oshirish'),
 ]
 
 
