@@ -306,7 +306,7 @@
 
     .slide.active .slide-bg img,
     .slide.active .slide-bg-video {
-        animation: kenBurnsZoom 6.5s ease-out both;
+        animation: kenBurnsZoom 7.5s ease-out both;
         transform-origin: center center;
         will-change: transform;
     }
@@ -324,22 +324,28 @@
         animation: contentRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
         animation-delay: 0.15s;
     }
-    .slide.active .slide-title {
-        animation: contentRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-        animation-delay: 0.3s;
+    /* SARLAVHA: pastdan tepaga chiqish animatsiyasi olib tashlandi — endi "typing" bilan yoziladi */
+    .slide-content > .slide-title {
+        opacity: 1;
     }
     .slide.active .slide-meta-row {
         animation: contentRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
         animation-delay: 0.45s;
     }
+    /* TUGMA: pastdan tepaga emas — chapdan o'ngga keladi */
     .slide.active .hero-buttons {
-        animation: contentRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-        animation-delay: 0.6s;
+        animation: contentSlideRight 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-delay: 0.7s;
     }
 
     @keyframes contentRise {
         from { opacity: 0; transform: translateY(26px); }
         to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes contentSlideRight {
+        from { opacity: 0; transform: translateX(-56px); }
+        to   { opacity: 1; transform: translateX(0); }
     }
 
     .slide-bg {
@@ -392,13 +398,30 @@
     }
     .tag-muted { background: rgba(255,255,255,0.07); color: var(--text-light); border-color: rgba(255,255,255,0.12); }
 
+    /* SARLAVHA — OLTIN RANG */
     .slide-title {
         font-size: 3.4rem;
         font-weight: 900;
         line-height: 1.08;
         margin-bottom: 12px;
-        text-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        color: #ffd700;
+        text-shadow: 0 2px 12px rgba(255, 190, 0, 0.28), 0 8px 24px rgba(0,0,0,0.65);
         letter-spacing: -0.02em;
+    }
+
+    /* Typing effekti: yozilgan qism + yozilmagan (ko'rinmas, joyi saqlanadi) qism */
+    .slide-title .tw-done {
+        border-right: 3px solid transparent;
+        margin-right: -3px;
+    }
+    .slide-title .tw-done.typing {
+        animation: twCaret 0.7s steps(1) infinite;
+    }
+    .slide-title .tw-rest { visibility: hidden; }
+
+    @keyframes twCaret {
+        0%, 100% { border-right-color: #ffd700; }
+        50%      { border-right-color: transparent; }
     }
 
     .slide-meta-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -457,7 +480,8 @@
     }
     .dot.viewed { background: var(--accent); }
     .dot.active { width: 26px; border-radius: 999px; background: rgba(255,255,255,0.25); }
-    .dot.active .dot-fill { animation: dotFillProgress 5s linear forwards; }
+    /* 7 soniya */
+    .dot.active .dot-fill { animation: dotFillProgress 7s linear forwards; }
     @keyframes dotFillProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
     .slider-controls .dot:only-child { width: 8px !important; border-radius: 50% !important; background: var(--accent) !important; }
     .slider-controls .dot:only-child .dot-fill { display: none; }
@@ -496,13 +520,15 @@
         font-size: 1.5rem;
         font-weight: 900;
         margin-bottom: 14px;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.85);
     }
     .beta-category-heading span { color: var(--accent); }
 
     .beta-tab-buttons {
         display: flex;
-        gap: 8px;
-        margin-bottom: 22px;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding: 4px 3px 12px;
         flex-wrap: nowrap;
         overflow-x: auto;
         scrollbar-width: none;
@@ -510,68 +536,104 @@
     }
     .beta-tab-buttons::-webkit-scrollbar { display: none; }
 
+    /* Tugmalar endi orqa fon rasmidan aniq ajralib turadi: to'q qattiq fon + yorqin chegara + soya */
     .beta-tab-btn {
         display: inline-flex;
         align-items: center;
         gap: 7px;
-        padding: 9px 16px;
+        padding: 10px 18px;
         border-radius: 30px;
-        border: 1.5px solid rgba(255,255,255,0.09);
-        background: rgba(255,255,255,0.04);
+        border: 1.5px solid rgba(255,255,255,0.28);
+        background: rgba(14,14,20,0.92);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.55);
         cursor: pointer;
-        transition: background 0.25s ease, border-color 0.25s ease;
+        transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         white-space: nowrap;
         flex-shrink: 0;
         -webkit-tap-highlight-color: transparent;
     }
 
     .beta-tab-btn i.tab-icon {
-        font-size: 1.05rem;
-        color: var(--text-dim);
+        font-size: 1.1rem;
+        color: #e5e7eb;
         transition: color 0.25s ease;
     }
 
     .beta-tab-btn .tab-label {
-        font-size: 0.8rem;
+        font-size: 0.82rem;
         font-weight: 800;
-        color: var(--text-light);
+        color: #fff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.6);
     }
 
     .beta-tab-btn .tab-count {
         font-size: 0.68rem;
         font-weight: 900;
-        color: var(--text-dim);
-        background: rgba(255,255,255,0.07);
+        color: #fff;
+        background: rgba(255,255,255,0.16);
         padding: 1px 7px;
         border-radius: 20px;
     }
 
     .beta-tab-btn.kunlik.active {
         background: linear-gradient(135deg, #ff003c, #ff4d6d);
-        border-color: transparent;
-        box-shadow: 0 6px 18px rgba(255, 0, 60, 0.3);
+        border-color: rgba(255,255,255,0.35);
+        box-shadow: 0 6px 20px rgba(255, 0, 60, 0.45);
     }
     .beta-tab-btn.kunlik.active i.tab-icon,
     .beta-tab-btn.kunlik.active .tab-label { color: #fff; }
-    .beta-tab-btn.kunlik.active .tab-count { background: rgba(255,255,255,0.25); color: #fff; }
+    .beta-tab-btn.kunlik.active .tab-count { background: rgba(255,255,255,0.28); color: #fff; }
 
     .beta-tab-btn.barcha.active {
         background: linear-gradient(135deg, #0ea5e9, #6366f1);
-        border-color: transparent;
-        box-shadow: 0 6px 18px rgba(14, 165, 233, 0.3);
+        border-color: rgba(255,255,255,0.35);
+        box-shadow: 0 6px 20px rgba(14, 165, 233, 0.45);
     }
     .beta-tab-btn.barcha.active i.tab-icon,
     .beta-tab-btn.barcha.active .tab-label { color: #fff; }
-    .beta-tab-btn.barcha.active .tab-count { background: rgba(255,255,255,0.25); color: #fff; }
+    .beta-tab-btn.barcha.active .tab-count { background: rgba(255,255,255,0.28); color: #fff; }
 
     .beta-tab-btn:not(.active):hover {
-        border-color: rgba(255,255,255,0.2);
-        background: rgba(255,255,255,0.08);
+        border-color: rgba(255,255,255,0.5);
+        background: rgba(30,30,42,0.96);
     }
 
-    /* Panel'lar */
+    /* ---- TUGMA BOSILGANDA ANIMATSIYA (PC va MOBIL alohida) ---- */
+    @keyframes tabPopPc {
+        0%   { transform: scale(1); }
+        40%  { transform: scale(1.09); }
+        100% { transform: scale(1); }
+    }
+    @keyframes tabIconSpinPc {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
+    @keyframes tabPopMobile {
+        0%   { transform: scale(0.95); }
+        100% { transform: scale(1); }
+    }
+
+    .beta-tab-btn.tab-pop { animation: tabPopPc 0.38s cubic-bezier(0.22, 1, 0.36, 1); }
+    .beta-tab-btn.tab-pop i.tab-icon { animation: tabIconSpinPc 0.5s ease; }
+
+    /* ---- PANEL ALMASHGANDA ANIMATSIYA ---- */
+    @keyframes panelInPc {
+        from { opacity: 0; transform: translateY(22px) scale(0.985); }
+        to   { opacity: 1; transform: none; }
+    }
+    @keyframes panelInMobile {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    /* Panellar */
     .beta-panel { display: none; }
     .beta-panel.active { display: block; }
+
+    /* PC: yengil fade + pastdan siljish. Faqat birinchi bosishdan keyin ishlaydi (.tabs-ready) */
+    .beta-category-section.tabs-ready .beta-panel.active .cards-grid {
+        animation: panelInPc 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
 
     .cards-grid {
         display: grid;
@@ -747,6 +809,10 @@
         .reveal-hidden { opacity: 1; transform: none; }
         .anime-card img,
         .slide-bg img { transition: none; }
+        .beta-tab-btn.tab-pop,
+        .beta-tab-btn.tab-pop i.tab-icon,
+        .beta-category-section.tabs-ready .beta-panel.active .cards-grid { animation: none !important; }
+        .slide.active .hero-buttons { animation: none; opacity: 1; }
     }
 
     /* ================= FOKUS: outline va zoom olib tashlandi ================= */
@@ -969,7 +1035,7 @@
             font-size: 1.5rem !important;
             text-align: left !important;
             line-height: 1.2;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.7);
         }
 
         .tags {
@@ -1174,6 +1240,15 @@
         }
         .slide { transition: opacity 0.6s ease; }
         .slide.outgoing { transform: none; transition: opacity 0.5s ease; }
+
+        /* ---- MOBIL ANIMATSIYALAR: yengil (faqat opacity / kichik scale), lag bo'lmasligi uchun ---- */
+        .beta-category-section.tabs-ready .beta-panel.active .cards-grid {
+            animation: panelInMobile 0.25s ease-out both;
+        }
+        .beta-tab-btn.tab-pop { animation: tabPopMobile 0.22s ease-out; }
+        .beta-tab-btn.tab-pop i.tab-icon { animation: none; }
+        .beta-tab-btn { padding: 9px 15px; }
+        .beta-tab-btn .tab-label { font-size: 0.78rem; }
     }
 
     @media (max-width: 480px) {
@@ -1266,6 +1341,74 @@
         .card-title { font-size: 0.88rem; }
     }
 
+    /* ================= HERO: ENG KICHIK QURILMALAR UCHUN MOSLASH =================
+       (kichik telefonlar, katta bo'lmagan ekranlar, gadjetlar).
+       Hero slayderning o'zi o'zgarmagan — faqat o'lchamlar kichik ekranga moslanadi. */
+    @media (max-width: 380px) {
+        .slider-container {
+            aspect-ratio: 16 / 10;
+            min-height: 190px;
+            max-height: none;
+        }
+        .slide { padding: 12px 11px 14px; }
+
+        .tags { gap: 4px; margin-bottom: 6px; }
+        .tag { font-size: 0.6rem; padding: 3px 7px; letter-spacing: 0.5px; border-radius: 5px; }
+
+        .slide-title {
+            font-size: 1.2rem !important;
+            line-height: 1.18;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .hero-buttons { margin-top: 10px; }
+        .btn-main {
+            padding: 9px 16px;
+            font-size: 13px;
+            border-radius: 11px;
+            gap: 6px;
+            box-shadow: 0 5px 16px rgba(255, 0, 60, 0.35);
+        }
+
+        .slider-controls { gap: 6px; margin-top: 10px; }
+        .dot { width: 6px; height: 6px; }
+        .dot.active { width: 20px; }
+    }
+
+    @media (max-width: 340px) {
+        .slider-container { min-height: 175px; }
+        .slide { padding: 10px 9px 12px; }
+
+        .tag-muted { display: none; }
+        .tag { font-size: 0.56rem; padding: 2px 6px; }
+
+        .slide-title { font-size: 1.02rem !important; }
+
+        .hero-buttons { margin-top: 8px; }
+        .btn-main { padding: 8px 13px; font-size: 12px; border-radius: 10px; }
+    }
+
+    @media (max-width: 280px) {
+        .slider-container { min-height: 160px; }
+        .tags { display: none; }
+        .slide-title { font-size: 0.92rem !important; }
+        .btn-main { padding: 7px 11px; font-size: 11px; }
+    }
+
+    /* Past balandlikdagi (gorizontal) kichik ekranlar */
+    @media (max-height: 420px) and (orientation: landscape) {
+        .slider-container { min-height: 150px; max-height: none; aspect-ratio: 21 / 9; }
+        .slide { padding: 10px 16px 12px; }
+        .slide-title { font-size: 1.25rem !important; margin-bottom: 4px; }
+        .tags { margin-bottom: 4px; }
+        .hero-buttons { margin-top: 8px; }
+        .btn-main { padding: 8px 16px; font-size: 13px; }
+    }
+
     /* ================= MOBIL: ILOVA (APP) USLUBIDAGI KATTA KARTALAR =================
        Eng oxirida turadi — yuqoridagi mobil qoidalarni bosib o'tadi.
        Kartalar kengroq (chetlarga yaqin), balandroq (2:3.1 poster nisbati),
@@ -1273,7 +1416,7 @@
     @media (max-width: 768px) {
         .beta-category-section { padding: 0 10px; }
         .beta-category-heading { padding: 0 2px; }
-        .beta-tab-buttons { padding: 0 2px; }
+        .beta-tab-buttons { padding: 4px 2px 10px; }
 
         .cards-grid { gap: 10px; padding-bottom: 40px; }
         .card-wrapper { contain-intrinsic-size: 190px 290px; }
@@ -1511,7 +1654,7 @@
     {% endif %}
 
     <!-- ================= KATEGORIYA: KUNLIK / BARCHA ================= -->
-    <div class="beta-category-section">
+    <div class="beta-category-section" id="betaCategorySection">
         <h3 class="beta-category-heading">Animelar <span>ro'yxati</span></h3>
 
         <div class="beta-tab-buttons">
@@ -1560,7 +1703,7 @@
                             </div>
                         </div>
 
-                        <button type="button" class="fav-badge{% if anime.id in fav_ids %} is-fav{% endif %}" data-anime-id="{{ anime.id }}" onclick="toggleFavorite(event, {{ anime.id }})" aria-label="Saqlash">
+                        <button type="button" class="fav-badge{% if anime.id in fav_ids %} is-fav{% endif %}" data-anime-id="{{ anime.id }}" onclick="favClick(event, {{ anime.id }})" aria-label="Saqlash">
                             {% if anime.id in fav_ids %}
                                 <i class='bx bxs-star' id="fav-icon-daily-{{ anime.id }}"></i>
                             {% else %}
@@ -1621,7 +1764,7 @@
                             </div>
                         </div>
 
-                        <button type="button" class="fav-badge{% if anime.id in fav_ids %} is-fav{% endif %}" data-anime-id="{{ anime.id }}" onclick="toggleFavorite(event, {{ anime.id }})" aria-label="Saqlash">
+                        <button type="button" class="fav-badge{% if anime.id in fav_ids %} is-fav{% endif %}" data-anime-id="{{ anime.id }}" onclick="favClick(event, {{ anime.id }})" aria-label="Saqlash">
                             {% if anime.id in fav_ids %}
                                 <i class='bx bxs-star' id="fav-icon-all-{{ anime.id }}"></i>
                             {% else %}
@@ -1654,13 +1797,14 @@
 </div><!-- /story-top-space -->
 
 <script>
-/* ================= SAQLASH (YULDUZ) — bosilganda ichi qizil to'ladi =================
-   Bir xil anime ikkala panelda (Kunlik / Barcha) bo'lsa, ikkalasida ham yangilanadi.
-   Agar base.html ichida serverga so'rov yuboradigan asl toggleFavorite bo'lsa,
-   u ham chaqiriladi (saqlash serverda ham bajariladi). */
+/* ================= SAQLASH (YULDUZ) — bir marta bosilsa ichi qizil to'lib qoladi =================
+   Muhim: funksiya nomi `favClick` — base.html dagi `toggleFavorite` bilan to'qnashmaydi
+   (avval base.html keyin yuklanib, bizning o'rnimizni bosib ketayotgan edi, shuning uchun
+   yulduz faqat sahifa yangilangandan keyin o'zgarardi).
+   - Yulduz holati DARHOL o'zgaradi (sahifani yangilash shart emas).
+   - Bir xil anime ikkala panelda (Kunlik / Barcha) bo'lsa, ikkalasida ham yangilanadi.
+   - base.html dagi asl `toggleFavorite` bo'lsa, u ham chaqiriladi (serverga saqlash). */
 (function() {
-    var originalToggle = (typeof window.toggleFavorite === 'function') ? window.toggleFavorite : null;
-
     function setFavState(id, on) {
         var buttons = document.querySelectorAll('.fav-badge[data-anime-id="' + id + '"]');
         buttons.forEach(function(btn) {
@@ -1674,26 +1818,36 @@
         });
     }
 
-    window.toggleFavorite = function(e, id) {
+    window.favClick = function(e, id) {
         if (e) {
             if (e.preventDefault) e.preventDefault();
             if (e.stopPropagation) e.stopPropagation(); // kartaga bosilib sahifa ochilib ketmasin
         }
 
-        var anyFav = document.querySelector('.fav-badge.is-fav[data-anime-id="' + id + '"]');
-        var willBeFav = !anyFav;
+        var willBeFav = !document.querySelector('.fav-badge.is-fav[data-anime-id="' + id + '"]');
 
+        // Asl funksiyani (serverga saqlash) chaqiramiz — u hali eski holatni ko'radi
+        var serverToggle = window.toggleFavorite;
+        if (typeof serverToggle === 'function') {
+            try { serverToggle(e, id); } catch (err) {}
+        }
+
+        // Keyin ko'rinishni o'zimiz belgilaymiz — qizil to'lgan yulduz
         setFavState(id, willBeFav);
 
-        if (originalToggle) {
-            try { originalToggle(e, id); } catch (err) {}
-            // asl funksiya ikonkani o'zgartirib yuborgan bo'lsa ham, holatni to'g'rilab qo'yamiz
-            setTimeout(function() { setFavState(id, willBeFav); }, 60);
-        }
+        // Asl funksiya ikonkani o'zgartirib yuborgan bo'lsa ham, holatni to'g'rilab qo'yamiz
+        setTimeout(function() {
+            var btns = document.querySelectorAll('.fav-badge[data-anime-id="' + id + '"]');
+            btns.forEach(function(btn) {
+                btn.classList.toggle('is-fav', willBeFav);
+                var icon = btn.querySelector('i');
+                if (icon) icon.className = willBeFav ? 'bx bxs-star' : 'bx bx-star';
+            });
+        }, 80);
     };
 })();
 
-/* ================= HERO SLIDER (FADE + ZOOM) ================= */
+/* ================= HERO SLIDER (FADE + ZOOM + TYPING) ================= */
 (function() {
     const wrapper = document.getElementById('slidesWrapper');
     if (!wrapper) return;
@@ -1702,13 +1856,89 @@
     const totalSlides = slides.length;
     if (totalSlides === 0) return;
 
+    const AUTOPLAY_MS = 7000; // 7 soniya
+
     let currentSlide = 0;
     let autoPlayTimer = null;
     let heroStartX = 0;
     let heroDragging = false;
     let heroInView = true;
+    let typeTimer = null;
+
+    const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
     slides[0].classList.add('active');
+
+    /* ---------- TYPING: sarlavha harfma-harf yoziladi ---------- */
+    function setupTypewriters() {
+        slides.forEach(function(slide) {
+            const h = slide.querySelector('.slide-title');
+            if (!h || h.dataset.twReady) return;
+
+            const text = h.textContent.trim();
+            h.dataset.fullTitle = text;
+            h.setAttribute('aria-label', text);
+            h.textContent = '';
+
+            const done = document.createElement('span');
+            done.className = 'tw-done';
+            done.setAttribute('aria-hidden', 'true');
+
+            const rest = document.createElement('span');
+            rest.className = 'tw-rest';
+            rest.setAttribute('aria-hidden', 'true');
+            rest.textContent = text;
+
+            h.appendChild(done);
+            h.appendChild(rest);
+            h.dataset.twReady = '1';
+        });
+    }
+
+    function typeTitle(slide) {
+        if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
+
+        const h = slide.querySelector('.slide-title');
+        if (!h || !h.dataset.twReady) return;
+
+        const text = h.dataset.fullTitle || '';
+        const done = h.querySelector('.tw-done');
+        const rest = h.querySelector('.tw-rest');
+        if (!done || !rest) return;
+
+        if (reduceMotion || !text) {
+            done.textContent = text;
+            rest.textContent = '';
+            done.classList.remove('typing');
+            return;
+        }
+
+        let i = 0;
+        done.textContent = '';
+        rest.textContent = text;
+        done.classList.add('typing');
+
+        // Uzun sarlavha ham ~1.8 soniyada yozilib bo'ladi
+        const step = Math.max(28, Math.min(70, Math.round(1800 / text.length)));
+
+        function tick() {
+            i++;
+            done.textContent = text.slice(0, i);
+            rest.textContent = text.slice(i);
+            if (i < text.length) {
+                typeTimer = setTimeout(tick, step);
+            } else {
+                typeTimer = setTimeout(function() {
+                    done.classList.remove('typing');
+                }, 1400);
+            }
+        }
+
+        typeTimer = setTimeout(tick, 350);
+    }
+
+    setupTypewriters();
+    typeTitle(slides[0]);
 
     function playCurrentVideo() {
         const v = slides[currentSlide].querySelector('.slide-bg-video');
@@ -1785,6 +2015,7 @@
         nextEl.classList.add('active');
 
         currentSlide = nextIndex;
+        typeTitle(nextEl);
         playCurrentVideo();
 
         setTimeout(function() {
@@ -1803,7 +2034,7 @@
         if (totalSlides > 1) {
             autoPlayTimer = setInterval(function() {
                 goToSlide(currentSlide + 1);
-            }, 5000);
+            }, AUTOPLAY_MS);
         }
     }
 
@@ -2039,12 +2270,28 @@ document.addEventListener('click', function(e) {
     }
 })();
 
-/* ================= KATEGORIYA TUGMALARI ================= */
+/* ================= KATEGORIYA TUGMALARI =================
+   Bosilganda animatsiya CSS orqali ishlaydi:
+   - PC (>768px): tugma "pop" + ikonka aylanadi + kartalar yumshoq fade/slide bilan chiqadi.
+   - Mobil (<=768px): faqat yengil fade (transform yo'q) — lag bo'lmasligi uchun.
+   JS faqat .tabs-ready va .tab-pop sinflarini boshqaradi. */
 function switchBetaTab(btn) {
-    document.querySelectorAll('.beta-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    if (!btn || btn.classList.contains('active')) return;
+
+    var section = document.getElementById('betaCategorySection');
+    if (section) section.classList.add('tabs-ready');
+
+    document.querySelectorAll('.beta-tab-btn').forEach(function(b) {
+        b.classList.remove('active', 'tab-pop');
+    });
     document.querySelectorAll('.beta-panel').forEach(function(p) { p.classList.remove('active'); });
+
     btn.classList.add('active');
     document.getElementById(btn.dataset.target).classList.add('active');
+
+    void btn.offsetWidth; // animatsiyani qayta ishga tushirish
+    btn.classList.add('tab-pop');
+    setTimeout(function() { btn.classList.remove('tab-pop'); }, 550);
 }
 
 /* ================= BETA BADGE — 3 TA XABAR AYLANMA ================= */
