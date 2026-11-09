@@ -1510,10 +1510,11 @@
             height: 100dvh;      /* shu yerga ham qo'shing */
             background: rgba(10, 10, 15, 0.55);
             z-index: -1;
-            pointer-events: none;
+           pointer-events: none;
         }
-        {% block extra_css %}{% endblock %}
     </style>
+    {% block extra_css %}{% endblock %}
+
 
     {# ===== USER THEME/BG SETTINGS ===== #}
     {% if request.user.is_authenticated %}
