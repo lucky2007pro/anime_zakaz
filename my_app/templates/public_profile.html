@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ target.display_name }} | BESTMEDIA{% endblock %}
+
+{% block extra_css %}
+<style>
+.pp-wrap { max-width: 680px; margin: 20px auto; padding: 0 14px 36px; }
+
+.pp-card {
+    text-align: center;
+    padding: 26px 16px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,255,255,0.09);
+}
+
+.pp-avatar {
+    width: 84px; height: 84px; margin: 0 auto 12px;
+    border-radius: 50%; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid #b45cff;
+    font-size: 28px; font-weight: 900; color: #b45cff;
+    background: rgba(255,255,255,0.05);
+}
+.pp-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.pp-name  { font-size: 20px; font-weight: 800; color: #fff; margin: 0 0 2px; }
+.pp-user  { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 14px; }
+
+.pp-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+.pp-stat  { padding: 10px 4px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); }
+.pp-stat b { display: block; font-size: 18px; font-weight: 900; color: #b45cff; }
+.pp-stat span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgba(255,255,255,0.45); }
+
+.pp-edit {
+    display: inline-block; margin-top: 16px; padding: 9px 18px; border-radius: 10px;
+    background: linear-gradient(90deg, #b45cff, #9c4cff); color: #fff;
+    font-weight: 800; font-size: 13px; text-decoration: none;
+}
+
+.pp-soon { margin-top: 14px; font-size: 12px; color: rgba(255,255,255,0.35); }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+<div class="pp-wrap">
+
+    <div class="pp-card">
+        <div class="pp-avatar">
+            {% if target.avatar %}
+                <img src="{{ target.avatar.image.url }}" alt="avatar" draggable="false">
+            {% else %}
+                {{ target.username|make_list|first|upper }}
+            {% endif %}
+        </div>
+
+        <h1 class="pp-name">{{ target.display_name }}</h1>
+        <div class="pp-user">@{{ target.username }}</div>
+
+        {% if tier == 'vip' %}
+            <span class="pv-tier-badge vip"><i class='bx bxs-crown'></i> VIP</span>
+        {% elif tier == 'premium' %}
+            <span class="pv-tier-badge premium"><i class='bx bx-crown'></i> Premium</span>
+        {% else %}
+            <span class="pv-tier-badge normal"><i class='bx bx-user'></i> Oddiy</span>
+        {% endif %}
+
+        <div class="pp-stats">
+            <div class="pp-stat"><b>{{ level }}</b><span>Daraja</span></div>
+            <div class="pp-stat"><b>{{ watched_count }}</b><span>Ko'rilgan</span></div>
+            <div class="pp-stat"><b>{{ days_joined }}</b><span>Kun</span></div>
+        </div>
+
+        {% if is_own %}
+            <a href="{% url 'profile' %}" class="pp-edit">Profilni tahrirlash</a>
+        {% endif %}
+
+        <p class="pp-soon">A'zo bo'lgan sana: {{ joined_local|date:"d.m.Y" }}</p>
+
+        {# TODO: ochiq profil ichki qismi keyin to'ldiriladi #}
+    </div>
+
+</div>
+</main>
+{% endblock %}
