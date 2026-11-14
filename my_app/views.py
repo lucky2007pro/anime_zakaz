@@ -25,7 +25,7 @@ from pywebpush import webpush, WebPushException
 from django.conf import settings
 import random
 from django.db import transaction
-
+from django.http import Http404
 
 
 from .models import *
@@ -691,6 +691,8 @@ def profile(request):
     for w in last_watched_history:
         w.local_time = localtime(w.last_watched, tz)
 
+    vip_expire_local = localtime(vip_data.vip_expire, tz) if vip_data.vip_active() else None
+
     # ===== PREMIUM PROFIL DIZAYN =====
     p_settings, _ = UserSettings.objects.get_or_create(user=request.user)
     profile_bg_url = None
@@ -714,9 +716,37 @@ def profile(request):
         'watched_count': request.user.watched_count(),
         'profile_bg_url': profile_bg_url,
         'menu_images': menu_images,
+                # ... mavjud kalitlar o'z joyida qoladi ...
+        'joined_local': localtime(request.user.date_joined, tz),
+        'days_joined': request.user.days_since_joined(),
+        'vip_expire_local': vip_expire_local,
+        'public_profile_url': request.build_absolute_uri(
+            reverse('public_profile', args=[request.user.username])
+        ),
     }
     return render(request, 'profile.html', context)
 
+# =======================
+# OCHIQ PROFIL  (anibest.uz/profile/subaru/)
+# =======================
+def public_profile(request, username):
+    target = (
+        CustomUser.objects.select_related('avatar').filter(username=username).first()
+        or CustomUser.objects.select_related('avatar').filter(username__iexact=username).first()
+    )
+    if not target:
+        raise Http404("Foydalanuvchi topilmadi")
+
+    tz = ZoneInfo('Asia/Tashkent')
+    return render(request, 'public_profile.html', {
+        'target': target,
+        'tier': target.active_tier(),
+        'level': target.get_level(),
+        'watched_count': target.watched_count(),
+        'days_joined': target.days_since_joined(),
+        'joined_local': localtime(target.date_joined, tz),
+        'is_own': request.user.is_authenticated and request.user.id == target.id,
+    })
 
 # =======================
 # MAKE VIP
