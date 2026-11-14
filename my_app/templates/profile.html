@@ -49,7 +49,11 @@
 .p-save-btn,
 .pv-tier-badge,
 .pv-level-circle,
-.pv-level-circle * {
+.pv-level-circle *,
+.pv-detail-btn,
+.pv-detail-btn *,
+.pd-sheet,
+.pd-sheet * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
@@ -58,7 +62,8 @@
 
 .pv-avatar img,
 .p-av-img,
-.p-watched-row-img img {
+.p-watched-row-img img,
+.pd-avatar img {
     pointer-events: none;
     -webkit-user-drag: none;
     user-drag: none;
@@ -66,7 +71,8 @@
 
 .pv-menu-box,
 .p-watched-row,
-.p-save-btn {
+.p-save-btn,
+.pv-detail-btn {
     touch-action: manipulation;
 }
 
@@ -414,6 +420,15 @@
     border-top: 1px solid rgba(255,255,255,0.06);
 }
 
+/* "Daraja" yozuvi + uning ostidagi "Batafsil" tugmasi */
+.pv-level-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+}
+
 .pv-level-title {
     position: relative;
     display: inline-block;
@@ -446,6 +461,60 @@
 
 @keyframes lt-caret {
     50% { opacity: 0; }
+}
+
+
+/* =========================================================
+   BATAFSIL TUGMASI (Daraja ostida, ixcham)
+   ========================================================= */
+
+.pv-detail-btn {
+    -webkit-appearance: none;
+    appearance: none;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 5px 12px;
+    border-radius: 20px;
+
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.13);
+    color: var(--tier-color, #b45cff);
+
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: .02em;
+
+    cursor: pointer;
+    transition: border-color .2s ease, background-color .2s ease, opacity .2s ease;
+}
+
+.pv-detail-btn i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.pv-detail-btn:active { opacity: .85; }
+
+.pv-detail-btn:focus-visible {
+    outline: 2px solid var(--tier-color, #b45cff);
+    outline-offset: 2px;
+}
+
+.pv-card.has-bg .pv-detail-btn {
+    background: rgba(10,8,16,0.58);
+    border-color: rgba(255,255,255,0.20);
+}
+
+@media (hover: hover) {
+    .pv-detail-btn:hover {
+        border-color: var(--tier-color, #b45cff);
+        background: rgba(255,255,255,0.09);
+    }
 }
 
 .pv-level-circle {
@@ -1167,6 +1236,301 @@
 
 
 /* =========================================================
+   BATAFSIL OYNASI (modal)
+   - PC: markazda kichik karta
+   - Mobil: pastdan chiqadigan ixcham sheet
+   - faqat opacity / transform animatsiya (arzon)
+   ========================================================= */
+
+.pd-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+
+    background: rgba(6,4,12,0.74);
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+
+.pd-overlay.pd-open { display: flex; }
+.pd-overlay.pd-show { opacity: 1; }
+
+.pd-sheet {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    max-height: 88vh;
+    max-height: 88dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-sizing: border-box;
+
+    background: linear-gradient(160deg, #1d1729, #14101d);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+
+    transform: translateY(16px) scale(.98);
+    transition: transform .22s cubic-bezier(.2, .8, .3, 1);
+}
+
+.pd-overlay.pd-show .pd-sheet { transform: none; }
+
+/* modal ichida tier rangi */
+.pd-sheet.tier-basic   { --tier-color: rgba(255,255,255,0.82); }
+.pd-sheet.tier-vip     { --tier-color: #ffd23f; }
+
+.pd-sheet::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--tier-color, #b45cff), transparent);
+    opacity: .8;
+}
+
+.pd-grab {
+    display: none;
+    width: 38px;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.18);
+    margin: 0 auto 10px;
+}
+
+.pd-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.pd-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2.5px solid var(--tier-color, #b45cff);
+    background: rgba(255,255,255,0.05);
+    color: var(--tier-color, #b45cff);
+    font-size: 19px;
+    font-weight: 900;
+}
+
+.pd-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.pd-head-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.pd-name {
+    max-width: 100%;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pd-user {
+    max-width: 100%;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+}
+
+.pd-close {
+    -webkit-appearance: none;
+    appearance: none;
+    flex-shrink: 0;
+    align-self: flex-start;
+
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.8);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.pd-close:focus-visible,
+.pd-copy:focus-visible,
+.pd-open-btn:focus-visible {
+    outline: 2px solid var(--tier-color, #b45cff);
+    outline-offset: 2px;
+}
+
+.pd-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.pd-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 4px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+}
+
+.pd-stat b {
+    font-size: 19px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--tier-color, #b45cff);
+}
+
+.pd-stat span {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: rgba(255,255,255,0.45);
+}
+
+.pd-rows { margin-bottom: 2px; }
+
+.pd-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px;
+}
+
+.pd-row:last-child { border-bottom: none; }
+
+.pd-row > span {
+    flex-shrink: 0;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+}
+
+.pd-row > b {
+    min-width: 0;
+    font-weight: 800;
+    color: #fff;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pd-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 7px 7px 7px 12px;
+    border-radius: 11px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.pd-link-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pd-copy {
+    -webkit-appearance: none;
+    appearance: none;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 11px;
+    border-radius: 8px;
+    background: rgba(180,92,255,0.12);
+    border: 1px solid rgba(180,92,255,0.28);
+    color: #b45cff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.pd-copy.pd-copied {
+    color: #3ddc97;
+    border-color: rgba(61,220,151,0.35);
+    background: rgba(61,220,151,0.10);
+}
+
+.pd-open-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 41px;
+    margin-top: 10px;
+    border-radius: 11px;
+    background: linear-gradient(90deg, #b45cff, #9c4cff);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 8px 22px rgba(180,92,255,0.18), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.pd-open-btn i { font-size: 16px; }
+
+@media (hover: hover) {
+    .pd-close:hover { background: rgba(255,255,255,0.10); }
+    .pd-copy:hover  { border-color: rgba(180,92,255,0.55); }
+}
+
+
+/* =========================================================
    LOADING SKELETON
    ========================================================= */
 
@@ -1326,7 +1690,12 @@
 
     .pv-level-row { padding-top: 18px; }
 
+    .pv-level-left { gap: 10px; }
+
     .pv-level-title { font-size: 15px; }
+
+    .pv-detail-btn { font-size: 12.5px; padding: 6px 15px; gap: 6px; }
+    .pv-detail-btn i { font-size: 15px; }
 
     .pv-level-circle { width: 74px; height: 74px; }
     .lv-num { font-size: 24px; }
@@ -1343,6 +1712,11 @@
     .p-footer { font-size: 13px; padding: 12px 16px; }
 
     .pv-menu-box { padding: 15px 18px; font-size: 15px; }
+
+    .pd-sheet { max-width: 440px; padding: 20px; }
+    .pd-avatar { width: 64px; height: 64px; font-size: 22px; }
+    .pd-name { font-size: 18px; }
+    .pd-row { font-size: 14px; padding: 10px 2px; }
 }
 
 
@@ -1406,6 +1780,11 @@
     .pv-tier-badge { font-size: 9px; padding: 2px 8px; gap: 3px; }
 
     .pv-level-row { padding-top: 12px; }
+
+    .pv-level-left { gap: 6px; }
+
+    .pv-detail-btn { font-size: 10px; padding: 4px 10px; gap: 4px; }
+    .pv-detail-btn i { font-size: 13px; }
 
     .pv-level-circle {
         width: 48px;
@@ -1500,6 +1879,43 @@
     .pcard,
     .pv-card { box-shadow: 0 6px 16px rgba(0,0,0,0.18); }
 
+    /* batafsil oynasi: pastdan chiqadigan ixcham sheet */
+    .pd-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .pd-sheet {
+        max-width: none;
+        max-height: 82vh;
+        max-height: 82dvh;
+        border-radius: 18px 18px 0 0;
+        border-bottom: none;
+        padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+        transform: translateY(100%);
+    }
+
+    .pd-grab { display: block; }
+
+    .pd-head { gap: 10px; margin-bottom: 11px; }
+    .pd-avatar { width: 48px; height: 48px; font-size: 16px; border-width: 2px; }
+    .pd-name { font-size: 15px; }
+    .pd-user { font-size: 11px; }
+    .pd-close { width: 30px; height: 30px; font-size: 19px; }
+
+    .pd-stats { gap: 6px; margin-bottom: 6px; }
+    .pd-stat { padding: 8px 2px; border-radius: 11px; }
+    .pd-stat b { font-size: 17px; }
+    .pd-stat span { font-size: 9px; }
+
+    .pd-row { font-size: 12px; padding: 7px 2px; }
+
+    .pd-link { margin-top: 6px; padding: 6px 6px 6px 10px; }
+    .pd-link-text { font-size: 11px; }
+    .pd-copy { padding: 5px 9px; font-size: 10px; }
+
+    .pd-open-btn { height: 38px; font-size: 12px; margin-top: 8px; border-radius: 10px; }
+
     /* skeleton */
     .sk-card { padding: 13px; border-radius: 14px; }
     .sk-avatar { width: 52px; height: 52px; }
@@ -1530,6 +1946,8 @@
     .pv-id-value   { font-size: 14px; }
 
     .pv-tier-badge { font-size: 8.5px; padding: 2px 7px; }
+
+    .pv-detail-btn { font-size: 9.5px; padding: 4px 9px; }
 
     .p-form-row { gap: 6px; }
 
@@ -1586,6 +2004,7 @@
     .pv-card.lv-anim .lv-arc { stroke-dashoffset: 0 !important; }
     .pv-card.lv-anim .lv-num { fill-opacity: 1 !important; stroke-dashoffset: 0 !important; }
     .pv-card.lv-anim .pv-level-label { opacity: 1 !important; }
+    .pv-detail-btn { display: none !important; }
 </style>
 </noscript>
 {% endblock %}
@@ -1726,8 +2145,18 @@
 
             <div class="pv-level-row">
 
-                <div class="pv-level-title" id="pvLevelTitle" aria-label="Daraja">
-                    <span class="lt-ghost">Daraja</span><span class="lt-type" id="pvLevelType" aria-hidden="true"></span>
+                <div class="pv-level-left">
+
+                    <div class="pv-level-title" id="pvLevelTitle" aria-label="Daraja">
+                        <span class="lt-ghost">Daraja</span><span class="lt-type" id="pvLevelType" aria-hidden="true"></span>
+                    </div>
+
+                    {# BATAFSIL — Daraja yozuvi ostida #}
+                    <button type="button" class="pv-detail-btn" id="pvDetailBtn"
+                            aria-haspopup="dialog" aria-controls="pvDetailModal">
+                        <i class='bx bx-info-circle'></i><span>Batafsil</span>
+                    </button>
+
                 </div>
 
                 <div class="pv-level-circle">
@@ -1909,6 +2338,80 @@
 </div>
 </main>
 
+
+<!-- =========================================================
+     BATAFSIL OYNASI — foydalanuvchi o'zi haqidagi ma'lumotlar.
+     (position: fixed — shuning uchun .pcard/.pv-card ichida emas)
+     ========================================================= -->
+<div class="pd-overlay" id="pvDetailModal" role="dialog" aria-modal="true" aria-labelledby="pdTitle">
+    <div class="pd-sheet tier-{{ user_tier|default:'basic' }}">
+
+        <div class="pd-grab" aria-hidden="true"></div>
+
+        <div class="pd-head">
+            <div class="pd-avatar">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.image.url }}" alt="avatar" loading="lazy" decoding="async" draggable="false">
+                {% else %}
+                    {{ user.username|make_list|first|upper }}
+                {% endif %}
+            </div>
+
+            <div class="pd-head-info">
+                <div class="pd-name" id="pdTitle">
+                    {% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}
+                </div>
+                <div class="pd-user">@{{ user.username }}</div>
+
+                {% if user_tier == 'vip' %}
+                    <span class="pv-tier-badge vip"><i class='bx bxs-crown'></i> VIP</span>
+                {% elif user_tier == 'premium' %}
+                    <span class="pv-tier-badge premium"><i class='bx bx-crown'></i> Premium</span>
+                {% else %}
+                    <span class="pv-tier-badge normal"><i class='bx bx-user'></i> Oddiy</span>
+                {% endif %}
+            </div>
+
+            <button type="button" class="pd-close" id="pdClose" aria-label="Yopish">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+
+        <div class="pd-stats">
+            <div class="pd-stat"><b>{{ user_level }}</b><span>Daraja</span></div>
+            <div class="pd-stat"><b>{{ watched_count }}</b><span>Ko'rilgan</span></div>
+            <div class="pd-stat"><b>{{ days_joined }}</b><span>Kun</span></div>
+        </div>
+
+        <div class="pd-rows">
+            <div class="pd-row"><span>ID</span><b>{{ user.id }}</b></div>
+            <div class="pd-row"><span>Username</span><b>{{ user.username }}</b></div>
+            <div class="pd-row"><span>Ro'yxatdan o'tgan</span><b>{{ joined_local|date:"d.m.Y" }}</b></div>
+            <div class="pd-row">
+                <span>Tarif</span>
+                <b>{% if user_tier == 'vip' %}VIP{% elif user_tier == 'premium' %}Premium{% else %}Oddiy{% endif %}</b>
+            </div>
+            {% if vip_expire_local %}
+            <div class="pd-row"><span>Obuna tugaydi</span><b>{{ vip_expire_local|date:"d.m.Y H:i" }}</b></div>
+            {% endif %}
+            <div class="pd-row"><span>Hisob</span><b>{{ balance.amount }} so'm</b></div>
+        </div>
+
+        <div class="pd-link">
+            <span class="pd-link-text" id="pdLinkText">{{ public_profile_url }}</span>
+            <button type="button" class="pd-copy" id="pdCopy" data-url="{{ public_profile_url }}">
+                <i class='bx bx-copy'></i><span>Nusxa</span>
+            </button>
+        </div>
+
+        <a href="{% url 'public_profile' user.username %}" class="pd-open-btn" draggable="false">
+            <i class='bx bx-link-external'></i> Ochiq profilni ko'rish
+        </a>
+
+    </div>
+</div>
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -1920,19 +2423,22 @@ document.addEventListener('DOMContentLoaded', function () {
        Avatar, tugmalar, rasmlar: kontekst menyu (Chrome),
        drag va matn belgilash bloklanadi. Inputlarga tegmaydi.
        ----------------------------------------------------- */
-    var realWrap = document.getElementById('pvReal');
+    var realWrap    = document.getElementById('pvReal');
+    var detailModal = document.getElementById('pvDetailModal');
     var lockSel  = '.pv-avatar, .pv-menu-box, .p-av-item, .p-watched-row, ' +
-                   '.p-save-btn, .pv-tier-badge, .pv-level-circle';
+                   '.p-save-btn, .pv-tier-badge, .pv-level-circle, ' +
+                   '.pv-detail-btn, .pd-sheet';
 
-    if (realWrap) {
+    [realWrap, detailModal].forEach(function (root) {
+        if (!root) return;
         ['contextmenu', 'dragstart', 'selectstart'].forEach(function (type) {
-            realWrap.addEventListener(type, function (e) {
+            root.addEventListener(type, function (e) {
                 var t = e.target;
                 if (t && t.nodeType === 3) t = t.parentNode;
                 if (t && t.closest && t.closest(lockSel)) e.preventDefault();
             }, true);
         });
-    }
+    });
 
 
     /* -----------------------------------------------------
@@ -1955,6 +2461,110 @@ document.addEventListener('DOMContentLoaded', function () {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 toggleEdit();
+            }
+        });
+    }
+
+
+    /* -----------------------------------------------------
+       1.1) BATAFSIL OYNASI — ochish / yopish / nusxalash
+       ----------------------------------------------------- */
+    var detailBtn   = document.getElementById('pvDetailBtn');
+    var detailClose = document.getElementById('pdClose');
+    var copyBtn     = document.getElementById('pdCopy');
+    var detailTimer = null;
+    var lastFocus   = null;
+
+    function openDetail() {
+        if (!detailModal || detailModal.classList.contains('pd-open')) return;
+        clearTimeout(detailTimer);
+        lastFocus = document.activeElement;
+
+        detailModal.classList.add('pd-open');
+        document.body.style.overflow = 'hidden';
+
+        // display o'zgargach, keyingi kadrda animatsiya boshlansin
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                detailModal.classList.add('pd-show');
+            });
+        });
+
+        if (detailClose) detailClose.focus();
+    }
+
+    function closeDetail() {
+        if (!detailModal || !detailModal.classList.contains('pd-open')) return;
+
+        detailModal.classList.remove('pd-show');
+        document.body.style.overflow = '';
+
+        detailTimer = setTimeout(function () {
+            detailModal.classList.remove('pd-open');
+            if (lastFocus && lastFocus.focus) lastFocus.focus();
+        }, reduceMotion ? 0 : 230);
+    }
+
+    if (detailBtn)   detailBtn.addEventListener('click', openDetail);
+    if (detailClose) detailClose.addEventListener('click', closeDetail);
+
+    if (detailModal) {
+        // fon (overlay) ga bosilganda yopiladi
+        detailModal.addEventListener('click', function (e) {
+            if (e.target === detailModal) closeDetail();
+        });
+
+        // Tab tugmasi oyna ichida aylanadi
+        detailModal.addEventListener('keydown', function (e) {
+            if (e.key !== 'Tab') return;
+            var f = detailModal.querySelectorAll('button, a[href]');
+            if (!f.length) return;
+            var first = f[0], last = f[f.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault(); last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault(); first.focus();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeDetail();
+    });
+
+    if (copyBtn) {
+        var copyLabel = copyBtn.querySelector('span');
+        var copyTimer = null;
+
+        function copied() {
+            copyBtn.classList.add('pd-copied');
+            if (copyLabel) copyLabel.textContent = 'Nusxalandi';
+            clearTimeout(copyTimer);
+            copyTimer = setTimeout(function () {
+                copyBtn.classList.remove('pd-copied');
+                if (copyLabel) copyLabel.textContent = 'Nusxa';
+            }, 1600);
+        }
+
+        function fallbackCopy(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { if (document.execCommand('copy')) copied(); } catch (err) {}
+            document.body.removeChild(ta);
+        }
+
+        copyBtn.addEventListener('click', function () {
+            var text = copyBtn.getAttribute('data-url') || '';
+            if (!text) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(copied, function () { fallbackCopy(text); });
+            } else {
+                fallbackCopy(text);
             }
         });
     }
