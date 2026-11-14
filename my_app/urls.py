@@ -25,6 +25,7 @@ urlpatterns = [
     path('catalog/', anime_catalog, name='anime_catalog'),
     path('search/', search, name='search'),
     path('profile/', profile, name='profile'),
+    path('profile/<str:username>/', public_profile, name='public_profile'),
     path('premium/', premium_page, name='premium_page'),
     path('news/', news_feed, name='news_feed'),
     path('news/<int:pk>/', news_detail, name='news_detail'),
