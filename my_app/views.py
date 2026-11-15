@@ -26,6 +26,8 @@ from django.conf import settings
 import random
 from django.db import transaction
 from django.http import Http404
+from django.contrib.auth import update_session_auth_hash
+
 
 
 from .models import *
@@ -642,15 +644,105 @@ def send_test_push_api(request):
 # =======================
 # PROFILE
 # =======================
+PW_MIN_LEN = 6
+PW_MAX_FAILS = 5          # shuncha xato urinishdan keyin
+PW_LOCK_SECONDS = 300     # 5 daqiqa bloklanadi
+
+
+def _pw_locked_seconds(request):
+    until = request.session.get('pw_lock_until', 0)
+    left = int(until - timezone.now().timestamp())
+    return left if left > 0 else 0
+
+
+def _pw_register_fail(request):
+    fails = request.session.get('pw_fails', 0) + 1
+    if fails >= PW_MAX_FAILS:
+        request.session['pw_fails'] = 0
+        request.session['pw_lock_until'] = timezone.now().timestamp() + PW_LOCK_SECONDS
+    else:
+        request.session['pw_fails'] = fails
+
+
+def _pw_reset_fails(request):
+    request.session.pop('pw_fails', None)
+    request.session.pop('pw_lock_until', None)
+
+
+@login_required(login_url='login')
+def profile_check_password(request):
+    """AJAX: hozirgi parol to'g'rimi? (parol almashtirish oynasi 1-qadami)"""
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'POST talab qilinadi'}, status=405)
+
+    left = _pw_locked_seconds(request)
+    if left:
+        return JsonResponse(
+            {'ok': False, 'error': f"Juda ko'p xato urinish. {left // 60 + 1} daqiqadan keyin urinib ko'ring."},
+            status=429
+        )
+
+    old = request.POST.get('old_password', '')
+    if request.user.check_password(old):
+        _pw_reset_fails(request)
+        return JsonResponse({'ok': True})
+
+    _pw_register_fail(request)
+    return JsonResponse({'ok': False, 'error': "Parol noto'g'ri."}, status=400)
+
+
+def _handle_password_change(request):
+    user = request.user
+
+    left = _pw_locked_seconds(request)
+    if left:
+        messages.error(request, f"Juda ko'p xato urinish. {left // 60 + 1} daqiqadan keyin urinib ko'ring.")
+        return redirect('profile')
+
+    old = request.POST.get('old_password', '')
+    new1 = request.POST.get('new_password1', '')
+    new2 = request.POST.get('new_password2', '')
+
+    if not user.check_password(old):
+        _pw_register_fail(request)
+        messages.error(request, "Hozirgi parol noto'g'ri.")
+    elif len(new1) < PW_MIN_LEN:
+        messages.error(request, f"Yangi parol kamida {PW_MIN_LEN} ta belgidan iborat bo'lsin.")
+    elif new1 != new2:
+        messages.error(request, "Yangi parollar bir xil emas.")
+    elif new1 == old:
+        messages.error(request, "Yangi parol hozirgisidan farq qilishi kerak.")
+    else:
+        user.set_password(new1)
+        user.save()
+        update_session_auth_hash(request, user)   # foydalanuvchi akkauntdan chiqib ketmasin
+        _pw_reset_fails(request)
+        AccountHistory.objects.create(user=user, text="Login kod (parol) o'zgartirildi 🔒")
+        messages.success(request, "Login kod muvaffaqiyatli o'zgartirildi!")
+
+    return redirect('profile')
+
+
 @login_required(login_url='login')
 def profile(request):
-    from .models import WatchHistory, UserBalance  # fayl boshida import bo'lsa kerak emas
+    from .models import WatchHistory, UserBalance
 
     vip_data, _ = VipUser.objects.get_or_create(user=request.user)
     balance, _ = UserBalance.objects.get_or_create(user=request.user)
     avatars = ProfileAvatar.objects.all().order_by('-created_at')
 
     if request.method == 'POST':
+        action = request.POST.get('action', 'save_profile')
+
+        # ---- AJAX: hozirgi parol to'g'rimi? ----
+        if action == 'check_password':
+            return profile_check_password(request)
+
+        # ---- Login kod (parol) o'zgartirish ----
+        if action == 'change_password':
+            return _handle_password_change(request)
+
+        # ---- Profil bo'limi: avatar, ism, familya ----
         avatar_id = request.POST.get('avatar_id')
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
@@ -663,7 +755,7 @@ def profile(request):
                 selected_avatar = ProfileAvatar.objects.get(id=avatar_id)
                 user.avatar = selected_avatar
                 updated = True
-            except ProfileAvatar.DoesNotExist:
+            except (ProfileAvatar.DoesNotExist, ValueError):
                 messages.error(request, "Maxsus profil rasmi topilmadi.")
 
         if first_name != user.first_name:
@@ -716,7 +808,7 @@ def profile(request):
         'watched_count': request.user.watched_count(),
         'profile_bg_url': profile_bg_url,
         'menu_images': menu_images,
-                # ... mavjud kalitlar o'z joyida qoladi ...
+
         'joined_local': localtime(request.user.date_joined, tz),
         'days_joined': request.user.days_since_joined(),
         'vip_expire_local': vip_expire_local,
@@ -725,6 +817,8 @@ def profile(request):
         ),
     }
     return render(request, 'profile.html', context)
+
+
 
 # =======================
 # OCHIQ PROFIL  (anibest.uz/profile/subaru/)
