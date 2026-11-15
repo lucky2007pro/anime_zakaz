@@ -6,7 +6,20 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .sitemaps import NewsSitemap
 from django.contrib.sitemaps.views import sitemap
-
+from .views import (
+    register, login, home, movie_detail, check_username,
+    profile, make_vip, search, anime_catalog,
+    chat, chat_messages_api, edit_message, delete_message, ban_user,
+    logout_view, premium_page, toggle_favorite, favorites_page, watch_history_page, aloqa, news_feed, news_detail, toggle_like, next_story_view, prev_story_view, story_view, mark_story_seen,
+    reelbest_view_increment,reelbest_comments_api,reelbest_add_comment,reelbest_toggle_like,reelbest_page,
+    settings_privacy, settings_devices, settings_premium, settings_telegram, settings_general, user_mini_profile_api,
+    anime_category, notice, delete_comment, service_worker_view, offline_view, manifest_view,
+    hisobim_page, statistika_page, imkon_page, imkon_toggle_bg, imkon_select_bg, imkon_toggle_telegram_download,
+    imkon_vote_request_add, imkon_vote, imkon_anime_request_add, check_username,
+    news_load_more, vip_buy_balance, debt_request_add, balance_topup_add, jackpot_redeem, imkon_toggle_beta_home,
+    save_push_subscription, send_test_push_api,imkon_set_music_volume,imkon_select_music,imkon_toggle_music,poll_vote,mark_episode_watched,imkon_toggle_vip_box_expire,imkon_toggle_vip_box_recent,imkon_toggle_vip_box,
+    imkon_select_vip_box_video
+)
 sitemaps = {
     'news': NewsSitemap,
 }
@@ -25,8 +38,8 @@ urlpatterns = [
     path('catalog/', anime_catalog, name='anime_catalog'),
     path('search/', search, name='search'),
     path('profile/', profile, name='profile'),
-    path('profile/<str:username>/', public_profile, name='public_profile'),
-    path('premium/', premium_page, name='premium_page'),
+    path('profile/check-password/', profile_check_password, name='profile_check_password'),
+    path('profile/<str:username>/', public_profile, name='public_profile'),    path('premium/', premium_page, name='premium_page'),
     path('news/', news_feed, name='news_feed'),
     path('news/<int:pk>/', news_detail, name='news_detail'),
     path('news/<int:pk>/like/', toggle_like, name='toggle_like'),
@@ -185,7 +198,7 @@ urlpatterns = [
     # PREMIUM AZOLAR (admin)
     path('control-panel/premium/', admin_premium_list, name='admin_premium_list'),
     path('control-panel/premium/<int:pk>/edit/', admin_premium_form, name='admin_premium_form'),
-    path('control-panel/premium/<int:pk>/bekor/', admin_premium_cancel, name='admin_premium_cancel'),  
+    path('control-panel/premium/<int:pk>/bekor/', admin_premium_cancel, name='admin_premium_cancel'),
     path('statistika/', statistika_page, name='statistika_page'),
     path('poll/vote/<int:poll_id>/', poll_vote, name='poll_vote'),
     path('control-panel/polls/', admin_polls, name='admin_polls'),
@@ -194,7 +207,7 @@ urlpatterns = [
     path('control-panel/polls/<int:pk>/delete/',admin_poll_delete, name='admin_poll_delete'),
     path('reels/<int:reel_id>/', reelbest_page, name='reels_detail'),  # YANGI — masalan /reels/4/
 
-    path('episode/<int:episode_id>/watched/', mark_episode_watched, name='mark_episode_watched'),  
+    path('episode/<int:episode_id>/watched/', mark_episode_watched, name='mark_episode_watched'),
     path('imkon/vip-box/yoqish/', imkon_toggle_vip_box, name='imkon_toggle_vip_box'),
     path('imkon/vip-box/oxirgi-anime/', imkon_toggle_vip_box_recent, name='imkon_toggle_vip_box_recent'),
     path('imkon/vip-box/tugash-vaqti/', imkon_toggle_vip_box_expire, name='imkon_toggle_vip_box_expire'),
@@ -214,6 +227,7 @@ urlpatterns = [
     path('imkon/profil-dizayn/toggle/', imkon_toggle_profile_design, name='imkon_toggle_profile_design'),
     path('imkon/profil-dizayn/<str:cat>/<int:idx>/tanlash/', imkon_select_profile_bg, name='imkon_select_profile_bg'),
     path('imkon/profil-dizayn/menyu/toggle/', imkon_toggle_profile_menu, name='imkon_toggle_profile_menu'),
+
     path('daraja-oshirish/', daraja_oshirish_page, name='daraja_oshirish'),
     path('daraja-oshirish/', daraja_oshirish_page, name='daraja_oshirish'),
     path('daraja-oshirish/puzzle/start/', daraja_puzzle_start, name='daraja_puzzle_start'),
@@ -225,10 +239,12 @@ urlpatterns = [
     path('control-panel/daraja/qidirish/', admin_daraja_form, name='admin_daraja_form_lookup'),
     path('control-panel/daraja/<int:user_id>/', admin_daraja_form, name='admin_daraja_form'),
 
-    
 ]
+
 
 
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
