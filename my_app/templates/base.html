@@ -1609,6 +1609,7 @@
 {% endif %}
 
 <!-- ==================== NAVBAR ==================== -->
+{% block navbar %}
 <nav class="navbar" id="navbar">
     <a href="{% url 'home' %}" class="nav-brand" aria-label="BESTMEDIA bosh sahifa">
         <img src="{% static 'images/favicon.svg' %}" alt="ANI BEST" class="nav-brand-logo">
@@ -1653,6 +1654,7 @@
         </button>
     </div>
 </nav>
+{% endblock navbar %}
 
 <!-- ==================== MOBILE NAV ==================== -->
 <div class="mobile-nav-overlay" id="mobileNavOverlay">
