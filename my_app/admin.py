@@ -508,13 +508,6 @@ class BstLogAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(BstLog)
-class BstLogAdmin(admin.ModelAdmin):
-    list_display = ('user', 'source', 'ref', 'amount', 'created_at')
-    list_filter = ('source', 'created_at')
-    search_fields = ('user__username', 'ref')
-    readonly_fields = ('user', 'source', 'ref', 'amount', 'created_at')
-
 # =======================
 # OCHIQ PROFIL
 # =======================
