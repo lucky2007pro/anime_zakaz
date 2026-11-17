@@ -239,6 +239,19 @@ urlpatterns = [
     path('control-panel/daraja/qidirish/', admin_daraja_form, name='admin_daraja_form_lookup'),
     path('control-panel/daraja/<int:user_id>/', admin_daraja_form, name='admin_daraja_form'),
 
+    path('pp/verify/', pp_verify_request, name='pp_verify_request'),
+    path('pp/info/save/', pp_info_save, name='pp_info_save'),
+    path('pp/bg/', pp_bg_set, name='pp_bg_set'),
+    path('pp/card/add/', pp_card_add, name='pp_card_add'),
+    path('pp/card/<int:pk>/delete/', pp_card_delete, name='pp_card_delete'),
+    path('pp/card/<int:card_id>/role/add/', pp_role_add, name='pp_role_add'),
+    path('pp/role/<int:pk>/delete/', pp_role_delete, name='pp_role_delete'),
+
+path('control-panel/profverify/', admin_profverify_list, name='admin_profverify_list'),
+path('control-panel/profverify/lookup/', admin_profverify_lookup, name='admin_profverify_lookup'),
+path('control-panel/profverify/<int:pk>/', admin_profverify_form, name='admin_profverify_form'),
+path('control-panel/profverify/<int:pk>/<str:action>/', admin_profverify_action, name='admin_profverify_action'),
+
 ]
 
 
