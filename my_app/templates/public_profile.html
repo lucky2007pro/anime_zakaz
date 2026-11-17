@@ -137,11 +137,12 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 .pp-hr { border: 0; height: 1px; background: rgba(255,255,255,.08); margin: 9px 0; }
 
 /* ---- cardlar karuseli ---- */
-.pp-car { position: relative; }
+.pp-car { position: relative; perspective: 1200px; }
 .pp-track {
     display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
     scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
     padding: 4px 2px 8px; scrollbar-width: none; overscroll-behavior-x: contain;
+    perspective: 1200px;
 }
 .pp-track::-webkit-scrollbar { display: none; }
 
@@ -151,6 +152,28 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     scroll-snap-align: start; background: #1b1626;
     box-shadow: 0 8px 20px rgba(0,0,0,.3); transition: transform .2s ease;
     -webkit-tap-highlight-color: transparent;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform;
+    animation: ppCardLiveRotate 6s ease-in-out infinite;
+}
+.pp-c:nth-child(2n) { animation-delay: -1.5s; }
+.pp-c:nth-child(3n) { animation-delay: -3s; }
+.pp-c:nth-child(4n) { animation-delay: -4.5s; }
+
+@keyframes ppCardLiveRotate {
+    0%, 100% {
+        transform: perspective(900px) rotateY(-7deg) rotateX(1deg) translateY(0);
+    }
+    25% {
+        transform: perspective(900px) rotateY(0deg) rotateX(-1deg) translateY(-2px);
+    }
+    50% {
+        transform: perspective(900px) rotateY(7deg) rotateX(1deg) translateY(0);
+    }
+    75% {
+        transform: perspective(900px) rotateY(0deg) rotateX(-1deg) translateY(-2px);
+    }
 }
 .pp-c img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
 .pp-c::after { content: ""; position: absolute; inset: 0;
@@ -165,7 +188,12 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 }
 .pp-c.add::after { display: none; }
 .pp-c.add i { font-size: 34px; line-height: 1; font-style: normal; }
-@media (hover: hover) { .pp-c:hover { transform: translateY(-4px); } }
+@media (hover: hover) {
+    .pp-c:hover {
+        animation-play-state: paused;
+        transform: perspective(900px) rotateY(0deg) rotateX(0deg) translateY(-5px) scale(1.015);
+    }
+}
 
 .pp-nav {
     -webkit-appearance: none; appearance: none; cursor: pointer; padding: 0;
@@ -256,6 +284,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 
 @media (prefers-reduced-motion: reduce) {
     .pp-track { scroll-behavior: auto; }
+    .pp-c { animation: none !important; transform: none !important; }
     * { transition-duration: .01ms !important; }
 }
 </style>
