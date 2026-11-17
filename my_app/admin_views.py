@@ -13,6 +13,8 @@ from collections import defaultdict
 
 from django.db import transaction
 from .views import BST_STAGES
+from django.db.models import Case, When, Value, IntegerField
+
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser or user.is_admin_user)
@@ -1558,3 +1560,117 @@ def admin_daraja_form(request, user_id=None):
         }
 
     return render(request, 'custom_admin/darajabst_form.html', ctx)
+
+
+
+def _pv_set_status(ver, status, note=''):
+    changed = ver.status != status
+    ver.status = status
+    ver.admin_note = note[:255] if status == 'rejected' else ''
+    ver.processed_at = None if status == 'pending' else tz_utils.now()
+    if changed:
+        ver.seen_by_user = False   # foydalanuvchi natija xabarini qayta ko'radi
+    ver.save()
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_profverify_list(request):
+    items = (
+        ProfileVerification.objects.select_related('user')
+        .annotate(_o=Case(
+            When(status='pending', then=Value(0)),
+            When(status='approved', then=Value(1)),
+            default=Value(2), output_field=IntegerField()))
+        .order_by('_o', '-requested_at')
+    )
+    return render(request, 'custom_admin/list_base.html', {
+        'page_title': 'Profil tasdiqlash',
+        'items': items,
+        'type': 'profverify',
+        'pending_count': ProfileVerification.objects.filter(status='pending').count(),
+        'approved_count': ProfileVerification.objects.filter(status='approved').count(),
+    })
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_profverify_lookup(request):
+    """ID orqali foydalanuvchini topib, tasdiqlash formasini ochadi (yozuv yo'q bo'lsa yaratadi)"""
+    uid = request.GET.get('user_id', '').strip()
+    target = CustomUser.objects.filter(id=uid).first() if uid.isdigit() else None
+    if not target:
+        messages.error(request, f"#{uid} ID li foydalanuvchi topilmadi.")
+        return redirect('admin_profverify_list')
+    ver, _ = ProfileVerification.objects.get_or_create(user=target, defaults={'status': 'pending'})
+    return redirect('admin_profverify_form', pk=ver.pk)
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_profverify_action(request, pk, action):
+    """Ro'yxatdan tezkor: approve / reject / pending"""
+    if request.method != 'POST':
+        return redirect('admin_profverify_list')
+    ver = get_object_or_404(ProfileVerification, pk=pk)
+    if action == 'approve':
+        _pv_set_status(ver, 'approved')
+        messages.success(request, f"{ver.user.username} akkaunti tasdiqlandi.")
+    elif action == 'reject':
+        _pv_set_status(ver, 'rejected', request.POST.get('admin_note', '').strip())
+        messages.error(request, f"{ver.user.username} so'rovi rad etildi.")
+    elif action == 'pending':
+        _pv_set_status(ver, 'pending')
+        messages.success(request, f"{ver.user.username} so'rovi kutilmoqdaga qaytarildi.")
+    return redirect('admin_profverify_list')
+
+
+@user_passes_test(is_admin, login_url='/')
+def admin_profverify_form(request, pk):
+    ver = get_object_or_404(ProfileVerification.objects.select_related('user'), pk=pk)
+    target = ver.user
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'save_status':
+            status = request.POST.get('status')
+            if status in dict(ProfileVerification.STATUS_CHOICES):
+                _pv_set_status(ver, status, request.POST.get('admin_note', '').strip())
+                messages.success(request, "Holat saqlandi.")
+            else:
+                messages.error(request, "Noto'g'ri holat.")
+
+        elif action == 'save_info':
+            info, _ = PublicProfileInfo.objects.get_or_create(user=target)
+            info.ifo = request.POST.get('ifo', '').strip()[:120]
+            info.nickname = request.POST.get('nickname', '').strip()[:80]
+            info.fandub = request.POST.get('fandub', '').strip()[:150]
+            info.status_text = request.POST.get('status_text', '').strip()[:150]
+            info.motto = request.POST.get('motto', '').strip()[:200]
+            info.save()
+            messages.success(request, "Ma'lumotlar saqlandi.")
+
+        elif action == 'clear_bg':
+            info = PublicProfileInfo.objects.filter(user=target).first()
+            if info:
+                info.bg_color = None
+                info.bg_image_url = ''
+                info.bg_source_url = ''
+                info.save()
+            messages.success(request, "Profil foni tozalandi.")
+
+        elif action == 'delete_card':
+            ProfileCard.objects.filter(pk=request.POST.get('card_id'), user=target).delete()
+            messages.success(request, "Card o'chirildi.")
+
+        elif action == 'delete_role':
+            ProfileRole.objects.filter(pk=request.POST.get('role_id'), card__user=target).delete()
+            messages.success(request, "Rol o'chirildi.")
+
+        return redirect('admin_profverify_form', pk=ver.pk)
+
+    return render(request, 'custom_admin/profiltastiq_form.html', {
+        'ver': ver,
+        'target': target,
+        'info': PublicProfileInfo.objects.select_related('bg_color').filter(user=target).first(),
+        'cards': target.pp_cards.prefetch_related('roles'),
+        'status_choices': ProfileVerification.STATUS_CHOICES,
+    })
