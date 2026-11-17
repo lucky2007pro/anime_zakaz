@@ -20,6 +20,7 @@ SECTIONS = [
     ('daraja', 'Daraja (BST)'),
     ('qarz', "Qarz so'rovlari"),
     ('jackpot', 'Jackpot kodlar'),
+    ('profverify', "Profil tasdiqlash"),
 ]
 
 SECTION_KEYS = [k for k, _ in SECTIONS]
