@@ -1,0 +1,237 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block page_title %}Profil tasdiqlash — {{ target.username }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 992px) { .pv-grid { grid-template-columns: 1fr; } }
+
+    .pv-card { background: var(--bg-card); border: 1px solid var(--border-line); border-radius: 8px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,.8); margin-bottom: 20px; }
+    .pv-card h3 { font-size: 0.85rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 18px; }
+
+    .pv-flash { margin-bottom: 14px; padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; font-weight: 600;
+                background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.3); }
+    .pv-flash.error { background: rgba(248,113,113,.12); color: #f87171; border-color: rgba(248,113,113,.3); }
+    .pv-flash.warning { background: rgba(251,191,36,.12); color: #fbbf24; border-color: rgba(251,191,36,.3); }
+
+    .pv-user { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .pv-av { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; background: #1e1e24; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.3rem; color: var(--accent); flex-shrink: 0; }
+    .pv-av img { width: 100%; height: 100%; object-fit: cover; }
+    .pv-uname { font-size: 1.1rem; font-weight: 800; color: #fff; }
+    .pv-usub { font-size: 0.8rem; color: var(--text-dim); }
+
+    .pv-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+    .pv-meta div { background: #0a0a0f; border: 1px solid var(--border-line); border-radius: 6px; padding: 10px 12px; }
+    .pv-meta span { display: block; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+    .pv-meta b { font-size: 0.9rem; color: #fff; }
+
+    .pv-fld { margin-bottom: 14px; }
+    .pv-fld label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+    .pv-fld input[type=text], .pv-fld select, .pv-fld textarea {
+        width: 100%; background: #0a0a0f; border: 1px solid var(--border-line); border-radius: 6px;
+        padding: 11px 14px; color: #fff; font-size: 0.95rem; outline: none;
+    }
+    .pv-fld input:focus, .pv-fld select:focus, .pv-fld textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,243,255,.08); }
+    .pv-hint { font-size: 0.75rem; color: var(--text-dim); margin-top: 5px; }
+
+    .pv-status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .pv-status-row label { cursor: pointer; }
+    .pv-status-row input { display: none; }
+    .pv-status-row span {
+        display: inline-block; padding: 9px 16px; border-radius: 6px; font-weight: 700; font-size: 0.82rem;
+        background: #0a0a0f; border: 1px solid var(--border-line); color: var(--text-dim); transition: .2s;
+    }
+    .pv-status-row input:checked + span.s-pending  { background: rgba(251,191,36,.15); color: #fbbf24; border-color: rgba(251,191,36,.5); }
+    .pv-status-row input:checked + span.s-approved { background: rgba(52,211,153,.15); color: #34d399; border-color: rgba(52,211,153,.5); }
+    .pv-status-row input:checked + span.s-rejected { background: rgba(248,113,113,.15); color: #f87171; border-color: rgba(248,113,113,.5); }
+
+    .pv-btn { background: var(--accent); color: #000; border: none; padding: 11px 22px; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.82rem; box-shadow: 0 0 10px var(--accent-glow); transition: .3s; }
+    .pv-btn:hover { background: #fff; }
+    .pv-btn.ghost { background: #1e1e24; color: #fff; border: 1px solid #333; box-shadow: none; }
+    .pv-btn.ghost:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+    .pv-btn.danger { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; box-shadow: none; padding: 6px 12px; font-size: 0.75rem; }
+    .pv-btn.danger:hover { background: #ef4444; color: #fff; }
+
+    .pv-bg-preview { height: 90px; border-radius: 8px; border: 1px solid var(--border-line); background-size: cover; background-position: center; margin-bottom: 12px; }
+
+    .pv-card-item { border: 1px solid var(--border-line); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #0a0a0f; }
+    .pv-card-top { display: flex; align-items: center; gap: 12px; }
+    .pv-card-top img { width: 52px; height: 72px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+    .pv-card-top .t { flex: 1; min-width: 0; font-weight: 700; color: #fff; word-break: break-word; }
+    .pv-card-top .t small { display: block; color: var(--text-dim); font-weight: 400; font-size: 0.75rem; margin-top: 2px; }
+    .pv-roles { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-line); }
+    .pv-role { width: 84px; text-align: center; }
+    .pv-role img { width: 84px; height: 110px; object-fit: cover; border-radius: 6px; display: block; }
+    .pv-role .n { font-size: 0.72rem; color: #fff; margin: 4px 0; word-break: break-word; }
+    .pv-empty { color: var(--text-dim); font-size: 0.88rem; }
+
+    .pv-top-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .pv-top-actions a { text-decoration: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+    {% for m in messages %}
+        <div class="pv-flash {% if m.tags == 'error' %}error{% elif m.tags == 'warning' %}warning{% endif %}">{{ m }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="pv-top-actions">
+    <a href="{% url 'admin_profverify_list' %}" class="pv-btn ghost">← Ro'yxatga qaytish</a>
+    <a href="{% url 'public_profile' target.username %}" target="_blank" class="pv-btn ghost">Ochiq profilni ko'rish</a>
+</div>
+
+<div class="pv-grid">
+
+    <!-- ================= CHAP USTUN ================= -->
+    <div>
+        <!-- Foydalanuvchi + holat -->
+        <div class="pv-card">
+            <h3>Akkauntni tasdiqlash</h3>
+
+            <div class="pv-user">
+                <div class="pv-av">
+                    {% if target.avatar %}<img src="{{ target.avatar.image.url }}" alt="">
+                    {% else %}{{ target.username|make_list|first|upper }}{% endif %}
+                </div>
+                <div>
+                    <div class="pv-uname">{{ target.username }}</div>
+                    <div class="pv-usub">
+                        ID #{{ target.id }}{% if target.first_name %} · {{ target.first_name }} {{ target.last_name }}{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="pv-meta">
+                <div><span>So'ralgan</span><b>{{ ver.requested_at|date:"d.m.Y H:i" }}</b></div>
+                <div><span>Ko'rib chiqilgan</span><b>{% if ver.processed_at %}{{ ver.processed_at|date:"d.m.Y H:i" }}{% else %}—{% endif %}</b></div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save_status">
+
+                <div class="pv-status-row">
+                    {% for val, label in status_choices %}
+                        <label>
+                            <input type="radio" name="status" value="{{ val }}" {% if ver.status == val %}checked{% endif %}>
+                            <span class="s-{{ val }}">{{ label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="pv-fld">
+                    <label for="admin_note">Rad etish sababi (foydalanuvchiga ko'rinadi)</label>
+                    <input type="text" id="admin_note" name="admin_note" maxlength="255" value="{{ ver.admin_note }}" placeholder="Faqat «Rad etilgan» holatida ishlatiladi">
+                    <div class="pv-hint">«Tasdiqlangan» ga o'tkazsangiz, foydalanuvchiga bir martalik tabrik xabari chiqadi.</div>
+                </div>
+
+                <button type="submit" class="pv-btn">Holatni saqlash</button>
+            </form>
+        </div>
+
+        <!-- Ma'lumotlar -->
+        <div class="pv-card">
+            <h3>O'zi haqida ma'lumot</h3>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save_info">
+
+                <div class="pv-fld">
+                    <label for="ifo">I.FO</label>
+                    <input type="text" id="ifo" name="ifo" maxlength="120" value="{{ info.ifo|default:'' }}">
+                </div>
+                <div class="pv-fld">
+                    <label for="nickname">Tahallusi</label>
+                    <input type="text" id="nickname" name="nickname" maxlength="80" value="{{ info.nickname|default:'' }}">
+                </div>
+                <div class="pv-fld">
+                    <label for="fandub">Ishlagan fandubi</label>
+                    <input type="text" id="fandub" name="fandub" maxlength="150" value="{{ info.fandub|default:'' }}">
+                </div>
+                <div class="pv-fld">
+                    <label for="status_text">Status</label>
+                    <input type="text" id="status_text" name="status_text" maxlength="150" value="{{ info.status_text|default:'' }}">
+                    <div class="pv-hint">Bo'sh qolsa ochiq profilda ko'rinmaydi.</div>
+                </div>
+                <div class="pv-fld">
+                    <label for="motto">Shiori</label>
+                    <input type="text" id="motto" name="motto" maxlength="200" value="{{ info.motto|default:'' }}">
+                </div>
+
+                <button type="submit" class="pv-btn">Ma'lumotlarni saqlash</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= O'NG USTUN ================= -->
+    <div>
+        <!-- Fon -->
+        <div class="pv-card">
+            <h3>Profil foni</h3>
+            {% if info and info.bg_image_url %}
+                <div class="pv-bg-preview" style="background-image:url('{{ info.bg_image_url }}');"></div>
+                <div class="pv-hint" style="margin-bottom:12px; word-break:break-all;">Rasm: {{ info.bg_image_url }}</div>
+            {% elif info and info.bg_color %}
+                <div class="pv-bg-preview" style="background:{{ info.bg_color.value }};"></div>
+                <div class="pv-hint" style="margin-bottom:12px;">Rang: {{ info.bg_color.name }}</div>
+            {% else %}
+                <p class="pv-empty" style="margin-bottom:12px;">Fon o'rnatilmagan.</p>
+            {% endif %}
+
+            {% if info and info.bg_image_url or info and info.bg_color %}
+            <form method="post" onsubmit="return confirm('Profil foni tozalansinmi?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="clear_bg">
+                <button type="submit" class="pv-btn danger">Fonni tozalash</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Cardlar -->
+        <div class="pv-card">
+            <h3>Cardlar va rollar ({{ cards|length }})</h3>
+
+            {% for c in cards %}
+                <div class="pv-card-item">
+                    <div class="pv-card-top">
+                        {% if c.image_url %}<img src="{{ c.image_url }}" alt="" loading="lazy">{% endif %}
+                        <div class="t">
+                            {{ c.title }}
+                            <small>{{ c.roles.count }} ta rol</small>
+                        </div>
+                        <form method="post" onsubmit="return confirm('Card va ichidagi barcha rollar o\'chirilsinmi?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_card">
+                            <input type="hidden" name="card_id" value="{{ c.id }}">
+                            <button type="submit" class="pv-btn danger">O'chirish</button>
+                        </form>
+                    </div>
+
+                    {% if c.roles.all %}
+                    <div class="pv-roles">
+                        {% for r in c.roles.all %}
+                            <div class="pv-role">
+                                {% if r.image_url %}<img src="{{ r.image_url }}" alt="" loading="lazy">{% endif %}
+                                <div class="n">{{ r.name }}</div>
+                                <form method="post" onsubmit="return confirm('Rol o\'chirilsinmi?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_role">
+                                    <input type="hidden" name="role_id" value="{{ r.id }}">
+                                    <button type="submit" class="pv-btn danger">✕</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p class="pv-empty">Bu foydalanuvchi hali card qo'shmagan.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
