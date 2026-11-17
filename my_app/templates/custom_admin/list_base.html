@@ -28,6 +28,7 @@
     }
     .header-actions .stat-pill i { font-size: 1.05rem; }
     .header-actions .stat-pill b { font-size: 1rem; }
+    .header-actions .stat-pill.warn { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.35); color: #fbbf24; }
 
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; padding: 15px; font-size: 0.75rem; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border-line); letter-spacing: 1px;}
@@ -109,11 +110,29 @@
                 <div class="stat-pill"><i class='bx bxs-crown'></i> Jami VIP: <b>{{ total_vip }}</b></div>
             {% elif type == 'vip_video' %}
                 <a href="{% url 'admin_vip_video_form' %}" class="btn">+ Yangi video yuklash</a>
+            {% elif type == 'profverify' %}
+                <div class="stat-pill warn"><i class='bx bx-time-five'></i> Kutilmoqda: <b>{{ pending_count }}</b></div>
+                <div class="stat-pill"><i class='bx bx-badge-check'></i> Tasdiqlangan: <b>{{ approved_count }}</b></div>
+                <form method="get" action="{% url 'admin_profverify_lookup' %}">
+                    <input type="text" name="user_id" placeholder="Foydalanuvchi ID">
+                    <button type="submit" class="btn-outline">ID orqali ochish</button>
+                </form>
             {% else %}
                 <button class="btn" style="opacity:0.5; pointer-events:none;">+ Qo'shish</button>
             {% endif %}
         </div>
     </div>
+
+    {% if messages %}
+        {% for m in messages %}
+            <div style="margin-bottom:12px; padding:10px 14px; border-radius:6px; font-size:0.88rem; font-weight:600;
+                        {% if m.tags == 'error' %}background:rgba(248,113,113,0.12); color:#f87171; border:1px solid rgba(248,113,113,0.3);
+                        {% elif m.tags == 'warning' %}background:rgba(251,191,36,0.12); color:#fbbf24; border:1px solid rgba(251,191,36,0.3);
+                        {% else %}background:rgba(52,211,153,0.12); color:#34d399; border:1px solid rgba(52,211,153,0.3);{% endif %}">
+                {{ m }}
+            </div>
+        {% endfor %}
+    {% endif %}
 
     <div class="table-wrap">
     <table>
@@ -165,6 +184,8 @@
                     <th>ID</th><th>Foydalanuvchi</th><th>Reja</th><th>Tugash sanasi</th><th>Holat</th><th>Harakatlar</th>
                 {% elif type == 'vip_video' %}
                     <th>Sarlavha</th><th>Video</th><th>Holat</th><th>Yuklangan sana</th><th>Harakatlar</th>
+                {% elif type == 'profverify' %}
+                    <th>ID</th><th>Foydalanuvchi</th><th>Holat</th><th>Rad etish sababi</th><th>So'ralgan</th><th>Ko'rib chiqilgan</th><th>Harakatlar</th>
                 {% endif %}
             </tr>
         </thead>
@@ -477,6 +498,23 @@
                         {% endif %}
                     </td>
                     <td style="color:var(--text-dim); white-space:nowrap;">{{ item.created_at|date:"d.m.Y H:i" }}</td>
+
+                {% elif type == 'profverify' %}
+                    <td style="color:var(--text-dim); font-weight:700;">#{{ item.user.id }}</td>
+                    <td style="font-weight:700; color:#fff;">
+                        {{ item.user.username }}
+                        {% if item.user.first_name %}<div style="font-size:0.78rem; color:var(--text-dim); font-weight:400;">{{ item.user.first_name }} {{ item.user.last_name }}</div>{% endif %}
+                    </td>
+                    <td>
+                        {% if item.status == 'approved' %}<span class="badge badge-green">Tasdiqlangan</span>
+                        {% elif item.status == 'rejected' %}<span class="badge badge-red">Rad etilgan</span>
+                        {% else %}<span class="badge badge-yellow">Kutilmoqda</span>{% endif %}
+                    </td>
+                    <td style="color:var(--text-dim);">{{ item.admin_note|default:"—"|truncatechars:40 }}</td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">{{ item.requested_at|date:"d.m.Y H:i" }}</td>
+                    <td style="color:var(--text-dim); white-space:nowrap;">
+                        {% if item.processed_at %}{{ item.processed_at|date:"d.m.Y H:i" }}{% else %}—{% endif %}
+                    </td>
                 {% endif %}
 
                 <!-- HARAKATLAR -->
@@ -592,6 +630,24 @@
                     {% elif type == 'vip_video' %}
                         <a href="{% url 'admin_vip_video_edit' item.id %}" class="action-btn">Tahrirlash</a>
                         <a href="{% url 'admin_vip_video_delete' item.id %}" class="action-btn delete" onclick="return confirm('Bu VIP videoni o\'chirishni tasdiqlaysizmi?');">O'chirish</a>
+
+                    {% elif type == 'profverify' %}
+                        <a href="{% url 'admin_profverify_form' item.id %}" class="action-btn">Boshqarish</a>
+                        <a href="{% url 'public_profile' item.user.username %}" target="_blank" class="action-btn">Profil</a>
+                        {% if item.status != 'approved' %}
+                            <form method="post" action="{% url 'admin_profverify_action' item.id 'approve' %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="action-btn success">Tasdiqlash</button>
+                            </form>
+                        {% endif %}
+                        {% if item.status != 'rejected' %}
+                            <form method="post" action="{% url 'admin_profverify_action' item.id 'reject' %}" style="display:inline;"
+                                  onsubmit="var n = prompt('Rad etish sababi (ixtiyoriy):'); if (n === null) return false; this.admin_note.value = n; return true;">
+                                {% csrf_token %}
+                                <input type="hidden" name="admin_note" value="">
+                                <button type="submit" class="action-btn delete">Rad etish</button>
+                            </form>
+                        {% endif %}
 
                     {% elif type == 'newslike' or type == 'storyview' %}
                         <span style="color:var(--text-dim); font-size:0.82rem;">—</span>
