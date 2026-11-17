@@ -14,6 +14,7 @@
    OCHIQ PROFIL
    ========================================================= */
 
+/* navbar yo'q — base.html dagi tepa bo'sh joyni olib tashlaymiz */
 main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; width: 100%; }
 
 /* ---- BUTUN SAHIFA FONI ---- */
@@ -37,28 +38,17 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 }
 .pp-back:hover { border-color: rgba(180,92,255,.55); color: #b45cff; }
 
-.pp-stage { position: relative; border-radius: 20px; padding: 12px; }
-
-/* ---- BOX + OLTIN CHIZIQ ----
-   Chiziq yuqori-chap burchakdan boshlanib so'nadi,
-   pastki-o'ng burchakdan boshlanib so'nadi. */
-.pp-card {
+.pp-stage {
     position: relative;
+    border-radius: 20px;
+    padding: 12px;
+}
+
+.pp-card {
     background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.03));
     border: 1px solid rgba(255,255,255,.09);
     border-radius: 18px; padding: 16px; margin-bottom: 12px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 10px 30px rgba(0,0,0,.14);
-}
-.pp-card::before {
-    content: ""; position: absolute; inset: -1px; border-radius: inherit;
-    padding: 1.5px; pointer-events: none; z-index: 1;
-    background: linear-gradient(to bottom right,
-        #fff0b0 0%, #ffc107 7%, rgba(255,193,7,.55) 15%, rgba(255,193,7,0) 28%,
-        rgba(255,193,7,0) 72%, rgba(255,193,7,.55) 85%, #ffc107 93%, #fff0b0 100%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            mask-composite: exclude;
 }
 .pp-stage.has-bg .pp-card { background: rgba(20,16,28,.72); }
 
@@ -72,8 +62,8 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 .pp-title { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
             color: rgba(255,255,255,.45); margin: 0 0 12px; }
 
-/* ---- avatar (faqat "O'zi haqida" boxida) ---- */
-.pp-tier-premium { --tc: #ffc107; } .pp-tier-vip { --tc: #ffd23f; } .pp-tier-basic { --tc: rgba(255,255,255,.8); }
+/* ---- 1) yuqori box ---- */
+.pp-top { display: flex; align-items: center; gap: 14px; }
 .pp-av {
     width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
@@ -81,10 +71,23 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     font-size: 24px; font-weight: 900; background: rgba(255,255,255,.05);
 }
 .pp-av img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.pp-name { font-size: 18px; font-weight: 800; color: #fff; line-height: 1.2; word-break: break-word; }
+.pp-user { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); margin: 2px 0 6px; }
+.pp-badge { display: inline-block; padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 800;
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.7); }
+.pp-badge.premium { color: #ffc107; border-color: rgba(255,193,7,.3); background: rgba(255,193,7,.1); }
+.pp-badge.vip { color: #ffd23f; border-color: rgba(255,210,63,.55); background: rgba(255,193,7,.12);
+                text-shadow: 0 0 8px rgba(255,210,63,.7); }
+.pp-tier-premium { --tc: #ffc107; } .pp-tier-vip { --tc: #ffd23f; } .pp-tier-basic { --tc: rgba(255,255,255,.8); }
 
-/* ---- tasdiqlash box ---- */
+.pp-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+.pp-stat { text-align: center; padding: 10px 4px; border-radius: 12px;
+           background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); }
+.pp-stat b { display: block; font-size: 19px; font-weight: 900; color: var(--tc, #b45cff); }
+.pp-stat span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgba(255,255,255,.45); }
+
+/* ---- 2) tasdiqlash box ---- */
 .pp-verify p { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.65); }
-.pp-verify p.pp-title { color: rgba(255,255,255,.45); font-size: 11px; line-height: normal; }
 .pp-btn {
     -webkit-appearance: none; appearance: none; cursor: pointer; width: 100%;
     height: 43px; border-radius: 11px; border: 1px solid rgba(255,255,255,.1);
@@ -104,7 +107,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 .pp-state.approved { color: #3ddc97; background: rgba(61,220,151,.1); border: 1px solid rgba(61,220,151,.25); }
 .pp-state.rejected { color: #ff8a97; background: rgba(255,90,110,.1); border: 1px solid rgba(255,90,110,.25); }
 
-/* ---- asosiy panjara: PC da 30 / 70 ---- */
+/* ---- 3) asosiy panjara: PC da 30 / 70 ---- */
 .pp-grid { display: block; }
 .pp-left, .pp-right { min-width: 0; }
 
@@ -116,7 +119,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     .pp-left { position: sticky; top: 14px; }
 }
 
-/* ---- sarlavha qatori ---- */
+/* ---- o'z haqida box ---- */
 .pp-about-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .pp-about-head .pp-title { margin: 0; }
 .pp-icon-btn {
@@ -124,14 +127,6 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
     background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: #fff; font-size: 17px; padding: 0;
 }
-.pp-add-btn {
-    -webkit-appearance: none; appearance: none; cursor: pointer;
-    height: 32px; padding: 0 13px; border-radius: 10px;
-    background: rgba(180,92,255,.12); border: 1px solid rgba(180,92,255,.5); color: #d9a8ff;
-    font: 800 12px 'Outfit', sans-serif; letter-spacing: .02em;
-}
-.pp-add-btn:hover { background: rgba(180,92,255,.22); color: #fff; }
-
 .pp-about-av { display: flex; justify-content: center; margin-bottom: 14px; }
 .pp-about-av .pp-av { width: 104px; height: 104px; font-size: 34px; border-width: 4px; }
 
@@ -141,16 +136,13 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 .pp-row > b.empty { color: rgba(255,255,255,.3); font-weight: 600; font-style: italic; }
 .pp-hr { border: 0; height: 1px; background: rgba(255,255,255,.08); margin: 9px 0; }
 
-/* =========================================================
-   CARDLAR KARUSELI — INFINITE + NEON
-   ========================================================= */
-.pp-car { position: relative; }
+/* ---- cardlar karuseli ---- */
+.pp-car { position: relative; perspective: 1200px; }
 .pp-track {
     display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
     scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
-    /* neon nur kesilib qolmasligi uchun joy qoldiramiz */
-    padding: 16px 12px 20px; scroll-padding: 0 12px;
-    scrollbar-width: none; overscroll-behavior-x: contain;
+    padding: 4px 2px 8px; scrollbar-width: none; overscroll-behavior-x: contain;
+    perspective: 1200px;
 }
 .pp-track::-webkit-scrollbar { display: none; }
 
@@ -158,38 +150,48 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     -webkit-appearance: none; appearance: none; cursor: pointer; padding: 0; border: 0;
     position: relative; flex: 0 0 150px; height: 210px; border-radius: 15px; overflow: hidden;
     scroll-snap-align: start; background: #1b1626;
+    box-shadow: 0 8px 20px rgba(0,0,0,.3); transition: transform .2s ease;
     -webkit-tap-highlight-color: transparent;
-    /* tashqi neon nur */
-    box-shadow:
-        0 0 0 1.5px rgba(190,110,255,.95),
-        0 0 10px rgba(180,92,255,.7),
-        0 0 24px rgba(180,92,255,.38);
-    transition: transform .22s ease, box-shadow .22s ease;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform;
+    animation: ppCardLiveRotate 6s ease-in-out infinite;
 }
-/* ichki neon chet (nafas oladi) */
-.pp-c::before {
-    content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none;
-    box-shadow: inset 0 0 0 1.5px rgba(225,170,255,.95), inset 0 0 14px rgba(180,92,255,.6);
-    animation: ppNeonBreath 3.2s ease-in-out infinite;
-}
-.pp-c:nth-child(2n)::before { animation-delay: -1.1s; }
-.pp-c:nth-child(3n)::before { animation-delay: -2.2s; }
-@keyframes ppNeonBreath { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.pp-c:nth-child(2n) { animation-delay: -1.5s; }
+.pp-c:nth-child(3n) { animation-delay: -3s; }
+.pp-c:nth-child(4n) { animation-delay: -4.5s; }
 
+@keyframes ppCardLiveRotate {
+    0%, 100% {
+        transform: perspective(900px) rotateY(-7deg) rotateX(1deg) translateY(0);
+    }
+    25% {
+        transform: perspective(900px) rotateY(0deg) rotateX(-1deg) translateY(-2px);
+    }
+    50% {
+        transform: perspective(900px) rotateY(7deg) rotateX(1deg) translateY(0);
+    }
+    75% {
+        transform: perspective(900px) rotateY(0deg) rotateX(-1deg) translateY(-2px);
+    }
+}
 .pp-c img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
 .pp-c::after { content: ""; position: absolute; inset: 0;
                background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.82)); }
 .pp-c-name { position: absolute; left: 10px; right: 10px; bottom: 9px; z-index: 2; text-align: left;
              font: 800 13px 'Outfit', sans-serif; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.8);
              overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
+.pp-c.add {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    background: rgba(180,92,255,.08); border: 2px dashed rgba(180,92,255,.4); color: #b45cff;
+    box-shadow: none; font: 800 12px 'Outfit', sans-serif;
+}
+.pp-c.add::after { display: none; }
+.pp-c.add i { font-size: 34px; line-height: 1; font-style: normal; }
 @media (hover: hover) {
     .pp-c:hover {
-        transform: translateY(-5px) scale(1.02);
-        box-shadow:
-            0 0 0 1.5px #e3b0ff,
-            0 0 14px rgba(190,110,255,.95),
-            0 0 34px rgba(180,92,255,.6);
+        animation-play-state: paused;
+        transform: perspective(900px) rotateY(0deg) rotateX(0deg) translateY(-5px) scale(1.015);
     }
 }
 
@@ -225,18 +227,11 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     padding: 16px; background: rgba(6,4,12,.8); opacity: 0; transition: opacity .2s ease;
 }
 .pp-ov.open { display: flex; } .pp-ov.show { opacity: 1; }
-
-/* oyna boxi: oltin chiziq (yuqori-chap va pastki-o'ng burchakdan) */
 .pp-box {
     position: relative; width: 100%; max-width: 420px; max-height: 90vh; max-height: 90dvh; overflow-y: auto;
     overscroll-behavior: contain; box-sizing: border-box; padding: 18px;
-    border: 1.5px solid transparent; border-radius: 18px;
-    background:
-        linear-gradient(160deg, #1d1729, #14101d) padding-box,
-        linear-gradient(to bottom right,
-            #fff0b0 0%, #ffc107 8%, rgba(255,193,7,.5) 16%, rgba(255,255,255,.1) 30%,
-            rgba(255,255,255,.1) 70%, rgba(255,193,7,.5) 84%, #ffc107 92%, #fff0b0 100%) border-box;
-    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    background: linear-gradient(160deg, #1d1729, #14101d); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.5);
     transform: translateY(16px) scale(.98); transition: transform .22s cubic-bezier(.2,.8,.3,1);
 }
 .pp-ov.show .pp-box { transform: none; }
@@ -259,12 +254,10 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 .pp-big-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,.07); }
 .pp-big-head .pp-mt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pp-big-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 16px; }
-.pp-big-hero { display: block; width: 100%; max-height: 38vh; object-fit: cover; border-radius: 14px; margin-bottom: 16px;
-               box-shadow: 0 0 0 1.5px rgba(190,110,255,.8), 0 0 18px rgba(180,92,255,.45); }
+.pp-big-hero { display: block; width: 100%; max-height: 38vh; object-fit: cover; border-radius: 14px; margin-bottom: 16px; }
 .pp-roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 @media (min-width: 640px) { .pp-roles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; } }
-.pp-role { position: relative; border-radius: 13px; overflow: hidden; background: #1b1626; aspect-ratio: 3/4;
-           box-shadow: 0 0 0 1px rgba(190,110,255,.75), 0 0 12px rgba(180,92,255,.35); }
+.pp-role { position: relative; border-radius: 13px; overflow: hidden; background: #1b1626; aspect-ratio: 3/4; }
 .pp-role img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
 .pp-role::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,.85)); }
 .pp-role-name { position: absolute; left: 9px; right: 9px; bottom: 8px; z-index: 2; font: 800 12.5px 'Outfit', sans-serif;
@@ -272,8 +265,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 .pp-role-del { position: absolute; top: 6px; right: 6px; z-index: 3; width: 26px; height: 26px; border-radius: 8px; padding: 0;
                border: 0; background: rgba(0,0,0,.6); color: #ff8a97; font-size: 16px; cursor: pointer; }
 .pp-role.add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer;
-               background: rgba(180,92,255,.08); border: 2px dashed rgba(180,92,255,.4); color: #b45cff;
-               font: 800 12px 'Outfit', sans-serif; box-shadow: none; }
+               background: rgba(180,92,255,.08); border: 2px dashed rgba(180,92,255,.4); color: #b45cff; font: 800 12px 'Outfit', sans-serif; }
 .pp-role.add::after { display: none; }
 .pp-role.add i { font-size: 32px; font-style: normal; line-height: 1; }
 
@@ -281,6 +273,8 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     .pp-wrap { padding: 0 8px 28px; margin: 12px auto; }
     .pp-stage { padding: 8px; border-radius: 16px; }
     .pp-card { padding: 13px; border-radius: 15px; }
+    .pp-av { width: 58px; height: 58px; font-size: 20px; }
+    .pp-name { font-size: 16px; }
     .pp-c { flex-basis: 132px; height: 186px; }
     .pp-nav { display: none; }          /* mobilda faqat touch */
     .pp-ov { padding: 0; align-items: flex-end; }
@@ -290,7 +284,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 
 @media (prefers-reduced-motion: reduce) {
     .pp-track { scroll-behavior: auto; }
-    .pp-c::before { animation: none; opacity: 1; }
+    .pp-c { animation: none !important; transform: none !important; }
     * { transition-duration: .01ms !important; }
 }
 </style>
@@ -322,7 +316,31 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     {% endif %}
 
     <!-- =====================================================
-         1) AKKAUNTNI TASDIQLASH BOXI (faqat egasiga)
+         1) YUQORI BOX — asosiy ma'lumot
+         ===================================================== -->
+    <div class="pp-card">
+        <div class="pp-top">
+            <div class="pp-av">
+                {% if target.avatar %}<img src="{{ target.avatar.image.url }}" alt="avatar" draggable="false">
+                {% else %}{{ target.username|make_list|first|upper }}{% endif %}
+            </div>
+            <div style="min-width:0;">
+                <div class="pp-name">{% if target.first_name %}{{ target.first_name }} {{ target.last_name }}{% else %}{{ target.username }}{% endif %}</div>
+                <div class="pp-user">@{{ target.username }}</div>
+                {% if tier == 'vip' %}<span class="pp-badge vip">VIP</span>
+                {% elif tier == 'premium' %}<span class="pp-badge premium">Premium</span>
+                {% else %}<span class="pp-badge">Oddiy</span>{% endif %}
+            </div>
+        </div>
+        <div class="pp-stats">
+            <div class="pp-stat"><b>{{ level }}</b><span>Daraja</span></div>
+            <div class="pp-stat"><b>{{ watched_count }}</b><span>Ko'rilgan</span></div>
+            <div class="pp-stat"><b>{{ days_joined }}</b><span>Kun</span></div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         2) AKKAUNTNI TASDIQLASH BOXI (faqat egasiga)
          ===================================================== -->
     {% if verify_state %}
     <div class="pp-card pp-verify" id="ppVerify" data-state="{{ verify_state }}">
@@ -353,7 +371,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 
     {% if approved %}
     <!-- =====================================================
-         2) ASOSIY QISM: PC 30/70, mobil ustma-ust
+         3) ASOSIY QISM: PC 30/70, mobil ustma-ust
          ===================================================== -->
     <div class="pp-grid">
 
@@ -384,12 +402,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
         <!-- ---------- O'NG: cardlar ---------- -->
         <div class="pp-right">
             <div class="pp-card">
-                <div class="pp-about-head">
-                    <p class="pp-title">Cardlar</p>
-                    {% if is_own %}
-                    <button type="button" class="pp-add-btn" id="ppCardAdd">+ Card</button>
-                    {% endif %}
-                </div>
+                <p class="pp-title">Cardlar</p>
 
                 <div class="pp-car" id="ppCar">
                     <button type="button" class="pp-nav prev" id="ppPrev" aria-label="Oldingi">‹</button>
@@ -572,98 +585,41 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* =====================================================
-       KARUSEL — INFINITE
-       Cardlar bir necha nusxada chiziladi, o'rtadagi nusxadan
-       boshlanadi. Chetga yaqinlashganda scroll sezdirmasdan
-       bir to'plam (S) masofaga ko'chiriladi.
+       KARUSEL
        ===================================================== */
-    var GAP = 12;
-    var track    = document.getElementById('ppTrack');
-    var car      = document.getElementById('ppCar');
+    var track = document.getElementById('ppTrack');
     var emptyMsg = document.getElementById('ppCardsEmpty');
-    var paused = false, resumeT = null, jumpT = null;
-    var loopOn = false, S = 0, lo = 0, hi = 0;
-
-    function makeCard(c, isClone) {
-        var b = el('button', 'pp-c'); b.type = 'button';
-        var img = el('img'); img.src = c.image; img.alt = ''; img.loading = 'lazy'; img.draggable = false;
-        b.appendChild(img);
-        b.appendChild(el('span', 'pp-c-name', c.title));
-        if (isClone) { b.setAttribute('aria-hidden', 'true'); b.tabIndex = -1; }
-        b.addEventListener('click', function () { openCard(c.id); });
-        return b;
-    }
-
-    function jumpTo(x) {
-        track.style.scrollBehavior = 'auto';
-        track.scrollLeft = x;
-        track.style.scrollBehavior = '';
-    }
-
-    function setupLoop() {
-        var n0 = cards.length;
-        var kids = track.children;
-        if (n0 < 3 || kids.length !== n0) return;
-        var W = track.clientWidth;
-        if (!W) return;
-
-        var first = kids[0], last = kids[n0 - 1];
-        var s = last.offsetLeft + last.offsetWidth + GAP - first.offsetLeft;   // bir to'plam kengligi
-        if (s <= 0) return;
-
-        var k = Math.ceil(W / s);
-        var n = 2 * k + 3;           // nusxalar soni
-        var mid = k + 1;             // o'rtadagi nusxa
-
-        for (var i = 1; i < n; i++) {
-            cards.forEach(function (c) { track.appendChild(makeCard(c, true)); });
-        }
-
-        var padL = parseFloat(getComputedStyle(track).scrollPaddingLeft) || 0;
-        var base = track.children[mid * n0].offsetLeft - padL;
-        S = s; lo = base - S / 2; hi = base + S / 2;
-        loopOn = true;
-        jumpTo(base);
-    }
-
-    function normalize() {
-        if (!loopOn) return;
-        var x = track.scrollLeft, nx = x;
-        while (nx < lo) nx += S;
-        while (nx > hi) nx -= S;
-        if (nx !== x) jumpTo(nx);
-    }
+    var paused = false, resumeT = null;
 
     function renderCards() {
         track.innerHTML = '';
-        loopOn = false;
-        var has = cards.length > 0;
-        car.style.display = has ? 'block' : 'none';
-        emptyMsg.style.display = has ? 'none' : 'block';
-        if (!has) return;
-        cards.forEach(function (c) { track.appendChild(makeCard(c, false)); });
-        requestAnimationFrame(function () { requestAnimationFrame(setupLoop); });
+        cards.forEach(function (c) {
+            var b = el('button', 'pp-c'); b.type = 'button';
+            var img = el('img'); img.src = c.image; img.alt = ''; img.loading = 'lazy'; img.draggable = false;
+            b.appendChild(img);
+            b.appendChild(el('span', 'pp-c-name', c.title));
+            b.addEventListener('click', function () { openCard(c.id); });
+            track.appendChild(b);
+        });
+        if (own) {
+            var add = el('button', 'pp-c add'); add.type = 'button';
+            add.appendChild(el('i', null, '+'));
+            add.appendChild(el('span', null, 'Card qo\'shish'));
+            add.addEventListener('click', function () { openLink('card'); });
+            track.appendChild(add);
+        }
+        emptyMsg.style.display = (!cards.length && !own) ? 'block' : 'none';
+        document.getElementById('ppCar').style.display = (!cards.length && !own) ? 'none' : 'block';
     }
-
-    track.addEventListener('scroll', function () {
-        if (!loopOn) return;
-        var max = track.scrollWidth - track.clientWidth;
-        if (track.scrollLeft <= 1 || track.scrollLeft >= max - 1) { normalize(); return; }   // chetga yetib qolsa darhol
-        clearTimeout(jumpT);
-        jumpT = setTimeout(normalize, 90);                                                   // to'xtagach ko'chiramiz
-    }, { passive: true });
 
     function step() {
         var first = track.querySelector('.pp-c');
-        return first ? first.offsetWidth + GAP : 160;
+        return first ? first.offsetWidth + 12 : 160;
     }
     function slide(dir) {
-        if (loopOn) { track.scrollBy({ left: dir * step() }); return; }
-        // 3 tadan kam card bo'lsa — oddiy aylantirish
         var max = track.scrollWidth - track.clientWidth;
-        if (max <= 4) return;
-        if (dir > 0 && track.scrollLeft >= max - 4) track.scrollTo({ left: 0 });
-        else if (dir < 0 && track.scrollLeft <= 4) track.scrollTo({ left: max });
+        if (dir > 0 && track.scrollLeft >= max - 4) track.scrollTo({ left: 0 });          // oxiriga yetsa — boshiga qaytadi
+        else if (dir < 0 && track.scrollLeft <= 4) track.scrollTo({ left: max });         // boshida bo'lsa — oxiriga
         else track.scrollBy({ left: dir * step() });
     }
     function pauseAuto(ms) {
@@ -684,15 +640,6 @@ document.addEventListener('DOMContentLoaded', function () {
             slide(1);
         }, 3500);
     }
-
-    // ekran kengligi o'zgarsa — karuselni qayta hisoblaymiz
-    var lastW = window.innerWidth, rzT = null;
-    window.addEventListener('resize', function () {
-        clearTimeout(rzT);
-        rzT = setTimeout(function () {
-            if (window.innerWidth !== lastW) { lastW = window.innerWidth; renderCards(); }
-        }, 200);
-    });
 
     /* =====================================================
        CARD OYNASI (to'liq ekran, o'rtada)
@@ -781,8 +728,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-open-link]').forEach(function (b) {
         b.addEventListener('click', function () { openLink(b.getAttribute('data-open-link')); });
     });
-    var cardAddBtn = document.getElementById('ppCardAdd');
-    if (cardAddBtn) cardAddBtn.addEventListener('click', function () { openLink('card'); });
 
     var lmSave = document.getElementById('ppLmSave');
     if (lmSave) lmSave.addEventListener('click', function () {
@@ -808,7 +753,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (mode === 'bg') { window.location.reload(); return; }
 
-            if (mode === 'card') { cards.push(res.card); renderCards(); pauseAuto(); }
+            if (mode === 'card') { cards.push(res.card); renderCards();
+                                   setTimeout(function () { track.scrollTo({ left: track.scrollWidth }); }, 50); }
             else { var c = curCard(); if (c) { c.roles.push(res.role); renderRoles(); } }
             closeOv(lm);
         });
