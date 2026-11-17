@@ -5,8 +5,10 @@ from django.utils import timezone
 from zoneinfo import ZoneInfo
 from django.core.validators import MaxValueValidator
 
-BST_MAX = 55            
-BST_PREMIUM_GOAL = 40   
+
+BST_MAX = 55
+BST_PREMIUM_GOAL = 40
+
 
 
 # =======================
@@ -69,13 +71,14 @@ class CustomUser(AbstractUser):
         """Yangi tizim: daraja_kutarish jadvalidan o'qiydi. Yozuv yo'q bo'lsa — 0"""
         lvl = daraja_kutarish.objects.filter(user=self).values_list('level', flat=True).first()
         return lvl or 0
-        
+
     def display_name(self):
         """Profilda kiritilgan ismi bo'lsa o'shani, bo'lmasa username'ni qaytaradi"""
         return self.first_name.strip() if self.first_name and self.first_name.strip() else self.username
 
     def __str__(self):
         return self.username if self.username else f"User-{self.id}"
+
 
 class VipUser(models.Model):
     TIER_CHOICES = [
@@ -245,7 +248,7 @@ class MovieEpisode(models.Model):
     def __str__(self):
         return f"{self.movie.title} - {self.episode_number}-qism - {self.title}"
 
- # ⬇️ YANGI — admin kiritadigan / avtomatik hisoblanadigan hajm
+    # ⬇️ YANGI — admin kiritadigan / avtomatik hisoblanadigan hajm
     video_size = models.DecimalField(
         max_digits=9, decimal_places=2, blank=True, null=True,
         help_text="Qism hajmi (MB), masalan: 265.4. Bo'sh qoldirilsa — yuklangan fayldan avtomatik olinadi"
@@ -390,9 +393,6 @@ class FavoriteAnime(models.Model):
         unique_together = ('user', 'movie')
 
 
-
-
-
 # =======================
 # MOVIE COMMENTS
 # =======================
@@ -509,7 +509,6 @@ class StoryView(models.Model):
         return f"{self.user.username} -> {self.story.title}"
 
 
-
 # =======================
 # REELBEST
 # =======================
@@ -583,21 +582,17 @@ class ReelBestComment(models.Model):
         return f"{self.user.username}: {self.text[:30]}"
 
 
-
-
-
 # ========================
 # setting uchun confik lr
 # ========================
 
 class UserSettings(models.Model):
     THEME_CHOICES = [
-        ('dark',    'Qorong\'i'),
-        ('white',   'Oq'),
-        ('rose',    'Qizil / Ro\'za'),
+        ('dark', 'Qorong\'i'),
+        ('white', 'Oq'),
+        ('rose', 'Qizil / Ro\'za'),
         ('premium', 'Premium (To\'q binafsha)'),
     ]
-
 
     # PREMIUM IMKONIYATLAR
     premium_bg_on = models.BooleanField(default=False)
@@ -605,12 +600,11 @@ class UserSettings(models.Model):
         'PremiumBackground', on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
     )
     telegram_download_on = models.BooleanField(default=False)
-    
+
     premium_profile_on = models.BooleanField(default=False)
     premium_profile_cat = models.CharField(max_length=10, default='auto')  # auto / boy / girl
     premium_profile_bg_idx = models.PositiveSmallIntegerField(default=0)
     premium_profile_menu_on = models.BooleanField(default=False)
-
 
     # YANGI — PREMIUM VIP BOX (chat'da avatar bosilganda maxsus oyna)
     premium_vip_box_on = models.BooleanField(
@@ -629,7 +623,7 @@ class UserSettings(models.Model):
         'VipThankVideo', on_delete=models.SET_NULL, null=True, blank=True, related_name='+',
         help_text="VIP foydalanuvchi tanlagan maxsus VIP box videosi"
     )
-    
+
     # PREMIUM MUZIKALAR
     premium_music_on = models.BooleanField(default=False)
     premium_music = models.ForeignKey(
@@ -687,8 +681,8 @@ class UserSettings(models.Model):
     telegram_download_on = models.BooleanField(default=False)
 
     # Telegram sozlamalari
-    telegram_username  = models.CharField(max_length=100, blank=True, null=True)
-    telegram_chat_id   = models.CharField(max_length=50,  blank=True, null=True)
+    telegram_username = models.CharField(max_length=100, blank=True, null=True)
+    telegram_chat_id = models.CharField(max_length=50, blank=True, null=True)
     telegram_bot_token = models.CharField(max_length=200, blank=True, null=True)
     telegram_notify_on = models.BooleanField(
         default=False,
@@ -699,7 +693,6 @@ class UserSettings(models.Model):
 
     def __str__(self):
         return f"{self.user.username} – sozlamalar"
-
 
 
 # =======================
@@ -717,20 +710,19 @@ class ActiveSession(models.Model):
     session_key = models.CharField(max_length=40, unique=True)
 
     # Qurilma ma'lumotlari
-    device_type   = models.CharField(max_length=20, choices=DEVICE_CHOICES, default='unknown')
-    device_name   = models.CharField(max_length=200, blank=True, null=True, help_text="Browser + OS")
-    ip_address    = models.GenericIPAddressField(blank=True, null=True)
-    user_agent    = models.TextField(blank=True, null=True)
-    browser       = models.CharField(max_length=100, blank=True, null=True)
-    os_name       = models.CharField(max_length=100, blank=True, null=True)
-    location      = models.CharField(max_length=200, blank=True, null=True, help_text="Taxminiy joylashuv")
+    device_type = models.CharField(max_length=20, choices=DEVICE_CHOICES, default='unknown')
+    device_name = models.CharField(max_length=200, blank=True, null=True, help_text="Browser + OS")
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.TextField(blank=True, null=True)
+    browser = models.CharField(max_length=100, blank=True, null=True)
+    os_name = models.CharField(max_length=100, blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True, help_text="Taxminiy joylashuv")
 
-    created_at    = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     last_activity = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.username} — {self.device_name or 'Noma\'lum qurilma'} ({self.ip_address})"
-
 
 
 # =======================
@@ -738,32 +730,31 @@ class ActiveSession(models.Model):
 # =======================
 class AnimeSchedule(models.Model):
     DAY_CHOICES = [
-        ('dushanba',  'Dushanba'),
-        ('seshanba',  'Seshanba'),
-        ('chorshanba','Chorshanba'),
+        ('dushanba', 'Dushanba'),
+        ('seshanba', 'Seshanba'),
+        ('chorshanba', 'Chorshanba'),
         ('payshanba', 'Payshanba'),
-        ('juma',      'Juma'),
-        ('shanba',    'Shanba'),
+        ('juma', 'Juma'),
+        ('shanba', 'Shanba'),
         ('yakshanba', 'Yakshanba'),
     ]
 
-    name        = models.CharField(max_length=200, help_text="Anime nomi")
-    subtitle    = models.CharField(max_length=200, blank=True, null=True, help_text="Kichik sarlavha")
-    image_url   = models.URLField(help_text="Poster rasmi URL (masalan: https://i.pinimg.com/...)")
-    day         = models.CharField(max_length=20, choices=DAY_CHOICES, help_text="Chiqish kuni")
+    name = models.CharField(max_length=200, help_text="Anime nomi")
+    subtitle = models.CharField(max_length=200, blank=True, null=True, help_text="Kichik sarlavha")
+    image_url = models.URLField(help_text="Poster rasmi URL (masalan: https://i.pinimg.com/...)")
+    day = models.CharField(max_length=20, choices=DAY_CHOICES, help_text="Chiqish kuni")
     episode_number = models.PositiveIntegerField(default=1, help_text="Chiqadigan qism raqami")
-    fandub      = models.CharField(max_length=100, default='AniBest', help_text="Fandub nomi")
-    watch_url   = models.URLField(help_text="Ko'rish havolasi (masalan: https://bestmedia-official.uz/movie/7/)")
-    is_active   = models.BooleanField(default=True)
-    order       = models.PositiveSmallIntegerField(default=0, help_text="Kichik raqam avval chiqadi")
-    created_at  = models.DateTimeField(auto_now_add=True)
+    fandub = models.CharField(max_length=100, default='AniBest', help_text="Fandub nomi")
+    watch_url = models.URLField(help_text="Ko'rish havolasi (masalan: https://bestmedia-official.uz/movie/7/)")
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveSmallIntegerField(default=0, help_text="Kichik raqam avval chiqadi")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['order', '-created_at']
 
     def __str__(self):
         return f"{self.name} — {self.get_day_display()} ({self.episode_number}-qism)"
-
 
 
 # =======================
@@ -800,12 +791,6 @@ class AnimeSectionItem(models.Model):
 
     def __str__(self):
         return f"{self.get_section_display()} — {self.movie.title}"
-
-
-
-
-
-
 
 
 # =======================
@@ -892,10 +877,6 @@ class MovieFrame(models.Model):
         return f"{self.movie.title} - kadr #{self.order}"
 
 
-
-
-
-
 class WatchHistory(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='watch_history')
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='watched_by')
@@ -919,6 +900,8 @@ class UserBalance(models.Model):
 
     def __str__(self):
         return f"{self.user.username} — {self.amount}"
+
+
 # =======================
 # PREMIUM FON
 # =======================
@@ -976,9 +959,6 @@ class AnimeRequestSuggestion(models.Model):
         return f"{self.user.username} - {self.name}"
 
 
-
-
-
 # =======================
 # QIDIRUV - NATIJA TOPILMADI MEDIA (yashil fon avtomatik olib tashlanadi)
 # =======================
@@ -1009,7 +989,6 @@ class NoResultsMedia(models.Model):
 
     def __str__(self):
         return f"NoResultsMedia #{self.id} ({self.get_media_type_display()})"
-
 
 
 # =======================
@@ -1086,9 +1065,11 @@ class JackpotCode(models.Model):
     reward_type = models.CharField(max_length=10, choices=REWARD_CHOICES, default='balance')
     vip_hours = models.PositiveIntegerField(default=0, blank=True, help_text="reward_type=vip_hour bo'lsa nechta soat")
     vip_days = models.PositiveIntegerField(default=0, blank=True, help_text="reward_type=vip_day bo'lsa nechta kun")
-    balance_amount = models.PositiveIntegerField(default=0, blank=True, help_text="reward_type=balance bo'lsa nechta so'm")
+    balance_amount = models.PositiveIntegerField(default=0, blank=True,
+                                                 help_text="reward_type=balance bo'lsa nechta so'm")
     max_uses = models.PositiveIntegerField(default=0, help_text="Nechta foydalanuvchi ishlata oladi (0 = cheksiz)")
-    expires_at = models.DateTimeField(null=True, blank=True, help_text="Bo'sh qoldirilsa — muddatsiz amal qiladi (admin o'zi bekor qilmaguncha)")
+    expires_at = models.DateTimeField(null=True, blank=True,
+                                      help_text="Bo'sh qoldirilsa — muddatsiz amal qiladi (admin o'zi bekor qilmaguncha)")
     is_active = models.BooleanField(default=True)
     created_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -1126,9 +1107,6 @@ class JackpotCodeUse(models.Model):
 
     class Meta:
         unique_together = ('user', 'code')
-
-
-
 
 
 # =======================
@@ -1230,6 +1208,7 @@ class PollVote(models.Model):
     def __str__(self):
         return f"{self.user.username} → {self.option.text}"
 
+
 # =======================
 # KO'RILGAN QISMLAR (statistika uchun — MB hisoblash)
 # =======================
@@ -1250,6 +1229,7 @@ class WatchedEpisode(models.Model):
     def __str__(self):
         ep = f"{self.episode.episode_number}-qism" if self.episode else "Film"
         return f"{self.user.username} — {self.movie.title} ({ep})"
+
 
 # =======================
 # VIP TASHAKKUR VIDEOSI (hisobim.html -> "Batafsil" oynasi)
@@ -1299,6 +1279,7 @@ class AdminActionLog(models.Model):
     def __str__(self):
         return f"{self.user.username}: {self.action}"
 
+
 class daraja_kutarish(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='daraja_data')
     level = models.PositiveIntegerField(
@@ -1344,3 +1325,227 @@ class BstLog(models.Model):
 
     def __str__(self):
         return f"{self.user.username} +{self.amount} ({self.source}:{self.ref})"
+
+    def __str__(self):
+        return f"{self.user.username} +{self.amount} ({self.source}:{self.ref})"
+
+    # =====================================================================
+    # models.py ning OXIRIGA qo'shing
+    # Keyin:  python manage.py makemigrations && python manage.py migrate
+    # =====================================================================
+
+    # =======================
+    # OCHIQ PROFIL — AKKAUNT TASDIQLASH
+    # (yozuv yo'q = foydalanuvchi hali so'ramagan)
+    # =======================
+
+
+class ProfileVerification(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Kutilmoqda'),
+        ('approved', 'Tasdiqlangan'),
+        ('rejected', 'Rad etilgan'),
+    ]
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile_verification')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    admin_note = models.CharField(
+        max_length=255, blank=True, default='',
+        help_text="Rad etilganda foydalanuvchiga ko'rinadigan sabab (ixtiyoriy)"
+    )
+    seen_by_user = models.BooleanField(
+        default=False,
+        help_text="Foydalanuvchi natija xabarini ko'rdimi (tasdiqlangan xabar bir marta chiqadi)"
+    )
+    requested_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-requested_at']
+        verbose_name = "Profil tasdiqlash"
+        verbose_name_plural = "Profil tasdiqlash so'rovlari"
+
+    def __str__(self):
+        return f"{self.user.username} — {self.get_status_display()}"
+
+    # =======================
+    # OCHIQ PROFIL — FON RANGLARI (admin beradi)
+    # =======================
+
+
+class ProfileBgColor(models.Model):
+    name = models.CharField(max_length=60)
+    value = models.CharField(
+        max_length=200,
+        help_text="CSS: #1a1030 yoki linear-gradient(135deg,#1a1030,#0a0818)"
+    )
+    order = models.PositiveSmallIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = "Profil fon rangi"
+        verbose_name_plural = "Profil fon ranglari"
+
+    def __str__(self):
+        return self.name
+
+    # =======================
+    # OCHIQ PROFIL — O'Z HAQIDA MA'LUMOT
+    # =======================
+
+
+
+    # =======================
+    # OCHIQ PROFIL — CARDLAR (cheksiz)
+    # =======================
+
+
+class ProfileCard(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='pp_cards')
+    title = models.CharField(max_length=100)
+    image_url = models.URLField(max_length=600, blank=True, default='')
+    source_url = models.URLField(max_length=600, blank=True, default='')
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = "Profil card"
+        verbose_name_plural = "Profil cardlar"
+
+    def __str__(self):
+        return f"{self.user.username}: {self.title}"
+
+    # =======================
+    # CARD ICHIDAGI ROLLAR (cheksiz)
+    # =======================
+
+
+class ProfileRole(models.Model):
+    card = models.ForeignKey(ProfileCard, on_delete=models.CASCADE, related_name='roles')
+    name = models.CharField(max_length=100)
+    image_url = models.URLField(max_length=600, blank=True, default='')
+    source_url = models.URLField(max_length=600, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['id']
+        verbose_name = "Profil rol"
+        verbose_name_plural = "Profil rollar"
+
+    def __str__(self):
+        return f"{self.card.title} — {self.name}"
+
+
+
+
+
+
+# =======================
+# OCHIQ PROFIL — AKKAUNT TASDIQLASH
+# =======================
+class ProfileVerification(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Kutilmoqda'),
+        ('approved', 'Tasdiqlangan'),
+        ('rejected', 'Rad etilgan'),
+    ]
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile_verification')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    admin_note = models.CharField(max_length=255, blank=True, default='',
+                                  help_text="Rad etilganda foydalanuvchiga ko'rinadigan sabab (ixtiyoriy)")
+    seen_by_user = models.BooleanField(default=False)
+    requested_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-requested_at']
+        verbose_name = "Profil tasdiqlash"
+        verbose_name_plural = "Profil tasdiqlash so'rovlari"
+
+    def __str__(self):
+        return f"{self.user.username} — {self.get_status_display()}"
+
+
+# =======================
+# OCHIQ PROFIL — FON RANGLARI (admin beradi)
+# =======================
+class ProfileBgColor(models.Model):
+    name = models.CharField(max_length=60)
+    value = models.CharField(max_length=200,
+                             help_text="CSS: #1a1030 yoki linear-gradient(135deg,#1a1030,#0a0818)")
+    order = models.PositiveSmallIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = "Profil fon rangi"
+        verbose_name_plural = "Profil fon ranglari"
+
+    def __str__(self):
+        return self.name
+
+
+# =======================
+# OCHIQ PROFIL — O'Z HAQIDA MA'LUMOT
+# =======================
+class PublicProfileInfo(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='public_info')
+    ifo = models.CharField("I.FO", max_length=120, blank=True, default='')
+    nickname = models.CharField("Tahallusi", max_length=80, blank=True, default='')
+    fandub = models.CharField("Ishlagan fandubi", max_length=150, blank=True, default='')
+    status_text = models.CharField("Status", max_length=150, blank=True, default='',
+                                   help_text="Bo'sh bo'lsa hech kimga ko'rinmaydi")
+    motto = models.CharField("Shiori", max_length=200, blank=True, default='')
+
+    bg_color = models.ForeignKey(ProfileBgColor, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    bg_image_url = models.URLField(max_length=600, blank=True, default='')
+    bg_source_url = models.URLField(max_length=600, blank=True, default='')
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Ochiq profil ma'lumoti"
+        verbose_name_plural = "Ochiq profil ma'lumotlari"
+
+    def __str__(self):
+        return f"{self.user.username} — ochiq profil"
+
+
+# =======================
+# OCHIQ PROFIL — CARDLAR
+# =======================
+class ProfileCard(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='pp_cards')
+    title = models.CharField(max_length=100)
+    image_url = models.URLField(max_length=600, blank=True, default='')
+    source_url = models.URLField(max_length=600, blank=True, default='')
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = "Profil card"
+        verbose_name_plural = "Profil cardlar"
+
+    def __str__(self):
+        return f"{self.user.username}: {self.title}"
+
+
+# =======================
+# CARD ICHIDAGI ROLLAR
+# =======================
+class ProfileRole(models.Model):
+    card = models.ForeignKey(ProfileCard, on_delete=models.CASCADE, related_name='roles')
+    name = models.CharField(max_length=100)
+    image_url = models.URLField(max_length=600, blank=True, default='')
+    source_url = models.URLField(max_length=600, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['id']
+        verbose_name = "Profil rol"
+        verbose_name_plural = "Profil rollar"
+
+    def __str__(self):
+        return f"{self.card.title} — {self.name}"
