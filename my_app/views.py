@@ -27,7 +27,8 @@ import random
 from django.db import transaction
 from django.http import Http404
 from django.contrib.auth import update_session_auth_hash
-
+import requests
+from urllib.parse import urlparse, urljoin
 
 
 from .models import *
@@ -35,6 +36,13 @@ from .models import *
 User = get_user_model()
 NEWS_PAGE_SIZE = 9
 BETA_HOME_TRIAL_DAYS = 7
+
+
+PIN_DOMAINS = ('pin.it', 'pinterest.com', 'pinimg.com')
+PIN_UA = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+          '(KHTML, like Gecko) Chrome/124.0 Safari/537.36')
+
+
 
 # ================= PREMIUM PROFIL DIZAYN =================
 PROFILE_BG_IMAGES = {
@@ -820,27 +828,6 @@ def profile(request):
 
 
 
-# =======================
-# OCHIQ PROFIL  (anibest.uz/profile/subaru/)
-# =======================
-def public_profile(request, username):
-    target = (
-        CustomUser.objects.select_related('avatar').filter(username=username).first()
-        or CustomUser.objects.select_related('avatar').filter(username__iexact=username).first()
-    )
-    if not target:
-        raise Http404("Foydalanuvchi topilmadi")
-
-    tz = ZoneInfo('Asia/Tashkent')
-    return render(request, 'public_profile.html', {
-        'target': target,
-        'tier': target.active_tier(),
-        'level': target.get_level(),
-        'watched_count': target.watched_count(),
-        'days_joined': target.days_since_joined(),
-        'joined_local': localtime(target.date_joined, tz),
-        'is_own': request.user.is_authenticated and request.user.id == target.id,
-    })
 
 # =======================
 # MAKE VIP
@@ -2772,3 +2759,305 @@ def daraja_puzzle_finish(request):
             BstLog.objects.create(user=request.user, source='puzzle',
                                   ref=now.isoformat(), amount=gained)
     return JsonResponse({'ok': True, 'gained': gained, 'level': data.level})
+
+
+
+
+
+
+
+
+
+
+
+
+def _pin_host_ok(url):
+    """Faqat Pinterest domenlari (SSRF dan himoya)"""
+    try:
+        p = urlparse(url)
+    except ValueError:
+        return False
+    if p.scheme not in ('http', 'https') or not p.hostname:
+        return False
+    h = p.hostname.lower()
+    return any(h == d or h.endswith('.' + d) for d in PIN_DOMAINS)
+
+
+def _extract_pin_image(url):
+    """pin.it / pinterest.com havoladan rasm URL ni oladi. Topilmasa None."""
+    url = (url or '').strip()
+    if not _pin_host_ok(url):
+        return None
+
+    host = urlparse(url).hostname.lower()
+    if host == 'pinimg.com' or host.endswith('.pinimg.com'):
+        return url
+
+    html = None
+    cur = url
+    try:
+        for _ in range(5):
+            r = requests.get(
+                cur, headers={'User-Agent': PIN_UA, 'Accept-Language': 'en'},
+                timeout=8, allow_redirects=False, stream=True
+            )
+            if r.status_code in (301, 302, 303, 307, 308):
+                nxt = urljoin(cur, r.headers.get('Location', ''))
+                r.close()
+                if not _pin_host_ok(nxt):
+                    return None
+                cur = nxt
+                continue
+            if r.status_code != 200:
+                r.close()
+                return None
+            html = r.raw.read(600000, decode_content=True).decode('utf-8', 'ignore')
+            r.close()
+            break
+    except requests.RequestException:
+        return None
+
+    if not html:
+        return None
+
+    m = (re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']', html, re.I)
+         or re.search(r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']', html, re.I))
+    if not m:
+        return None
+
+    img = m.group(1).replace('&amp;', '&')
+    if not _pin_host_ok(img):
+        return None
+    return img.replace('/236x/', '/736x/').replace('/474x/', '/736x/')
+
+
+def _pp_approved(user):
+    return ProfileVerification.objects.filter(user=user, status='approved').exists()
+
+
+def _pp_bad(msg, status=400):
+    return JsonResponse({'ok': False, 'error': msg}, status=status)
+
+
+def _card_to_dict(c):
+    return {
+        'id': c.id,
+        'title': c.title,
+        'image': c.image_url,
+        'roles': [{'id': r.id, 'name': r.name, 'image': r.image_url} for r in c.roles.all()],
+    }
+
+
+def public_profile(request, username):
+    target = (
+        CustomUser.objects.select_related('avatar').filter(username=username).first()
+        or CustomUser.objects.select_related('avatar').filter(username__iexact=username).first()
+    )
+    if not target:
+        raise Http404("Foydalanuvchi topilmadi")
+
+    tz = ZoneInfo('Asia/Tashkent')
+    is_own = request.user.is_authenticated and request.user.id == target.id
+
+    ver = ProfileVerification.objects.filter(user=target).first()
+    approved = bool(ver and ver.status == 'approved')
+
+    verify_state = None   # None | 'none' | 'pending' | 'rejected' | 'approved_msg'
+    if is_own:
+        if not ver:
+            verify_state = 'none'
+        elif ver.status in ('pending', 'rejected'):
+            verify_state = ver.status
+        elif ver.status == 'approved' and not ver.seen_by_user:
+            verify_state = 'approved_msg'
+            ver.seen_by_user = True
+            ver.save(update_fields=['seen_by_user'])
+
+    info = None
+    info_rows = []
+    cards_data = []
+    bg_style = ''
+    bg_colors = []
+
+    if approved:
+        info = PublicProfileInfo.objects.select_related('bg_color').filter(user=target).first()
+        empty = "Kiritilmagan"
+        g = lambda f: ((getattr(info, f, '') or '').strip() if info else '')
+
+        info_rows = [
+            {'label': 'I.FO', 'value': g('ifo') or empty, 'empty': not g('ifo')},
+            {'label': 'Tahallusi', 'value': g('nickname') or empty, 'empty': not g('nickname')},
+            {'label': 'Ishlagan fandubi', 'value': g('fandub') or empty, 'empty': not g('fandub')},
+        ]
+        if g('status_text'):
+            info_rows.append({'label': 'Status', 'value': g('status_text'), 'empty': False})
+        info_rows.append({'label': 'Shiori', 'value': g('motto') or empty, 'empty': not g('motto')})
+
+        cards = target.pp_cards.prefetch_related('roles')
+        cards_data = [_card_to_dict(c) for c in cards]
+
+        if info and info.bg_image_url:
+            bg_style = f"background-image:url('{info.bg_image_url}');"
+        elif info and info.bg_color:
+            bg_style = f"background:{info.bg_color.value};"
+
+        if is_own:
+            bg_colors = list(ProfileBgColor.objects.filter(is_active=True))
+
+    return render(request, 'public_profile.html', {
+        'target': target,
+        'tier': target.active_tier(),
+        'level': target.get_level(),
+        'watched_count': target.watched_count(),
+        'days_joined': target.days_since_joined(),
+        'joined_local': localtime(target.date_joined, tz),
+        'is_own': is_own,
+
+        'ver': ver,
+        'approved': approved,
+        'verify_state': verify_state,
+        'info': info,
+        'info_rows': info_rows,
+        'cards_data': cards_data,
+        'bg_style': bg_style,
+        'bg_colors': bg_colors,
+    })
+
+
+@login_required
+def pp_verify_request(request):
+    if request.method != 'POST':
+        return redirect('public_profile', username=request.user.username)
+
+    ver = ProfileVerification.objects.filter(user=request.user).first()
+    if ver and ver.status in ('pending', 'approved'):
+        return redirect('public_profile', username=request.user.username)
+
+    if ver:
+        ver.status = 'pending'
+        ver.admin_note = ''
+        ver.seen_by_user = False
+        ver.processed_at = None
+        ver.requested_at = timezone.now()
+        ver.save()
+    else:
+        ProfileVerification.objects.create(user=request.user)
+
+    messages.success(request, "So'rov yuborildi. Admin tasdiqlashini kuting.")
+    return redirect('public_profile', username=request.user.username)
+
+
+@login_required
+def pp_info_save(request):
+    if request.method != 'POST' or not _pp_approved(request.user):
+        return redirect('public_profile', username=request.user.username)
+
+    info, _ = PublicProfileInfo.objects.get_or_create(user=request.user)
+    info.ifo = request.POST.get('ifo', '').strip()[:120]
+    info.nickname = request.POST.get('nickname', '').strip()[:80]
+    info.fandub = request.POST.get('fandub', '').strip()[:150]
+    info.status_text = request.POST.get('status_text', '').strip()[:150]
+    info.motto = request.POST.get('motto', '').strip()[:200]
+    info.save()
+
+    messages.success(request, "Ma'lumotlar saqlandi!")
+    return redirect('public_profile', username=request.user.username)
+
+
+@login_required
+def pp_bg_set(request):
+    if request.method != 'POST':
+        return _pp_bad('POST talab qilinadi', 405)
+    if not _pp_approved(request.user):
+        return _pp_bad('Avval akkauntni tasdiqlating', 403)
+
+    info, _ = PublicProfileInfo.objects.get_or_create(user=request.user)
+    mode = request.POST.get('mode')
+
+    if mode == 'image':
+        link = request.POST.get('url', '').strip()
+        img = _extract_pin_image(link)
+        if not img:
+            return _pp_bad("Havoladan rasm topilmadi. Pinterest havolasini tekshiring.")
+        info.bg_image_url = img
+        info.bg_source_url = link[:600]
+        info.bg_color = None
+    elif mode == 'color':
+        color = ProfileBgColor.objects.filter(id=request.POST.get('color_id'), is_active=True).first()
+        if not color:
+            return _pp_bad("Rang topilmadi")
+        info.bg_color = color
+        info.bg_image_url = ''
+        info.bg_source_url = ''
+    elif mode == 'clear':
+        info.bg_color = None
+        info.bg_image_url = ''
+        info.bg_source_url = ''
+    else:
+        return _pp_bad("Noto'g'ri amal")
+
+    info.save()
+    return JsonResponse({'ok': True})
+
+
+@login_required
+def pp_card_add(request):
+    if request.method != 'POST':
+        return _pp_bad('POST talab qilinadi', 405)
+    if not _pp_approved(request.user):
+        return _pp_bad('Avval akkauntni tasdiqlating', 403)
+
+    title = request.POST.get('title', '').strip()[:100]
+    link = request.POST.get('url', '').strip()
+    if not title:
+        return _pp_bad("Card nomini kiriting")
+
+    img = _extract_pin_image(link)
+    if not img:
+        return _pp_bad("Havoladan rasm topilmadi. Pinterest havolasini tekshiring.")
+
+    last = request.user.pp_cards.aggregate(m=Max('order'))['m'] or 0
+    card = ProfileCard.objects.create(
+        user=request.user, title=title, image_url=img,
+        source_url=link[:600], order=last + 1
+    )
+    return JsonResponse({'ok': True, 'card': _card_to_dict(card)})
+
+
+@login_required
+def pp_card_delete(request, pk):
+    if request.method != 'POST':
+        return _pp_bad('POST talab qilinadi', 405)
+    card = get_object_or_404(ProfileCard, pk=pk, user=request.user)
+    card.delete()
+    return JsonResponse({'ok': True})
+
+
+@login_required
+def pp_role_add(request, card_id):
+    if request.method != 'POST':
+        return _pp_bad('POST talab qilinadi', 405)
+    if not _pp_approved(request.user):
+        return _pp_bad('Avval akkauntni tasdiqlating', 403)
+
+    card = get_object_or_404(ProfileCard, pk=card_id, user=request.user)
+    name = request.POST.get('title', '').strip()[:100]
+    link = request.POST.get('url', '').strip()
+    if not name:
+        return _pp_bad("Rol nomini kiriting")
+
+    img = _extract_pin_image(link)
+    if not img:
+        return _pp_bad("Havoladan rasm topilmadi. Pinterest havolasini tekshiring.")
+
+    role = ProfileRole.objects.create(card=card, name=name, image_url=img, source_url=link[:600])
+    return JsonResponse({'ok': True, 'role': {'id': role.id, 'name': role.name, 'image': role.image_url}})
+
+
+@login_required
+def pp_role_delete(request, pk):
+    if request.method != 'POST':
+        return _pp_bad('POST talab qilinadi', 405)
+    role = get_object_or_404(ProfileRole, pk=pk, card__user=request.user)
+    role.delete()
+    return JsonResponse({'ok': True})
