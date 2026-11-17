@@ -1303,7 +1303,6 @@ class daraja_kutarish(models.Model):
     def __str__(self):
         return f"{self.user.username} — {self.level} BST"
 
-
 class BstLog(models.Model):
     SOURCE_CHOICES = [
         ('reel_like', 'Reels like'),
@@ -1326,20 +1325,10 @@ class BstLog(models.Model):
     def __str__(self):
         return f"{self.user.username} +{self.amount} ({self.source}:{self.ref})"
 
-    def __str__(self):
-        return f"{self.user.username} +{self.amount} ({self.source}:{self.ref})"
 
-    # =====================================================================
-    # models.py ning OXIRIGA qo'shing
-    # Keyin:  python manage.py makemigrations && python manage.py migrate
-    # =====================================================================
-
-    # =======================
-    # OCHIQ PROFIL — AKKAUNT TASDIQLASH
-    # (yozuv yo'q = foydalanuvchi hali so'ramagan)
-    # =======================
-
-
+# =======================
+# OCHIQ PROFIL — AKKAUNT TASDIQLASH
+# =======================
 class ProfileVerification(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Kutilmoqda'),
@@ -1348,14 +1337,9 @@ class ProfileVerification(models.Model):
     ]
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile_verification')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    admin_note = models.CharField(
-        max_length=255, blank=True, default='',
-        help_text="Rad etilganda foydalanuvchiga ko'rinadigan sabab (ixtiyoriy)"
-    )
-    seen_by_user = models.BooleanField(
-        default=False,
-        help_text="Foydalanuvchi natija xabarini ko'rdimi (tasdiqlangan xabar bir marta chiqadi)"
-    )
+    admin_note = models.CharField(max_length=255, blank=True, default='',
+                                  help_text="Rad etilganda foydalanuvchiga ko'rinadigan sabab (ixtiyoriy)")
+    seen_by_user = models.BooleanField(default=False)
     requested_at = models.DateTimeField(auto_now_add=True)
     processed_at = models.DateTimeField(null=True, blank=True)
 
@@ -1367,17 +1351,14 @@ class ProfileVerification(models.Model):
     def __str__(self):
         return f"{self.user.username} — {self.get_status_display()}"
 
-    # =======================
-    # OCHIQ PROFIL — FON RANGLARI (admin beradi)
-    # =======================
 
-
+# =======================
+# OCHIQ PROFIL — FON RANGLARI (admin beradi)
+# =======================
 class ProfileBgColor(models.Model):
     name = models.CharField(max_length=60)
-    value = models.CharField(
-        max_length=200,
-        help_text="CSS: #1a1030 yoki linear-gradient(135deg,#1a1030,#0a0818)"
-    )
+    value = models.CharField(max_length=200,
+                             help_text="CSS: #1a1030 yoki linear-gradient(135deg,#1a1030,#0a0818)")
     order = models.PositiveSmallIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
@@ -1389,17 +1370,36 @@ class ProfileBgColor(models.Model):
     def __str__(self):
         return self.name
 
-    # =======================
-    # OCHIQ PROFIL — O'Z HAQIDA MA'LUMOT
-    # =======================
+
+# =======================
+# OCHIQ PROFIL — O'Z HAQIDA MA'LUMOT
+# =======================
+class PublicProfileInfo(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='public_info')
+    ifo = models.CharField("I.FO", max_length=120, blank=True, default='')
+    nickname = models.CharField("Tahallusi", max_length=80, blank=True, default='')
+    fandub = models.CharField("Ishlagan fandubi", max_length=150, blank=True, default='')
+    status_text = models.CharField("Status", max_length=150, blank=True, default='',
+                                   help_text="Bo'sh bo'lsa hech kimga ko'rinmaydi")
+    motto = models.CharField("Shiori", max_length=200, blank=True, default='')
+
+    bg_color = models.ForeignKey(ProfileBgColor, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    bg_image_url = models.URLField(max_length=600, blank=True, default='')
+    bg_source_url = models.URLField(max_length=600, blank=True, default='')
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Ochiq profil ma'lumoti"
+        verbose_name_plural = "Ochiq profil ma'lumotlari"
+
+    def __str__(self):
+        return f"{self.user.username} — ochiq profil"
 
 
-
-    # =======================
-    # OCHIQ PROFIL — CARDLAR (cheksiz)
-    # =======================
-
-
+# =======================
+# OCHIQ PROFIL — CARDLAR
+# =======================
 class ProfileCard(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='pp_cards')
     title = models.CharField(max_length=100)
@@ -1416,11 +1416,10 @@ class ProfileCard(models.Model):
     def __str__(self):
         return f"{self.user.username}: {self.title}"
 
-    # =======================
-    # CARD ICHIDAGI ROLLAR (cheksiz)
-    # =======================
 
-
+# =======================
+# CARD ICHIDAGI ROLLAR
+# =======================
 class ProfileRole(models.Model):
     card = models.ForeignKey(ProfileCard, on_delete=models.CASCADE, related_name='roles')
     name = models.CharField(max_length=100)
