@@ -508,6 +508,48 @@ class BstLogAdmin(admin.ModelAdmin):
 
 
 
+@admin.register(BstLog)
+class BstLogAdmin(admin.ModelAdmin):
+    list_display = ('user', 'source', 'ref', 'amount', 'created_at')
+    list_filter = ('source', 'created_at')
+    search_fields = ('user__username', 'ref')
+    readonly_fields = ('user', 'source', 'ref', 'amount', 'created_at')
+
+# =======================
+# OCHIQ PROFIL
+# =======================
+@admin.register(ProfileVerification)
+class ProfileVerificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'status', 'requested_at', 'processed_at')
+    list_filter = ('status',)
+    search_fields = ('user__username',)
+    list_editable = ('status',)
+    readonly_fields = ('requested_at',)
+
+
+@admin.register(ProfileBgColor)
+class ProfileBgColorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'value', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+
+
+@admin.register(PublicProfileInfo)
+class PublicProfileInfoAdmin(admin.ModelAdmin):
+    list_display = ('user', 'ifo', 'nickname', 'fandub', 'updated_at')
+    search_fields = ('user__username', 'ifo', 'nickname')
+
+
+class ProfileRoleInline(admin.TabularInline):
+    model = ProfileRole
+    extra = 0
+
+
+@admin.register(ProfileCard)
+class ProfileCardAdmin(admin.ModelAdmin):
+    list_display = ('user', 'title', 'order', 'created_at')
+    search_fields = ('user__username', 'title')
+    inlines = [ProfileRoleInline]
+
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Movie, MovieAdmin)
