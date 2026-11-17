@@ -247,10 +247,10 @@ urlpatterns = [
     path('pp/card/<int:card_id>/role/add/', pp_role_add, name='pp_role_add'),
     path('pp/role/<int:pk>/delete/', pp_role_delete, name='pp_role_delete'),
 
-path('control-panel/profverify/', admin_profverify_list, name='admin_profverify_list'),
-path('control-panel/profverify/lookup/', admin_profverify_lookup, name='admin_profverify_lookup'),
-path('control-panel/profverify/<int:pk>/', admin_profverify_form, name='admin_profverify_form'),
-path('control-panel/profverify/<int:pk>/<str:action>/', admin_profverify_action, name='admin_profverify_action'),
+    path('control-panel/profverify/', admin_profverify_list, name='admin_profverify_list'),
+    path('control-panel/profverify/lookup/', admin_profverify_lookup, name='admin_profverify_lookup'),
+    path('control-panel/profverify/<int:pk>/', admin_profverify_form, name='admin_profverify_form'),
+    path('control-panel/profverify/<int:pk>/<str:action>/', admin_profverify_action, name='admin_profverify_action'),
 
 ]
 
