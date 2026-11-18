@@ -14,7 +14,6 @@
    OCHIQ PROFIL
    ========================================================= */
 
-/* navbar yo'q — base.html dagi tepa bo'sh joyni olib tashlaymiz */
 main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; width: 100%; }
 
 /* ---- BUTUN SAHIFA FONI ---- */
@@ -38,11 +37,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 }
 .pp-back:hover { border-color: rgba(180,92,255,.55); color: #b45cff; }
 
-.pp-stage {
-    position: relative;
-    border-radius: 20px;
-    padding: 12px;
-}
+.pp-stage { position: relative; border-radius: 20px; padding: 12px; }
 
 .pp-card {
     background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.03));
@@ -62,31 +57,9 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 .pp-title { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
             color: rgba(255,255,255,.45); margin: 0 0 12px; }
 
-/* ---- 1) yuqori box ---- */
-.pp-top { display: flex; align-items: center; gap: 14px; }
-.pp-av {
-    width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    border: 3px solid var(--tc, rgba(255,255,255,.3)); color: var(--tc, #fff);
-    font-size: 24px; font-weight: 900; background: rgba(255,255,255,.05);
-}
-.pp-av img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-.pp-name { font-size: 18px; font-weight: 800; color: #fff; line-height: 1.2; word-break: break-word; }
-.pp-user { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); margin: 2px 0 6px; }
-.pp-badge { display: inline-block; padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 800;
-            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.7); }
-.pp-badge.premium { color: #ffc107; border-color: rgba(255,193,7,.3); background: rgba(255,193,7,.1); }
-.pp-badge.vip { color: #ffd23f; border-color: rgba(255,210,63,.55); background: rgba(255,193,7,.12);
-                text-shadow: 0 0 8px rgba(255,210,63,.7); }
 .pp-tier-premium { --tc: #ffc107; } .pp-tier-vip { --tc: #ffd23f; } .pp-tier-basic { --tc: rgba(255,255,255,.8); }
 
-.pp-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
-.pp-stat { text-align: center; padding: 10px 4px; border-radius: 12px;
-           background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); }
-.pp-stat b { display: block; font-size: 19px; font-weight: 900; color: var(--tc, #b45cff); }
-.pp-stat span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgba(255,255,255,.45); }
-
-/* ---- 2) tasdiqlash box ---- */
+/* ---- tasdiqlash box ---- */
 .pp-verify p { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.65); }
 .pp-btn {
     -webkit-appearance: none; appearance: none; cursor: pointer; width: 100%;
@@ -107,19 +80,71 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 .pp-state.approved { color: #3ddc97; background: rgba(61,220,151,.1); border: 1px solid rgba(61,220,151,.25); }
 .pp-state.rejected { color: #ff8a97; background: rgba(255,90,110,.1); border: 1px solid rgba(255,90,110,.25); }
 
-/* ---- 3) asosiy panjara: PC da 30 / 70 ---- */
-.pp-grid { display: block; }
-.pp-left, .pp-right { min-width: 0; }
+/* ---- asosiy qism: hamma narsa markazda, ustma-ust ---- */
+.pp-main { display: flex; flex-direction: column; align-items: center; }
+.pp-main > .pp-card { width: 100%; }
+.pp-main > .pp-about { max-width: 640px; }
+.pp-main > .pp-cards-box { max-width: 100%; }
+.pp-main > .pp-bgbox { max-width: 640px; }
 
-@media (min-width: 900px) {
-    .pp-wrap { margin: 28px auto; }
-    .pp-stage { padding: 18px; }
-    .pp-grid { display: grid; grid-template-columns: 30fr 70fr; gap: 12px; align-items: start; }
-    .pp-grid .pp-card { margin-bottom: 0; }
-    .pp-left { position: sticky; top: 14px; }
+.pp-avatar-badge { display: inline-block; padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 800;
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.7); }
+.pp-avatar-badge.premium { color: #ffc107; border-color: rgba(255,193,7,.3); background: rgba(255,193,7,.1); }
+.pp-avatar-badge.vip { color: #ffd23f; border-color: rgba(255,210,63,.55); background: rgba(255,193,7,.12);
+                text-shadow: 0 0 8px rgba(255,210,63,.7); }
+
+/* =========================================================
+   O'ZI HAQIDA — oltin border animatsiyasi (har 15 soniyada)
+   ========================================================= */
+.pp-about { position: relative; --gold: #ffc83d; }
+.pp-about > * { position: relative; z-index: 1; }
+
+/* border chiziqlari uchun SVG (JS yaratadi) */
+.pp-gold-svg { position: absolute !important; left: 0; top: 0; z-index: 3 !important; pointer-events: none; overflow: visible; }
+.pp-gold-svg rect {
+    fill: none; stroke: var(--gold); stroke-width: 3; stroke-linecap: round;
+    stroke-dasharray: 0 100; opacity: 0;
+    filter: drop-shadow(0 0 5px rgba(255,200,61,.95)) drop-shadow(0 0 12px rgba(255,170,0,.6));
+    animation: ppGoldLine 15s ease-in-out infinite;
 }
 
-/* ---- o'z haqida box ---- */
+/* ikkala chiziq: boshlanib (0–20%) o'rtada uchrashadi va g'oyib bo'ladi */
+@keyframes ppGoldLine {
+    0%   { stroke-dasharray: 0 100;  opacity: 1; }
+    20%  { stroke-dasharray: 50 100; opacity: 1; }
+    23%  { stroke-dasharray: 50 100; opacity: 0; }
+    100% { stroke-dasharray: 50 100; opacity: 0; }
+}
+
+/* chiziqlar g'oyib bo'lgach — box oltin bo'lib yaltiraydi */
+.pp-about::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 0; pointer-events: none;
+    background:
+        radial-gradient(120% 90% at 50% 0%, rgba(255,215,90,.30), transparent 60%),
+        linear-gradient(145deg, rgba(255,200,61,.20), rgba(255,170,0,.06));
+    opacity: 0;
+    animation: ppGoldFill 15s ease-in-out infinite;
+}
+@keyframes ppGoldFill {
+    0%, 19% { opacity: 0; }
+    26%     { opacity: 1; }
+    40%     { opacity: .85; }
+    55%     { opacity: 0; }
+    100%    { opacity: 0; }
+}
+.pp-about { animation: ppGoldGlow 15s ease-in-out infinite; }
+@keyframes ppGoldGlow {
+    0%, 19% { border-color: rgba(255,255,255,.09);
+              box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 10px 30px rgba(0,0,0,.14); }
+    26%     { border-color: rgba(255,210,63,.95);
+              box-shadow: 0 0 30px rgba(255,193,7,.5), 0 0 70px rgba(255,170,0,.25), inset 0 0 36px rgba(255,200,61,.18); }
+    40%     { border-color: rgba(255,210,63,.75);
+              box-shadow: 0 0 22px rgba(255,193,7,.35), 0 0 50px rgba(255,170,0,.15), inset 0 0 26px rgba(255,200,61,.12); }
+    55%, 100% { border-color: rgba(255,255,255,.09);
+              box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 10px 30px rgba(0,0,0,.14); }
+}
+
+/* ---- o'z haqida box ichi ---- */
 .pp-about-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .pp-about-head .pp-title { margin: 0; }
 .pp-icon-btn {
@@ -127,8 +152,16 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
     background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: #fff; font-size: 17px; padding: 0;
 }
-.pp-about-av { display: flex; justify-content: center; margin-bottom: 14px; }
-.pp-about-av .pp-av { width: 104px; height: 104px; font-size: 34px; border-width: 4px; }
+.pp-about-av { display: flex; flex-direction: column; align-items: center; margin-bottom: 14px; text-align: center; }
+.pp-av {
+    width: 104px; height: 104px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    border: 4px solid var(--tc, rgba(255,255,255,.3)); color: var(--tc, #fff);
+    font-size: 34px; font-weight: 900; background: rgba(255,255,255,.05);
+}
+.pp-av img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.pp-name { font-size: 18px; font-weight: 800; color: #fff; line-height: 1.2; margin-top: 10px; word-break: break-word; }
+.pp-user { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); margin: 2px 0 7px; }
 
 .pp-row { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 2px 0; }
 .pp-row > span { flex-shrink: 0; font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.5); }
@@ -136,76 +169,78 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 .pp-row > b.empty { color: rgba(255,255,255,.3); font-weight: 600; font-style: italic; }
 .pp-hr { border: 0; height: 1px; background: rgba(255,255,255,.08); margin: 9px 0; }
 
-/* ---- cardlar karuseli ---- */
-.pp-car { position: relative; perspective: 1200px; }
-.pp-track {
-    display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
-    scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
-    padding: 4px 2px 8px; scrollbar-width: none; overscroll-behavior-x: contain;
-    perspective: 1200px;
+/* =========================================================
+   CARDLAR — markazda katta, ikki yonida kichik, cheksiz
+   ========================================================= */
+.pp-cards-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; min-height: 34px; }
+.pp-cards-head .pp-title { margin: 0; }
+.pp-add-top {
+    -webkit-appearance: none; appearance: none; cursor: pointer; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 10px;
+    background: rgba(180,92,255,.12); border: 1.5px dashed rgba(180,92,255,.55); color: #b45cff;
+    font: 800 12px 'Outfit', sans-serif;
 }
-.pp-track::-webkit-scrollbar { display: none; }
+.pp-add-top:hover { background: rgba(180,92,255,.2); }
+.pp-add-top i { font-style: normal; font-size: 17px; line-height: 1; }
 
+.pp-car {
+    position: relative; height: 270px; overflow: hidden; user-select: none; -webkit-user-select: none;
+    touch-action: pan-y;
+}
 .pp-c {
     -webkit-appearance: none; appearance: none; cursor: pointer; padding: 0; border: 0;
-    position: relative; flex: 0 0 150px; height: 210px; border-radius: 15px; overflow: hidden;
-    scroll-snap-align: start; background: #1b1626;
-    box-shadow: 0 8px 20px rgba(0,0,0,.3); transition: transform .2s ease;
+    position: absolute; left: 50%; top: 50%;
+    width: 160px; height: 224px; margin: -112px 0 0 -80px;
+    border-radius: 16px; overflow: hidden; background: #1b1626;
+    box-shadow: 0 10px 26px rgba(0,0,0,.4);
+    transition: transform .55s cubic-bezier(.22,.8,.3,1), opacity .45s ease, filter .45s ease;
     -webkit-tap-highlight-color: transparent;
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-    will-change: transform;
-    animation: ppCardLiveRotate 6s ease-in-out infinite;
+    will-change: transform, opacity;
 }
-.pp-c:nth-child(2n) { animation-delay: -1.5s; }
-.pp-c:nth-child(3n) { animation-delay: -3s; }
-.pp-c:nth-child(4n) { animation-delay: -4.5s; }
-
-@keyframes ppCardLiveRotate {
-    0%, 100% {
-        transform: perspective(900px) rotateY(-7deg) rotateX(1deg) translateY(0);
-    }
-    25% {
-        transform: perspective(900px) rotateY(0deg) rotateX(-1deg) translateY(-2px);
-    }
-    50% {
-        transform: perspective(900px) rotateY(7deg) rotateX(1deg) translateY(0);
-    }
-    75% {
-        transform: perspective(900px) rotateY(0deg) rotateX(-1deg) translateY(-2px);
-    }
-}
+.pp-c.center { box-shadow: 0 16px 40px rgba(0,0,0,.5), 0 0 0 2px rgba(180,92,255,.5); }
 .pp-c img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
 .pp-c::after { content: ""; position: absolute; inset: 0;
                background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.82)); }
-.pp-c-name { position: absolute; left: 10px; right: 10px; bottom: 9px; z-index: 2; text-align: left;
+.pp-c-name { position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 2; text-align: left;
              font: 800 13px 'Outfit', sans-serif; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.8);
              overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pp-c.add {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-    background: rgba(180,92,255,.08); border: 2px dashed rgba(180,92,255,.4); color: #b45cff;
-    box-shadow: none; font: 800 12px 'Outfit', sans-serif;
-}
-.pp-c.add::after { display: none; }
-.pp-c.add i { font-size: 34px; line-height: 1; font-style: normal; }
-@media (hover: hover) {
-    .pp-c:hover {
-        animation-play-state: paused;
-        transform: perspective(900px) rotateY(0deg) rotateX(0deg) translateY(-5px) scale(1.015);
-    }
-}
+.pp-c.center .pp-c-name { font-size: 15px; }
 
 .pp-nav {
     -webkit-appearance: none; appearance: none; cursor: pointer; padding: 0;
-    position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
-    width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.15);
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 50;
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,.15);
     background: rgba(12,9,20,.82); color: #fff; font-size: 22px; line-height: 1;
     display: flex; align-items: center; justify-content: center;
 }
-.pp-nav.prev { left: -6px; } .pp-nav.next { right: -6px; }
+.pp-nav.prev { left: 4px; } .pp-nav.next { right: 4px; }
 .pp-empty { font-size: 12.5px; color: rgba(255,255,255,.4); padding: 8px 0; }
 
-@media (min-width: 900px) { .pp-c { flex-basis: 190px; height: 262px; } }
+/* ---- PC: hammasi markazda va kattaroq ---- */
+@media (min-width: 900px) {
+    .pp-wrap { max-width: 1100px; margin: 32px auto; }
+    .pp-stage { padding: 22px; }
+    .pp-main { gap: 18px; }
+    .pp-main > .pp-card { margin-bottom: 0; padding: 26px; border-radius: 22px; }
+    .pp-main > .pp-about { max-width: 720px; }
+    .pp-main > .pp-bgbox { max-width: 720px; }
+    .pp-main > .pp-cards-box { max-width: 100%; }
+    .pp-av { width: 140px; height: 140px; font-size: 46px; }
+    .pp-name { font-size: 24px; margin-top: 14px; }
+    .pp-user { font-size: 14px; }
+    .pp-title { font-size: 12.5px; }
+    .pp-row { padding: 4px 0; }
+    .pp-row > span { font-size: 15px; }
+    .pp-row > b { font-size: 16.5px; }
+    .pp-hr { margin: 12px 0; }
+    .pp-car { height: 410px; }
+    .pp-c { width: 250px; height: 350px; margin: -175px 0 0 -125px; border-radius: 20px; }
+    .pp-c-name { font-size: 15px; left: 14px; right: 14px; bottom: 14px; }
+    .pp-c.center .pp-c-name { font-size: 19px; }
+    .pp-nav { width: 46px; height: 46px; font-size: 28px; }
+    .pp-nav.prev { left: 10px; } .pp-nav.next { right: 10px; }
+    .pp-add-top { height: 40px; font-size: 13.5px; padding: 0 18px; }
+}
 
 /* ---- fon sozlamasi box ---- */
 .pp-bg-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
@@ -273,9 +308,9 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     .pp-wrap { padding: 0 8px 28px; margin: 12px auto; }
     .pp-stage { padding: 8px; border-radius: 16px; }
     .pp-card { padding: 13px; border-radius: 15px; }
-    .pp-av { width: 58px; height: 58px; font-size: 20px; }
-    .pp-name { font-size: 16px; }
-    .pp-c { flex-basis: 132px; height: 186px; }
+    .pp-av { width: 90px; height: 90px; font-size: 30px; }
+    .pp-car { height: 250px; }
+    .pp-c { width: 150px; height: 210px; margin: -105px 0 0 -75px; }
     .pp-nav { display: none; }          /* mobilda faqat touch */
     .pp-ov { padding: 0; align-items: flex-end; }
     .pp-box { max-width: none; border-radius: 18px 18px 0 0; border-bottom: 0; }
@@ -283,8 +318,8 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .pp-track { scroll-behavior: auto; }
-    .pp-c { animation: none !important; transform: none !important; }
+    .pp-c { transition: none !important; }
+    .pp-about, .pp-about::before, .pp-gold-svg rect { animation: none !important; }
     * { transition-duration: .01ms !important; }
 }
 </style>
@@ -316,31 +351,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     {% endif %}
 
     <!-- =====================================================
-         1) YUQORI BOX — asosiy ma'lumot
-         ===================================================== -->
-    <div class="pp-card">
-        <div class="pp-top">
-            <div class="pp-av">
-                {% if target.avatar %}<img src="{{ target.avatar.image.url }}" alt="avatar" draggable="false">
-                {% else %}{{ target.username|make_list|first|upper }}{% endif %}
-            </div>
-            <div style="min-width:0;">
-                <div class="pp-name">{% if target.first_name %}{{ target.first_name }} {{ target.last_name }}{% else %}{{ target.username }}{% endif %}</div>
-                <div class="pp-user">@{{ target.username }}</div>
-                {% if tier == 'vip' %}<span class="pp-badge vip">VIP</span>
-                {% elif tier == 'premium' %}<span class="pp-badge premium">Premium</span>
-                {% else %}<span class="pp-badge">Oddiy</span>{% endif %}
-            </div>
-        </div>
-        <div class="pp-stats">
-            <div class="pp-stat"><b>{{ level }}</b><span>Daraja</span></div>
-            <div class="pp-stat"><b>{{ watched_count }}</b><span>Ko'rilgan</span></div>
-            <div class="pp-stat"><b>{{ days_joined }}</b><span>Kun</span></div>
-        </div>
-    </div>
-
-    <!-- =====================================================
-         2) AKKAUNTNI TASDIQLASH BOXI (faqat egasiga)
+         AKKAUNTNI TASDIQLASH BOXI (faqat egasiga)
          ===================================================== -->
     {% if verify_state %}
     <div class="pp-card pp-verify" id="ppVerify" data-state="{{ verify_state }}">
@@ -358,7 +369,6 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
             <button type="button" class="pp-btn" disabled>So'rov yuborildi — kutilmoqda...</button>
         {% endif %}
 
-        {# natija xabari — box pastida #}
         {% if verify_state == 'pending' %}
             <div class="pp-state pending">⏳ So'rovingiz admin ko'rib chiqishida. Natija shu yerda chiqadi.</div>
         {% elif verify_state == 'rejected' %}
@@ -371,65 +381,71 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 
     {% if approved %}
     <!-- =====================================================
-         3) ASOSIY QISM: PC 30/70, mobil ustma-ust
+         ASOSIY QISM: hammasi markazda, ustma-ust
          ===================================================== -->
-    <div class="pp-grid">
+    <div class="pp-main">
 
-        <!-- ---------- CHAP: o'zi haqida ---------- -->
-        <div class="pp-left">
-            <div class="pp-card">
-                <div class="pp-about-head">
-                    <p class="pp-title">O'zi haqida</p>
-                    {% if is_own %}
-                    <button type="button" class="pp-icon-btn" data-open="ppEdit" aria-label="Tahrirlash">✎</button>
-                    {% endif %}
-                </div>
-
-                <div class="pp-about-av">
-                    <div class="pp-av">
-                        {% if target.avatar %}<img src="{{ target.avatar.image.url }}" alt="avatar" draggable="false">
-                        {% else %}{{ target.username|make_list|first|upper }}{% endif %}
-                    </div>
-                </div>
-
-                {% for r in info_rows %}
-                    <div class="pp-row"><span>{{ r.label }}</span><b class="{% if r.empty %}empty{% endif %}">{{ r.value }}</b></div>
-                    {% if not forloop.last %}<hr class="pp-hr">{% endif %}
-                {% endfor %}
+        <!-- ---------- O'ZI HAQIDA (oltin border animatsiyasi) ---------- -->
+        <div class="pp-card pp-about" id="ppAbout">
+            <div class="pp-about-head">
+                <p class="pp-title">O'zi haqida</p>
+                {% if is_own %}
+                <button type="button" class="pp-icon-btn" data-open="ppEdit" aria-label="Tahrirlash">✎</button>
+                {% endif %}
             </div>
+
+            <div class="pp-about-av">
+                <div class="pp-av">
+                    {% if target.avatar %}<img src="{{ target.avatar.image.url }}" alt="avatar" draggable="false">
+                    {% else %}{{ target.username|make_list|first|upper }}{% endif %}
+                </div>
+                <div class="pp-name">{% if target.first_name %}{{ target.first_name }} {{ target.last_name }}{% else %}{{ target.username }}{% endif %}</div>
+                <div class="pp-user">@{{ target.username }}</div>
+                {% if tier == 'vip' %}<span class="pp-avatar-badge vip">VIP</span>
+                {% elif tier == 'premium' %}<span class="pp-avatar-badge premium">Premium</span>
+                {% else %}<span class="pp-avatar-badge">Oddiy</span>{% endif %}
+            </div>
+
+            {% for r in info_rows %}
+                <div class="pp-row"><span>{{ r.label }}</span><b class="{% if r.empty %}empty{% endif %}">{{ r.value }}</b></div>
+                {% if not forloop.last %}<hr class="pp-hr">{% endif %}
+            {% endfor %}
         </div>
 
-        <!-- ---------- O'NG: cardlar ---------- -->
-        <div class="pp-right">
-            <div class="pp-card">
+        <!-- ---------- CARDLAR ---------- -->
+        <div class="pp-card pp-cards-box">
+            <div class="pp-cards-head">
+                {% if is_own %}
+                <button type="button" class="pp-add-top" data-open-link="card"><i>+</i> Card qo'shish</button>
+                {% endif %}
                 <p class="pp-title">Cardlar</p>
-
-                <div class="pp-car" id="ppCar">
-                    <button type="button" class="pp-nav prev" id="ppPrev" aria-label="Oldingi">‹</button>
-                    <div class="pp-track" id="ppTrack"></div>
-                    <button type="button" class="pp-nav next" id="ppNext" aria-label="Keyingi">›</button>
-                </div>
-                <p class="pp-empty" id="ppCardsEmpty" style="display:none;">Hali card qo'shilmagan.</p>
             </div>
 
-            {% if is_own %}
-            <!-- fon sozlamasi (egasi uchun) -->
-            <div class="pp-card" style="margin-top:12px;">
-                <p class="pp-title">Profil foni</p>
-                <div class="pp-bg-row">
-                    {% for c in bg_colors %}
-                        <button type="button" class="pp-sw{% if info and info.bg_color_id == c.id %} on{% endif %}"
-                                data-color="{{ c.id }}" title="{{ c.name }}" style="background:{{ c.value }};"></button>
-                    {% endfor %}
-                    <button type="button" class="pp-bg-add" data-open-link="bg" title="Pinterest rasm qo'yish">+</button>
-                    {% if bg_style %}
-                    <button type="button" class="pp-btn danger" id="ppBgClear" style="width:auto;height:36px;padding:0 14px;font-size:12px;">Fonni tozalash</button>
-                    {% endif %}
-                </div>
-                <p class="pp-bg-note">Rangni tanlang yoki «+» orqali Pinterest havolasidan rasm qo'ying.</p>
+            <div class="pp-car" id="ppCar">
+                <button type="button" class="pp-nav prev" id="ppPrev" aria-label="Oldingi">‹</button>
+                <div id="ppTrack"></div>
+                <button type="button" class="pp-nav next" id="ppNext" aria-label="Keyingi">›</button>
             </div>
-            {% endif %}
+            <p class="pp-empty" id="ppCardsEmpty" style="display:none;">Hali card qo'shilmagan.</p>
         </div>
+
+        {% if is_own %}
+        <!-- ---------- FON SOZLAMASI ---------- -->
+        <div class="pp-card pp-bgbox">
+            <p class="pp-title">Profil foni</p>
+            <div class="pp-bg-row">
+                {% for c in bg_colors %}
+                    <button type="button" class="pp-sw{% if info and info.bg_color_id == c.id %} on{% endif %}"
+                            data-color="{{ c.id }}" title="{{ c.name }}" style="background:{{ c.value }};"></button>
+                {% endfor %}
+                <button type="button" class="pp-bg-add" data-open-link="bg" title="Pinterest rasm qo'yish">+</button>
+                {% if bg_style %}
+                <button type="button" class="pp-btn danger" id="ppBgClear" style="width:auto;height:36px;padding:0 14px;font-size:12px;">Fonni tozalash</button>
+                {% endif %}
+            </div>
+            <p class="pp-bg-note">Rangni tanlang yoki «+» orqali Pinterest havolasidan rasm qo'ying.</p>
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 
@@ -447,7 +463,7 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
      data-bg="{% url 'pp_bg_set' %}"></div>
 
 <!-- =========================================================
-     OYNA: card ichi (to'liq ekran, o'rtada)
+     OYNA: card ichi
      ========================================================= -->
 <div class="pp-ov" id="ppCardModal" role="dialog" aria-modal="true">
     <div class="pp-box big">
@@ -551,10 +567,43 @@ document.addEventListener('DOMContentLoaded', function () {
         b.addEventListener('click', function () { openOv(document.getElementById(b.getAttribute('data-open'))); });
     });
 
-    /* ---------- tasdiqlash kutilayotgan bo'lsa — vaqti-vaqti bilan yangilab turamiz ---------- */
+    /* ---------- tasdiqlash kutilayotgan bo'lsa — yangilab turamiz ---------- */
     var vbox = document.getElementById('ppVerify');
     if (vbox && vbox.getAttribute('data-state') === 'pending') {
         setTimeout(function () { window.location.reload(); }, 30000);
+    }
+
+    /* =====================================================
+       O'ZI HAQIDA — oltin border chiziqlari (SVG)
+       Chap-yuqori va o'ng-pastki burchakdan boshlanadi
+       ===================================================== */
+    var about = document.getElementById('ppAbout');
+    if (about && !reduce) {
+        var NS = 'http://www.w3.org/2000/svg';
+        var svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('class', 'pp-gold-svg');
+        svg.setAttribute('aria-hidden', 'true');
+        var rA = document.createElementNS(NS, 'rect');
+        var rB = document.createElementNS(NS, 'rect');
+        [rA, rB].forEach(function (r) { r.setAttribute('pathLength', '100'); svg.appendChild(r); });
+        about.appendChild(svg);
+
+        function sizeGold() {
+            var w = about.offsetWidth, h = about.offsetHeight;
+            var rad = parseFloat(getComputedStyle(about).borderTopLeftRadius) || 18;
+            svg.setAttribute('width', w); svg.setAttribute('height', h);
+            svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+            [rA, rB].forEach(function (r) {
+                r.setAttribute('x', 1.5); r.setAttribute('y', 1.5);
+                r.setAttribute('width', Math.max(w - 3, 0)); r.setAttribute('height', Math.max(h - 3, 0));
+                r.setAttribute('rx', rad); r.setAttribute('ry', rad);
+            });
+            /* B chiziq — 180° burilgan: o'ng-pastdan chap-pastga qarab yuradi */
+            rB.setAttribute('transform', 'rotate(180 ' + (w / 2) + ' ' + (h / 2) + ')');
+        }
+        sizeGold();
+        if (window.ResizeObserver) new ResizeObserver(sizeGold).observe(about);
+        else window.addEventListener('resize', sizeGold);
     }
 
     var cfgEl = document.getElementById('ppCfg');
@@ -585,64 +634,122 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* =====================================================
-       KARUSEL
+       KARUSEL — markazda katta, yonlarida kichik, cheksiz
        ===================================================== */
+    var car = document.getElementById('ppCar');
     var track = document.getElementById('ppTrack');
     var emptyMsg = document.getElementById('ppCardsEmpty');
-    var paused = false, resumeT = null;
+    var items = [];          // {id, node}
+    var cur = 0;             // markazdagi card indeksi
+    var paused = false, resumeT = null, timer = null;
 
-    function renderCards() {
-        track.innerHTML = '';
-        cards.forEach(function (c) {
-            var b = el('button', 'pp-c'); b.type = 'button';
-            var img = el('img'); img.src = c.image; img.alt = ''; img.loading = 'lazy'; img.draggable = false;
-            b.appendChild(img);
-            b.appendChild(el('span', 'pp-c-name', c.title));
-            b.addEventListener('click', function () { openCard(c.id); });
-            track.appendChild(b);
-        });
-        if (own) {
-            var add = el('button', 'pp-c add'); add.type = 'button';
-            add.appendChild(el('i', null, '+'));
-            add.appendChild(el('span', null, 'Card qo\'shish'));
-            add.addEventListener('click', function () { openLink('card'); });
-            track.appendChild(add);
+    /* har kirganda tasodifiy tartib (Fisher–Yates) */
+    function shuffle(a) {
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
         }
-        emptyMsg.style.display = (!cards.length && !own) ? 'block' : 'none';
-        document.getElementById('ppCar').style.display = (!cards.length && !own) ? 'none' : 'block';
+        return a;
+    }
+    shuffle(cards);
+
+    function mod(a, n) { return ((a % n) + n) % n; }
+
+    function layout() {
+        var n = items.length;
+        if (!n) return;
+        var half = Math.min(2, Math.floor(n / 2));
+        var cw = items[0].node.offsetWidth || 160;
+        var X1 = cw * 0.80, X2 = cw * 1.38;
+        items.forEach(function (it, i) {
+            /* eng qisqa aylanma masofa: -floor(n/2) ... +ceil(n/2)-1 */
+            var d = mod(i - cur + Math.floor(n / 2), n) - Math.floor(n / 2);
+            /* juft sonda ikki chetdagi bir xil card — faqat o'ng tomonda ko'rsatamiz */
+            var visible = Math.abs(d) <= half && !(n % 2 === 0 && d === -half && half === n / 2);
+            var a = Math.abs(d), sgn = d < 0 ? -1 : 1;
+            var x = a === 0 ? 0 : (a === 1 ? X1 : (a === 2 ? X2 : X2 * 1.2)) * sgn;
+            var s = a === 0 ? 1 : (a === 1 ? 0.74 : (a === 2 ? 0.56 : 0.5));
+            var node = it.node;
+            node.style.transform = 'translateX(' + x + 'px) scale(' + s + ')';
+            node.style.zIndex = String(10 - Math.min(a, 9));
+            node.style.opacity = visible ? (a === 0 ? '1' : (a === 1 ? '.85' : '.5')) : '0';
+            node.style.filter = a === 0 ? 'none' : 'brightness(' + (a === 1 ? '.7' : '.5') + ')';
+            node.style.pointerEvents = visible ? 'auto' : 'none';
+            node.tabIndex = visible ? 0 : -1;
+            node.classList.toggle('center', d === 0);
+        });
     }
 
-    function step() {
-        var first = track.querySelector('.pp-c');
-        return first ? first.offsetWidth + 12 : 160;
-    }
-    function slide(dir) {
-        var max = track.scrollWidth - track.clientWidth;
-        if (dir > 0 && track.scrollLeft >= max - 4) track.scrollTo({ left: 0 });          // oxiriga yetsa — boshiga qaytadi
-        else if (dir < 0 && track.scrollLeft <= 4) track.scrollTo({ left: max });         // boshida bo'lsa — oxiriga
-        else track.scrollBy({ left: dir * step() });
-    }
+    function go(i) { cur = mod(i, items.length || 1); layout(); }
     function pauseAuto(ms) {
         paused = true; clearTimeout(resumeT);
         resumeT = setTimeout(function () { paused = false; }, ms || 6000);
     }
 
-    document.getElementById('ppPrev').addEventListener('click', function () { slide(-1); pauseAuto(); });
-    document.getElementById('ppNext').addEventListener('click', function () { slide(1);  pauseAuto(); });
-    ['touchstart', 'pointerdown', 'wheel', 'mouseenter'].forEach(function (ev) {
-        track.addEventListener(ev, function () { pauseAuto(ev === 'mouseenter' ? 3000 : 6000); }, { passive: true });
-    });
+    function renderCards() {
+        track.innerHTML = '';
+        items = [];
+        cards.forEach(function (c, i) {
+            var b = el('button', 'pp-c'); b.type = 'button';
+            var img = el('img'); img.src = c.image; img.alt = ''; img.draggable = false;
+            b.appendChild(img);
+            b.appendChild(el('span', 'pp-c-name', c.title));
+            b.addEventListener('click', function () {
+                if (swiped) return;
+                if (i === cur) openCard(c.id);
+                else { go(i); pauseAuto(); }
+            });
+            track.appendChild(b);
+            items.push({ id: c.id, node: b });
+        });
+        var has = cards.length > 0;
+        car.style.display = has ? 'block' : 'none';
+        emptyMsg.style.display = (!has && !own) ? 'block' : 'none';
+        if (cur >= items.length) cur = 0;
+        /* birinchi joylashuvda animatsiyasiz o'rnatamiz */
+        items.forEach(function (it) { it.node.style.transition = 'none'; });
+        layout();
+        void track.offsetWidth;
+        items.forEach(function (it) { it.node.style.transition = ''; });
+        var multi = items.length > 1;
+        document.getElementById('ppPrev').style.visibility = multi ? '' : 'hidden';
+        document.getElementById('ppNext').style.visibility = multi ? '' : 'hidden';
+    }
 
+    document.getElementById('ppPrev').addEventListener('click', function () { go(cur - 1); pauseAuto(); });
+    document.getElementById('ppNext').addEventListener('click', function () { go(cur + 1); pauseAuto(); });
+
+    /* surish (swipe) */
+    var sx = null, swiped = false;
+    car.addEventListener('pointerdown', function (e) { sx = e.clientX; swiped = false; pauseAuto(); });
+    car.addEventListener('pointerup', function (e) {
+        if (sx === null) return;
+        var dx = e.clientX - sx; sx = null;
+        if (Math.abs(dx) > 40 && items.length > 1) {
+            swiped = true; go(dx < 0 ? cur + 1 : cur - 1); pauseAuto();
+            setTimeout(function () { swiped = false; }, 60);
+        }
+    });
+    car.addEventListener('pointercancel', function () { sx = null; });
+    car.addEventListener('mouseenter', function () { pauseAuto(3000); });
+    car.addEventListener('wheel', function (e) {
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 20 && items.length > 1) {
+            go(e.deltaX > 0 ? cur + 1 : cur - 1); pauseAuto();
+        }
+    }, { passive: true });
+    window.addEventListener('resize', layout);
+
+    /* cheksiz avto-aylanish */
     if (!reduce) {
-        setInterval(function () {
+        timer = setInterval(function () {
             if (paused || document.hidden || document.querySelector('.pp-ov.open')) return;
-            if (track.scrollWidth <= track.clientWidth + 4) return;
-            slide(1);
+            if (items.length < 2) return;
+            go(cur + 1);
         }, 3500);
     }
 
     /* =====================================================
-       CARD OYNASI (to'liq ekran, o'rtada)
+       CARD OYNASI
        ===================================================== */
     var cm = document.getElementById('ppCardModal');
     var cmTitle = document.getElementById('ppCmTitle');
@@ -699,6 +806,7 @@ document.addEventListener('DOMContentLoaded', function () {
         post(urlWith(cfg.cardDel, curId)).then(function (res) {
             if (res.ok) {
                 cards = cards.filter(function (c) { return c.id !== curId; });
+                cur = 0;
                 closeOv(cm); renderCards();
             } else alert(res.error || 'Xatolik');
         });
@@ -753,9 +861,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (mode === 'bg') { window.location.reload(); return; }
 
-            if (mode === 'card') { cards.push(res.card); renderCards();
-                                   setTimeout(function () { track.scrollTo({ left: track.scrollWidth }); }, 50); }
-            else { var c = curCard(); if (c) { c.roles.push(res.role); renderRoles(); } }
+            if (mode === 'card') {
+                cards.push(res.card);
+                cur = cards.length - 1;          // yangi card markazga chiqadi
+                renderCards();
+            } else { var c = curCard(); if (c) { c.roles.push(res.role); renderRoles(); } }
             closeOv(lm);
         });
     });
