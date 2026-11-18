@@ -1500,6 +1500,7 @@ class PublicProfileInfo(models.Model):
     bg_color = models.ForeignKey(ProfileBgColor, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
     bg_image_url = models.URLField(max_length=600, blank=True, default='')
     bg_source_url = models.URLField(max_length=600, blank=True, default='')
+    bg_image = models.ImageField(upload_to='profile_bg/', blank=True, null=True)
 
     updated_at = models.DateTimeField(auto_now=True)
 
