@@ -14,6 +14,13 @@ from collections import defaultdict
 from django.db import transaction
 from .views import BST_STAGES
 from django.db.models import Case, When, Value, IntegerField
+import re
+import html as html_lib
+import urllib.request
+from urllib.parse import urlparse
+
+
+_PIN_HOSTS = ('pin.it', 'pinterest.com', 'pinimg.com')
 
 
 def is_admin(user):
@@ -1563,6 +1570,7 @@ def admin_daraja_form(request, user_id=None):
 
 
 
+
 def _pv_set_status(ver, status, note=''):
     changed = ver.status != status
     ver.status = status
@@ -1621,7 +1629,6 @@ def admin_profverify_action(request, pk, action):
         messages.success(request, f"{ver.user.username} so'rovi kutilmoqdaga qaytarildi.")
     return redirect('admin_profverify_list')
 
-
 @user_passes_test(is_admin, login_url='/')
 def admin_profverify_form(request, pk):
     ver = get_object_or_404(ProfileVerification.objects.select_related('user'), pk=pk)
@@ -1665,6 +1672,75 @@ def admin_profverify_form(request, pk):
             ProfileRole.objects.filter(pk=request.POST.get('role_id'), card__user=target).delete()
             messages.success(request, "Rol o'chirildi.")
 
+        # ===== YANGI: admin foydalanuvchi nomidan fon / card / rol qo'shadi =====
+        elif action in ('set_bg_image', 'set_bg_color', 'add_card', 'add_role'):
+
+            # faqat tasdiqlangan akkauntga (ochiq profil faqat shunda ko'rinadi)
+            if ver.status != 'approved':
+                messages.error(request, "Avval akkauntni «Tasdiqlangan» holatiga o'tkazing.")
+
+            # --- fon: Pinterest rasm ---
+            elif action == 'set_bg_image':
+                url = request.POST.get('url', '').strip()
+                img = _resolve_pin_image(url)
+                if not img:
+                    messages.error(request, "Pinterest havolasidan rasm olinmadi. Havolani tekshiring.")
+                else:
+                    info, _ = PublicProfileInfo.objects.get_or_create(user=target)
+                    info.bg_color = None            # rasm qo'ysak, rang o'chadi
+                    info.bg_image_url = img
+                    info.bg_source_url = url
+                    info.save()
+                    messages.success(request, "Fon rasmi o'rnatildi.")
+
+            # --- fon: tayyor rang ---
+            elif action == 'set_bg_color':
+                color = ProfileBgColor.objects.filter(pk=request.POST.get('color_id')).first()
+                if not color:
+                    messages.error(request, "Rang topilmadi.")
+                else:
+                    info, _ = PublicProfileInfo.objects.get_or_create(user=target)
+                    info.bg_color = color
+                    info.bg_image_url = ''          # rang qo'ysak, rasm o'chadi
+                    info.bg_source_url = ''
+                    info.save()
+                    messages.success(request, f"Fon rangi «{color.name}» o'rnatildi.")
+
+            # --- yangi card ---
+            elif action == 'add_card':
+                title = request.POST.get('title', '').strip()[:100]
+                url = request.POST.get('url', '').strip()
+                if not title or not url:
+                    messages.error(request, "Card nomi va Pinterest havolasini kiriting.")
+                else:
+                    img = _resolve_pin_image(url)
+                    if not img:
+                        messages.error(request, "Pinterest havolasidan rasm olinmadi.")
+                    else:
+                        card = ProfileCard(user=target, title=title, image_url=img)
+                        _set_if_field(card, 'source_url', url)
+                        card.save()
+                        messages.success(request, f"«{title}» card qo'shildi.")
+
+            # --- yangi rol (card ichiga) ---
+            elif action == 'add_role':
+                card = ProfileCard.objects.filter(pk=request.POST.get('card_id'), user=target).first()
+                name = request.POST.get('name', '').strip()[:100]
+                url = request.POST.get('url', '').strip()
+                if not card:
+                    messages.error(request, "Card topilmadi.")
+                elif not name or not url:
+                    messages.error(request, "Rol nomi va Pinterest havolasini kiriting.")
+                else:
+                    img = _resolve_pin_image(url)
+                    if not img:
+                        messages.error(request, "Pinterest havolasidan rasm olinmadi.")
+                    else:
+                        role = ProfileRole(card=card, name=name, image_url=img)
+                        _set_if_field(role, 'source_url', url)
+                        role.save()
+                        messages.success(request, f"«{name}» roli qo'shildi.")
+
         return redirect('admin_profverify_form', pk=ver.pk)
 
     return render(request, 'custom_admin/profiltastiq_form.html', {
@@ -1673,4 +1749,44 @@ def admin_profverify_form(request, pk):
         'info': PublicProfileInfo.objects.select_related('bg_color').filter(user=target).first(),
         'cards': target.pp_cards.prefetch_related('roles'),
         'status_choices': ProfileVerification.STATUS_CHOICES,
+        'bg_colors': ProfileBgColor.objects.all(),     # YANGI: rang tanlash uchun
     })
+
+
+def _pin_host_ok(url):
+    """Faqat Pinterest havolalariga ruxsat beramiz."""
+    try:
+        p = urlparse(url)
+    except Exception:
+        return False
+    if p.scheme not in ('http', 'https'):
+        return False
+    host = (p.hostname or '').lower()
+    return any(host == h or host.endswith('.' + h) for h in _PIN_HOSTS)
+
+
+def _resolve_pin_image(url):
+    """Pinterest havoladan rasm manzilini qaytaradi (topilmasa None)."""
+    url = (url or '').strip()
+    if not _pin_host_ok(url):
+        return None
+    # to'g'ridan-to'g'ri rasm havolasi bo'lsa — o'zini qaytaramiz
+    if (urlparse(url).hostname or '').lower().endswith('pinimg.com'):
+        return url
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            if not _pin_host_ok(r.geturl()):
+                return None
+            body = r.read(600000).decode('utf-8', 'ignore')
+    except Exception:
+        return None
+    m = (re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)', body)
+         or re.search(r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']', body))
+    return html_lib.unescape(m.group(1)) if m else None
+
+
+def _set_if_field(obj, name, value):
+    """Modelda shunday maydon bo'lsagina qiymat beradi (xato chiqmasligi uchun)."""
+    if name in [f.name for f in obj._meta.get_fields()]:
+        setattr(obj, name, value)
