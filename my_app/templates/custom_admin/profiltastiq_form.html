@@ -28,7 +28,7 @@
 
     .pv-fld { margin-bottom: 14px; }
     .pv-fld label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
-    .pv-fld input[type=text], .pv-fld select, .pv-fld textarea {
+    .pv-fld input[type=text], .pv-fld input[type=url], .pv-fld select, .pv-fld textarea {
         width: 100%; background: #0a0a0f; border: 1px solid var(--border-line); border-radius: 6px;
         padding: 11px 14px; color: #fff; font-size: 0.95rem; outline: none;
     }
@@ -52,6 +52,7 @@
     .pv-btn.ghost:hover { background: var(--accent); color: #000; border-color: var(--accent); }
     .pv-btn.danger { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; box-shadow: none; padding: 6px 12px; font-size: 0.75rem; }
     .pv-btn.danger:hover { background: #ef4444; color: #fff; }
+    .pv-btn.small { padding: 8px 14px; font-size: 0.75rem; }
 
     .pv-bg-preview { height: 90px; border-radius: 8px; border: 1px solid var(--border-line); background-size: cover; background-position: center; margin-bottom: 12px; }
 
@@ -68,6 +69,34 @@
 
     .pv-top-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
     .pv-top-actions a { text-decoration: none; }
+
+    /* ---- yangi: rang tanlash ---- */
+    .pv-swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+    .pv-sw {
+        width: 36px; height: 36px; border-radius: 50%; cursor: pointer; padding: 0;
+        border: 2px solid rgba(255,255,255,.2); transition: .2s;
+    }
+    .pv-sw:hover { transform: scale(1.1); border-color: #fff; }
+    .pv-sw.on { border-color: #fff; box-shadow: 0 0 0 3px rgba(0,243,255,.45); }
+
+    /* ---- yangi: qo'shish formalari ---- */
+    .pv-add { border-top: 1px dashed var(--border-line); margin-top: 18px; padding-top: 18px; }
+    .pv-add-title { font-size: 0.75rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+    .pv-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 560px) { .pv-row2 { grid-template-columns: 1fr; } }
+
+    .pv-role-add { margin-top: 12px; }
+    .pv-role-add summary {
+        cursor: pointer; list-style: none; display: inline-block; padding: 7px 13px; border-radius: 6px;
+        font-size: 0.75rem; font-weight: 800; color: var(--accent); border: 1px dashed var(--accent); text-transform: uppercase;
+    }
+    .pv-role-add summary::-webkit-details-marker { display: none; }
+    .pv-role-add[open] summary { margin-bottom: 12px; }
+
+    .pv-lock {
+        padding: 12px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; line-height: 1.5;
+        background: rgba(251,191,36,.1); color: #fbbf24; border: 1px solid rgba(251,191,36,.3);
+    }
 </style>
 {% endblock %}
 
@@ -189,6 +218,43 @@
                 <button type="submit" class="pv-btn danger">Fonni tozalash</button>
             </form>
             {% endif %}
+
+            <!-- ===== YANGI: admin fon qo'yadi ===== -->
+            <div class="pv-add">
+                {% if ver.status == 'approved' %}
+
+                    {% if bg_colors %}
+                    <div class="pv-add-title">Tayyor rang tanlash</div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="set_bg_color">
+                        <div class="pv-swatches">
+                            {% for c in bg_colors %}
+                                <button type="submit" name="color_id" value="{{ c.id }}"
+                                        class="pv-sw{% if info and info.bg_color_id == c.id %} on{% endif %}"
+                                        title="{{ c.name }}" style="background:{{ c.value }};"></button>
+                            {% endfor %}
+                        </div>
+                    </form>
+                    <div style="height:16px;"></div>
+                    {% endif %}
+
+                    <div class="pv-add-title">Pinterest rasm qo'yish</div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="set_bg_image">
+                        <div class="pv-fld">
+                            <label for="bg_url">Pinterest havolasi</label>
+                            <input type="url" id="bg_url" name="url" placeholder="https://pin.it/..." autocomplete="off" required>
+                            <div class="pv-hint">Rasm qo'yilsa, oldingi rang o'chadi (va aksincha).</div>
+                        </div>
+                        <button type="submit" class="pv-btn small">Fon rasmini o'rnatish</button>
+                    </form>
+
+                {% else %}
+                    <div class="pv-lock">Fon qo'yish uchun avval akkauntni «Tasdiqlangan» holatiga o'tkazib saqlang.</div>
+                {% endif %}
+            </div>
         </div>
 
         <!-- Cardlar -->
@@ -227,10 +293,57 @@
                         {% endfor %}
                     </div>
                     {% endif %}
+
+                    <!-- ===== YANGI: shu cardga rol qo'shish ===== -->
+                    {% if ver.status == 'approved' %}
+                    <details class="pv-role-add">
+                        <summary>+ Rol qo'shish</summary>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_role">
+                            <input type="hidden" name="card_id" value="{{ c.id }}">
+                            <div class="pv-row2">
+                                <div class="pv-fld">
+                                    <label>Rol nomi</label>
+                                    <input type="text" name="name" maxlength="100" autocomplete="off" required>
+                                </div>
+                                <div class="pv-fld">
+                                    <label>Pinterest havolasi</label>
+                                    <input type="url" name="url" placeholder="https://pin.it/..." autocomplete="off" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="pv-btn small">Rolni qo'shish</button>
+                        </form>
+                    </details>
+                    {% endif %}
                 </div>
             {% empty %}
                 <p class="pv-empty">Bu foydalanuvchi hali card qo'shmagan.</p>
             {% endfor %}
+
+            <!-- ===== YANGI: yangi card qo'shish ===== -->
+            <div class="pv-add">
+                {% if ver.status == 'approved' %}
+                    <div class="pv-add-title">Yangi card qo'shish</div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_card">
+                        <div class="pv-row2">
+                            <div class="pv-fld">
+                                <label for="card_title">Card nomi</label>
+                                <input type="text" id="card_title" name="title" maxlength="100" autocomplete="off" required>
+                            </div>
+                            <div class="pv-fld">
+                                <label for="card_url">Pinterest havolasi</label>
+                                <input type="url" id="card_url" name="url" placeholder="https://pin.it/..." autocomplete="off" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="pv-btn small">Cardni qo'shish</button>
+                    </form>
+                {% else %}
+                    <div class="pv-lock">Card qo'shish uchun avval akkauntni «Tasdiqlangan» holatiga o'tkazib saqlang.</div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
