@@ -11,10 +11,20 @@
 {% block extra_css %}
 <style>
 /* =========================================================
-   OCHIQ PROFIL
+   OCHIQ PROFIL — glass dizayn, skrollsiz (tasdiqlangan profil)
    ========================================================= */
 
 main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; width: 100%; }
+main.main-content.pp-fit {
+    height: 100vh; height: 100dvh; height: 100svh; min-height: 0; padding-bottom: 0;
+    box-sizing: border-box; overflow: hidden;
+}
+
+/* tasdiqlangan profilda sahifa skrolli o'chiriladi */
+html:has(.pp-wrap.fit), html:has(.pp-wrap.fit) body,
+html.pp-fit-on, html.pp-fit-on body {
+    overflow: hidden; height: 100%; overscroll-behavior: none;
+}
 
 /* ---- BUTUN SAHIFA FONI ---- */
 .pp-page-bg {
@@ -23,92 +33,169 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 }
 .pp-page-bg::after {
     content: ""; position: absolute; inset: 0;
-    background: linear-gradient(180deg, rgba(8,6,14,.45), rgba(8,6,14,.7));
+    background: linear-gradient(180deg, rgba(60,32,110,.18), rgba(40,20,80,.38));
 }
+/* foydalanuvchi fon tanlamagan bo'lsa — standart binafsha gradient */
+.pp-page-bg.pp-default {
+    background: radial-gradient(120% 80% at 20% 0%, #5a35a0 0%, transparent 60%),
+                radial-gradient(100% 80% at 90% 100%, #2c4a9a 0%, transparent 60%),
+                linear-gradient(160deg, #3a2370, #2a1c5c);
+}
+.pp-page-bg.pp-default::after { display: none; }
 
 .pp-wrap { max-width: 1000px; margin: 20px auto; padding: 0 12px 40px; }
+.pp-wrap.fit {
+    max-width: 1100px; height: 100%; margin: 0 auto; box-sizing: border-box;
+    padding: 8px 10px calc(22px + env(safe-area-inset-bottom, 0px));
+    display: flex; flex-direction: column;
+}
 
 .pp-backbar { margin-bottom: 10px; }
-.pp-back {
-    display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px;
-    border-radius: 12px; text-decoration: none; font-size: 12.5px; font-weight: 800; color: #fff;
-    background: rgba(20,16,28,.72); border: 1px solid rgba(255,255,255,.12);
-    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+.pp-back, .pp-back-ic {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px;
+    border-radius: 14px; text-decoration: none; font-size: 13px; font-weight: 800; color: #fff;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    -webkit-tap-highlight-color: transparent;
 }
-.pp-back:hover { border-color: rgba(180,92,255,.55); color: #b45cff; }
+.pp-back { padding: 0 16px; }
+.pp-back-ic { width: 44px; padding: 0; font-size: 26px; line-height: 1; }
+.pp-back:hover, .pp-back-ic:hover { border-color: rgba(200,140,255,.7); color: #e2c4ff; }
 
 .pp-stage { position: relative; border-radius: 20px; padding: 12px; }
-
-.pp-card {
-    background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.03));
-    border: 1px solid rgba(255,255,255,.09);
-    border-radius: 18px; padding: 16px; margin-bottom: 12px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 10px 30px rgba(0,0,0,.14);
+.pp-wrap.fit .pp-stage {
+    flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0; border-radius: 0;
 }
-.pp-stage.has-bg .pp-card { background: rgba(20,16,28,.72); }
+
+/* ---- GLASS CARD ---- */
+.pp-card {
+    background: linear-gradient(145deg, rgba(255,255,255,.03), rgba(255,255,255,.008));
+    border: 1px solid rgba(255,255,255,.1);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    border-radius: 18px; padding: 16px; margin-bottom: 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 4px 14px rgba(50,20,100,.06);
+}
 
 .pp-flash {
-    margin: 0 0 12px; padding: 10px 14px; border-radius: 12px;
+    flex-shrink: 0; margin: 0 0 8px; padding: 10px 14px; border-radius: 12px;
     font-size: 13px; font-weight: 700;
-    background: rgba(61,220,151,.1); border: 1px solid rgba(61,220,151,.25); color: #3ddc97;
+    background: rgba(61,220,151,.18); border: 1px solid rgba(61,220,151,.4); color: #8ff0c4;
 }
-.pp-flash.error { background: rgba(255,90,110,.1); border-color: rgba(255,90,110,.25); color: #ff8a97; }
+.pp-flash.error { background: rgba(255,90,110,.18); border-color: rgba(255,90,110,.4); color: #ffb0ba; }
 
 .pp-title { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
-            color: rgba(255,255,255,.45); margin: 0 0 12px; }
+            color: rgba(255,255,255,.7); margin: 0 0 10px; }
 
-.pp-tier-premium { --tc: #ffc107; } .pp-tier-vip { --tc: #ffd23f; } .pp-tier-basic { --tc: rgba(255,255,255,.8); }
+.pp-tier-premium { --tc: #ffc107; } .pp-tier-vip { --tc: #ffd23f; } .pp-tier-basic { --tc: rgba(255,255,255,.85); }
 
 /* ---- tasdiqlash box ---- */
-.pp-verify p { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.65); }
+.pp-verify { flex-shrink: 0; }
+.pp-verify p { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.8); }
+.pp-verify p.pp-title { color: rgba(255,255,255,.7); }
 .pp-btn {
     -webkit-appearance: none; appearance: none; cursor: pointer; width: 100%;
-    height: 43px; border-radius: 11px; border: 1px solid rgba(255,255,255,.1);
+    height: 48px; border-radius: 12px; border: 1px solid rgba(255,255,255,.2);
     background: linear-gradient(90deg, #b45cff, #9c4cff); color: #fff;
-    font: 800 13px 'Outfit', sans-serif; letter-spacing: .02em;
-    box-shadow: 0 8px 22px rgba(180,92,255,.18), inset 0 1px 0 rgba(255,255,255,.15);
+    font: 800 13.5px 'Outfit', sans-serif; letter-spacing: .02em;
+    box-shadow: 0 8px 22px rgba(120,60,200,.3), inset 0 1px 0 rgba(255,255,255,.2);
+    -webkit-tap-highlight-color: transparent;
 }
 .pp-btn:disabled { opacity: .55; cursor: default; }
-.pp-btn.ghost { background: rgba(255,255,255,.06); box-shadow: none; color: #fff; }
-.pp-btn.danger { background: rgba(255,90,110,.15); border-color: rgba(255,90,110,.3); color: #ff8a97; box-shadow: none; }
+.pp-btn.danger { background: rgba(255,90,110,.2); border-color: rgba(255,90,110,.45); color: #ffb0ba; box-shadow: none; }
 
 .pp-state {
     margin-top: 12px; padding: 10px 13px; border-radius: 11px;
     font-size: 12.5px; font-weight: 700; line-height: 1.4;
 }
-.pp-state.pending  { color: #ffc107; background: rgba(255,193,7,.09); border: 1px solid rgba(255,193,7,.25); }
-.pp-state.approved { color: #3ddc97; background: rgba(61,220,151,.1); border: 1px solid rgba(61,220,151,.25); }
-.pp-state.rejected { color: #ff8a97; background: rgba(255,90,110,.1); border: 1px solid rgba(255,90,110,.25); }
+.pp-state.pending  { color: #ffd76a; background: rgba(255,193,7,.14); border: 1px solid rgba(255,193,7,.35); }
+.pp-state.approved { color: #8ff0c4; background: rgba(61,220,151,.16); border: 1px solid rgba(61,220,151,.35); }
+.pp-state.rejected { color: #ffb0ba; background: rgba(255,90,110,.16); border: 1px solid rgba(255,90,110,.35); }
 
-/* ---- asosiy qism: hamma narsa markazda, ustma-ust ---- */
-.pp-main { display: flex; flex-direction: column; align-items: center; }
-.pp-main > .pp-card { width: 100%; }
-.pp-main > .pp-about { max-width: 640px; }
-.pp-main > .pp-cards-box { max-width: 100%; }
-.pp-main > .pp-bgbox { max-width: 640px; }
-
+/* ---- badge (daraja) ---- */
 .pp-avatar-badge { display: inline-block; padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 800;
-            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.7); }
-.pp-avatar-badge.premium { color: #ffc107; border-color: rgba(255,193,7,.3); background: rgba(255,193,7,.1); }
-.pp-avatar-badge.vip { color: #ffd23f; border-color: rgba(255,210,63,.55); background: rgba(255,193,7,.12);
-                text-shadow: 0 0 8px rgba(255,210,63,.7); }
+            background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); color: rgba(255,255,255,.9); }
+.pp-avatar-badge.premium { color: #ffd76a; border-color: rgba(255,193,7,.5); background: rgba(255,193,7,.16); }
+.pp-avatar-badge.vip { color: #ffe27a; border-color: rgba(255,210,63,.7); background: rgba(255,193,7,.2); }
+
+/* ---- avatar (umumiy) ---- */
+.pp-av {
+    width: 96px; height: 96px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid var(--tc, rgba(255,255,255,.4)); color: var(--tc, #fff);
+    font-size: 32px; font-weight: 900; background: rgba(255,255,255,.1);
+}
+.pp-av img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.pp-name { font-size: 16px; font-weight: 800; color: #fff; line-height: 1.2; }
+.pp-user { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.7); margin: 2px 0 6px; }
 
 /* =========================================================
-   O'ZI HAQIDA — oltin border animatsiyasi (har 15 soniyada)
+   TASDIQLANMAGAN — oddiy profil
    ========================================================= */
-.pp-about { position: relative; --gold: #ffc83d; }
-.pp-about > * { position: relative; z-index: 1; }
+.pp-basic { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 22px 16px; }
+.pp-basic .pp-name { font-size: 20px; margin-top: 12px; word-break: break-word; }
+.pp-basic .pp-user { font-size: 13px; margin: 3px 0 10px; }
+.pp-basic-rows { width: 100%; max-width: 360px; margin-top: 16px; }
+.pp-basic-row { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+                padding: 10px 0; border-top: 1px solid rgba(255,255,255,.14); }
+.pp-basic-row span { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.7); }
+.pp-basic-row b { font-size: 13.5px; font-weight: 800; color: #fff; }
+.pp-basic-note { margin: 14px 0 0; font-size: 12px; line-height: 1.5; color: rgba(255,255,255,.65); max-width: 360px; }
 
-/* border chiziqlari uchun SVG (JS yaratadi) */
+/* =========================================================
+   ASOSIY QISM (tasdiqlangan) — ekranga sig'adi
+   ========================================================= */
+.pp-main { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.pp-main > .pp-card { margin-bottom: 0; }
+
+/* "O'zi haqida" va "Cardlar" qutilari — fon rasm ustida o'qilishi uchun zichroq glass */
+.pp-main > .pp-card {
+    background: linear-gradient(145deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+    border-color: rgba(255,255,255,.28);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.pp-about .pp-name, .pp-about .pp-user, .pp-about .pp-row > b, .pp-about .pp-row > span,
+.pp-about .pp-title, .pp-cards-box .pp-title, .pp-count {
+    text-shadow: 0 1px 3px rgba(20,8,48,.9), 0 0 8px rgba(20,8,48,.45);
+}
+.pp-about .pp-row > span { color: rgba(255,255,255,.85); }
+.pp-about .pp-row > b.empty { color: rgba(255,255,255,.6); }
+.pp-about .pp-user { color: rgba(255,255,255,.85); }
+.pp-cards-box .pp-title { color: rgba(255,255,255,.85); }
+
+/* ---- O'ZI HAQIDA (ixcham) ---- */
+.pp-about { position: relative; flex-shrink: 0; padding: 10px 12px 12px; --gold: #ffc83d; }
+.pp-about > * { position: relative; z-index: 1; }
+.pp-about > .pp-back-ic { position: absolute; top: 6px; right: 6px; z-index: 4; }
+.pp-about .pp-title { margin: 0 0 6px; }
+
+.pp-about-body { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.pp-about-av { display: flex; align-items: center; gap: 12px; text-align: left; min-width: 0; }
+.pp-about .pp-av { width: 56px; height: 56px; font-size: 22px; border-width: 3px; }
+.pp-id { min-width: 0; padding-right: 48px; }
+.pp-about .pp-name { font-size: 15px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pp-about .pp-user { font-size: 11.5px; margin: 1px 0 4px; }
+.pp-about .pp-avatar-badge { padding: 2px 9px; font-size: 10.5px; }
+
+.pp-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+.pp-row { min-width: 0; }
+.pp-row > span { display: block; font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.65); }
+.pp-row > b {
+    display: block; font-size: 13px; font-weight: 800; color: #fff; line-height: 1.25;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pp-row > b.empty { color: rgba(255,255,255,.45); font-weight: 600; font-style: italic; }
+.pp-row:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.pp-row:last-child:nth-child(odd) > b {
+    white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+}
+
+/* oltin chiziq animatsiyasi (faqat chiziq, porlashsiz) */
 .pp-gold-svg { position: absolute !important; left: 0; top: 0; z-index: 3 !important; pointer-events: none; overflow: visible; }
 .pp-gold-svg rect {
     fill: none; stroke: var(--gold); stroke-width: 3; stroke-linecap: round;
     stroke-dasharray: 0 100; opacity: 0;
-    filter: drop-shadow(0 0 5px rgba(255,200,61,.95)) drop-shadow(0 0 12px rgba(255,170,0,.6));
     animation: ppGoldLine 15s ease-in-out infinite;
 }
-
-/* ikkala chiziq: boshlanib (0–20%) o'rtada uchrashadi va g'oyib bo'ladi */
 @keyframes ppGoldLine {
     0%   { stroke-dasharray: 0 100;  opacity: 1; }
     20%  { stroke-dasharray: 50 100; opacity: 1; }
@@ -116,210 +203,184 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     100% { stroke-dasharray: 50 100; opacity: 0; }
 }
 
-/* chiziqlar g'oyib bo'lgach — box oltin bo'lib yaltiraydi */
-.pp-about::before {
-    content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 0; pointer-events: none;
-    background:
-        radial-gradient(120% 90% at 50% 0%, rgba(255,215,90,.30), transparent 60%),
-        linear-gradient(145deg, rgba(255,200,61,.20), rgba(255,170,0,.06));
-    opacity: 0;
-    animation: ppGoldFill 15s ease-in-out infinite;
-}
-@keyframes ppGoldFill {
-    0%, 19% { opacity: 0; }
-    26%     { opacity: 1; }
-    40%     { opacity: .85; }
-    55%     { opacity: 0; }
-    100%    { opacity: 0; }
-}
-.pp-about { animation: ppGoldGlow 15s ease-in-out infinite; }
-@keyframes ppGoldGlow {
-    0%, 19% { border-color: rgba(255,255,255,.09);
-              box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 10px 30px rgba(0,0,0,.14); }
-    26%     { border-color: rgba(255,210,63,.95);
-              box-shadow: 0 0 30px rgba(255,193,7,.5), 0 0 70px rgba(255,170,0,.25), inset 0 0 36px rgba(255,200,61,.18); }
-    40%     { border-color: rgba(255,210,63,.75);
-              box-shadow: 0 0 22px rgba(255,193,7,.35), 0 0 50px rgba(255,170,0,.15), inset 0 0 26px rgba(255,200,61,.12); }
-    55%, 100% { border-color: rgba(255,255,255,.09);
-              box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 10px 30px rgba(0,0,0,.14); }
-}
-
-/* ---- o'z haqida box ichi ---- */
-.pp-about-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.pp-about-head .pp-title { margin: 0; }
-.pp-icon-btn {
-    -webkit-appearance: none; appearance: none; cursor: pointer;
-    width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: #fff; font-size: 17px; padding: 0;
-}
-.pp-about-av { display: flex; flex-direction: column; align-items: center; margin-bottom: 14px; text-align: center; }
-.pp-av {
-    width: 104px; height: 104px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    border: 4px solid var(--tc, rgba(255,255,255,.3)); color: var(--tc, #fff);
-    font-size: 34px; font-weight: 900; background: rgba(255,255,255,.05);
-}
-.pp-av img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-.pp-name { font-size: 18px; font-weight: 800; color: #fff; line-height: 1.2; margin-top: 10px; word-break: break-word; }
-.pp-user { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); margin: 2px 0 7px; }
-
-.pp-row { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 2px 0; }
-.pp-row > span { flex-shrink: 0; font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.5); }
-.pp-row > b { min-width: 0; text-align: right; font-size: 13.5px; font-weight: 800; color: #fff; word-break: break-word; }
-.pp-row > b.empty { color: rgba(255,255,255,.3); font-weight: 600; font-style: italic; }
-.pp-hr { border: 0; height: 1px; background: rgba(255,255,255,.08); margin: 9px 0; }
-
 /* =========================================================
-   CARDLAR — markazda katta, ikki yonida kichik, cheksiz
+   CARDLAR — kattaroq, yon cardlar yorqin
    ========================================================= */
-.pp-cards-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; min-height: 34px; }
+.pp-cards-box { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 10px 0 10px; }
+.pp-cards-head { display: flex; align-items: center; justify-content: space-between; padding: 0 14px 6px; flex-shrink: 0; }
 .pp-cards-head .pp-title { margin: 0; }
-.pp-add-top {
-    -webkit-appearance: none; appearance: none; cursor: pointer; flex-shrink: 0;
-    display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 10px;
-    background: rgba(180,92,255,.12); border: 1.5px dashed rgba(180,92,255,.55); color: #b45cff;
-    font: 800 12px 'Outfit', sans-serif;
-}
-.pp-add-top:hover { background: rgba(180,92,255,.2); }
-.pp-add-top i { font-style: normal; font-size: 17px; line-height: 1; }
+.pp-count { font-size: 11px; font-weight: 800; color: rgba(255,255,255,.75); }
 
 .pp-car {
-    position: relative; height: 270px; overflow: hidden; user-select: none; -webkit-user-select: none;
-    touch-action: pan-y;
+    position: relative; flex: 1; min-height: 150px; overflow: hidden;
+    user-select: none; -webkit-user-select: none; touch-action: pan-y;
+    --cw: 190px; --ch: 264px;
 }
 .pp-c {
     -webkit-appearance: none; appearance: none; cursor: pointer; padding: 0; border: 0;
     position: absolute; left: 50%; top: 50%;
-    width: 160px; height: 224px; margin: -112px 0 0 -80px;
-    border-radius: 16px; overflow: hidden; background: #1b1626;
-    box-shadow: 0 10px 26px rgba(0,0,0,.4);
-    transition: transform .55s cubic-bezier(.22,.8,.3,1), opacity .45s ease, filter .45s ease;
+    width: var(--cw); height: var(--ch);
+    margin: calc(var(--ch) / -2) 0 0 calc(var(--cw) / -2);
+    border-radius: 18px; overflow: hidden; background: #4a3a78;
+    box-shadow: 0 10px 26px rgba(40,16,90,.35);
+    transition: transform .5s cubic-bezier(.22,.8,.3,1), opacity .4s ease;
     -webkit-tap-highlight-color: transparent;
     will-change: transform, opacity;
+    backface-visibility: hidden;
 }
-.pp-c.center { box-shadow: 0 16px 40px rgba(0,0,0,.5), 0 0 0 2px rgba(180,92,255,.5); }
+.pp-c.center { box-shadow: 0 14px 34px rgba(40,16,90,.45), 0 0 0 2px rgba(210,160,255,.75); }
 .pp-c img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
-.pp-c::after { content: ""; position: absolute; inset: 0;
-               background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.82)); }
-.pp-c-name { position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 2; text-align: left;
-             font: 800 13px 'Outfit', sans-serif; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.8);
+.pp-c-dim { position: absolute; inset: 0; background: #2a1650; opacity: 0; transition: opacity .4s ease; pointer-events: none; }
+.pp-c::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+               background: linear-gradient(180deg, transparent 55%, rgba(34,14,70,.78)); }
+.pp-c-name { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; text-align: left;
+             font: 800 14px 'Outfit', sans-serif; color: #fff; text-shadow: 0 1px 3px rgba(30,10,60,.8);
              overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pp-c.center .pp-c-name { font-size: 15px; }
+.pp-c.center .pp-c-name { font-size: 16px; }
 
 .pp-nav {
     -webkit-appearance: none; appearance: none; cursor: pointer; padding: 0;
     position: absolute; top: 50%; transform: translateY(-50%); z-index: 50;
-    width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,.15);
-    background: rgba(12,9,20,.82); color: #fff; font-size: 22px; line-height: 1;
+    width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,.26);
+    background: rgba(255,255,255,.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    color: #fff; font-size: 28px; line-height: 1;
     display: flex; align-items: center; justify-content: center;
 }
-.pp-nav.prev { left: 4px; } .pp-nav.next { right: 4px; }
-.pp-empty { font-size: 12.5px; color: rgba(255,255,255,.4); padding: 8px 0; }
+.pp-nav.prev { left: 10px; } .pp-nav.next { right: 10px; }
+.pp-empty { font-size: 12.5px; color: rgba(255,255,255,.7); padding: 8px 14px; margin: auto; text-align: center; }
 
-/* ---- PC: hammasi markazda va kattaroq ---- */
-@media (min-width: 900px) {
-    .pp-wrap { max-width: 1100px; margin: 32px auto; }
-    .pp-stage { padding: 22px; }
-    .pp-main { gap: 18px; }
-    .pp-main > .pp-card { margin-bottom: 0; padding: 26px; border-radius: 22px; }
-    .pp-main > .pp-about { max-width: 720px; }
-    .pp-main > .pp-bgbox { max-width: 720px; }
-    .pp-main > .pp-cards-box { max-width: 100%; }
-    .pp-av { width: 140px; height: 140px; font-size: 46px; }
-    .pp-name { font-size: 24px; margin-top: 14px; }
-    .pp-user { font-size: 14px; }
-    .pp-title { font-size: 12.5px; }
-    .pp-row { padding: 4px 0; }
-    .pp-row > span { font-size: 15px; }
-    .pp-row > b { font-size: 16.5px; }
-    .pp-hr { margin: 12px 0; }
-    .pp-car { height: 410px; }
-    .pp-c { width: 250px; height: 350px; margin: -175px 0 0 -125px; border-radius: 20px; }
-    .pp-c-name { font-size: 15px; left: 14px; right: 14px; bottom: 14px; }
-    .pp-c.center .pp-c-name { font-size: 19px; }
-    .pp-nav { width: 46px; height: 46px; font-size: 28px; }
-    .pp-nav.prev { left: 10px; } .pp-nav.next { right: 10px; }
-    .pp-add-top { height: 40px; font-size: 13.5px; padding: 0 18px; }
+/* ---- HARAKAT PANELI (egasi uchun) — endi cardlar qutisi ichida ---- */
+.pp-actions {
+    display: flex; gap: 8px; flex-shrink: 0; width: 100%; max-width: 560px;
+    margin: 8px auto 2px; padding: 0 12px; box-sizing: border-box;
 }
+.pp-act {
+    -webkit-appearance: none; appearance: none; cursor: pointer; flex: 1; min-width: 0; height: 46px;
+    display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 8px;
+    border-radius: 14px; color: #fff; font: 800 12.5px 'Outfit', sans-serif;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    box-shadow: 0 6px 18px rgba(50,20,100,.14);
+    -webkit-tap-highlight-color: transparent;
+}
+.pp-act i { font-style: normal; font-size: 18px; line-height: 1; }
+.pp-act span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-act.primary { background: linear-gradient(90deg, rgba(180,92,255,.85), rgba(156,76,255,.85)); border-color: rgba(255,255,255,.3); }
+.pp-act:active { transform: scale(.97); }
 
-/* ---- fon sozlamasi box ---- */
-.pp-bg-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+/* ---- fon sozlamasi (oyna ichida) ---- */
+.pp-bg-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .pp-sw {
-    width: 38px; height: 38px; border-radius: 50%; cursor: pointer; padding: 0;
-    border: 2px solid rgba(255,255,255,.2);
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer; padding: 0;
+    border: 2px solid rgba(255,255,255,.35); -webkit-tap-highlight-color: transparent;
 }
-.pp-sw.on { border-color: #fff; box-shadow: 0 0 0 3px rgba(180,92,255,.5); }
+.pp-sw.on { border-color: #fff; box-shadow: 0 0 0 3px rgba(180,92,255,.6); }
 .pp-bg-add {
-    width: 38px; height: 38px; border-radius: 50%; cursor: pointer; padding: 0;
-    background: rgba(180,92,255,.1); border: 2px dashed rgba(180,92,255,.5); color: #b45cff; font-size: 22px;
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer; padding: 0;
+    background: rgba(255,255,255,.1); border: 2px dashed rgba(220,180,255,.7); color: #e2c4ff; font-size: 24px;
     display: flex; align-items: center; justify-content: center;
 }
-.pp-bg-note { font-size: 11.5px; color: rgba(255,255,255,.4); margin: 10px 0 0; }
+.pp-bg-note { font-size: 12px; color: rgba(255,255,255,.65); margin: 12px 0 12px; }
 
 /* ---- oynalar ---- */
+.pp-icon-btn {
+    -webkit-appearance: none; appearance: none; cursor: pointer; flex-shrink: 0;
+    width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); color: #fff; font-size: 18px; padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
 .pp-ov {
     position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center;
-    padding: 16px; background: rgba(6,4,12,.8); opacity: 0; transition: opacity .2s ease;
+    padding: 16px; background: rgba(34,16,70,.45); opacity: 0; transition: opacity .2s ease;
 }
 .pp-ov.open { display: flex; } .pp-ov.show { opacity: 1; }
 .pp-box {
     position: relative; width: 100%; max-width: 420px; max-height: 90vh; max-height: 90dvh; overflow-y: auto;
     overscroll-behavior: contain; box-sizing: border-box; padding: 18px;
-    background: linear-gradient(160deg, #1d1729, #14101d); border: 1px solid rgba(255,255,255,.1);
-    border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    background: linear-gradient(160deg, rgba(88,64,140,.72), rgba(58,40,106,.76));
+    -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 18px; box-shadow: 0 20px 60px rgba(40,16,90,.4);
     transform: translateY(16px) scale(.98); transition: transform .22s cubic-bezier(.2,.8,.3,1);
 }
 .pp-ov.show .pp-box { transform: none; }
-.pp-box.big { max-width: 920px; width: 100%; height: 88vh; height: 88dvh; display: flex; flex-direction: column; padding: 0; }
+.pp-box.big { max-width: 920px; width: 100%; height: 88vh; height: 88dvh; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
 .pp-mh { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
 .pp-mt { font-size: 16px; font-weight: 800; color: #fff; }
 .pp-fld { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
-.pp-fld label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5); }
+.pp-fld label { font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.75); }
 .pp-fld input {
-    width: 100%; box-sizing: border-box; height: 42px; padding: 0 12px; border-radius: 10px;
-    background: rgba(20,20,25,.6); border: 1px solid rgba(255,255,255,.1); color: #fff;
+    width: 100%; box-sizing: border-box; height: 46px; padding: 0 12px; border-radius: 10px;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); color: #fff;
     font: 16px 'Outfit', sans-serif; outline: none;
 }
-.pp-fld input:focus { border-color: rgba(180,92,255,.55); box-shadow: 0 0 0 3px rgba(180,92,255,.08); }
+.pp-fld input::placeholder { color: rgba(255,255,255,.45); }
+.pp-fld input:focus { border-color: rgba(210,160,255,.85); box-shadow: 0 0 0 3px rgba(180,92,255,.2); }
 .pp-err { display: none; margin-bottom: 10px; padding: 8px 11px; border-radius: 10px; font-size: 12px; font-weight: 700;
-          color: #ff8a97; background: rgba(255,90,110,.1); border: 1px solid rgba(255,90,110,.25); }
+          color: #ffb0ba; background: rgba(255,90,110,.18); border: 1px solid rgba(255,90,110,.4); }
 .pp-err.show { display: block; }
 
 /* card ochilgan katta oyna */
-.pp-big-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,.07); }
+.pp-big-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 16px; border-bottom: 1px solid rgba(255,255,255,.16); }
 .pp-big-head .pp-mt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pp-big-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 16px; }
-.pp-big-hero { display: block; width: 100%; max-height: 38vh; object-fit: cover; border-radius: 14px; margin-bottom: 16px; }
+.pp-big-foot { padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(255,255,255,.16); }
+.pp-big-hero { display: block; width: 100%; max-height: 32vh; object-fit: cover; border-radius: 14px; margin-bottom: 16px; }
 .pp-roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 @media (min-width: 640px) { .pp-roles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; } }
-.pp-role { position: relative; border-radius: 13px; overflow: hidden; background: #1b1626; aspect-ratio: 3/4; }
+.pp-role { position: relative; border-radius: 13px; overflow: hidden; background: #4a3a78; aspect-ratio: 3/4; }
 .pp-role img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
-.pp-role::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,.85)); }
+.pp-role::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+                  background: linear-gradient(180deg, transparent 50%, rgba(34,14,70,.82)); }
 .pp-role-name { position: absolute; left: 9px; right: 9px; bottom: 8px; z-index: 2; font: 800 12.5px 'Outfit', sans-serif;
-                color: #fff; word-break: break-word; text-shadow: 0 1px 3px rgba(0,0,0,.8); }
-.pp-role-del { position: absolute; top: 6px; right: 6px; z-index: 3; width: 26px; height: 26px; border-radius: 8px; padding: 0;
-               border: 0; background: rgba(0,0,0,.6); color: #ff8a97; font-size: 16px; cursor: pointer; }
+                color: #fff; word-break: break-word; text-shadow: 0 1px 3px rgba(30,10,60,.8); }
+.pp-role-del { position: absolute; top: 4px; right: 4px; z-index: 3; width: 38px; height: 38px; border-radius: 10px; padding: 0;
+               border: 0; background: rgba(40,16,90,.6); color: #ffb0ba; font-size: 17px; cursor: pointer; }
 .pp-role.add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer;
-               background: rgba(180,92,255,.08); border: 2px dashed rgba(180,92,255,.4); color: #b45cff; font: 800 12px 'Outfit', sans-serif; }
+               background: rgba(255,255,255,.1); border: 2px dashed rgba(220,180,255,.6); color: #e2c4ff; font: 800 12px 'Outfit', sans-serif; }
 .pp-role.add::after { display: none; }
 .pp-role.add i { font-size: 32px; font-style: normal; line-height: 1; }
 
+/* ---- PC ---- */
+@media (min-width: 900px) {
+    .pp-wrap.fit { padding: 16px 16px 16px; }
+    .pp-main { gap: 12px; }
+    .pp-about { padding: 14px 18px 16px; }
+    .pp-about .pp-title { font-size: 12px; margin-bottom: 8px; }
+    .pp-about-body { grid-template-columns: minmax(240px, 300px) 1fr; gap: 20px; align-items: center; }
+    .pp-about .pp-av { width: 84px; height: 84px; font-size: 30px; }
+    .pp-about .pp-name { font-size: 19px; }
+    .pp-about .pp-user { font-size: 13px; }
+    .pp-id { padding-right: 0; }
+    .pp-rows { grid-template-columns: repeat(3, 1fr); gap: 10px 18px; }
+    .pp-row > span { font-size: 12px; }
+    .pp-row > b { font-size: 15px; }
+    .pp-row:last-child:nth-child(odd) { grid-column: auto; }
+    .pp-row:last-child:nth-child(odd) > b { display: block; white-space: nowrap; }
+    .pp-c-name { font-size: 15px; }
+    .pp-c.center .pp-c-name { font-size: 19px; }
+}
+
 @media (max-width: 560px) {
-    .pp-wrap { padding: 0 8px 28px; margin: 12px auto; }
-    .pp-stage { padding: 8px; border-radius: 16px; }
-    .pp-card { padding: 13px; border-radius: 15px; }
-    .pp-av { width: 90px; height: 90px; font-size: 30px; }
-    .pp-car { height: 250px; }
-    .pp-c { width: 150px; height: 210px; margin: -105px 0 0 -75px; }
-    .pp-nav { display: none; }          /* mobilda faqat touch */
+    .pp-nav { display: none; }                 /* mobilda faqat touch */
     .pp-ov { padding: 0; align-items: flex-end; }
     .pp-box { max-width: none; border-radius: 18px 18px 0 0; border-bottom: 0; }
     .pp-box.big { height: 94vh; height: 94dvh; max-height: none; }
+    .pp-basic { padding: 18px 14px; }
+    /* telefon pastki paneli (orqaga / bosh sahifa) tugmalarni yopmasligi uchun yuqoriga ko'tarildi */
+    .pp-wrap.fit { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
+    .pp-cards-box { padding-bottom: 12px; }
+}
+
+@media (max-height: 640px) and (max-width: 560px) {
+    .pp-about .pp-av { width: 48px; height: 48px; font-size: 18px; }
+    .pp-row > b { font-size: 12.5px; }
+    .pp-act { height: 42px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .pp-c { transition: none !important; }
-    .pp-about, .pp-about::before, .pp-gold-svg rect { animation: none !important; }
+    .pp-c, .pp-c-dim { transition: none !important; }
+    .pp-gold-svg rect { animation: none !important; }
     * { transition-duration: .01ms !important; }
 }
 </style>
@@ -328,19 +389,23 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
 
 {% block content %}
 
-{# ===== BUTUN SAHIFA FONI (foydalanuvchi tanlagan rang yoki rasm) ===== #}
+{# ===== BUTUN SAHIFA FONI ===== #}
 {% if bg_style %}
 <div class="pp-page-bg" style="{{ bg_style }}"></div>
+{% else %}
+<div class="pp-page-bg pp-default"></div>
 {% endif %}
 
-<main class="main-content">
-<div class="pp-wrap">
+<main class="main-content{% if approved %} pp-fit{% endif %}">
+<div class="pp-wrap{% if approved %} fit{% endif %}">
 
 {% csrf_token %}
 
+{% if not approved %}
 <div class="pp-backbar">
     <a href="{% url 'home' %}" class="pp-back"><i class='bx bx-chevron-left'></i> Bosh sahifa</a>
 </div>
+{% endif %}
 
 <div class="pp-stage pp-tier-{{ tier|default:'basic' }}{% if bg_style %} has-bg{% endif %}">
 
@@ -379,46 +444,75 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     </div>
     {% endif %}
 
+    {% if not approved %}
+    <!-- =====================================================
+         TASDIQLANMAGAN — ODDIY PROFIL (hamma ko'radi)
+         ===================================================== -->
+    <div class="pp-card pp-basic">
+        <div class="pp-av">
+            {% if target.avatar %}<img src="{{ target.avatar.image.url }}" alt="avatar" draggable="false">
+            {% else %}{{ target.username|make_list|first|upper }}{% endif %}
+        </div>
+        <div class="pp-name">{% if target.first_name %}{{ target.first_name }} {{ target.last_name }}{% else %}{{ target.username }}{% endif %}</div>
+        <div class="pp-user">@{{ target.username }}</div>
+        {% if tier == 'vip' %}<span class="pp-avatar-badge vip">VIP</span>
+        {% elif tier == 'premium' %}<span class="pp-avatar-badge premium">Premium</span>
+        {% else %}<span class="pp-avatar-badge">Oddiy</span>{% endif %}
+
+        <div class="pp-basic-rows">
+            <div class="pp-basic-row"><span>Daraja</span>
+                <b>{% if tier == 'vip' %}VIP{% elif tier == 'premium' %}Premium{% else %}Oddiy{% endif %}</b></div>
+            <div class="pp-basic-row"><span>Foydalanuvchi nomi</span><b>@{{ target.username }}</b></div>
+            {% if target.date_joined %}
+            <div class="pp-basic-row"><span>A'zo bo'lgan sana</span><b>{{ target.date_joined|date:"d.m.Y" }}</b></div>
+            {% endif %}
+        </div>
+
+        {% if not is_own %}
+        <p class="pp-basic-note">Bu foydalanuvchi hali ochiq profilini to'ldirmagan.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
     {% if approved %}
     <!-- =====================================================
-         ASOSIY QISM: hammasi markazda, ustma-ust
+         ASOSIY QISM: skrollsiz, hammasi ekranga sig'adi
          ===================================================== -->
     <div class="pp-main">
 
-        <!-- ---------- O'ZI HAQIDA (oltin border animatsiyasi) ---------- -->
+        <!-- ---------- O'ZI HAQIDA (ixcham, oltin chiziq animatsiyasi) ---------- -->
         <div class="pp-card pp-about" id="ppAbout">
-            <div class="pp-about-head">
-                <p class="pp-title">O'zi haqida</p>
-                {% if is_own %}
-                <button type="button" class="pp-icon-btn" data-open="ppEdit" aria-label="Tahrirlash">✎</button>
-                {% endif %}
-            </div>
+            <a href="{% url 'home' %}" class="pp-back-ic" aria-label="Bosh sahifa"><i class='bx bx-chevron-left'></i></a>
+            <p class="pp-title">O'zi haqida</p>
 
-            <div class="pp-about-av">
-                <div class="pp-av">
-                    {% if target.avatar %}<img src="{{ target.avatar.image.url }}" alt="avatar" draggable="false">
-                    {% else %}{{ target.username|make_list|first|upper }}{% endif %}
+            <div class="pp-about-body">
+                <div class="pp-about-av">
+                    <div class="pp-av">
+                        {% if target.avatar %}<img src="{{ target.avatar.image.url }}" alt="avatar" draggable="false">
+                        {% else %}{{ target.username|make_list|first|upper }}{% endif %}
+                    </div>
+                    <div class="pp-id">
+                        <div class="pp-name">{% if target.first_name %}{{ target.first_name }} {{ target.last_name }}{% else %}{{ target.username }}{% endif %}</div>
+                        <div class="pp-user">@{{ target.username }}</div>
+                        {% if tier == 'vip' %}<span class="pp-avatar-badge vip">VIP</span>
+                        {% elif tier == 'premium' %}<span class="pp-avatar-badge premium">Premium</span>
+                        {% else %}<span class="pp-avatar-badge">Oddiy</span>{% endif %}
+                    </div>
                 </div>
-                <div class="pp-name">{% if target.first_name %}{{ target.first_name }} {{ target.last_name }}{% else %}{{ target.username }}{% endif %}</div>
-                <div class="pp-user">@{{ target.username }}</div>
-                {% if tier == 'vip' %}<span class="pp-avatar-badge vip">VIP</span>
-                {% elif tier == 'premium' %}<span class="pp-avatar-badge premium">Premium</span>
-                {% else %}<span class="pp-avatar-badge">Oddiy</span>{% endif %}
-            </div>
 
-            {% for r in info_rows %}
-                <div class="pp-row"><span>{{ r.label }}</span><b class="{% if r.empty %}empty{% endif %}">{{ r.value }}</b></div>
-                {% if not forloop.last %}<hr class="pp-hr">{% endif %}
-            {% endfor %}
+                <div class="pp-rows">
+                    {% for r in info_rows %}
+                        <div class="pp-row"><span>{{ r.label }}</span><b class="{% if r.empty %}empty{% endif %}">{{ r.value }}</b></div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
 
-        <!-- ---------- CARDLAR ---------- -->
+        <!-- ---------- CARDLAR (qolgan butun joy) + harakat tugmalari ---------- -->
         <div class="pp-card pp-cards-box">
             <div class="pp-cards-head">
-                {% if is_own %}
-                <button type="button" class="pp-add-top" data-open-link="card"><i>+</i> Card qo'shish</button>
-                {% endif %}
                 <p class="pp-title">Cardlar</p>
+                <span class="pp-count" id="ppCount"></span>
             </div>
 
             <div class="pp-car" id="ppCar">
@@ -426,26 +520,17 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
                 <div id="ppTrack"></div>
                 <button type="button" class="pp-nav next" id="ppNext" aria-label="Keyingi">›</button>
             </div>
-            <p class="pp-empty" id="ppCardsEmpty" style="display:none;">Hali card qo'shilmagan.</p>
-        </div>
+            <p class="pp-empty" id="ppCardsEmpty" style="display:none;"></p>
 
-        {% if is_own %}
-        <!-- ---------- FON SOZLAMASI ---------- -->
-        <div class="pp-card pp-bgbox">
-            <p class="pp-title">Profil foni</p>
-            <div class="pp-bg-row">
-                {% for c in bg_colors %}
-                    <button type="button" class="pp-sw{% if info and info.bg_color_id == c.id %} on{% endif %}"
-                            data-color="{{ c.id }}" title="{{ c.name }}" style="background:{{ c.value }};"></button>
-                {% endfor %}
-                <button type="button" class="pp-bg-add" data-open-link="bg" title="Pinterest rasm qo'yish">+</button>
-                {% if bg_style %}
-                <button type="button" class="pp-btn danger" id="ppBgClear" style="width:auto;height:36px;padding:0 14px;font-size:12px;">Fonni tozalash</button>
-                {% endif %}
+            {% if is_own %}
+            <!-- ---------- HARAKAT TUGMALARI (cardlar ichida) ---------- -->
+            <div class="pp-actions">
+                <button type="button" class="pp-act" data-open="ppEdit"><i>✎</i><span>Tahrirlash</span></button>
+                <button type="button" class="pp-act primary" data-open-link="card"><i>+</i><span>Card qo'shish</span></button>
+                <button type="button" class="pp-act" data-open-link="bg"><i>🎨</i><span>Fon</span></button>
             </div>
-            <p class="pp-bg-note">Rangni tanlang yoki «+» orqali Pinterest havolasidan rasm qo'ying.</p>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
     {% endif %}
 
@@ -469,13 +554,17 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
     <div class="pp-box big">
         <div class="pp-big-head">
             <div class="pp-mt" id="ppCmTitle"></div>
-            {% if is_own %}<button type="button" class="pp-icon-btn" id="ppCmDel" aria-label="Cardni o'chirish" style="color:#ff8a97;">🗑</button>{% endif %}
             <button type="button" class="pp-icon-btn" data-close aria-label="Yopish">✕</button>
         </div>
         <div class="pp-big-body">
             <img class="pp-big-hero" id="ppCmHero" alt="">
             <div class="pp-roles" id="ppRoles"></div>
         </div>
+        {% if is_own %}
+        <div class="pp-big-foot">
+            <button type="button" class="pp-btn danger" id="ppCmDel">🗑 Cardni o'chirish</button>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -499,6 +588,29 @@ main.main-content { margin-top: 0; padding: env(safe-area-inset-top, 0px) 0 0; w
             <input type="url" id="ppLmUrl" placeholder="https://pin.it/..." autocomplete="off" autocapitalize="off" spellcheck="false">
         </div>
         <button type="button" class="pp-btn" id="ppLmSave">Qo'shish</button>
+    </div>
+</div>
+
+<!-- =========================================================
+     OYNA: profil foni (rang tanlash / tozalash) — kod saqlangan
+     ========================================================= -->
+<div class="pp-ov" id="ppBgModal" role="dialog" aria-modal="true">
+    <div class="pp-box">
+        <div class="pp-mh">
+            <div class="pp-mt">Profil foni</div>
+            <button type="button" class="pp-icon-btn" data-close aria-label="Yopish">✕</button>
+        </div>
+        <div class="pp-bg-row">
+            {% for c in bg_colors %}
+                <button type="button" class="pp-sw{% if info and info.bg_color_id == c.id %} on{% endif %}"
+                        data-color="{{ c.id }}" title="{{ c.name }}" style="background:{{ c.value }};"></button>
+            {% endfor %}
+            <button type="button" class="pp-bg-add" data-open-link="bg" title="Pinterest rasm qo'yish">+</button>
+        </div>
+        <p class="pp-bg-note">Rangni tanlang yoki «+» orqali Pinterest havolasidan rasm qo'ying.</p>
+        {% if bg_style %}
+        <button type="button" class="pp-btn danger" id="ppBgClear">Fonni tozalash</button>
+        {% endif %}
     </div>
 </div>
 
@@ -539,6 +651,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    /* skrollsiz rejim (CSS :has() qo'llamasa ham ishlaydi) */
+    if (document.querySelector('.pp-wrap.fit')) document.documentElement.classList.add('pp-fit-on');
+
+    /* xabarlar bir necha soniyadan keyin yo'qoladi (joy bo'shashi uchun) */
+    document.querySelectorAll('.pp-flash').forEach(function (f) {
+        setTimeout(function () { f.style.display = 'none'; }, 4500);
+    });
+
     /* ---------- umumiy oyna boshqaruvi ---------- */
     function openOv(el) {
         if (!el) return;
@@ -567,15 +687,19 @@ document.addEventListener('DOMContentLoaded', function () {
         b.addEventListener('click', function () { openOv(document.getElementById(b.getAttribute('data-open'))); });
     });
 
-    /* ---------- tasdiqlash kutilayotgan bo'lsa — yangilab turamiz ---------- */
+    /* ---------- tasdiqlash holati ---------- */
     var vbox = document.getElementById('ppVerify');
-    if (vbox && vbox.getAttribute('data-state') === 'pending') {
-        setTimeout(function () { window.location.reload(); }, 30000);
+    if (vbox) {
+        var st = vbox.getAttribute('data-state');
+        if (st === 'pending') setTimeout(function () { window.location.reload(); }, 30000);
+        if (st === 'approved_msg') setTimeout(function () { vbox.style.display = 'none'; }, 4500);
     }
+
+    /* ---------- haptic ---------- */
+    function buzz() { try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {} }
 
     /* =====================================================
        O'ZI HAQIDA — oltin border chiziqlari (SVG)
-       Chap-yuqori va o'ng-pastki burchakdan boshlanadi
        ===================================================== */
     var about = document.getElementById('ppAbout');
     if (about && !reduce) {
@@ -598,7 +722,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 r.setAttribute('width', Math.max(w - 3, 0)); r.setAttribute('height', Math.max(h - 3, 0));
                 r.setAttribute('rx', rad); r.setAttribute('ry', rad);
             });
-            /* B chiziq — 180° burilgan: o'ng-pastdan chap-pastga qarab yuradi */
             rB.setAttribute('transform', 'rotate(180 ' + (w / 2) + ' ' + (h / 2) + ')');
         }
         sizeGold();
@@ -634,16 +757,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* =====================================================
-       KARUSEL — markazda katta, yonlarida kichik, cheksiz
+       KARUSEL — markazda katta, yonlarida yorqin, cheksiz
        ===================================================== */
     var car = document.getElementById('ppCar');
     var track = document.getElementById('ppTrack');
     var emptyMsg = document.getElementById('ppCardsEmpty');
-    var items = [];          // {id, node}
+    var countEl = document.getElementById('ppCount');
+    var items = [];          // {id, node, dim}
     var cur = 0;             // markazdagi card indeksi
     var paused = false, resumeT = null, timer = null;
+    var cw = 190, vw = 360;  // card kengligi va karusel kengligi
 
-    /* har kirganda tasodifiy tartib (Fisher–Yates) */
     function shuffle(a) {
         for (var i = a.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
@@ -655,32 +779,51 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function mod(a, n) { return ((a % n) + n) % n; }
 
+    /* card o'lchami karusel balandligidan hisoblanadi */
+    function sizeCards() {
+        var H = car.clientHeight, W = car.clientWidth;
+        if (!H || !W) return false;
+        var h = Math.min(H - 8, 520), w = h * 0.72;
+        var maxW = W * (W < 600 ? 0.58 : 0.4);
+        if (w > maxW) { w = maxW; h = w / 0.72; }
+        cw = Math.round(w); vw = W;
+        car.style.setProperty('--cw', cw + 'px');
+        car.style.setProperty('--ch', Math.round(h) + 'px');
+        return true;
+    }
+
     function layout() {
         var n = items.length;
-        if (!n) return;
-        var half = Math.min(2, Math.floor(n / 2));
-        var cw = items[0].node.offsetWidth || 160;
-        var X1 = cw * 0.80, X2 = cw * 1.38;
+        if (!n) { countEl.textContent = ''; return; }
+        var fl = Math.floor(n / 2);
+        var half = Math.min(vw < 600 ? 1 : 2, fl);
+        var X1 = cw * 0.74, X2 = cw * 1.26;
         items.forEach(function (it, i) {
-            /* eng qisqa aylanma masofa: -floor(n/2) ... +ceil(n/2)-1 */
-            var d = mod(i - cur + Math.floor(n / 2), n) - Math.floor(n / 2);
-            /* juft sonda ikki chetdagi bir xil card — faqat o'ng tomonda ko'rsatamiz */
-            var visible = Math.abs(d) <= half && !(n % 2 === 0 && d === -half && half === n / 2);
+            var d = mod(i - cur + fl, n) - fl;
+            if (n % 2 === 0 && d === -fl) d = fl;          // juft sonda chetdagi cardni o'ng tomonga qo'yamiz
             var a = Math.abs(d), sgn = d < 0 ? -1 : 1;
+            var visible = a <= half;
             var x = a === 0 ? 0 : (a === 1 ? X1 : (a === 2 ? X2 : X2 * 1.2)) * sgn;
-            var s = a === 0 ? 1 : (a === 1 ? 0.74 : (a === 2 ? 0.56 : 0.5));
+            var s = a === 0 ? 1 : (a === 1 ? 0.82 : (a === 2 ? 0.66 : 0.6));
             var node = it.node;
-            node.style.transform = 'translateX(' + x + 'px) scale(' + s + ')';
+            node.style.transform = 'translate3d(' + x + 'px,0,0) scale(' + s + ')';
             node.style.zIndex = String(10 - Math.min(a, 9));
-            node.style.opacity = visible ? (a === 0 ? '1' : (a === 1 ? '.85' : '.5')) : '0';
-            node.style.filter = a === 0 ? 'none' : 'brightness(' + (a === 1 ? '.7' : '.5') + ')';
+            node.style.opacity = visible ? (a === 0 ? '1' : (a === 1 ? '1' : '.75')) : '0';
             node.style.pointerEvents = visible ? 'auto' : 'none';
             node.tabIndex = visible ? 0 : -1;
             node.classList.toggle('center', d === 0);
+            it.dim.style.opacity = a === 0 ? '0' : (a === 1 ? '.2' : '.4');
         });
+        countEl.textContent = (cur + 1) + ' / ' + n;
     }
 
-    function go(i) { cur = mod(i, items.length || 1); layout(); }
+    function go(i, fromUser) {
+        if (!items.length) return;
+        var nc = mod(i, items.length);
+        if (nc === cur) return;
+        cur = nc; layout();
+        if (fromUser) buzz();
+    }
     function pauseAuto(ms) {
         paused = true; clearTimeout(resumeT);
         resumeT = setTimeout(function () { paused = false; }, ms || 6000);
@@ -692,32 +835,35 @@ document.addEventListener('DOMContentLoaded', function () {
         cards.forEach(function (c, i) {
             var b = el('button', 'pp-c'); b.type = 'button';
             var img = el('img'); img.src = c.image; img.alt = ''; img.draggable = false;
+            var dim = el('span', 'pp-c-dim');
             b.appendChild(img);
+            b.appendChild(dim);
             b.appendChild(el('span', 'pp-c-name', c.title));
             b.addEventListener('click', function () {
                 if (swiped) return;
                 if (i === cur) openCard(c.id);
-                else { go(i); pauseAuto(); }
+                else { go(i, true); pauseAuto(); }
             });
             track.appendChild(b);
-            items.push({ id: c.id, node: b });
+            items.push({ id: c.id, node: b, dim: dim });
         });
         var has = cards.length > 0;
         car.style.display = has ? 'block' : 'none';
-        emptyMsg.style.display = (!has && !own) ? 'block' : 'none';
+        emptyMsg.textContent = own ? "Hali card yo'q. Pastdagi «Card qo'shish» tugmasini bosing." : "Hali card qo'shilmagan.";
+        emptyMsg.style.display = has ? 'none' : 'block';
         if (cur >= items.length) cur = 0;
-        /* birinchi joylashuvda animatsiyasiz o'rnatamiz */
-        items.forEach(function (it) { it.node.style.transition = 'none'; });
+        sizeCards();
+        items.forEach(function (it) { it.node.style.transition = 'none'; it.dim.style.transition = 'none'; });
         layout();
         void track.offsetWidth;
-        items.forEach(function (it) { it.node.style.transition = ''; });
+        items.forEach(function (it) { it.node.style.transition = ''; it.dim.style.transition = ''; });
         var multi = items.length > 1;
         document.getElementById('ppPrev').style.visibility = multi ? '' : 'hidden';
         document.getElementById('ppNext').style.visibility = multi ? '' : 'hidden';
     }
 
-    document.getElementById('ppPrev').addEventListener('click', function () { go(cur - 1); pauseAuto(); });
-    document.getElementById('ppNext').addEventListener('click', function () { go(cur + 1); pauseAuto(); });
+    document.getElementById('ppPrev').addEventListener('click', function () { go(cur - 1, true); pauseAuto(); });
+    document.getElementById('ppNext').addEventListener('click', function () { go(cur + 1, true); pauseAuto(); });
 
     /* surish (swipe) */
     var sx = null, swiped = false;
@@ -726,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (sx === null) return;
         var dx = e.clientX - sx; sx = null;
         if (Math.abs(dx) > 40 && items.length > 1) {
-            swiped = true; go(dx < 0 ? cur + 1 : cur - 1); pauseAuto();
+            swiped = true; go(dx < 0 ? cur + 1 : cur - 1, true); pauseAuto();
             setTimeout(function () { swiped = false; }, 60);
         }
     });
@@ -734,17 +880,21 @@ document.addEventListener('DOMContentLoaded', function () {
     car.addEventListener('mouseenter', function () { pauseAuto(3000); });
     car.addEventListener('wheel', function (e) {
         if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 20 && items.length > 1) {
-            go(e.deltaX > 0 ? cur + 1 : cur - 1); pauseAuto();
+            go(e.deltaX > 0 ? cur + 1 : cur - 1, true); pauseAuto();
         }
     }, { passive: true });
-    window.addEventListener('resize', layout);
+
+    /* o'lcham o'zgarsa (burilish, resize) — qayta hisoblaymiz */
+    function relayout() { if (sizeCards()) layout(); }
+    if (window.ResizeObserver) new ResizeObserver(relayout).observe(car);
+    else window.addEventListener('resize', relayout);
 
     /* cheksiz avto-aylanish */
     if (!reduce) {
         timer = setInterval(function () {
             if (paused || document.hidden || document.querySelector('.pp-ov.open')) return;
             if (items.length < 2) return;
-            go(cur + 1);
+            go(cur + 1, false);
         }, 3500);
     }
 
